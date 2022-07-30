@@ -1,31 +1,80 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.runeduniverse.tools.runes4tools</groupId>
-	<artifactId>runes4tools-maven-plugin</artifactId>
+	<artifactId>runes4maven-maven-plugin</artifactId>
 	<version>0.0.1</version>
 	<packaging>maven-plugin</packaging>
 
-	<name>Runes4Tools Maven Plugin</name>
+	<name>Runes4Maven Plugin</name>
+	<inceptionYear>2022</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>RunedUniverse</name>
+		<url>https://www.runeduniverse.net</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>pl4yingnight</id>
+			<name>Pl4yingNight</name>
+			<email>pl4yingnight@gmail.com</email>
+			<organization>RunedUniverse</organization>
+			<organizationUrl>https://www.runeduniverse.net</organizationUrl>
+			<timezone>Europe/Vienna</timezone>
+			<roles>
+				<role>Maintainer</role>
+				<role>Founder</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/RunedUniverse/runes4maven</url>
+		<connection>scm:git:http://github.com/RunedUniverse/runes4maven.git</connection>
+		<developerConnection>scm:git:git@github.com:RunedUniverse/runes4maven.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/runes4maven/issues</url>
+	</issueManagement>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- VERSIONS -->
+		<maven-version-min>3.3.9</maven-version-min>
+		<maven-version>3.8.5</maven-version>
+		<plexus-component-version>1.7.1</plexus-component-version>
 	</properties>
+
+	<prerequisites>
+		<maven>${maven-version-min}</maven>
+	</prerequisites>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.maven</groupId>
 			<artifactId>maven-core</artifactId>
-			<version>3.8.5</version>
+			<version>${maven-version}</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- dependency for plexus annotation -->
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-component-annotations</artifactId>
-			<version>1.7.1</version>
+			<version>${plexus-component-version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
@@ -34,7 +83,11 @@
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>
-				<version>1.7.1</version>
+				<version>${plexus-component-version}</version>
+				<configuration>
+					<staticMetadataDirectory>${basedir}/src/main/plexus</staticMetadataDirectory>
+					<testStaticMetadataDirectory>${basedir}/src/test/plexus</testStaticMetadataDirectory>
+				</configuration>
 				<executions>
 					<execution>
 						<goals>

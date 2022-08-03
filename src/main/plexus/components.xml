@@ -1,0 +1,219 @@
+<component-set>
+	<components>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>bom</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>bom-sources</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+			<role-hint>app</role-hint>
+			<implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+			</implementation>
+			<configuration>
+				<type>app</type>
+				<includesDependencies>false</includesDependencies>
+				<addedToClasspath>true</addedToClasspath>
+				<packaging>app</packaging>
+			</configuration>
+		</component>
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>app</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<validate></validate>
+							<initialize></initialize>
+							<generate-sources></generate-sources>
+							<process-sources></process-sources>
+							<generate-resources></generate-resources>
+							<process-resources></process-resources>
+							<compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder
+							</compile>
+							<prepare-package></prepare-package>
+							<package></package>
+							<pre-integration-test></pre-integration-test>
+							<integration-test></integration-test>
+							<post-integration-test></post-integration-test>
+							<verify></verify>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>lib</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>unix-kernel-module</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>hexsocket-module</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
+			<role-hint>hexsocket-app</role-hint>
+			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
+			</implementation>
+			<configuration>
+				<lifecycles>
+					<lifecycle>
+						<id>default</id>
+						<phases>
+							<install>
+								org.apache.maven.plugins:maven-install-plugin:2.4:install
+							</install>
+							<deploy>
+								org.apache.maven.plugins:maven-deploy-plugin:2.7:deploy
+							</deploy>
+						</phases>
+					</lifecycle>
+				</lifecycles>
+			</configuration>
+		</component>
+
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>builder</role-hint>
+			<configuration>
+				<id>builder</id>
+				<phases>
+					<phase>builder-map-references</phase>
+					<phase>builder-pre-preprocessor</phase>
+					<phase>builder-preprocessor</phase>
+					<phase>builder-post-preprocessor</phase>
+					<phase>builder-pre-compiler</phase>
+					<phase>builder-compiler</phase>
+					<phase>builder-post-compiler</phase>
+					<phase>builder-pre-assembler</phase>
+					<phase>builder-assembler</phase>
+					<phase>builder-post-assembler</phase>
+					<phase>builder-pre-linker</phase>
+					<phase>builder-linker</phase>
+					<phase>builder-post-linker</phase>
+					<phase>builder-package</phase>
+				</phases>
+				<default-phases>
+					<builder-map-references>
+						net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-map-references
+					</builder-map-references>
+				</default-phases>
+			</configuration>
+		</component>
+		
+		<!-- DEFAULT :: LIFECYCLE -->
+		<!-- <phases> <phase>validate</phase> <phase>initialize</phase> <phase>generate-sources</phase> 
+			<phase>process-sources</phase> <phase>generate-resources</phase> <phase>process-resources</phase> 
+			<phase>compile</phase> <phase>process-classes</phase> <phase>generate-test-sources</phase> 
+			<phase>process-test-sources</phase> <phase>generate-test-resources</phase> 
+			<phase>process-test-resources</phase> <phase>test-compile</phase> <phase>process-test-classes</phase> 
+			<phase>test</phase> <phase>prepare-package</phase> <phase>package</phase> 
+			<phase>pre-integration-test</phase> <phase>integration-test</phase> <phase>post-integration-test</phase> 
+			<phase>verify</phase> <phase>install</phase> <phase>deploy</phase> </phases> -->
+
+	</components>
+</component-set>

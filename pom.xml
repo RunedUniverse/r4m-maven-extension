@@ -55,6 +55,8 @@
 		<maven-version-min>3.3.9</maven-version-min>
 		<maven-version>3.8.5</maven-version>
 		<plexus-component-version>1.7.1</plexus-component-version>
+
+		<maven-plugin-annotations-version>3.6.4</maven-plugin-annotations-version>
 	</properties>
 
 	<prerequisites>
@@ -79,7 +81,20 @@
 	</dependencies>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/maven</directory>
+				<targetPath>META-INF/maven</targetPath>
+			</resource>
+		</resources>
 		<plugins>
+			<plugin>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<version>2.3</version>
+				<configuration>
+					<goalPrefix>runes4maven</goalPrefix>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>

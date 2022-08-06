@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
  * Maps out all references of the source files to later be able to compile
  * source files in order
  * 
- * @author basti
+ * @author Pl4yingNight
  * @goal builder-map-references
  */
 public class MapReferencesMojo extends ABuilderMojo {

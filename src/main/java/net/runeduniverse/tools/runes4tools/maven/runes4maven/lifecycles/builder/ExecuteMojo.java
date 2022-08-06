@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 
 /**
  * Forks the builder lifecycle
- * @author basti
+ * @author Pl4yingNight
  * @goal builder
  * @execute lifecycle="builder" phase="builder-package"
  */

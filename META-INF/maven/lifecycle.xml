@@ -56,7 +56,6 @@
 			</phase>
 		</phases>
 	</lifecycle>
-	
 	<lifecycle>
 		<id>builder-test</id>
 		<phases>
@@ -112,4 +111,5 @@
 			</phase>
 		</phases>
 	</lifecycle>
+</lifecycles>
 </lifecycles>

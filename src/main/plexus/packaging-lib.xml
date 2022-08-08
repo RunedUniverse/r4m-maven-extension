@@ -1,6 +1,18 @@
 <component-set>
 	<components>
 		<component>
+			<role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+			<role-hint>lib</role-hint>
+			<implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler
+			</implementation>
+			<configuration>
+				<type>lib</type>
+				<includesDependencies>false</includesDependencies>
+				<addedToClasspath>true</addedToClasspath>
+				<packaging>lib</packaging>
+			</configuration>
+		</component>
+		<component>
 			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
 			<role-hint>lib</role-hint>
 			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
@@ -10,6 +22,27 @@
 					<lifecycle>
 						<id>default</id>
 						<phases>
+							<validate></validate>
+							<initialize></initialize>
+							<generate-sources></generate-sources>
+							<process-sources></process-sources>
+							<generate-resources></generate-resources>
+							<process-resources></process-resources>
+							<compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-main
+							</compile>
+							<generate-test-sources></generate-test-sources>
+							<process-test-sources></process-test-sources>
+							<generate-test-resources></generate-test-resources>
+							<process-test-resources></process-test-resources>
+							<test-compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-test
+							</test-compile>
+							<test></test>
+							<prepare-package></prepare-package>
+							<package></package>
+							<pre-integration-test></pre-integration-test>
+							<integration-test></integration-test>
+							<post-integration-test></post-integration-test>
+							<verify></verify>
 							<install>
 								org.apache.maven.plugins:maven-install-plugin:2.4:install
 							</install>

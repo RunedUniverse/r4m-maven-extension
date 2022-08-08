@@ -28,8 +28,6 @@
 							<process-sources></process-sources>
 							<generate-resources></generate-resources>
 							<process-resources></process-resources>
-							<compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder
-							</compile>
 							<prepare-package></prepare-package>
 							<package></package>
 							<pre-integration-test></pre-integration-test>

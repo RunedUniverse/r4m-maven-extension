@@ -7,7 +7,7 @@
 			<configuration>
 				<id>builder</id>
 				<phases>
-					<phase>builder-map-references</phase>
+					<phase>builder-scan-references</phase>
 					<phase>builder-pre-preprocessor</phase>
 					<phase>builder-preprocessor</phase>
 					<phase>builder-post-preprocessor</phase>
@@ -23,9 +23,9 @@
 					<phase>builder-package</phase>
 				</phases>
 				<default-phases>
-					<builder-map-references>
-						net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-map-references
-					</builder-map-references>
+					<builder-scan-references>
+						net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-scan-references
+					</builder-scan-references>
 				</default-phases>
 			</configuration>
 		</component>

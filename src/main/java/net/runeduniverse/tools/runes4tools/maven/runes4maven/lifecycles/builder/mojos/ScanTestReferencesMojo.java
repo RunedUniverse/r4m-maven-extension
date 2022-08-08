@@ -25,14 +25,14 @@ public class ScanTestReferencesMojo extends ATestBuilderMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		scanner.inject(this.runtime)
-				.inject(this.fileScanner)
-				.inject(this.references);
-
+		/*
+		 * scanner.inject(this.runtime) .inject(this.fileScanner)
+		 * .inject(this.references);
+		 */
 		getLog().info("mapping references of source-files");
-		scanner.logInfo(getLog());
+		// scanner.logInfo(getLog());
 		// TODO collect collectors from compiler plugins and run those
-		scanner.logAnalisis(getLog());
+		// scanner.logAnalisis(getLog());
 		getLog().info("finished mapping references of source-files");
 	}
 

@@ -22,11 +22,6 @@
 					<phase>builder-post-linker</phase>
 					<phase>builder-package</phase>
 				</phases>
-				<default-phases>
-					<builder-scan-references>
-						net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-scan-references
-					</builder-scan-references>
-				</default-phases>
 			</configuration>
 		</component>
 	</components>

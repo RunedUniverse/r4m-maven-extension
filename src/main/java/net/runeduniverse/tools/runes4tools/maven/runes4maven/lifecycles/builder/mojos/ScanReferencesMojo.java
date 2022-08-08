@@ -32,9 +32,9 @@ public class ScanReferencesMojo extends AMainBuilderMojo {
 		 */
 
 		getLog().info("mapping references of source-files");
-		scanner.logInfo(getLog());
+		//scanner.logInfo(getLog());
 		// TODO collect collectors from compiler plugins and run those
-		scanner.logAnalisis(getLog());
+		//scanner.logAnalisis(getLog());
 		getLog().info("finished mapping references of source-files");
 	}
 }

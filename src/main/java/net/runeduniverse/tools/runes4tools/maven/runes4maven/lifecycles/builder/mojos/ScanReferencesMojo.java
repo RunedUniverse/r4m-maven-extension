@@ -37,5 +37,4 @@ public class ScanReferencesMojo extends AMainBuilderMojo {
 		scanner.logAnalisis(getLog());
 		getLog().info("finished mapping references of source-files");
 	}
-
 }

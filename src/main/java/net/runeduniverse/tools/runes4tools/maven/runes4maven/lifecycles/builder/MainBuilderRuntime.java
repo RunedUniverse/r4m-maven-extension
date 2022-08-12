@@ -10,9 +10,9 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.Runes4MavenProperti
 @Component(role = BuilderRuntime.class, hint = "builder-main")
 public class MainBuilderRuntime implements BuilderRuntime {
 
-	@Parameter(property = Runes4MavenProperties.LIFECYCLE.BUILDER.SOURCE_DIR, defaultValue = "${project.build.sourceDirectory}", required = true)
+	@Parameter(property = Runes4MavenProperties.LIFECYCLE.BUILDER.PARAM_SOURCE_DIR, defaultValue = "${project.build.sourceDirectory}", required = true)
 	File sourceDirectory;
-	@Parameter(property = Runes4MavenProperties.LIFECYCLE.BUILDER.TARGET_DIR, defaultValue = "${project.build.outputDirectory}", required = true)
+	@Parameter(property = Runes4MavenProperties.LIFECYCLE.BUILDER.PARAM_TARGET_DIR, defaultValue = "${project.build.outputDirectory}", required = true)
 	File targetDirectory;
 
 	@Override

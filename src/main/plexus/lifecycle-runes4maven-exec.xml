@@ -1,0 +1,17 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>runes4maven-exec</role-hint>
+			<configuration>
+				<id>runes4maven-exec</id>
+				<phases>
+					<phase>runes4maven-exec#builder</phase>
+					<phase>runes4maven-exec#builder@default</phase>
+					<phase>runes4maven-exec#builder@test</phase>
+				</phases>
+			</configuration>
+		</component>
+	</components>
+</component-set>

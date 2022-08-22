@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.exec.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
 
 public class LifecycleDescriptor {
 	private String prefix;
@@ -40,7 +40,7 @@ public class LifecycleDescriptor {
 	}
 
 	public static LifecycleDescriptor fromTask(String task) {
-		// task: runes4maven-exec#builder@default
+		// task: runes4maven-inject#builder@default
 		int len = task.length();
 		int splitIdx = task.indexOf('#');
 

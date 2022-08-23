@@ -6,6 +6,8 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.Runes4MavenProp
 public interface Properties {
 	public static String VAL_PREFIX = MavenProperties.VAL_PREFIX;
 	public static String VAL_POSTFIX = MavenProperties.VAL_POSTFIX;
+	public static String DEFAULT_LIFECYCLE_ID = MavenProperties.VAL_DEFAULT_LIFECYCLE_ID;
+	public static String DEFAULT_EXECUTION_ID = MavenProperties.VAL_DEFAULT_EXECUTION_ID;
 
 	public interface PROJECT {
 		public interface BUILD extends MavenProperties.PROJECT.BUILD {
@@ -14,6 +16,7 @@ public interface Properties {
 
 	public interface LIFECYCLE {
 		public interface INJECT extends Runes4MavenProperties.LIFECYCLE.INJECT {
+			public static String DEFAULT_EXECUTION_ID = Properties.DEFAULT_EXECUTION_ID;
 		}
 
 		public interface BUILDER extends Runes4MavenProperties.LIFECYCLE.BUILDER {

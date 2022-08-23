@@ -1,12 +1,14 @@
 package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
 
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
+
 public class LifecycleDescriptor {
 	private String prefix;
 	private String lifecycleId;
 	private String executionId;
 
 	public LifecycleDescriptor() {
-		this(null, null, null);
+		this(null, Properties.DEFAULT_LIFECYCLE_ID, Properties.DEFAULT_EXECUTION_ID);
 	}
 
 	public LifecycleDescriptor(String prefix, String lifecycleId, String executionId) {

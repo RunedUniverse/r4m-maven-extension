@@ -1,10 +1,15 @@
 package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
 
 import org.apache.maven.plugin.MavenPluginManager;
+import org.codehaus.plexus.util.xml.XmlStreamReader;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
+
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
 
 public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 
+	// @Requirement
 	private MavenPluginManager pluginManager;
 
 	public DefaultExecutionArchiveParser(MavenPluginManager pluginManager) {
@@ -16,8 +21,13 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 			return;
 		// parse Maven-Plugin -> executions.xml
 
+		XmlStreamReader inputStreamReader;
+
+		Xpp3Dom executionCfg = Xpp3DomBuilder.build(inputStreamReader, "UTF-8");
+		// Xpp3Dom executionCfg = Xpp3DomBuilder.build(inputStreamReader, false);
+
 		// TODO parse
-		Plugin plugin = new Plugin(null, null, null);
+		Plugin plugin = new Plugin(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), null);
 
 		archive.register(mvnPlugin, plugin);
 	}

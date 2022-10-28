@@ -3,7 +3,7 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven.api;
 public interface Runes4MavenProperties {
 	public interface LIFECYCLE {
 		public interface INJECT {
-			public static String LIFECYCLE_HINT = "runes4maven-inject";
+			public static String LIFECYCLE_HINT = "r4m-inject";
 
 			public static String PHASE_BUILDER = LIFECYCLE_HINT + "#builder";
 			public static String PHASE_BUILDER_default = PHASE_BUILDER + "@default";

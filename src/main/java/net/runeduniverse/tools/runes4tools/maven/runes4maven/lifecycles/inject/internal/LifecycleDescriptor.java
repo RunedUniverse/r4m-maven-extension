@@ -42,22 +42,23 @@ public class LifecycleDescriptor {
 	}
 
 	public static LifecycleDescriptor fromTask(String task) {
-		// task: runes4maven-inject#builder@default
-		int len = task.length();
-		int splitIdx = task.indexOf('#');
-
+		// task: r4m-inject#builder@default
 		String prefix = null;
 		String lifecycleId = null;
 		String executionId = null;
-		if (0 < splitIdx)
-			prefix = task.substring(0, splitIdx);
-		if (++splitIdx < len)
-			lifecycleId = task.substring(splitIdx);
-		splitIdx = task.indexOf('@');
-		if (0 < splitIdx)
-			lifecycleId = lifecycleId.substring(0, splitIdx);
-		if (++splitIdx < len)
-			executionId = task.substring(splitIdx);
+
+		int len = task.length();
+		int splitLifecycleIdx = task.indexOf('#');
+		if (0 < splitLifecycleIdx)
+			prefix = task.substring(0, splitLifecycleIdx);
+		if (++splitLifecycleIdx < len)
+			lifecycleId = task.substring(splitLifecycleIdx);
+		int splitExecutionIdx = task.indexOf('@');
+		if (0 < splitExecutionIdx)
+			lifecycleId = lifecycleId.substring(0, splitExecutionIdx - splitLifecycleIdx);
+		if (++splitExecutionIdx < len)
+			executionId = task.substring(splitExecutionIdx);
+
 		return new LifecycleDescriptor(prefix, lifecycleId, executionId);
 	}
 }

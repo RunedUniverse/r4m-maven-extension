@@ -2,7 +2,7 @@
 	<components>
 		<component>
 			<role>org.apache.maven.lifecycle.mapping.LifecycleMapping</role>
-			<role-hint>unix-kernel-module</role-hint>
+			<role-hint>linux-kernel-module</role-hint>
 			<implementation>org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping
 			</implementation>
 			<configuration>

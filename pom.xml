@@ -47,13 +47,6 @@
 		<url>https://github.com/RunedUniverse/runes4maven/issues</url>
 	</issueManagement>
 
-	<repositories>
-		<repository>
-			<id>runeduniverse-releases</id>
-			<url>https://nexus.runeduniverse.net/repository/maven-development/</url>
-		</repository>
-	</repositories>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
@@ -115,7 +108,7 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>${maven-plugin-plugin-version}</version>
 				<configuration>
-					<goalPrefix>runes4maven</goalPrefix>
+					<goalPrefix>r4m</goalPrefix>
 				</configuration>
 			</plugin>
 			<plugin>

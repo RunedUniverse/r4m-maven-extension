@@ -7,20 +7,20 @@
 			<configuration>
 				<id>builder</id>
 				<phases>
-					<phase>builder-scan-references</phase>
-					<phase>builder-pre-preprocessor</phase>
-					<phase>builder-preprocessor</phase>
-					<phase>builder-post-preprocessor</phase>
-					<phase>builder-pre-compiler</phase>
-					<phase>builder-compiler</phase>
-					<phase>builder-post-compiler</phase>
-					<phase>builder-pre-assembler</phase>
-					<phase>builder-assembler</phase>
-					<phase>builder-post-assembler</phase>
-					<phase>builder-pre-linker</phase>
-					<phase>builder-linker</phase>
-					<phase>builder-post-linker</phase>
-					<phase>builder-package</phase>
+					<phase>scan-references</phase>
+					<phase>pre-preprocessor</phase>
+					<phase>preprocessor</phase>
+					<phase>post-preprocessor</phase>
+					<phase>pre-compiler</phase>
+					<phase>compiler</phase>
+					<phase>post-compiler</phase>
+					<phase>pre-assembler</phase>
+					<phase>assembler</phase>
+					<phase>post-assembler</phase>
+					<phase>pre-linker</phase>
+					<phase>linker</phase>
+					<phase>post-linker</phase>
+					<phase>bin-package</phase>
 				</phases>
 			</configuration>
 		</component>

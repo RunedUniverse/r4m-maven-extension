@@ -15,7 +15,7 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.builder.
  * 
  * @author Pl4yingNight
  * @goal builder-scan-references
- * @phase builder-scan-references
+ * @phase scan-references
  */
 public class ScanReferencesMojo extends AMainBuilderMojo {
 

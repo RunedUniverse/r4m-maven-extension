@@ -81,11 +81,9 @@ public class ExecutionBuilder {
 			// TODO resolve/create MojoExecutions
 
 			// for Goal
-			MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
-					project.getRemotePluginRepositories(), session.getRepositorySession());
+			//MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,	project.getRemotePluginRepositories(), session.getRepositorySession());
 
-			MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, descriptor.getExecutionId(),
-					MojoExecution.Source.LIFECYCLE);
+			//MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, descriptor.getExecutionId(), MojoExecution.Source.LIFECYCLE);
 
 			//
 

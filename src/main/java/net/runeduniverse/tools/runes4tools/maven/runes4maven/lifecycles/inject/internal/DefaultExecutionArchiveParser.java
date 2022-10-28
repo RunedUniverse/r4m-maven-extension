@@ -2,9 +2,6 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.
 
 import org.apache.maven.plugin.MavenPluginManager;
 import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
 
 public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
@@ -23,7 +20,7 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 
 		XmlStreamReader inputStreamReader;
 
-		Xpp3Dom executionCfg = Xpp3DomBuilder.build(inputStreamReader, "UTF-8");
+		//Xpp3Dom executionCfg = Xpp3DomBuilder.build(inputStreamReader, "UTF-8");
 		// Xpp3Dom executionCfg = Xpp3DomBuilder.build(inputStreamReader, false);
 
 		// TODO parse

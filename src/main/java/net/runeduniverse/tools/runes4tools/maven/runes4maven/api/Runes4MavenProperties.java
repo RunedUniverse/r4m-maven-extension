@@ -16,4 +16,11 @@ public interface Runes4MavenProperties {
 			public static String PARAM_TARGET_DIR = "runes4maven.builder.target.dir";
 		}
 	}
+
+	public interface METAINF extends MavenProperties.METAINF {
+		public interface RUNES4MAVEN {
+			public static String PATH = METAINF.PATH + "runes4maven/";
+			public static String EXECUTIONS = PATH + "executions.xml";
+		}
+	}
 }

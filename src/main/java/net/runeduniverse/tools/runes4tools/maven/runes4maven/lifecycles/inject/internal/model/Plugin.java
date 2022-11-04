@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.ExecutionDescriptor;
+
 public class Plugin {
 
 	private final String groupId;
@@ -12,7 +14,8 @@ public class Plugin {
 	private final Map<String, Execution> executions;
 
 	private String prefix = null;
-	private PluginDescriptor descriptor = null;
+	private PluginDescriptor pluginDescriptor = null;
+	private ExecutionDescriptor executionDescriptor = null;
 
 	public Plugin(final String groupId, final String artifactId, final String prefix) {
 		this.groupId = groupId;
@@ -38,7 +41,11 @@ public class Plugin {
 	}
 
 	public PluginDescriptor getDescriptor() {
-		return this.descriptor;
+		return this.pluginDescriptor;
+	}
+
+	public ExecutionDescriptor getExecutionDescriptor() {
+		return this.executionDescriptor;
 	}
 
 	public Execution getExecution(String id) {
@@ -54,7 +61,13 @@ public class Plugin {
 	}
 
 	public void setDescriptor(PluginDescriptor descriptor) {
-		this.descriptor = descriptor;
+		this.pluginDescriptor = descriptor;
+	}
+
+	public void setExecutionDescriptor(ExecutionDescriptor descriptor) {
+		this.executionDescriptor = descriptor;
+		this.executions.clear();
+		this.executionDescriptor.populate(this);
 	}
 
 	public void putExecution(Execution execution) {

@@ -17,4 +17,24 @@ public interface MavenProperties {
 			public static String PARAM_SCRIPT_SOURCE_DIR = "project.build.scriptSourceDirectory";
 		}
 	}
+
+	public interface METAINF {
+		public static String PATH = "META-INF/";
+
+		public interface MAVEN {
+			public static String PATH = METAINF.PATH + "maven/";
+			public static String PLUGIN_DESCRIPTOR = PATH + "plugin.xml";
+			public static String EXTENSIONS = PATH + "extension.xml";
+		}
+
+		public interface PLEXUS {
+			public static String PATH = METAINF.PATH + "plexus/";
+			public static String COMPONENTS = PATH + "components.xml";
+		}
+
+		public interface SISU {
+			public static String PATH = METAINF.PATH + "sisu/";
+			public static String NAMED_CONFIG = PATH + "javax.inject.Named";
+		}
+	}
 }

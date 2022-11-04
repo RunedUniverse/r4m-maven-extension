@@ -6,12 +6,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
@@ -23,7 +21,7 @@ public class ExecutionBuilder {
 	protected final ExecutionArchive archive;
 	protected final MavenProject mvnProject;
 
-	protected List<String> lifecyclePhases = null;
+	protected List<String> lifecyclePhases = new ArrayList<>();
 	protected MvnPluginFilter mvnPluginFilter = null;
 	protected String executionId = Properties.LIFECYCLE.INJECT.DEFAULT_EXECUTION_ID;
 
@@ -41,7 +39,7 @@ public class ExecutionBuilder {
 	public ExecutionBuilder applyLifecycle(Lifecycle lifecycle) {
 		// seed mappings with defined lifecycle phases
 		if (lifecycle == null)
-			this.lifecyclePhases = null;
+			this.lifecyclePhases = new ArrayList<>();
 		else
 			this.lifecyclePhases = lifecycle.getPhases();
 		return this;

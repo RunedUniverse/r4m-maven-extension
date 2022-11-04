@@ -42,7 +42,7 @@ public class InjectLifecycleMappingDelegate implements LifecycleMappingDelegate 
 	}
 
 	@Override
-	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject mvnProject,
+	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
 			Lifecycle injectLifecycle, String injectLifecyclePhase)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException {
@@ -53,7 +53,7 @@ public class InjectLifecycleMappingDelegate implements LifecycleMappingDelegate 
 
 		for (Plugin mvnPlugin : mvnProject.getBuild()
 				.getPlugins()) {
-			parser.parsePlugin(this.archive, mvnPlugin);
+			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);
 		}
 
 		ExecutionBuilder builder = this.archive.createBuilder(mvnProject);

@@ -29,28 +29,17 @@ public interface Properties {
 		}
 	}
 
-	public interface METAINF {
-		public static String PATH = "META-INF/";
-
-		public interface MAVEN {
-			public static String PATH = METAINF.PATH + "maven/";
-			public static String PLUGIN_DESCRIPTOR = PATH + "plugin.xml";
-			public static String EXTENSIONS = PATH + "extension.xml";
+	public interface METAINF extends MavenProperties.METAINF {
+		public interface MAVEN extends MavenProperties.METAINF.MAVEN {
 		}
 
-		public interface RUNES4MAVEN {
-			public static String PATH = METAINF.PATH + "runes4maven/";
-			public static String EXECUTIONS = PATH + "executions.xml";
+		public interface RUNES4MAVEN extends Runes4MavenProperties.METAINF.RUNES4MAVEN {
 		}
 
-		public interface PLEXUS {
-			public static String PATH = METAINF.PATH + "plexus/";
-			public static String COMPONENTS = PATH + "components.xml";
+		public interface PLEXUS extends MavenProperties.METAINF.PLEXUS {
 		}
 
-		public interface SISU {
-			public static String PATH = METAINF.PATH + "sisu/";
-			public static String NAMED_CONFIG = PATH + "javax.inject.Named";
+		public interface SISU extends MavenProperties.METAINF.SISU {
 		}
 	}
 }

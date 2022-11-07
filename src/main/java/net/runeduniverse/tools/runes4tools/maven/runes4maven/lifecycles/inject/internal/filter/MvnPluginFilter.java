@@ -10,7 +10,7 @@ import org.apache.maven.model.Plugin;
  */
 @FunctionalInterface
 public interface MvnPluginFilter {
-	public boolean apply(org.apache.maven.model.Plugin plugin);
+	public boolean apply(Plugin mvnPlugin);
 
 	default MvnPluginFilter and(MvnPluginFilter filter) {
 		return new And(this, filter);
@@ -30,8 +30,8 @@ public interface MvnPluginFilter {
 		}
 
 		@Override
-		public boolean apply(Plugin plugin) {
-			return this.a.apply(plugin) && this.b.apply(plugin);
+		public boolean apply(Plugin mvnPlugin) {
+			return this.a.apply(mvnPlugin) && this.b.apply(mvnPlugin);
 		}
 
 	}
@@ -46,8 +46,8 @@ public interface MvnPluginFilter {
 		}
 
 		@Override
-		public boolean apply(Plugin plugin) {
-			return this.a.apply(plugin) || this.b.apply(plugin);
+		public boolean apply(Plugin mvnPlugin) {
+			return this.a.apply(mvnPlugin) || this.b.apply(mvnPlugin);
 		}
 
 	}

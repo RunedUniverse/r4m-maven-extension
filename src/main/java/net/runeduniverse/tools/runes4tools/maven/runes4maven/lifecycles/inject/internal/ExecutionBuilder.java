@@ -2,7 +2,6 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,15 +17,15 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.i
 
 public class ExecutionBuilder {
 
-	protected final ExecutionArchive archive;
+	protected final ExecutionArchiveSubset archive;
 	protected final MavenProject mvnProject;
 
 	protected List<String> lifecyclePhases = new ArrayList<>();
 	protected MvnPluginFilter mvnPluginFilter = null;
 	protected String executionId = Properties.LIFECYCLE.INJECT.DEFAULT_EXECUTION_ID;
 
-	public ExecutionBuilder(ExecutionArchive archive, MavenProject mvnProject) {
-		this.archive = archive;
+	public ExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject) {
+		this.archive = archiveSubset;
 		this.mvnProject = mvnProject;
 	}
 
@@ -61,12 +60,13 @@ public class ExecutionBuilder {
 
 	protected Map<String, List<Goal>> collectGoals() {
 		Map<String, List<Goal>> phaseGoalMapping = new LinkedHashMap<>();
-		for (String phase : this.lifecyclePhases) {
-			List<Goal> goals = new LinkedList<>();
+		Map<String, List<Goal>> phaseGoalExecMapping = this.archive
+				.filterRegistry(this.mvnPluginFilter, (r4mPlugin) -> r4mPlugin.getExecution(this.executionId) != null)
+				.phaseMapGoals(this.executionId);
 
-			// TODO collect goals
-			phaseGoalMapping.put(phase, goals);
-		}
+		for (String phase : this.lifecyclePhases)
+			phaseGoalMapping.put(phase, phaseGoalExecMapping.get(phase));
+
 		return phaseGoalMapping;
 	}
 
@@ -79,9 +79,11 @@ public class ExecutionBuilder {
 			// TODO resolve/create MojoExecutions
 
 			// for Goal
-			//MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,	project.getRemotePluginRepositories(), session.getRepositorySession());
+			// MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
+			// project.getRemotePluginRepositories(), session.getRepositorySession());
 
-			//MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, descriptor.getExecutionId(), MojoExecution.Source.LIFECYCLE);
+			// MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
+			// descriptor.getExecutionId(), MojoExecution.Source.LIFECYCLE);
 
 			//
 

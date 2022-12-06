@@ -67,7 +67,8 @@ public class Plugin {
 	public void setExecutionDescriptor(ExecutionDescriptor descriptor) {
 		this.executionDescriptor = descriptor;
 		this.executions.clear();
-		this.executionDescriptor.populate(this);
+		if (this.executionDescriptor != null)
+			this.executionDescriptor.populate(this);
 	}
 
 	public void putExecution(Execution execution) {

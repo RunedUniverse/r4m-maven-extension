@@ -40,12 +40,15 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 			return;
 		// parse Maven-Plugin -> executions.xml
 		Plugin plugin = new Plugin(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), null);
+		ExecutionDescriptor executionDescriptor = null;
 
 		try {
 			plugin.setDescriptor(pluginManager.getPluginDescriptor(mvnPlugin, mvnProject.getRemotePluginRepositories(),
 					mvnSession.getRepositorySession()));
-			plugin.setExecutionDescriptor(extractExecutionDescriptor(plugin.getDescriptor()
-					.getPluginArtifact(), mvnPlugin));
+			executionDescriptor = extractExecutionDescriptor(plugin.getDescriptor()
+					.getPluginArtifact(), mvnPlugin);
+			if (executionDescriptor != null)
+				plugin.setExecutionDescriptor(executionDescriptor);
 		} catch (PluginResolutionException | PluginDescriptorParsingException | ExecutionDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
 			e.printStackTrace();
@@ -57,7 +60,6 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 	private ExecutionDescriptor extractExecutionDescriptor(Artifact pluginArtifact,
 			org.apache.maven.model.Plugin mvnPlugin) throws ExecutionDescriptorParsingException {
 		ExecutionDescriptor executionDescriptor = null;
-
 		File pluginFile = pluginArtifact.getFile();
 
 		try {
@@ -78,10 +80,6 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 						executionDescriptor = parseExecutionDescriptor(is, mvnPlugin, executionXml.getAbsolutePath());
 					}
 				}
-			}
-
-			if (executionDescriptor == null) {
-				throw new IOException("No execution descriptor found at " + Properties.METAINF.RUNES4MAVEN.EXECUTIONS);
 			}
 		} catch (IOException e) {
 			throw new ExecutionDescriptorParsingException(mvnPlugin, pluginFile.getAbsolutePath(), e);

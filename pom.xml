@@ -7,6 +7,7 @@
 	<packaging>maven-plugin</packaging>
 
 	<name>Runes4Maven Plugin</name>
+	<url>https://github.com/RunedUniverse/runes4maven</url>
 	<inceptionYear>2022</inceptionYear>
 
 	<licenses>
@@ -53,7 +54,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
-		<maven-version>3.8.5</maven-version>
+		<maven-version>3.8.4</maven-version>
 		<!-- VERSIONS : compiler -->
 		<plexus-component-version>1.7.1</plexus-component-version>
 		<maven-plugin-annotations-version>3.6.4</maven-plugin-annotations-version>
@@ -71,17 +72,22 @@
 			<version>${maven-version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+			<version>3.3.0</version>
+		</dependency>
 
 		<!-- logging utilities-->
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-common</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
-			<version>1.0.0</version>
+			<version>1.0.1</version>
 		</dependency>
 
 

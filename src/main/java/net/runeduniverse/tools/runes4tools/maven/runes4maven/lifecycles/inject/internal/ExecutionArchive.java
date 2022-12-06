@@ -35,8 +35,9 @@ public class ExecutionArchive {
 		return new Subset(this.pluginRegistry);
 	}
 
-	public ExecutionBuilder createBuilder(final MavenProject mvnProject) {
-		return new ExecutionBuilder(this.newSubset(), mvnProject);
+	public ExecutionBuilder createBuilder(final MavenProject mvnProject, final String executingLifecyclePhase,
+			final ForkMojoDescriptor preForkMojo, final ForkMojoDescriptor postForkMojo) {
+		return new ExecutionBuilder(this.newSubset(), mvnProject, executingLifecyclePhase, preForkMojo, postForkMojo);
 	}
 
 	private class Subset implements ExecutionArchiveSubset {

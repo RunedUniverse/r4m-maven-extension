@@ -47,14 +47,16 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 					mvnSession.getRepositorySession()));
 			executionDescriptor = extractExecutionDescriptor(plugin.getDescriptor()
 					.getPluginArtifact(), mvnPlugin);
-			if (executionDescriptor != null)
-				plugin.setExecutionDescriptor(executionDescriptor);
 		} catch (PluginResolutionException | PluginDescriptorParsingException | ExecutionDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
 			e.printStackTrace();
 		}
-
 		archive.register(mvnPlugin, plugin);
+
+		if (executionDescriptor == null)
+			return;
+
+		plugin.setExecutionDescriptor(executionDescriptor);
 	}
 
 	private ExecutionDescriptor extractExecutionDescriptor(Artifact pluginArtifact,

@@ -2,12 +2,14 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
@@ -15,18 +17,28 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter.MvnPluginFilter;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Goal;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 public class ExecutionBuilder {
 
 	protected final ExecutionArchiveSubset archive;
 	protected final MavenProject mvnProject;
+	protected final String executingLifecyclePhase;
+	protected final ForkMojoDescriptor preForkMojo;
+	protected final ForkMojoDescriptor postForkMojo;
 
 	protected List<String> lifecyclePhases = new ArrayList<>();
 	protected MvnPluginFilter mvnPluginFilter = null;
 	protected String executionId = Properties.LIFECYCLE.INJECT.DEFAULT_EXECUTION_ID;
 
-	public ExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject) {
+	public ExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject,
+			final String executingLifecyclePhase, final ForkMojoDescriptor preForkMojo,
+			final ForkMojoDescriptor postForkMojo) {
 		this.archive = archiveSubset;
 		this.mvnProject = mvnProject;
+		this.executingLifecyclePhase = executingLifecyclePhase;
+		this.preForkMojo = preForkMojo;
+		this.postForkMojo = postForkMojo;
 	}
 
 	/*
@@ -65,7 +77,7 @@ public class ExecutionBuilder {
 				.phaseMapGoals(this.executionId);
 
 		for (String phase : this.lifecyclePhases)
-			phaseGoalMapping.put(phase, phaseGoalExecMapping.get(phase));
+			phaseGoalMapping.put(phase, phaseGoalExecMapping.getOrDefault(phase, new LinkedList<>()));
 
 		return phaseGoalMapping;
 	}
@@ -73,23 +85,24 @@ public class ExecutionBuilder {
 	protected Map<String, Map<Integer, List<MojoExecution>>> convertExecutions(
 			Map<String, List<Goal>> phaseGoalMapping) {
 		Map<String, Map<Integer, List<MojoExecution>>> phaseExecutionMapping = new LinkedHashMap<>();
+		Map<ForkMojoDescriptor, MojoExecution> forkMojos = new LinkedHashMap<>();
+
+		if (this.preForkMojo != null)
+			installForkMojo(phaseExecutionMapping, forkMojos, this.preForkMojo);
+		installForkMojo(phaseExecutionMapping, forkMojos, this.postForkMojo);
+
+		List<MojoExecution> forkExecutions = new LinkedList<>();
 		for (Entry<String, List<Goal>> entry : phaseGoalMapping.entrySet()) {
-			Map<Integer, List<MojoExecution>> executionTree = new TreeMap<>();
-
-			// TODO resolve/create MojoExecutions
-
-			// for Goal
-			// MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
-			// project.getRemotePluginRepositories(), session.getRepositorySession());
-
-			// MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
-			// descriptor.getExecutionId(), MojoExecution.Source.LIFECYCLE);
-
-			//
-
-			phaseExecutionMapping.put(entry.getKey(), executionTree);
+			for (Goal goal : entry.getValue()) {
+				MojoExecution mojo = new MojoExecution(goal.getDescriptor(), this.executionId,
+						MojoExecution.Source.LIFECYCLE);
+				mojo.setLifecyclePhase(entry.getKey());
+				forkExecutions.add(mojo);
+			}
 		}
 
+		forkMojos.get(this.postForkMojo)
+				.setForkedExecutions(BuilderCommon.getKey(this.mvnProject), forkExecutions);
 		return phaseExecutionMapping;
 	}
 
@@ -107,5 +120,19 @@ public class ExecutionBuilder {
 			mapping.put(entry.getKey(), mojoExecutions);
 		}
 		return mapping;
+	}
+
+	protected void installForkMojo(final Map<String, Map<Integer, List<MojoExecution>>> phaseExecutionMapping,
+			final Map<ForkMojoDescriptor, MojoExecution> forkMojos, final ForkMojoDescriptor forkMojo) {
+		String execId = forkMojo.getExecutionId();
+		MojoExecution mojo = new MojoExecution(forkMojo.getMvnPlugin(), forkMojo.getGoal(),
+				isBlank(execId) ? this.executionId : execId);
+		String forkPhase = forkMojo.getExecutionId();
+		Map<Integer, List<MojoExecution>> executionTree = new TreeMap<>();
+		phaseExecutionMapping.put(isBlank(forkPhase) ? this.executingLifecyclePhase : forkPhase, executionTree);
+		List<MojoExecution> forkMojoExecutions = new ArrayList<>();
+		executionTree.put(0, forkMojoExecutions);
+		forkMojoExecutions.add(mojo);
+		forkMojos.put(forkMojo, mojo);
 	}
 }

@@ -22,6 +22,7 @@ import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.Runes4MavenProp
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.DefaultExecutionArchiveParser;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.ExecutionArchive;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.ExecutionBuilder;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.ForkMojoDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.LifecycleDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter.MvnPluginFilter;
 
@@ -56,7 +57,10 @@ public class InjectLifecycleMappingDelegate implements LifecycleMappingDelegate 
 			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);
 		}
 
-		ExecutionBuilder builder = this.archive.createBuilder(mvnProject);
+		// TODO add correct data
+		Plugin thisPlugin = mvnProject.getPlugin("net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin");
+		ExecutionBuilder builder = this.archive.createBuilder(mvnProject, "builder", null,
+				ForkMojoDescriptor.create(thisPlugin, "scan-references", "builder-scan-references", null));
 
 		builder.applyLifecycle(targetLifecycle);
 

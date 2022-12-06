@@ -1,12 +1,11 @@
 package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
-
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class ExecutionDescriptor {
@@ -32,8 +31,7 @@ public class ExecutionDescriptor {
 		return this.executions.put(id, execution);
 	}
 
-	public void populate(Plugin plugin) {
-		for (Execution item : executions.values())
-			plugin.putExecution(item);
+	public Collection<Execution> getExecutions() {
+		return this.executions.values();
 	}
 }

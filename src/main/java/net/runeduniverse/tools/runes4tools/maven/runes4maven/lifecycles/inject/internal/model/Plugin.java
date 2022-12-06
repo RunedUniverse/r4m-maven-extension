@@ -62,16 +62,26 @@ public class Plugin {
 
 	public void setDescriptor(PluginDescriptor descriptor) {
 		this.pluginDescriptor = descriptor;
+		this.prefix = this.pluginDescriptor.getGoalPrefix();
 	}
 
 	public void setExecutionDescriptor(ExecutionDescriptor descriptor) {
 		this.executionDescriptor = descriptor;
 		this.executions.clear();
-		if (this.executionDescriptor != null)
-			this.executionDescriptor.populate(this);
+		for (Execution item : this.executionDescriptor.getExecutions())
+			this.executions.put(item.getId(), item);
+		this.syncGoals();
 	}
 
 	public void putExecution(Execution execution) {
 		this.executions.put(execution.getId(), execution);
+	}
+
+	public void syncGoals() {
+		for (Execution exec : this.executions.values())
+			for (Phase phase : exec.getPhases()
+					.values())
+				for (Goal goal : phase.getGoals())
+					goal.setDescriptor(this.pluginDescriptor.getMojo(goal.getId()));
 	}
 }

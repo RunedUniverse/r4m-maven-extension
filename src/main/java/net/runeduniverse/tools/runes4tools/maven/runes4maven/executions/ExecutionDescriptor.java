@@ -4,12 +4,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Execution;
 
 public class ExecutionDescriptor {
 
-	//protected final CompoundTree record = new CompoundTree("Execution Tree");
+	protected final CompoundTree tree = new CompoundTree("Execution Tree");
 	protected final Map<String, Execution> executions;
 
 	public ExecutionDescriptor() {
@@ -25,7 +25,7 @@ public class ExecutionDescriptor {
 	}
 
 	public Execution put(Execution execution) {
-		//execution.toRecord(record);
+		execution.toRecord(tree);
 		return this.executions.put(execution.getId(), execution);
 	}
 
@@ -33,8 +33,8 @@ public class ExecutionDescriptor {
 		return this.executions.values();
 	}
 
-	/*@Override
+	@Override
 	public String toString() {
-		return this.record.toString();
-	}*/
+		return this.tree.toString();
+	}
 }

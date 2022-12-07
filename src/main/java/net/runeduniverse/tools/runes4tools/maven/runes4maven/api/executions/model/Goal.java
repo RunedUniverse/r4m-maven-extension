@@ -2,7 +2,7 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.mod
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
-//import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 
 public class Goal {
 
@@ -25,7 +25,7 @@ public class Goal {
 		this.descriptor = descriptor;
 	}
 
-	//public void toRecord(CompoundTree record) {
-	//	record.append("goal", this.id);
-	//}
+	public void toRecord(CompoundTree tree) {
+		tree.append("goal", this.id);
+	}
 }

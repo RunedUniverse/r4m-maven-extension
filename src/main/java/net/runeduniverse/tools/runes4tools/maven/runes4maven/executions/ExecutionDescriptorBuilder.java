@@ -55,14 +55,14 @@ public class ExecutionDescriptorBuilder {
 		protected Phase parsePhase(PlexusConfiguration cnfPhase) {
 			Phase phase = new Phase(cnfPhase.getChild("id")
 					.getValue());
-			for (PlexusConfiguration cnfGoal : cnf.getChild("goals")
+			for (PlexusConfiguration cnfGoal : cnfPhase.getChild("goals")
 					.getChildren("goal"))
 				phase.addGoal(parseGoal(cnfGoal));
 			return phase;
 		}
 
 		protected Goal parseGoal(PlexusConfiguration cnfGoal) {
-			Goal goal = new Goal(cnf.getValue());
+			Goal goal = new Goal(cnfGoal.getValue());
 			return goal;
 		}
 	}

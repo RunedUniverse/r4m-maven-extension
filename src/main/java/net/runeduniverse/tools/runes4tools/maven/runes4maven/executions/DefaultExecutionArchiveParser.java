@@ -60,13 +60,10 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 		}
 		archive.register(mvnPlugin, plugin);
 
-		System.out.println(plugin.getGroupId() + ':' + plugin.getArtifactId());
-
 		if (executionDescriptor == null)
 			return;
 
-		logger.debug(executionDescriptor.toString());
-		System.out.println("x");
+		logger.debug(plugin.getGroupId() + ':' + plugin.getArtifactId() + " | " + executionDescriptor.toString());
 		plugin.setExecutionDescriptor(executionDescriptor);
 	}
 

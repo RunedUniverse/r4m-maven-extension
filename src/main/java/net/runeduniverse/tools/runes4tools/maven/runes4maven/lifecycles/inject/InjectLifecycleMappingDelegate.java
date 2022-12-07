@@ -31,7 +31,7 @@ public class InjectLifecycleMappingDelegate extends AExecutionLifecycleMappingDe
 
 		LifecycleDescriptor targetLifecycleDescriptor = LifecycleDescriptor.fromTask(injectLifecyclePhase);
 		Lifecycle targetLifecycle = this.lifecycles.get(targetLifecycleDescriptor.getLifecycleId());
-		DefaultExecutionArchiveParser parser = new DefaultExecutionArchiveParser(this.pluginManager);
+		DefaultExecutionArchiveParser parser = new DefaultExecutionArchiveParser(this.pluginManager, this.logger);
 
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);

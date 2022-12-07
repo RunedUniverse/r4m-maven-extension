@@ -5,12 +5,12 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-//import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.MavenProperties;
 
 public class Execution {
 
-	//private final CompoundTree record = new CompoundTree("Execution");
+	private final CompoundTree tree = new CompoundTree("Execution");
 	private final String id;
 
 	private final Map<String, Phase> phases;
@@ -18,7 +18,7 @@ public class Execution {
 	public Execution(final String id) {
 		this.id = isBlank(id) ? MavenProperties.DEFAULT_EXECUTION_ID : id;
 		this.phases = new LinkedHashMap<>();
-		//this.record.append("id", this.id);
+		this.tree.append("id", this.id);
 	}
 
 	public String getId() {
@@ -35,10 +35,10 @@ public class Execution {
 
 	public void putPhase(Phase phase) {
 		this.phases.put(phase.getId(), phase);
-		//phase.toRecord(this.record);
+		phase.toRecord(this.tree);
 	}
 
-	//public void toRecord(CompoundTree record) {
-	//	record.append(this.record);
-	//}
+	public void toRecord(CompoundTree tree) {
+		tree.append(this.tree);
+	}
 }

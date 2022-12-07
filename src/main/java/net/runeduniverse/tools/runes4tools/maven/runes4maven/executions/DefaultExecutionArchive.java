@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.executions;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -8,18 +8,21 @@ import java.util.Map.Entry;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter.MvnPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter.R4mPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Phase;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionArchive;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionArchiveSubset;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ForkMojoDescriptor;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.filter.MvnPluginFilter;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.filter.R4mPluginFilter;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Execution;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Goal;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Phase;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Plugin;
 
-public class ExecutionArchive {
+public class DefaultExecutionArchive implements ExecutionArchive {
 
 	private Map<org.apache.maven.model.Plugin, Plugin> pluginRegistry = new LinkedHashMap<>();
 
-	public ExecutionArchive() {
+	public DefaultExecutionArchive() {
 	}
 
 	public boolean contains(org.apache.maven.model.Plugin mvnPlugin) {

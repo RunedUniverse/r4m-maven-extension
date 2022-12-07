@@ -1,5 +1,6 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.builder;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.maven.execution.MavenSession;
@@ -14,39 +15,54 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.Runes4MavenProperties;
+
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ForkMojoDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.executions.AExecutionLifecycleMappingDelegate;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.executions.DefaultExecutionArchiveParser;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.executions.ExecutionBuilder;
 
-@Component(role = LifecycleMappingDelegate.class, hint = Runes4MavenProperties.LIFECYCLE.INJECT.LIFECYCLE_HINT)
-public class InjectLifecycleMappingDelegate extends AExecutionLifecycleMappingDelegate {
+@Component(role = LifecycleMappingDelegate.class, hint = Properties.LIFECYCLE.BUILDER.INVOKER.LIFECYCLE_INVOKER_HINT)
+public class BuilderLifecycleMappingDelegate extends AExecutionLifecycleMappingDelegate {
 
 	@Override
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
-			Lifecycle injectLifecycle, String injectLifecyclePhase)
+			Lifecycle lifecycle, String executingLifecyclePhase)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException {
 
-		LifecycleDescriptor targetLifecycleDescriptor = LifecycleDescriptor.fromTask(injectLifecyclePhase);
-		Lifecycle targetLifecycle = this.lifecycles.get(targetLifecycleDescriptor.getLifecycleId());
-		DefaultExecutionArchiveParser parser = new DefaultExecutionArchiveParser(this.pluginManager);
+		Lifecycle targetLifecycle = this.lifecycles.get(Properties.LIFECYCLE.BUILDER.LIFECYCLE_HINT);
+		DefaultExecutionArchiveParser parser = new DefaultExecutionArchiveParser(this.pluginManager, this.logger);
 
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);
 		}
 
-		// TODO add correct data
-		Plugin thisPlugin = mvnProject.getPlugin("net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin");
-		ExecutionBuilder builder = this.archive.createBuilder(mvnProject, "builder", null,
-				ForkMojoDescriptor.create(thisPlugin, "scan-references", "builder-scan-references", null));
+		Plugin r4mPlugin = mvnProject.getPlugin(Properties.PLUGIN_KEY);
+
+		String executionId;
+		switch (executingLifecyclePhase) {
+		case Properties.LIFECYCLE.BUILDER.INVOKER.PHASE_BUILD:
+			executionId = Properties.LIFECYCLE.BUILDER.EXECUTION_DEFAULT_ID;
+			break;
+
+		case Properties.LIFECYCLE.BUILDER.INVOKER.PHASE_BUILD_TEST:
+			executionId = Properties.LIFECYCLE.BUILDER.EXECUTION_TEST_ID;
+			break;
+
+		default:
+			return Collections.emptyMap();
+		}
+
+		ExecutionBuilder builder = this.archive.createBuilder(mvnProject, executingLifecyclePhase, null,
+				ForkMojoDescriptor.create(r4mPlugin, executingLifecyclePhase,
+						Properties.LIFECYCLE.BUILDER.INVOKER.MOJO_SUMMARY, executionId));
 
 		builder.applyLifecycle(targetLifecycle);
 
 		builder.applyPluginFilter(filterForBuildPlugins(mvnProject));
 
-		builder.applyExecutionId(targetLifecycleDescriptor.getExecutionId());
+		builder.applyExecutionId(executionId);
 
 		return builder.build();
 	}

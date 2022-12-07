@@ -3,11 +3,12 @@ package net.runeduniverse.tools.runes4tools.maven.runes4maven;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.MavenProperties;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.Runes4MavenProperties;
 
-public interface Properties {
-	public static String VAL_PREFIX = MavenProperties.VAL_PREFIX;
-	public static String VAL_POSTFIX = MavenProperties.VAL_POSTFIX;
-	public static String DEFAULT_LIFECYCLE_ID = MavenProperties.VAL_DEFAULT_LIFECYCLE_ID;
-	public static String DEFAULT_EXECUTION_ID = MavenProperties.VAL_DEFAULT_EXECUTION_ID;
+public interface Properties extends MavenProperties {
+	public static String VAL_PREFIX = "${";
+	public static String VAL_POSTFIX = "}";
+
+	public static String PLUGIN_KEY = Runes4MavenProperties.GROUP_ID + ':' + Runes4MavenProperties.ARTIFACT_ID;
+	public static String PREFIX_ID = Runes4MavenProperties.PREFIX_ID;
 
 	public interface PROJECT {
 		public interface BUILD extends MavenProperties.PROJECT.BUILD {
@@ -26,6 +27,9 @@ public interface Properties {
 					+ Properties.PROJECT.BUILD.PARAM_TEST_SOURCE_DIR + VAL_POSTFIX;
 			public static String DEFAULT_VAL_TARGET_DIR = VAL_PREFIX + Properties.PROJECT.BUILD.PARAM_OUTPUT_DIR
 					+ VAL_POSTFIX;
+
+			public interface INVOKER extends Runes4MavenProperties.LIFECYCLE.BUILDER.INVOKER {
+			}
 		}
 	}
 

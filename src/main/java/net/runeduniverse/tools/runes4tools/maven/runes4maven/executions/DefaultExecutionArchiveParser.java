@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.executions;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -16,22 +16,29 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionArchive;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionArchiveParser;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Plugin;
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.errors.ExecutionDescriptorParsingException;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
 
 public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 
 	// @Requirement
 	private MavenPluginManager pluginManager;
 
+	// @Requirement
+	private Logger logger;
+
 	private ExecutionDescriptorBuilder builder = new ExecutionDescriptorBuilder();
 
-	public DefaultExecutionArchiveParser(MavenPluginManager pluginManager) {
+	public DefaultExecutionArchiveParser(MavenPluginManager pluginManager, Logger logger) {
 		this.pluginManager = pluginManager;
+		this.logger = logger;
 	}
 
 	public void parsePlugin(final ExecutionArchive archive, final MavenSession mvnSession,
@@ -53,9 +60,13 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 		}
 		archive.register(mvnPlugin, plugin);
 
+		System.out.println(plugin.getGroupId() + ':' + plugin.getArtifactId());
+
 		if (executionDescriptor == null)
 			return;
 
+		logger.debug(executionDescriptor.toString());
+		System.out.println("x");
 		plugin.setExecutionDescriptor(executionDescriptor);
 	}
 

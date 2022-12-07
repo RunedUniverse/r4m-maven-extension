@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
 

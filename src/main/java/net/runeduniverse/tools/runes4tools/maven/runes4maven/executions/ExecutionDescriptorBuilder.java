@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.executions;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -9,9 +9,10 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Phase;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionDescriptorBuilderInstance;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Execution;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Goal;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Phase;
 
 public class ExecutionDescriptorBuilder {
 

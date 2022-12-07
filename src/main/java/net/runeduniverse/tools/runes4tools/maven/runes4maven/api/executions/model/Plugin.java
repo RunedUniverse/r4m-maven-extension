@@ -1,10 +1,10 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.ExecutionDescriptor;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.executions.ExecutionDescriptor;
 
 public class Plugin {
 

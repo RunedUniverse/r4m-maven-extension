@@ -1,10 +1,8 @@
 package net.runeduniverse.tools.runes4tools.maven.runes4maven.api;
 
 public interface MavenProperties {
-	public static String VAL_PREFIX = "${";
-	public static String VAL_POSTFIX = "}";
-	public static String VAL_DEFAULT_LIFECYCLE_ID = "default";
-	public static String VAL_DEFAULT_EXECUTION_ID = "default";
+	public static String DEFAULT_LIFECYCLE_ID = "default";
+	public static String DEFAULT_EXECUTION_ID = "default";
 
 	public interface PROJECT {
 		public interface BUILD {

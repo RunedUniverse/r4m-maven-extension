@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.executions;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -14,8 +14,10 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.runes4tools.maven.runes4maven.Properties;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter.MvnPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Goal;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ExecutionArchiveSubset;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.ForkMojoDescriptor;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.filter.MvnPluginFilter;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Goal;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

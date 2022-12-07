@@ -1,6 +1,6 @@
-package net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.filter;
+package net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.filter;
 
-import net.runeduniverse.tools.runes4tools.maven.runes4maven.lifecycles.inject.internal.model.Plugin;
+import net.runeduniverse.tools.runes4tools.maven.runes4maven.api.executions.model.Plugin;
 
 /**
  * Check if the MavenPlugin meets the filter

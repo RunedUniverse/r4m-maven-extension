@@ -5,7 +5,7 @@
 			<phase>
 				<id>scan-references</id>
 				<goals>
-					<goal>r4m:builder-scan-references</goal>
+					<goal>builder-scan-references</goal>
 				</goals>
 			</phase>
 		</phases>
@@ -16,7 +16,7 @@
 			<phase>
 				<id>scan-references</id>
 				<goals>
-					<goal>r4m:builder-scan-test-references</goal>
+					<goal>builder-scan-test-references</goal>
 				</goals>
 			</phase>
 		</phases>

@@ -106,7 +106,6 @@ public class DefaultExecutionArchive implements ExecutionArchive {
 					phaseList.addAll(phase.getGoals());
 				}
 			}
-
 			return map;
 		}
 	}

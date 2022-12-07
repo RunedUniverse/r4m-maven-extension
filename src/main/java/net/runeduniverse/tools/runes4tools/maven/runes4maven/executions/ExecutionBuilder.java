@@ -80,7 +80,6 @@ public class ExecutionBuilder {
 
 		for (String phase : this.lifecyclePhases)
 			phaseGoalMapping.put(phase, phaseGoalExecMapping.getOrDefault(phase, new LinkedList<>()));
-
 		return phaseGoalMapping;
 	}
 

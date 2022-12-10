@@ -28,14 +28,12 @@
 							<process-sources></process-sources>
 							<generate-resources></generate-resources>
 							<process-resources></process-resources>
-							<compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-main
-							</compile>
+							<build></build>
 							<generate-test-sources></generate-test-sources>
 							<process-test-sources></process-test-sources>
 							<generate-test-resources></generate-test-resources>
 							<process-test-resources></process-test-resources>
-							<test-compile>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:builder-test
-							</test-compile>
+							<build-test></build-test>
 							<test></test>
 							<prepare-package></prepare-package>
 							<package></package>

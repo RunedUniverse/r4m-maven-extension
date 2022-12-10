@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.runeduniverse.tools.runes4tools</groupId>
-	<artifactId>runes4maven-maven-plugin</artifactId>
+	<artifactId>r4m-maven-plugin</artifactId>
 	<version>0.0.1</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Runes4Maven Plugin</name>
-	<url>https://github.com/RunedUniverse/runes4maven</url>
+	<url>https://github.com/RunedUniverse/r4m</url>
 	<inceptionYear>2022</inceptionYear>
 
 	<licenses>
@@ -39,13 +39,13 @@
 	</developers>
 
 	<scm>
-		<url>https://github.com/RunedUniverse/runes4maven</url>
-		<connection>scm:git:http://github.com/RunedUniverse/runes4maven.git</connection>
-		<developerConnection>scm:git:git@github.com:RunedUniverse/runes4maven.git</developerConnection>
+		<url>https://github.com/RunedUniverse/r4m</url>
+		<connection>scm:git:http://github.com/RunedUniverse/r4m.git</connection>
+		<developerConnection>scm:git:git@github.com:RunedUniverse/r4m.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
-		<url>https://github.com/RunedUniverse/runes4maven/issues</url>
+		<url>https://github.com/RunedUniverse/r4m/issues</url>
 	</issueManagement>
 
 	<properties>
@@ -90,7 +90,6 @@
 			<version>1.0.1</version>
 		</dependency>
 
-
 		<!-- dependency for plexus annotation -->
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
@@ -114,8 +113,8 @@
 				<targetPath>META-INF/maven</targetPath>
 			</resource>
 			<resource>
-				<directory>src/main/runes4maven</directory>
-				<targetPath>META-INF/runes4maven</targetPath>
+				<directory>src/main/r4m</directory>
+				<targetPath>META-INF/r4m</targetPath>
 			</resource>
 		</resources>
 		<plugins>
@@ -131,8 +130,8 @@
 				<artifactId>plexus-component-metadata</artifactId>
 				<version>${plexus-component-version}</version>
 				<configuration>
-					<staticMetadataDirectory>${basedir}/src/main/plexus</staticMetadataDirectory>
-					<testStaticMetadataDirectory>${basedir}/src/test/plexus</testStaticMetadataDirectory>
+					<staticMetadataDirectory>src/main/plexus</staticMetadataDirectory>
+					<testStaticMetadataDirectory>src/test/plexus</testStaticMetadataDirectory>
 				</configuration>
 				<executions>
 					<execution>

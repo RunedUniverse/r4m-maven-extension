@@ -1,0 +1,16 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>dev</role-hint>
+			<configuration>
+				<id>dev</id>
+				<phases>
+					<phase>all-the-phases-get-defined-at-runtime</phase>
+				</phases>
+			</configuration>
+		</component>
+
+	</components>
+</component-set>

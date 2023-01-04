@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.sequential;
+package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.dev;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,16 +32,27 @@ import org.codehaus.plexus.component.annotations.Requirement;
  */
 @Component(role = LifecycleMappingDelegate.class, hint = SequentialLifecycleMappingDelegate.HINT)
 public class SequentialLifecycleMappingDelegate implements LifecycleMappingDelegate {
-	public static final String HINT = "default";
+	public static final String HINT = "dev";
+
+	@Requirement(role = Lifecycle.class)
+	protected Map<String, Lifecycle> lifecycles;
 
 	@Requirement
 	private BuildPluginManager pluginManager;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
+			Lifecycle devLifecycle, String devLifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 
-		System.out.println("OVERRIDE Sequential >> Lifecycle: " + lifecycle + " Phase: " + lifecyclePhase);
+		// trim "dev-"
+		String lifecyclePhase = devLifecyclePhase.substring(4);
+
+		for (Lifecycle lifecycle : this.lifecycles.values())
+			if (lifecycle.getPhases()
+					.contains(lifecyclePhase)) {
+				devLifecycle = lifecycle;
+				break;
+			}
 
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos. The key set of this
@@ -51,7 +62,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 
 		Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
 
-		for (String phase : lifecycle.getPhases()) {
+		for (String phase : devLifecycle.getPhases()) {
 			Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
 
 			mappings.put(phase, phaseBindings);
@@ -69,7 +80,8 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 		 * in the map, we are not interested in any of the executions bound to it.
 		 */
 
-		for (Plugin plugin : project.getBuild().getPlugins()) {
+		for (Plugin plugin : project.getBuild()
+				.getPlugins()) {
 			for (PluginExecution execution : plugin.getExecutions()) {
 				// if the phase is specified then I don't have to go fetch the plugin yet and
 				// pull it down
@@ -107,7 +119,8 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 		for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
 			List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-			for (List<MojoExecution> executions : entry.getValue().values()) {
+			for (List<MojoExecution> executions : entry.getValue()
+					.values()) {
 				mojoExecutions.addAll(executions);
 			}
 

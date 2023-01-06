@@ -1,6 +1,12 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
@@ -35,29 +41,39 @@ public class MavenExecutionArchiveParser implements ExecutionArchiveParser {
 		 * in the map, we are not interested in any of the executions bound to it.
 		 */
 
-		/*
-		 * for (Plugin plugin : project.getBuild() .getPlugins()) { for (PluginExecution
-		 * execution : plugin.getExecutions()) { // if the phase is specified then I
-		 * don't have to go fetch the plugin yet and // pull it down // to examine the
-		 * phase it is associated to. if (execution.getPhase() != null) { Map<Integer,
-		 * List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase()); if
-		 * (phaseBindings != null) { for (String goal : execution.getGoals()) {
-		 * MojoExecution mojoExecution = new MojoExecution(plugin, goal,
-		 * execution.getId()); mojoExecution.setLifecyclePhase(execution.getPhase());
-		 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-		 * } // if not then i need to grab the mojo descriptor and look at the phase
-		 * that is // specified else { for (String goal : execution.getGoals()) {
-		 * MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
-		 * project.getRemotePluginRepositories(), session.getRepositorySession());
-		 * 
-		 * Map<Integer, List<MojoExecution>> phaseBindings =
-		 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
-		 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
-		 * execution.getId());
-		 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-		 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-		 * } } }
-		 */
+		
+		
+		for (PluginExecution execution : mvnPlugin.getExecutions()) {
+			// if the phase is specified then I don't have to
+			// go fetch the plugin yet and
+			// pull it down
+			// to examine the phase it is associated to.
+			/*if (execution.getPhase() != null) {
+				Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
+				if (phaseBindings != null) {
+					for (String goal : execution.getGoals()) {
+						MojoExecution mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
+						mojoExecution.setLifecyclePhase(execution.getPhase());
+						addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
+					}
+				}
+			}*/
+			// if not then i need to grab the mojo descriptor and look at the phase that is
+			// specified
+			/*else {
+				for (String goal : execution.getGoals()) {
+					MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
+							mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
+
+					Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
+					if (phaseBindings != null) {
+						MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
+						mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
+						addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
+					}
+				}
+			}*/
+		}
 
 		archive.setFlag(mvnPlugin, ARCHIVE_PLUGIN_FLAG, true);
 	}

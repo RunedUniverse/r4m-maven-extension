@@ -26,7 +26,9 @@ import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArc
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
 import net.runeduniverse.tools.runes4tools.maven.r4m.errors.ExecutionDescriptorParsingException;
 
-public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
+public class ConfigExecutionArchiveParser implements ExecutionArchiveParser {
+
+	public static final String ARCHIVE_PLUGIN_FLAG = "r4m:config-parsed";
 
 	// @Requirement
 	private MavenPluginManager pluginManager;
@@ -36,17 +38,24 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 
 	private ExecutionDescriptorBuilder builder = new ExecutionDescriptorBuilder();
 
-	public DefaultExecutionArchiveParser(MavenPluginManager pluginManager, Logger logger) {
+	public ConfigExecutionArchiveParser(MavenPluginManager pluginManager, Logger logger) {
 		this.pluginManager = pluginManager;
 		this.logger = logger;
 	}
 
 	public void parsePlugin(final ExecutionArchive archive, final MavenSession mvnSession,
 			final MavenProject mvnProject, org.apache.maven.model.Plugin mvnPlugin) {
-		if (archive.contains(mvnPlugin))
+		if (archive.isRegisteredWithFlag(mvnPlugin, ARCHIVE_PLUGIN_FLAG, true))
 			return;
+
+		Plugin plugin = null;
+		if (archive.isRegistered(mvnPlugin))
+			plugin = archive.getPlugin(mvnPlugin);
+		else {
+			plugin = new Plugin(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), null);
+			archive.register(mvnPlugin, plugin);
+		}
 		// parse Maven-Plugin -> executions.xml
-		Plugin plugin = new Plugin(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), null);
 		ExecutionDescriptor executionDescriptor = null;
 
 		try {
@@ -65,6 +74,7 @@ public class DefaultExecutionArchiveParser implements ExecutionArchiveParser {
 
 		logger.debug(plugin.getGroupId() + ':' + plugin.getArtifactId() + " | " + executionDescriptor.toString());
 		plugin.setExecutionDescriptor(executionDescriptor);
+		archive.setFlag(mvnPlugin, ARCHIVE_PLUGIN_FLAG, true);
 	}
 
 	private ExecutionDescriptor extractExecutionDescriptor(Artifact pluginArtifact,

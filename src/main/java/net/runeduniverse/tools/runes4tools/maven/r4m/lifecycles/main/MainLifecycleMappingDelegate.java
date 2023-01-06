@@ -44,22 +44,12 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		System.out.println("OVERRIDE Sequential >> Lifecycle: " + lifecycle + " Phase: " + lifecyclePhase);
 
 		/*
-		 * Initialize mapping from lifecycle phase to bound mojos. The key set of this
-		 * map denotes the phases the caller is interested in, i.e. all phases up to and
-		 * including the specified phase.
+		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */
 
 		Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
 
-		for (String phase : lifecycle.getPhases()) {
-			Map<Integer, List<MojoExecution>> phaseBindings = new TreeMap<>();
-
-			mappings.put(phase, phaseBindings);
-
-			if (phase.equals(lifecyclePhase)) {
-				break;
-			}
-		}
+		mappings.put(lifecyclePhase, new TreeMap<>());
 
 		/*
 		 * Grab plugin executions that are bound to the selected lifecycle phases from
@@ -69,7 +59,8 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		 * in the map, we are not interested in any of the executions bound to it.
 		 */
 
-		for (Plugin plugin : project.getBuild().getPlugins()) {
+		for (Plugin plugin : project.getBuild()
+				.getPlugins()) {
 			for (PluginExecution execution : plugin.getExecutions()) {
 				// if the phase is specified then I don't have to go fetch the plugin yet and
 				// pull it down
@@ -107,7 +98,8 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
 			List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-			for (List<MojoExecution> executions : entry.getValue().values()) {
+			for (List<MojoExecution> executions : entry.getValue()
+					.values()) {
 				mojoExecutions.addAll(executions);
 			}
 

@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,19 +22,100 @@ import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin
 public class DefaultExecutionArchive implements ExecutionArchive {
 
 	private Map<org.apache.maven.model.Plugin, Plugin> pluginRegistry = new LinkedHashMap<>();
+	private Map<org.apache.maven.model.Plugin, Map<String, Boolean>> pluginRegistryFlags = new LinkedHashMap<>();
 
 	public DefaultExecutionArchive() {
 	}
 
-	public boolean contains(org.apache.maven.model.Plugin mvnPlugin) {
+	@Override
+	public boolean isRegistered(org.apache.maven.model.Plugin mvnPlugin) {
 		return this.pluginRegistry.containsKey(mvnPlugin);
 	}
 
-	public ExecutionArchive register(org.apache.maven.model.Plugin mvnPlugin, Plugin r4mPlugin) {
-		this.pluginRegistry.put(mvnPlugin, r4mPlugin);
+	@Override
+	public boolean isRegisteredWithFlag(org.apache.maven.model.Plugin mvnPlugin, String flag) {
+		Map<String, Boolean> flagMap = this.pluginRegistryFlags.get(mvnPlugin);
+		if (flagMap == null)
+			return false;
+		return flagMap.containsKey(flag);
+	}
+
+	@Override
+	public boolean isRegisteredWithFlag(org.apache.maven.model.Plugin mvnPlugin, String flag, Boolean flagValue) {
+		Map<String, Boolean> flagMap = this.pluginRegistryFlags.get(mvnPlugin);
+		if (flagMap == null)
+			return false;
+		if (!flagMap.containsKey(flag))
+			return false;
+		return flagMap.get(flag)
+				.equals(flagValue);
+	}
+
+	@Override
+	public ExecutionArchive setFlag(org.apache.maven.model.Plugin mvnPlugin, String flag, Boolean flagValue) {
+		if (!this.pluginRegistry.containsKey(mvnPlugin))
+			return this;
+		Map<String, Boolean> flagMap = this.pluginRegistryFlags.get(mvnPlugin);
+		if (flagMap == null) {
+			flagMap = new HashMap<>();
+			this.pluginRegistryFlags.put(mvnPlugin, flagMap);
+		}
+		flagMap.put(flag, flagValue);
 		return this;
 	}
 
+	@Override
+	public ExecutionArchive removeFlag(org.apache.maven.model.Plugin mvnPlugin, String flag) {
+		Map<String, Boolean> flagMap = this.pluginRegistryFlags.get(mvnPlugin);
+		if (flagMap == null)
+			return null;
+		flagMap.remove(flag);
+		return this;
+	}
+
+	@Override
+	public Plugin getPlugin(org.apache.maven.model.Plugin mvnPlugin) {
+		return this.pluginRegistry.get(mvnPlugin);
+	}
+
+	@Override
+	public Plugin getPluginOrDefault(org.apache.maven.model.Plugin mvnPlugin, Plugin r4mPlugin) {
+		Plugin plugin = this.pluginRegistry.get(mvnPlugin);
+		if (plugin == null)
+			return r4mPlugin;
+		return plugin;
+	}
+
+	@Override
+	public Boolean getFlag(org.apache.maven.model.Plugin mvnPlugin, String flag) {
+		Map<String, Boolean> flagMap = this.pluginRegistryFlags.get(mvnPlugin);
+		if (flagMap == null)
+			return null;
+		return flagMap.get(flag);
+	}
+
+	@Override
+	public ExecutionArchive register(org.apache.maven.model.Plugin mvnPlugin, Plugin r4mPlugin) {
+		this.pluginRegistry.put(mvnPlugin, r4mPlugin);
+		this.pluginRegistryFlags.put(mvnPlugin, new HashMap<>());
+		return this;
+	}
+
+	@Override
+	public ExecutionArchive remove(org.apache.maven.model.Plugin mvnPlugin) {
+		this.pluginRegistry.remove(mvnPlugin);
+		this.pluginRegistryFlags.remove(mvnPlugin);
+		return this;
+	}
+
+	@Override
+	public ExecutionArchive clear() {
+		this.pluginRegistry.clear();
+		this.pluginRegistryFlags.clear();
+		return this;
+	}
+
+	@Override
 	public ExecutionArchiveSubset newSubset() {
 		return new Subset(this.pluginRegistry);
 	}

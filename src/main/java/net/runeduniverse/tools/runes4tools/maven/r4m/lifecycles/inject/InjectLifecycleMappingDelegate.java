@@ -18,7 +18,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ForkMojoDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.r4m.executions.AExecutionLifecycleMappingDelegate;
-import net.runeduniverse.tools.runes4tools.maven.r4m.executions.DefaultExecutionArchiveParser;
+import net.runeduniverse.tools.runes4tools.maven.r4m.executions.ConfigExecutionArchiveParser;
 import net.runeduniverse.tools.runes4tools.maven.r4m.executions.ExecutionBuilder;
 
 @Component(role = LifecycleMappingDelegate.class, hint = Runes4MavenProperties.LIFECYCLE.INJECT.LIFECYCLE_HINT)
@@ -32,7 +32,7 @@ public class InjectLifecycleMappingDelegate extends AExecutionLifecycleMappingDe
 
 		LifecycleDescriptor targetLifecycleDescriptor = LifecycleDescriptor.fromTask(injectLifecyclePhase);
 		Lifecycle targetLifecycle = this.lifecycles.get(targetLifecycleDescriptor.getLifecycleId());
-		DefaultExecutionArchiveParser parser = new DefaultExecutionArchiveParser(this.pluginManager, this.logger);
+		ConfigExecutionArchiveParser parser = new ConfigExecutionArchiveParser(this.pluginManager, this.logger);
 
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);

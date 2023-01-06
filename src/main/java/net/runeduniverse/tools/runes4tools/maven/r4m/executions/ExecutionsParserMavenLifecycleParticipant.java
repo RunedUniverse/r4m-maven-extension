@@ -6,7 +6,6 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -40,21 +39,9 @@ public class ExecutionsParserMavenLifecycleParticipant extends AbstractMavenLife
 	 * This callback is intended to allow extensions to manipulate MavenProjects
 	 * before they are sorted and actual build execution starts.
 	 */
-	@SuppressWarnings("deprecation")
 	public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
-		PlexusContainer container = session.getContainer();
 
-		log.debug("Generating DEV Phases:");
-
-		Lifecycle devLifecycle = null;
-		try {
-			Map<String, Lifecycle> lifecycles = container.lookupMap(Lifecycle.class);
-			Map<String, LifecycleMappingDelegate> mappedDelegates = container.lookupMap(LifecycleMappingDelegate.class);
-
-
-		} catch (ComponentLookupException e) {
-			log.error("Failed interaction with PlexusContainer", e);
-		}
+		// TODO Parse/Collect Executions -> Archive
 
 	}
 

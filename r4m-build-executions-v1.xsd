@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
+	elementFormDefault="qualified">
+	<xs:element name="executions" type="Model"></xs:element>
+	<xs:complexType name="Model">
+		<xs:all>
+			<xs:element name="execution" type="Execution" />
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="Execution">
+		<xs:all>
+			<xs:element name="profiles">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="profile" type="Profile" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="lifecycles">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="lifecycle" type="Lifecycle" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="Profile">
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="Lifecycle">
+		<xs:all>
+			<xs:element name="phases">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="phase" type="Phase" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="Phase">
+		<xs:all>
+			<xs:element name="goals">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="goal" type="Goal" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="Goal">
+		<xs:all>
+			<xs:element name="groupId" type="xs:string" />
+			<xs:element name="artifactId" type="xs:string" />
+			<xs:element name="fork" maxOccurs="1">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="lifecycle" type="TragetLifecycle" />
+						<xs:element name="phases">
+							<xs:complexType>
+								<xs:all>
+									<xs:element name="phase" type="TragetPhase" />
+								</xs:all>
+							</xs:complexType>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="TragetLifecycle">
+		<xs:all>
+			<xs:element name="executions">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="execution" type="xs:string" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="startAtPhase" />
+			<xs:element name="startFromPhase" />
+			<xs:element name="excludePhases">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="phase">
+							<xs:complexType>
+								<xs:attribute name="id" type="xs:string" />
+							</xs:complexType>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+	<xs:complexType name="TragetPhase">
+		<xs:all>
+			<xs:element name="executions">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="execution" type="xs:string" />
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" />
+	</xs:complexType>
+
+</xs:schema> 

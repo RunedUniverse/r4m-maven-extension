@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveSubset;
@@ -19,6 +20,7 @@ import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Goal;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Phase;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
 
+@Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
 public class DefaultExecutionArchive implements ExecutionArchive {
 
 	private Map<org.apache.maven.model.Plugin, Plugin> pluginRegistry = new LinkedHashMap<>();

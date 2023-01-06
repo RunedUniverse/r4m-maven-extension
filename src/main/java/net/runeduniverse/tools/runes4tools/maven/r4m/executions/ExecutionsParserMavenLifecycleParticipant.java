@@ -1,7 +1,5 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.dev;
+package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -9,7 +7,6 @@ import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -18,8 +15,8 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
 
-@Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.LIFECYCLE.DEV.LIFECYCLE_PARTICIPANT_HINT)
-public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
+@Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
+public class ExecutionsParserMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	@Requirement
 	private Logger log;
@@ -54,28 +51,6 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 			Map<String, Lifecycle> lifecycles = container.lookupMap(Lifecycle.class);
 			Map<String, LifecycleMappingDelegate> mappedDelegates = container.lookupMap(LifecycleMappingDelegate.class);
 
-			devLifecycle = lifecycles.get("dev");
-			devLifecycle.getPhases()
-					.clear();
-
-			for (Lifecycle lifecycle : lifecycles.values()) {
-				if (lifecycle == devLifecycle)
-					continue;
-
-				// ignore specifically mapped lifecycles except default
-				if (!lifecycle.getId()
-						.equals(DefaultLifecycleMappingDelegate.HINT) && mappedDelegates.containsKey(lifecycle.getId()))
-					continue;
-
-				List<String> devPhases = new LinkedList<>();
-				for (String phase : lifecycle.getPhases()) {
-					phase = "dev-" + phase;
-					devPhases.add(phase);
-					devLifecycle.getPhases()
-							.add(phase);
-				}
-				log.debug(lifecycle.getId() + " -> [" + String.join(", ", devPhases) + "]");
-			}
 
 		} catch (ComponentLookupException e) {
 			log.error("Failed interaction with PlexusContainer", e);

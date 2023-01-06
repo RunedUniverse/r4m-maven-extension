@@ -10,12 +10,17 @@ public interface Properties extends MavenProperties {
 	public static String PLUGIN_KEY = Runes4MavenProperties.GROUP_ID + ':' + Runes4MavenProperties.ARTIFACT_ID;
 	public static String PREFIX_ID = Runes4MavenProperties.PREFIX_ID;
 
+	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = Runes4MavenProperties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT;
+
 	public interface PROJECT {
 		public interface BUILD extends MavenProperties.PROJECT.BUILD {
 		}
 	}
 
 	public interface LIFECYCLE {
+		public interface DEV extends Runes4MavenProperties.LIFECYCLE.DEV {
+		}
+
 		public interface INJECT extends Runes4MavenProperties.LIFECYCLE.INJECT {
 			public static String DEFAULT_EXECUTION_ID = Properties.DEFAULT_EXECUTION_ID;
 		}

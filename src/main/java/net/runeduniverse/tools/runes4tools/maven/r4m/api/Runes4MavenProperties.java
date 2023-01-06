@@ -5,7 +5,13 @@ public interface Runes4MavenProperties {
 	public static String ARTIFACT_ID = "r4m-maven-plugin";
 	public static String PREFIX_ID = "r4m";
 
+	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = "r4m:executions-parser";
+
 	public interface LIFECYCLE {
+		public interface DEV {
+			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:dev-lifecycle";
+		}
+
 		public interface INJECT {
 			public static String LIFECYCLE_HINT = PREFIX_ID + "-inject";
 

@@ -61,19 +61,19 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 
 		for (Plugin plugin : project.getBuild()
 				.getPlugins()) {
-			System.out.println(plugin);
+		//	System.out.println(plugin);
 			for (PluginExecution execution : plugin.getExecutions()) {
-				System.out.println("Execution: " + execution.getId());
+			//	System.out.println("Execution: " + execution.getId());
 				// if the phase is specified then I don't have to go fetch the plugin yet and
 				// pull it down
 				// to examine the phase it is associated to.
-				System.out.println("Phase: "+execution.getPhase());
+			//	System.out.println("Phase: "+execution.getPhase());
 				
 				if (execution.getPhase() != null) {
 					Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
 					if (phaseBindings != null) {
 						for (String goal : execution.getGoals()) {
-							System.out.println("  Phase: "+execution.getPhase()+" Goal: "+goal);
+			//				System.out.println("  Phase: "+execution.getPhase()+" Goal: "+goal);
 							
 							MojoExecution mojoExecution = new MojoExecution(plugin, goal, execution.getId());
 							mojoExecution.setLifecyclePhase(execution.getPhase());
@@ -87,9 +87,9 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 					for (String goal : execution.getGoals()) {
 						MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
 								project.getRemotePluginRepositories(), session.getRepositorySession());
-						System.out.println("  Phase: " + mojoDescriptor.getPhase() + "\n  execute Phase: "
-								+ mojoDescriptor.getExecutePhase() + "\n  Goal: " + mojoDescriptor.getGoal()
-								+ "\n  execute Goal:" + mojoDescriptor.getExecuteGoal());
+			//			System.out.println("  Phase: " + mojoDescriptor.getPhase() + "\n  execute Phase: "
+			//					+ mojoDescriptor.getExecutePhase() + "\n  Goal: " + mojoDescriptor.getGoal()
+			//					+ "\n  execute Goal:" + mojoDescriptor.getExecuteGoal());
 						Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
 						if (phaseBindings != null) {
 							MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());

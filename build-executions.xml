@@ -1,9 +1,10 @@
-<!-- <build xmlns="https://api.runeduniverse.net/runes4tools/r4m-build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build https://api.runeduniverse.net/runes4tools/r4m-build-v1.xsd"> -->
-<executions xmlns="r4m-build-executions-v1.xsd"
+<!-- <build xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build-executions 
+	"> -->
+<executions
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build-executions https://api.runeduniverse.net/runes4tools/r4m-build-executions-v1.xsd">
-
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build-executions r4m-build-executions-v1.xsd">
 	<execution id="default">
 		<!-- <profiles> -->
 		<!-- <profile id="default"></profile> -->
@@ -50,5 +51,4 @@
 			</lifecycle>
 		</lifecycles>
 	</execution>
-
 </executions>

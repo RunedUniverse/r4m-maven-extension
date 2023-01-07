@@ -14,15 +14,17 @@
 
 	<xs:complexType name="Execution">
 		<xs:all>
-			<xs:element name="profiles" minOccurs="0">
+			<xs:element name="triggers" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="profile" type="Profile"
-							maxOccurs="unbounded" />
+						<xs:element name="active-profile" type="Profile"
+							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element name="passive-profile" type="Profile"
+							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="lifecycles">
+			<xs:element name="lifecycles" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="lifecycle" type="Lifecycle"
@@ -88,6 +90,14 @@
 			</xs:element>
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="dev" default="true">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="true" />
+					<xs:enumeration value="false" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="TragetLifecycle">

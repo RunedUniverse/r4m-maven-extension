@@ -1,15 +1,15 @@
 <!-- <build xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build-executions 
-	"> -->
+	https://api.runeduniverse.net/runes4tools/r4m-build-executions-v1.xsd "> -->
 <executions
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-build-executions r4m-build-executions-v1.xsd">
 	<execution id="default">
-		<!-- <profiles> -->
-		<!-- <profile id="default"></profile> -->
-		<!-- <profile id="test"></profile> -->
-		<!-- </profiles> -->
+		<!-- <triggers> -->
+		<!-- <active-profile id="default" /> -->
+		<!-- <passive-profile id="test" /> -->
+		<!-- </triggers> -->
 		<lifecycles>
 			<lifecycle id="clean">
 			</lifecycle>

@@ -90,11 +90,13 @@
 			</xs:element>
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
-		<xs:attribute name="dev" default="true">
+		<xs:attribute name="mode" default="dev/default">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
-					<xs:enumeration value="true" />
-					<xs:enumeration value="false" />
+					<xs:enumeration value="default" />
+					<xs:enumeration value="dev" />
+					<xs:enumeration value="dev/default" />
+					<xs:enumeration value="any" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>

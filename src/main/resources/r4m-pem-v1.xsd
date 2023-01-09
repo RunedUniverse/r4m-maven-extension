@@ -1,15 +1,23 @@
 <?xml version="1.0"?>
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
-	xmlns="https://api.runeduniverse.net/runes4tools/r4m-build-executions"
+	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	elementFormDefault="qualified">
-	<xs:element name="executions" type="Model"></xs:element>
+	<xs:element name="project-execution-model" type="Model" />
 	<xs:complexType name="Model">
-		<xs:sequence>
-			<xs:element name="execution" type="Execution"
-				minOccurs="0" maxOccurs="unbounded" />
-		</xs:sequence>
+		<xs:all>
+			<xs:element name="modelVersion" type="xs:string"
+				default="1.0.0" />
+			<xs:element name="executions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="execution" type="Execution"
+							minOccurs="0" maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
 	</xs:complexType>
 
 	<xs:complexType name="Execution">
@@ -21,6 +29,11 @@
 							minOccurs="0" maxOccurs="unbounded" />
 						<xs:element name="passive-profile" type="Profile"
 							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element name="packaging" type="xs:string"
+							minOccurs="0" maxOccurs="unbounded" />
+						<xs:element name="on-call" minOccurs="0" maxOccurs="1" />
+						<xs:element name="never" minOccurs="0" maxOccurs="1" />
+						<xs:element name="always" minOccurs="0" maxOccurs="1" />
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
@@ -34,6 +47,15 @@
 			</xs:element>
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="source" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="override" />
+					<xs:enumeration value="packaging" />
+					<xs:enumeration value="plugin" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="Profile">

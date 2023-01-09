@@ -1,0 +1,24 @@
+<executions>
+	<execution>
+		<id>default</id>
+		<phases>
+			<phase>
+				<id>scan-references</id>
+				<goals>
+					<goal>builder-scan-references</goal>
+				</goals>
+			</phase>
+		</phases>
+	</execution>
+	<execution>
+		<id>test</id>
+		<phases>
+			<phase>
+				<id>scan-references</id>
+				<goals>
+					<goal>builder-scan-test-references</goal>
+				</goals>
+			</phase>
+		</phases>
+	</execution>
+</executions>

@@ -1,0 +1,17 @@
+<component-set>
+	<components>
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>r4m-inject</role-hint>
+			<configuration>
+				<id>r4m-inject</id>
+				<phases>
+					<phase>r4m-inject#builder</phase>
+					<phase>r4m-inject#builder@default</phase>
+					<phase>r4m-inject#builder@test</phase>
+				</phases>
+			</configuration>
+		</component>
+	</components>
+</component-set>

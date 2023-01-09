@@ -1,0 +1,148 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+		<artifactId>r4m-parent</artifactId>
+		<version>0.0</version>
+	</parent>
+
+	<artifactId>r4m-maven-extension</artifactId>
+	<version>${parent.version}.1</version>
+	<packaging>maven-plugin</packaging>
+
+	<name>Runes4Maven Extension</name>
+	<url>https://github.com/RunedUniverse/r4m</url>
+	<inceptionYear>2022</inceptionYear>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+
+	<organization>
+		<name>RunedUniverse</name>
+		<url>https://www.runeduniverse.net</url>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>pl4yingnight</id>
+			<name>Pl4yingNight</name>
+			<email>pl4yingnight@gmail.com</email>
+			<organization>RunedUniverse</organization>
+			<organizationUrl>https://www.runeduniverse.net</organizationUrl>
+			<timezone>Europe/Vienna</timezone>
+			<roles>
+				<role>Maintainer</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<scm>
+		<url>https://github.com/RunedUniverse/r4m</url>
+		<connection>scm:git:http://github.com/RunedUniverse/r4m.git</connection>
+		<developerConnection>scm:git:git@github.com:RunedUniverse/r4m.git</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/r4m/issues</url>
+	</issueManagement>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- VERSIONS -->
+		<maven-version-min>3.3.9</maven-version-min>
+		<maven-version>3.8.4</maven-version>
+		<!-- VERSIONS : compiler -->
+		<plexus-component-version>1.7.1</plexus-component-version>
+		<maven-plugin-annotations-version>3.6.4</maven-plugin-annotations-version>
+		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
+	</properties>
+
+	<prerequisites>
+		<maven>${maven-version-min}</maven>
+	</prerequisites>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+			<artifactId>r4m-api</artifactId>
+			<version>0.0.1</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-core</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-utils</artifactId>
+		</dependency>
+
+		<!-- logging utilities-->
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-common</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-logging</artifactId>
+		</dependency>
+
+		<!-- dependency for plexus annotation -->
+		<dependency>
+			<groupId>org.codehaus.plexus</groupId>
+			<artifactId>plexus-component-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<!-- dependency for maven annotation -->
+		<dependency>
+			<groupId>org.apache.maven.plugin-tools</groupId>
+			<artifactId>maven-plugin-annotations</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/maven</directory>
+				<targetPath>META-INF/maven</targetPath>
+			</resource>
+			<resource>
+				<directory>src/main/r4m</directory>
+				<targetPath>META-INF/r4m</targetPath>
+			</resource>
+		</resources>
+		<plugins>
+			<plugin>
+				<artifactId>maven-plugin-plugin</artifactId>
+				<configuration>
+					<goalPrefix>r4m</goalPrefix>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+				<configuration>
+					<staticMetadataDirectory>src/main/plexus</staticMetadataDirectory>
+					<testStaticMetadataDirectory>src/test/plexus</testStaticMetadataDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

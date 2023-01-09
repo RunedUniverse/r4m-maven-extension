@@ -37,7 +37,7 @@ public class ExecutionsParserMavenLifecycleParticipant extends AbstractMavenLife
 	public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
 
 		// TODO Parse/Collect Executions -> Archive
-
+		
 	}
 
 	/**

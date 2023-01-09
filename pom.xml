@@ -3,14 +3,15 @@
 
 	<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>0.0</version>
+	<version>0.0.0</version>
 	<packaging>pom</packaging>
 
-	<name>Runes4Maven Extension Parent</name>
+	<name>Runes4Maven Parent</name>
 	<url>https://github.com/RunedUniverse/r4m</url>
 	<inceptionYear>2022</inceptionYear>
 
 	<modules>
+		<module>sources</module>
 		<module>api</module>
 		<module>extension</module>
 	</modules>
@@ -54,73 +55,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- VERSIONS -->
+		<major-version>0</major-version>
+		<minor-version>0</minor-version>
+		<artifact-version>0</artifact-version>
+		<!-- ARTIFACT VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
-		<maven-version>3.8.4</maven-version>
-		<!-- VERSIONS : compiler -->
-		<plexus-component-version>1.7.1</plexus-component-version>
-		<maven-plugin-annotations-version>3.6.4</maven-plugin-annotations-version>
-		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.apache.maven</groupId>
-				<artifactId>maven-core</artifactId>
-				<version>${maven-version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-utils</artifactId>
-				<version>3.3.0</version>
-			</dependency>
-
-			<!-- logging utilities-->
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-common</artifactId>
-				<version>1.0.1</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-logging</artifactId>
-				<version>1.0.1</version>
-			</dependency>
-
-			<!-- dependency for plexus annotation -->
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-annotations</artifactId>
-				<version>${plexus-component-version}</version>
-				<scope>provided</scope>
-			</dependency>
-			<!-- dependency for maven annotation -->
-			<dependency>
-				<groupId>org.apache.maven.plugin-tools</groupId>
-				<artifactId>maven-plugin-annotations</artifactId>
-				<version>${maven-plugin-annotations-version}</version>
-				<scope>provided</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-plugin-plugin</artifactId>
-					<version>${maven-plugin-plugin-version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.plexus</groupId>
-					<artifactId>plexus-component-metadata</artifactId>
-					<version>${plexus-component-version}</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
 </project>

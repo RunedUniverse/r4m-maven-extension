@@ -7,22 +7,29 @@
 		<version>0.0.0</version>
 	</parent>
 
-	<artifactId>r4m-api</artifactId>
+	<artifactId>r4m-bom-sources</artifactId>
 	<version>${major-version}.${minor-version}.${artifact-version}</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
-	<name>Runes4Maven API</name>
+	<name>Runes4Maven Bill of Sources</name>
 	<url>https://github.com/RunedUniverse/r4m</url>
 	<inceptionYear>2022</inceptionYear>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<artifact-version>0</artifact-version>
+
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
+		<!-- VERSIONS -->
+		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<artifact-version>0</artifact-version>
-		<sources-version>0</sources-version>
+		<runeduniverse-utils-common-version>[1.0.1,)</runeduniverse-utils-common-version>
+		<runeduniverse-utils-logging-version>[1.0.1,)</runeduniverse-utils-logging-version>
+		<plexus-utils-version>3.3.0</plexus-utils-version>
+		<!-- ARTIFACT VERSIONS - TESTING -->
 	</properties>
+
 
 	<licenses>
 		<license>
@@ -51,46 +58,31 @@
 		</developer>
 	</developers>
 
-	<scm>
-		<url>https://github.com/RunedUniverse/r4m</url>
-		<connection>scm:git:http://github.com/RunedUniverse/r4m.git</connection>
-		<developerConnection>scm:git:git@github.com:RunedUniverse/r4m.git</developerConnection>
-	</scm>
-	<issueManagement>
-		<system>GitHub Issues</system>
-		<url>https://github.com/RunedUniverse/r4m/issues</url>
-	</issueManagement>
-
-	<prerequisites>
-		<maven>${maven-version-min}</maven>
-	</prerequisites>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- logging utilities-->
-		<dependency>
-			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-common</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-logging</artifactId>
-		</dependency>
-	</dependencies>
-
 	<dependencyManagement>
 		<dependencies>
+			<!-- Maven Core -->
 			<dependency>
-				<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
-				<artifactId>r4m-bom-sources</artifactId>
-				<version>${major-version}.${minor-version}.${sources-version}</version>
-				<type>pom</type>
-				<scope>import</scope>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-core</artifactId>
+				<version>${maven-version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- UTILS -->
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>${plexus-utils-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-common</artifactId>
+				<version>${runeduniverse-utils-common-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-logging</artifactId>
+				<version>${runeduniverse-utils-logging-version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

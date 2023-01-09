@@ -4,8 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.executions.ExecutionDescriptor;
-
 public class Plugin {
 
 	private final String groupId;

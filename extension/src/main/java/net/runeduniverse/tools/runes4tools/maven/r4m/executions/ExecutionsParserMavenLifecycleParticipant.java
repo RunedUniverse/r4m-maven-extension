@@ -1,15 +1,10 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
 
-import java.util.Map;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.Lifecycle;
-import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;

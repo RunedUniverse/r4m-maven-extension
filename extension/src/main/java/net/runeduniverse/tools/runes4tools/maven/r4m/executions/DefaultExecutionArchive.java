@@ -12,6 +12,7 @@ import org.codehaus.plexus.component.annotations.Component;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveSubset;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionBuilder;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ForkMojoDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.MvnPluginFilter;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.R4mPluginFilter;
@@ -124,7 +125,8 @@ public class DefaultExecutionArchive implements ExecutionArchive {
 
 	public ExecutionBuilder createBuilder(final MavenProject mvnProject, final String executingLifecyclePhase,
 			final ForkMojoDescriptor preForkMojo, final ForkMojoDescriptor postForkMojo) {
-		return new ExecutionBuilder(this.newSubset(), mvnProject, executingLifecyclePhase, preForkMojo, postForkMojo);
+		return new DefaultExecutionBuilder(this.newSubset(), mvnProject, executingLifecyclePhase, preForkMojo,
+				postForkMojo);
 	}
 
 	private class Subset implements ExecutionArchiveSubset {

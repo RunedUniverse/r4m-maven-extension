@@ -15,13 +15,14 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveSubset;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionBuilder;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ForkMojoDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.MvnPluginFilter;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Goal;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-public class ExecutionBuilder {
+public class DefaultExecutionBuilder implements ExecutionBuilder{
 
 	protected final ExecutionArchiveSubset archive;
 	protected final MavenProject mvnProject;
@@ -33,7 +34,7 @@ public class ExecutionBuilder {
 	protected MvnPluginFilter mvnPluginFilter = null;
 	protected String executionId = Properties.LIFECYCLE.INJECT.DEFAULT_EXECUTION_ID;
 
-	public ExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject,
+	public DefaultExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject,
 			final String executingLifecyclePhase, final ForkMojoDescriptor preForkMojo,
 			final ForkMojoDescriptor postForkMojo) {
 		this.archive = archiveSubset;

@@ -23,6 +23,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveParser;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.ExecutionDescriptor;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
 import net.runeduniverse.tools.runes4tools.maven.r4m.errors.ExecutionDescriptorParsingException;
 

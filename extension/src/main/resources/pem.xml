@@ -23,6 +23,10 @@
 						<phase id="compile">
 							<goals>
 								<goal id="build-invoker-summary">
+									<modes>
+										<default />
+										<dev />
+									</modes>
 									<groupId>net.runeduniverse.tools.runes4tools</groupId>
 									<artifactId>runes4maven-maven-plugin</artifactId>
 									<fork>
@@ -38,6 +42,10 @@
 						<phase id="test-compile">
 							<goals>
 								<goal id="build-invoker-summary">
+									<modes>
+										<default />
+										<dev />
+									</modes>
 									<groupId>net.runeduniverse.tools.runes4tools</groupId>
 									<artifactId>runes4maven-maven-plugin</artifactId>
 									<fork>

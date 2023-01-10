@@ -110,18 +110,19 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
+			<xs:element name="modes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="default" />
+							<xs:element name="dev" />
+							<xs:any />
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
-		<xs:attribute name="mode" default="dev/default">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="default" />
-					<xs:enumeration value="dev" />
-					<xs:enumeration value="dev/default" />
-					<xs:enumeration value="any" />
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="TragetLifecycle">
@@ -135,7 +136,7 @@
 				</xs:complexType>
 			</xs:element>
 			<xs:element name="startAtPhase" minOccurs="0" />
-			<xs:element name="startFromPhase" minOccurs="0" />
+			<xs:element name="stopAtPhase" minOccurs="0" />
 			<xs:element name="excludePhases" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>

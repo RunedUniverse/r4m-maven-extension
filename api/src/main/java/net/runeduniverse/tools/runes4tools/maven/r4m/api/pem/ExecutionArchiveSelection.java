@@ -6,7 +6,6 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.ExecutionView;
-import net.runeduniverse.tools.runes4tools.maven.r4m.pem.Archive;
 
 public interface ExecutionArchiveSelection extends Cloneable {
 	public ExecutionArchiveSelection selectActiveProject(MavenProject value);
@@ -47,7 +46,7 @@ public interface ExecutionArchiveSelection extends Cloneable {
 
 	public ExecutionArchiveSelection clearModes();
 
-	public Archive getArchive();
+	public ExecutionArchive getArchive();
 
 	public MavenProject getActiveProject();
 

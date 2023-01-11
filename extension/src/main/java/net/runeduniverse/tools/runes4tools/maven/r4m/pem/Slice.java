@@ -14,7 +14,7 @@ import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSour
 
 public class Slice implements ExecutionArchiveSlice {
 	private final MavenProject mvnProject;
-	private Slice parent;
+	private ExecutionArchiveSlice parent;
 	private String version;
 	private Map<String, Map<ExecutionSource, Execution>> executions = new LinkedHashMap<>();
 
@@ -24,15 +24,18 @@ public class Slice implements ExecutionArchiveSlice {
 		this.parent = parent;
 	}
 
+	@Override
 	public MavenProject getMvnProject() {
 		return this.mvnProject;
 	}
 
+	@Override
 	public String getVersion() {
 		return this.version;
 	}
 
-	public Slice getParent() {
+	@Override
+	public ExecutionArchiveSlice getParent() {
 		return this.parent;
 	}
 
@@ -44,5 +47,10 @@ public class Slice implements ExecutionArchiveSlice {
 				if (filter.apply(execution))
 					executions.add(execution);
 		return executions;
+	}
+
+	@Override
+	public void setParent(ExecutionArchiveSlice parent) {
+		this.parent = parent;
 	}
 }

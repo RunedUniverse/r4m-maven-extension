@@ -14,4 +14,6 @@ public interface ExecutionArchiveSlice {
 	public ExecutionArchiveSlice getParent();
 
 	public Set<Execution> getExecutions(ExecutionFilter filter);
+
+	public void setParent(ExecutionArchiveSlice parent);
 }

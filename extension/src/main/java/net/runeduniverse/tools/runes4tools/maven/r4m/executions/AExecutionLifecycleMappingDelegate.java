@@ -26,17 +26,17 @@ public abstract class AExecutionLifecycleMappingDelegate implements LifecycleMap
 	@Requirement
 	protected Logger logger;
 
-	// @Requirement
+	@Requirement
 	protected ExecutionArchive archive;
-	
+
 	public AExecutionLifecycleMappingDelegate() {
 		this.archive = new DefaultExecutionArchive();
 	}
-	
+
 	protected static MvnPluginFilter filterForBuildPlugins(final MavenProject mvnProject) {
 		final Set<org.apache.maven.model.Plugin> mvnPlugins = new LinkedHashSet<Plugin>(mvnProject.getBuildPlugins());
 		return new MvnPluginFilter() {
-			
+
 			@Override
 			public boolean apply(Plugin mvnPlugin) {
 				return mvnPlugins.contains(mvnPlugin);

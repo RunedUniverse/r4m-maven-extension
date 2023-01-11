@@ -1,6 +1,6 @@
-<!-- <build xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd 
-	"> -->
+<!-- <project-execution-model xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd"> -->
 <project-execution-model
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -11,13 +11,10 @@
 	<executions>
 
 		<execution id="default" source="override">
-			<!-- <triggers> -->
-			<!-- <active-profile id="default" /> -->
-			<!-- <passive-profile id="test" /> -->
-			<!-- </triggers> -->
+			<triggers>
+				<always />
+			</triggers>
 			<lifecycles>
-				<lifecycle id="clean">
-				</lifecycle>
 				<lifecycle id="default">
 					<phases>
 						<phase id="compile">
@@ -59,8 +56,6 @@
 							</goals>
 						</phase>
 					</phases>
-				</lifecycle>
-				<lifecycle id="site">
 				</lifecycle>
 			</lifecycles>
 		</execution>

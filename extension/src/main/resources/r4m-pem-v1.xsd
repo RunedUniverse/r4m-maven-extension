@@ -26,11 +26,54 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="active-profile" type="Profile"
-							minOccurs="0" maxOccurs="unbounded" />
-						<xs:element name="passive-profile" type="Profile"
-							minOccurs="0" maxOccurs="unbounded" />
-						<xs:element name="packaging" type="xs:string"
-							minOccurs="0" maxOccurs="unbounded" />
+							minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Trigger is successful when the Profile got
+									explicitly mentioned
+									by executing 'mvn -Pactive-profile'.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="inactive-profile" type="Profile"
+							minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Trigger is successful when the Profile was
+									defined somewhere in the POM hierarchy and was not explicitly
+									mentioned to maven.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="provided-profile" type="Profile"
+							minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Trigger is successful when the Profile was
+									defined somewhere in the POM hierarchy.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="missing-profile" type="Profile"
+							minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Trigger is successful when the Profile was
+									neither explicitly mentioned to maven nor defined somewhere in
+									the POM hierarchy.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="packaging-procedure" type="xs:string"
+							minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>
+									Used to select packaging flag in POM. Keep in
+									mind the POM's packaging flag only indirectly defines the
+									Artifacts Type.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
 						<xs:element name="on-call" minOccurs="0" maxOccurs="1" />
 						<xs:element name="never" minOccurs="0" maxOccurs="1" />
 						<xs:element name="always" minOccurs="0" maxOccurs="1" />

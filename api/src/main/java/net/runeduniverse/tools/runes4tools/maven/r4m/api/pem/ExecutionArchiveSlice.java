@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
@@ -16,4 +17,6 @@ public interface ExecutionArchiveSlice {
 	public Set<Execution> getExecutions(ExecutionFilter filter);
 
 	public void setParent(ExecutionArchiveSlice parent);
+
+	public void register(Collection<Execution> executions);
 }

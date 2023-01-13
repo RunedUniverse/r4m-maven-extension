@@ -5,7 +5,7 @@ import org.apache.maven.project.MavenProject;
 public interface ExecutionArchive {
 	public ExecutionArchiveSlice createSlice(final MavenProject mvnProject);
 
-	public ExecutionArchiveSlice getSlice(MavenProject mvnProject);
+	public ExecutionArchiveSlice getSlice(final MavenProject mvnProject);
 
 	public ExecutionArchiveSelector newSelection();
 }

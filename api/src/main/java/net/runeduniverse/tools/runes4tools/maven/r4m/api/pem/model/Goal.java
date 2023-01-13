@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model;
 
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -11,10 +12,23 @@ public class Goal implements Recordable {
 	private String groupId;
 	private String artifactId;
 	private String goalId;
-	private Set<String> modes;
-	private Set<Target> targets;
+	private Set<String> modes = new LinkedHashSet<>();
+	private Set<Target> targets = new LinkedHashSet<>();
 
 	private MojoDescriptor descriptor;
+
+	public Goal() {
+	}
+
+	public Goal(String mvnGoalKey) {
+		// TODO parse mvnGoalKey
+	}
+
+	public Goal(String groupId, String artifactId, String goalId) {
+		this.groupId = groupId;
+		this.artifactId = artifactId;
+		this.goalId = goalId;
+	}
 
 	public String getGroupId() {
 		return this.groupId;
@@ -38,6 +52,12 @@ public class Goal implements Recordable {
 
 	public MojoDescriptor getDescriptor() {
 		return this.descriptor;
+	}
+
+	public Goal addModes(String... modes) {
+		for (int i = 0; i < modes.length; i++)
+			this.modes.add(modes[i]);
+		return this;
 	}
 
 	@Override

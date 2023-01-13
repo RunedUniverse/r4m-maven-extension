@@ -16,6 +16,14 @@ public class Execution {
 
 	private Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
 
+	public Execution() {
+	}
+
+	public Execution(final String id, final ExecutionSource source) {
+		this.id = id;
+		this.source = source;
+	}
+
 	public String getId() {
 		return this.id;
 	}
@@ -40,7 +48,19 @@ public class Execution {
 		return this.packagingProcedures;
 	}
 
+	public Lifecycle getLifecycle(String lifecycleId) {
+		return this.lifecycles.get(lifecycleId);
+	}
+
 	public Map<String, Lifecycle> getLifecycles() {
 		return this.lifecycles;
+	}
+
+	public void addPackagingProcedure(String value) {
+		this.packagingProcedures.add(value);
+	}
+
+	public void putLifecycle(Lifecycle lifecycle) {
+		this.lifecycles.put(lifecycle.getId(), lifecycle);
 	}
 }

@@ -1,20 +1,74 @@
 package net.runeduniverse.tools.runes4tools.maven.r4m.pem.parser;
 
-import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.maven.lifecycle.mapping.LifecycleMapping;
+import org.apache.maven.lifecycle.mapping.LifecycleMojo;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Goal;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Lifecycle;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Phase;
 
 @Component(role = ProjectExecutionModelPackagingParser.class, hint = "default")
 public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
+	@Requirement
+	private Logger log;
+
+	@Requirement
+	private Map<String, LifecycleMapping> mappings;
+
 	@Override
 	public Set<Execution> parse() {
-		// TODO Auto-generated method stub
-		return new HashSet<>(0);
+		this.log.debug("Scanning PackagingProcedures");
+		Set<Execution> effExecutions = new LinkedHashSet<>();
+
+		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : mappings.entrySet()) {
+			Map<String, Execution> executions = new LinkedHashMap<>();
+			this.log.debug("PackagingProcedure: " + lifecycleMappingEntry.getKey());
+
+			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
+					.getLifecycles()
+					.values())
+				for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecycleMapping.getLifecyclePhases()
+						.entrySet()) {
+
+					String executionId = phaseMappingEntry.getKey();
+					Execution execution = executions.get(executionId);
+					if (execution == null) {
+						execution = new Execution(executionId, ExecutionSource.PACKAGING);
+						execution.addPackagingProcedure(lifecycleMappingEntry.getKey());
+						executions.put(execution.getId(), execution);
+					}
+					Lifecycle lifecycle = execution.getLifecycle(lifecycleMapping.getId());
+					if (lifecycle == null) {
+						lifecycle = new Lifecycle(lifecycleMapping.getId());
+						execution.putLifecycle(lifecycle);
+					}
+					Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
+					if (phase == null) {
+						phase = new Phase(phaseMappingEntry.getKey());
+						lifecycle.putPhase(phase);
+					}
+
+					for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
+							.getMojos())
+						phase.addGoal(new Goal(mojoMapping.getGoal()).addModes("default", "dev"));
+				}
+			effExecutions.addAll(executions.values());
+		}
+		return effExecutions;
 	}
 
 }

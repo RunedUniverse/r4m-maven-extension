@@ -13,6 +13,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
@@ -44,27 +45,30 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 				for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecycleMapping.getLifecyclePhases()
 						.entrySet()) {
 
-					String executionId = phaseMappingEntry.getKey();
-					Execution execution = executions.get(executionId);
-					if (execution == null) {
-						execution = new Execution(executionId, ExecutionSource.PACKAGING);
-						execution.addPackagingProcedure(lifecycleMappingEntry.getKey());
-						executions.put(execution.getId(), execution);
-					}
-					Lifecycle lifecycle = execution.getLifecycle(lifecycleMapping.getId());
-					if (lifecycle == null) {
-						lifecycle = new Lifecycle(lifecycleMapping.getId());
-						execution.putLifecycle(lifecycle);
-					}
-					Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
-					if (phase == null) {
-						phase = new Phase(phaseMappingEntry.getKey());
-						lifecycle.putPhase(phase);
-					}
+					String executionId = String.join("-", Properties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
+							phaseMappingEntry.getKey());
 
 					for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
-							.getMojos())
+							.getMojos()) {
+						Execution execution = executions.get(executionId);
+						if (execution == null) {
+							execution = new Execution(executionId, ExecutionSource.PACKAGING);
+							execution.addPackagingProcedure(lifecycleMappingEntry.getKey());
+							executions.put(execution.getId(), execution);
+						}
+						Lifecycle lifecycle = execution.getLifecycle(lifecycleMapping.getId());
+						if (lifecycle == null) {
+							lifecycle = new Lifecycle(lifecycleMapping.getId());
+							execution.putLifecycle(lifecycle);
+						}
+						Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
+						if (phase == null) {
+							phase = new Phase(phaseMappingEntry.getKey());
+							lifecycle.putPhase(phase);
+						}
+
 						phase.addGoal(new Goal(mojoMapping.getGoal()).addModes("default", "dev"));
+					}
 				}
 			effExecutions.addAll(executions.values());
 		}

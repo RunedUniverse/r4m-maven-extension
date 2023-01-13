@@ -7,5 +7,5 @@ public interface ExecutionArchive {
 
 	public ExecutionArchiveSlice getSlice(MavenProject mvnProject);
 
-	public ExecutionArchiveSelection newSelection();
+	public ExecutionArchiveSelector newSelection();
 }

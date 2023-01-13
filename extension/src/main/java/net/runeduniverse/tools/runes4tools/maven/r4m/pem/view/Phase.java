@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.PhaseView;
 
@@ -39,6 +41,18 @@ public class Phase implements PhaseView {
 	@Override
 	public void addAllGoals(Collection<Goal> goals) {
 		this.goals.addAll(goals);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("PhaseView");
+
+		tree.append("id", this.id);
+
+		for (Recordable goal : this.goals)
+			tree.append(goal.toRecord());
+
+		return tree;
 	}
 
 }

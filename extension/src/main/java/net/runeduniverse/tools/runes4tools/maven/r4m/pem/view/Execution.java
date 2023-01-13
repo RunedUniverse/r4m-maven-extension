@@ -2,7 +2,8 @@ package net.runeduniverse.tools.runes4tools.maven.r4m.pem.view;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.LifecycleView;
 
@@ -33,6 +34,18 @@ public class Execution implements ExecutionView {
 	@Override
 	public LifecycleView getLifecycle(String lifecycleId) {
 		return this.lifecycles.get(lifecycleId);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("ExecutionView");
+
+		tree.append("id", this.id);
+
+		for (Recordable lifecycle : this.lifecycles.values())
+			tree.append(lifecycle.toRecord());
+
+		return tree;
 	}
 
 }

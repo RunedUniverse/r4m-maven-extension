@@ -5,10 +5,8 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.ExecutionView;
-
-public interface ExecutionArchiveSelection extends Cloneable {
-	public ExecutionArchiveSelection selectActiveProject(MavenProject value);
+public interface ExecutionArchiveSelector extends Cloneable {
+	public ExecutionArchiveSelector selectActiveProject(MavenProject value);
 
 	/***
 	 * used to select for the packaging flag in pom. Keep in mind there are multiple
@@ -18,33 +16,33 @@ public interface ExecutionArchiveSelection extends Cloneable {
 	 * @param value packaging procedure
 	 * @return selection
 	 */
-	public ExecutionArchiveSelection selectPackagingProcedure(String value);
+	public ExecutionArchiveSelector selectPackagingProcedure(String value);
 
-	public ExecutionArchiveSelection selectActiveExecution(String value);
+	public ExecutionArchiveSelector selectActiveExecution(String value);
 
-	public ExecutionArchiveSelection selectActiveProfiles(String... values);
+	public ExecutionArchiveSelector selectActiveProfiles(String... values);
 
-	public ExecutionArchiveSelection selectActiveProfiles(Collection<String> values);
+	public ExecutionArchiveSelector selectActiveProfiles(Collection<String> values);
 
-	public ExecutionArchiveSelection selectProvidedProfiles(String... values);
+	public ExecutionArchiveSelector selectProvidedProfiles(String... values);
 
-	public ExecutionArchiveSelection selectProvidedProfiles(Collection<String> values);
+	public ExecutionArchiveSelector selectProvidedProfiles(Collection<String> values);
 
-	public ExecutionArchiveSelection selectModes(String... values);
+	public ExecutionArchiveSelector selectModes(String... values);
 
-	public ExecutionArchiveSelection selectModes(Collection<String> values);
+	public ExecutionArchiveSelector selectModes(Collection<String> values);
 
-	public ExecutionArchiveSelection clearActiveProject();
+	public ExecutionArchiveSelector clearActiveProject();
 
-	public ExecutionArchiveSelection clearPackagingProcedure();
+	public ExecutionArchiveSelector clearPackagingProcedure();
 
-	public ExecutionArchiveSelection clearActiveExecution();
+	public ExecutionArchiveSelector clearActiveExecution();
 
-	public ExecutionArchiveSelection clearActiveProfiles();
+	public ExecutionArchiveSelector clearActiveProfiles();
 
-	public ExecutionArchiveSelection clearProvidedProfiles();
+	public ExecutionArchiveSelector clearProvidedProfiles();
 
-	public ExecutionArchiveSelection clearModes();
+	public ExecutionArchiveSelector clearModes();
 
 	public ExecutionArchive getArchive();
 
@@ -60,7 +58,7 @@ public interface ExecutionArchiveSelection extends Cloneable {
 
 	public Set<String> getModes();
 
-	public Set<ExecutionView> getEffectiveExecutions();
+	public ExecutionArchiveSelection compile();
 
-	public void copy(ExecutionArchiveSelection selection);
+	public void copy(ExecutionArchiveSelector selection);
 }

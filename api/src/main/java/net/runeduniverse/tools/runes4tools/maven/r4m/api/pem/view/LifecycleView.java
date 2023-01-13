@@ -2,7 +2,9 @@ package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view;
 
 import java.util.Map;
 
-public interface LifecycleView {
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
+
+public interface LifecycleView extends Recordable{
 	public String getId();
 
 	public Map<String, PhaseView> getPhases();

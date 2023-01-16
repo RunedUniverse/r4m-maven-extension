@@ -21,7 +21,7 @@ public class Goal implements Recordable {
 	}
 
 	public Goal(String mvnGoalKey) {
-		// TODO parse mvnGoalKey
+		parseMvnGoalKey(mvnGoalKey);
 	}
 
 	public Goal(String groupId, String artifactId, String goalId) {
@@ -60,6 +60,34 @@ public class Goal implements Recordable {
 		return this;
 	}
 
+	public boolean parseMvnGoalKey(String mvnGoalKey) {
+		String[] keyValues = mvnGoalKey.split(":");
+
+		switch (keyValues.length) {
+		case 2:
+			// prefix:goal
+			// prefix
+			this.goalId = keyValues[1];
+			return true;
+		case 3:
+			// groupId:artifactId:goal
+			this.groupId = keyValues[0];
+			this.artifactId = keyValues[1];
+			this.goalId = keyValues[2];
+			return true;
+		case 4:
+			// groupId:artifactId:version:goal
+			this.groupId = keyValues[0];
+			this.artifactId = keyValues[1];
+			// version
+			this.goalId = keyValues[3];
+			return true;
+		default:
+			return false;
+		}
+
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		// TODO COMPARE GOALS
@@ -70,9 +98,7 @@ public class Goal implements Recordable {
 	public CompoundTree toRecord() {
 		CompoundTree tree = new CompoundTree("Goal");
 
-		tree.append("groupId", this.groupId)
-				.append("artifactId", this.artifactId)
-				.append("goalId", this.goalId);
+		tree.append("groupId", this.groupId).append("artifactId", this.artifactId).append("goalId", this.goalId);
 
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
 

@@ -25,6 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 
 /**
@@ -57,10 +58,10 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		selector.selectModes("default");
 		selector.selectPackagingProcedure(project.getPackaging());
 
+		ExecutionArchiveSelection selection = selector.compile();
+
 		this.log.warn("Active Execution Selection:");
-		this.log.warn(selector.compile()
-				.toRecord()
-				.toString());
+		this.log.warn(selection.toRecord().toString());
 
 		System.out.println("OVERRIDE Sequential >> Lifecycle: " + lifecycle + " Phase: " + lifecyclePhase);
 
@@ -80,8 +81,7 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		 * in the map, we are not interested in any of the executions bound to it.
 		 */
 
-		for (Plugin plugin : project.getBuild()
-				.getPlugins()) {
+		for (Plugin plugin : project.getBuild().getPlugins()) {
 			// System.out.println(plugin);
 			for (PluginExecution execution : plugin.getExecutions()) {
 				// System.out.println("Execution: " + execution.getId());
@@ -128,8 +128,7 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
 			List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-			for (List<MojoExecution> executions : entry.getValue()
-					.values()) {
+			for (List<MojoExecution> executions : entry.getValue().values()) {
 				mojoExecutions.addAll(executions);
 			}
 

@@ -1,24 +1,58 @@
-<executions>
-	<execution>
-		<id>default</id>
-		<phases>
-			<phase>
-				<id>scan-references</id>
-				<goals>
-					<goal>builder-scan-references</goal>
-				</goals>
-			</phase>
-		</phases>
-	</execution>
-	<execution>
-		<id>test</id>
-		<phases>
-			<phase>
-				<id>scan-references</id>
-				<goals>
-					<goal>builder-scan-test-references</goal>
-				</goals>
-			</phase>
-		</phases>
-	</execution>
-</executions>
+<project-execution-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd">
+
+	<modelVersion>1.0.0</modelVersion>
+
+	<executions>
+		<execution source="plugin" id="default">
+			<triggers>
+				<default />
+				<on-call />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="builder">
+					<phases>
+						<phase id="scan-references">
+							<goals>
+								<goal id="builder-scan-references">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+		<execution source="plugin" id="test">
+			<triggers>
+				<on-call />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="builder">
+					<phases>
+						<phase id="scan-references">
+							<goals>
+								<goal id="builder-scan-test-references">
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+	</executions>
+</project-execution-model>

@@ -44,7 +44,7 @@ public interface Runes4MavenProperties {
 	public interface METAINF extends MavenProperties.METAINF {
 		public interface RUNES4MAVEN {
 			public static String PATH = METAINF.PATH + "r4m/";
-			public static String EXECUTIONS = PATH + "executions.xml";
+			public static String EXECUTIONS = PATH + "plugin-pem.xml";
 		}
 	}
 }

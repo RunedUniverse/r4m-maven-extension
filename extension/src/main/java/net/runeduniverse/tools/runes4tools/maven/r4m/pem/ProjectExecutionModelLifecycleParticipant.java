@@ -45,9 +45,9 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	 * This callback is intended to allow extensions to manipulate MavenProjects
 	 * before they are sorted and actual build execution starts.
 	 */
-	public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
+	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
 
-		for (MavenProject mvnProject : session.getAllProjects()) {
+		for (MavenProject mvnProject : mvnSession.getAllProjects()) {
 			ExecutionArchiveSlice projectSlice = this.archive.createSlice(mvnProject);
 
 			Set<Execution> configExec = new HashSet<>();
@@ -62,7 +62,8 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 			for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
 				for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
-					projectSlice.register(parser.parse(mvnPlugin));
+					projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
+							mvnSession.getRepositorySession(), mvnPlugin));
 				}
 
 			for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values()) {

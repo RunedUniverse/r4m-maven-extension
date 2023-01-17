@@ -23,7 +23,7 @@ public class Archive implements ExecutionArchive {
 	@Override
 	public ExecutionArchiveSlice createSlice(MavenProject mvnProject) {
 		ProjectDependencyGraph graph = this.mvnSession.getProjectDependencyGraph();
-		ExecutionArchiveSlice slice = new Slice(mvnProject, null, null);
+		ExecutionArchiveSlice slice = new ArchiveSlice(mvnProject, null, null);
 		this.registry.put(mvnProject, slice);
 
 		// this should contain max 1 project

@@ -14,13 +14,13 @@ import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
 
-public class Slice implements ExecutionArchiveSlice {
+public class ArchiveSlice implements ExecutionArchiveSlice {
 	private final MavenProject mvnProject;
 	private ExecutionArchiveSlice parent;
 	private String version;
 	private Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
 
-	public Slice(MavenProject mvnProject, String version, Slice parent) {
+	public ArchiveSlice(MavenProject mvnProject, String version, ArchiveSlice parent) {
 		this.mvnProject = mvnProject;
 		this.version = version;
 		this.parent = parent;

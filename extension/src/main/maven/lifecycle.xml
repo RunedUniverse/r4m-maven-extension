@@ -9,7 +9,7 @@
 				<executions>
 					<execution>
 						<goals>
-							<goal>net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin:scan-references
+							<goal>net.runeduniverse.tools.maven.r4m:r4m-maven-extension:scan-references
 							</goal>
 						</goals>
 					</execution>

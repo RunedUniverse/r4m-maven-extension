@@ -107,7 +107,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPlugin.getKey(), pluginFile.getAbsolutePath()), e);
 		}
 
-		slice.addExecutions(model.getExecutions());
+		slice.includeModel(model);
 		return slice;
 	}
 

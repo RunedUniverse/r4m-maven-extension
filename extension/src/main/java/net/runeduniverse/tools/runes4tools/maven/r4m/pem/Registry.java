@@ -11,8 +11,12 @@ public class Registry implements PluginExecutionRegistry {
 
 	@Override
 	public PluginExecutionRegistrySlice createSlice(PluginDescriptor mvnPluginDescriptor) {
-		// TODO Auto-generated method stub
-		return null;
+		// TODO index descriptor
+
+		PluginExecutionRegistrySlice slice = new RegistrySlice();
+		// TODO index slice
+
+		return slice;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.Set;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public class RegistrySlice implements PluginExecutionRegistrySlice {
 
@@ -22,6 +23,16 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 	@Override
 	public void addExecutions(Collection<Execution> values) {
 		this.executions.addAll(values);
+	}
+
+	@Override
+	public void includeModel(ProjectExecutionModel model) {
+		if (model == null)
+			return;
+
+		// track model?
+
+		this.executions.addAll(model.getExecutions());
 	}
 
 }

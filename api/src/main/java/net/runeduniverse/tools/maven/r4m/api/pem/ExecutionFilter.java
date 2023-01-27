@@ -1,6 +1,6 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem;
+package net.runeduniverse.tools.maven.r4m.api.pem;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 
 @FunctionalInterface
 public interface ExecutionFilter {

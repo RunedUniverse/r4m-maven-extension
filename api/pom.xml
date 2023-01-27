@@ -86,7 +86,7 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+				<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 				<artifactId>r4m-bom-sources</artifactId>
 				<version>${major-version}.${minor-version}.${sources-version}</version>
 				<type>pom</type>

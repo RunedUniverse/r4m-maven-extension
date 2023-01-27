@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -11,19 +11,19 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelector;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Lifecycle;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Phase;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ProfileTrigger;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.ExecutionView;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.LifecycleView;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.PhaseView;
-import net.runeduniverse.tools.runes4tools.maven.r4m.pem.view.ViewFactory;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProfileTrigger;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
+import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 
 public class Selector implements ExecutionArchiveSelector {
 

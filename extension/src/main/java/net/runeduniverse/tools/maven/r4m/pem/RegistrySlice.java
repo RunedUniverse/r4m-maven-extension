@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -7,9 +7,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public class RegistrySlice implements PluginExecutionRegistrySlice {
 

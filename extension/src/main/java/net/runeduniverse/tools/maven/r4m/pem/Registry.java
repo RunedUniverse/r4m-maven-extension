@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistry;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistry;
+import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

@@ -1,6 +1,6 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter;
+package net.runeduniverse.tools.maven.r4m.api.executions.filter;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Plugin;
 
 /**
  * Check if the MavenPlugin meets the filter

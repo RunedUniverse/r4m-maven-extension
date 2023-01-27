@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api;
+package net.runeduniverse.tools.maven.r4m.api;
 
 public interface MavenProperties {
 	public static String DEFAULT_LIFECYCLE_ID = "default";

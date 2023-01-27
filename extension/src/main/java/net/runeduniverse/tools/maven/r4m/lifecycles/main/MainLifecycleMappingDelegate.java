@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.main;
+package net.runeduniverse.tools.maven.r4m.lifecycles.main;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -24,9 +24,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build

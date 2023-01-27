@@ -1,8 +1,8 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view;
+package net.runeduniverse.tools.maven.r4m.api.pem.view;
 
 import java.util.Map;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 
 public interface LifecycleView extends Recordable{
 	public String getId();

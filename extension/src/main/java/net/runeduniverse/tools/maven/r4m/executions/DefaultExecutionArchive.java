@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
+package net.runeduniverse.tools.maven.r4m.executions;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -10,16 +10,16 @@ import java.util.Map.Entry;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveSubset;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionBuilder;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ForkMojoDescriptor;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.MvnPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.R4mPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Phase;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchiveSubset;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionBuilder;
+import net.runeduniverse.tools.maven.r4m.api.executions.ForkMojoDescriptor;
+import net.runeduniverse.tools.maven.r4m.api.executions.filter.MvnPluginFilter;
+import net.runeduniverse.tools.maven.r4m.api.executions.filter.R4mPluginFilter;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Phase;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Plugin;
 
 @Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
 public class DefaultExecutionArchive implements ExecutionArchive {

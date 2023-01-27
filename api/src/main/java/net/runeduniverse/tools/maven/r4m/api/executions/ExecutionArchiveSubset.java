@@ -1,12 +1,12 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.executions;
+package net.runeduniverse.tools.maven.r4m.api.executions;
 
 import java.util.List;
 import java.util.Map;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.MvnPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.R4mPluginFilter;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
+import net.runeduniverse.tools.maven.r4m.api.executions.filter.MvnPluginFilter;
+import net.runeduniverse.tools.maven.r4m.api.executions.filter.R4mPluginFilter;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Plugin;
 
 public interface ExecutionArchiveSubset {
 	public boolean contains(org.apache.maven.model.Plugin mvnPlugin);

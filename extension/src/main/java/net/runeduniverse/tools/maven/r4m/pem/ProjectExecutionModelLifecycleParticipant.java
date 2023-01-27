@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -13,13 +13,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {

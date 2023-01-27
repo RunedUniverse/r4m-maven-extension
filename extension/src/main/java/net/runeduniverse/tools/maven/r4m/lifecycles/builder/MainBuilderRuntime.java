@@ -1,11 +1,11 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder;
+package net.runeduniverse.tools.maven.r4m.lifecycles.builder;
 
 import java.io.File;
 
 import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.Properties;
 
 @Component(role = BuilderRuntime.class, hint = "builder-main")
 public class MainBuilderRuntime implements BuilderRuntime {

@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder;
+package net.runeduniverse.tools.maven.r4m.lifecycles.builder;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,11 +16,11 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionBuilder;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ForkMojoDescriptor;
-import net.runeduniverse.tools.runes4tools.maven.r4m.executions.AExecutionLifecycleMappingDelegate;
-import net.runeduniverse.tools.runes4tools.maven.r4m.executions.ConfigExecutionArchiveParser;
+import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionBuilder;
+import net.runeduniverse.tools.maven.r4m.api.executions.ForkMojoDescriptor;
+import net.runeduniverse.tools.maven.r4m.executions.AExecutionLifecycleMappingDelegate;
+import net.runeduniverse.tools.maven.r4m.executions.ConfigExecutionArchiveParser;
 
 @Component(role = LifecycleMappingDelegate.class, hint = Properties.LIFECYCLE.BUILDER.INVOKER.LIFECYCLE_INVOKER_HINT)
 public class BuilderLifecycleMappingDelegate extends AExecutionLifecycleMappingDelegate {

@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
+package net.runeduniverse.tools.maven.r4m.executions;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
@@ -7,7 +7,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.Properties;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
 public class ExecutionsParserMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {

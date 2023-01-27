@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.mojos;
+package net.runeduniverse.tools.maven.r4m.lifecycles.builder.mojos;
 
 import java.util.Set;
 
@@ -6,8 +6,8 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.ReferenceFileScanner;
-import net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.ReferenceScanner;
+import net.runeduniverse.tools.maven.r4m.lifecycles.builder.ReferenceFileScanner;
+import net.runeduniverse.tools.maven.r4m.lifecycles.builder.ReferenceScanner;
 
 /**
  * Maps out all references of the source files to later be able to compile

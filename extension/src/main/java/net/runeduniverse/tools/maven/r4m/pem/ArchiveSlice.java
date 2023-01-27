@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -9,10 +9,10 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionFilter;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 
 public class ArchiveSlice implements ExecutionArchiveSlice {
 	private final MavenProject mvnProject;

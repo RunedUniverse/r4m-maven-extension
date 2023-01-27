@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem.parser;
+package net.runeduniverse.tools.maven.r4m.pem.parser;
 
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -13,13 +13,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ExecutionSource;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Lifecycle;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 
 @Component(role = ProjectExecutionModelPackagingParser.class, hint = "default")
 public class PackagingParser implements ProjectExecutionModelPackagingParser {

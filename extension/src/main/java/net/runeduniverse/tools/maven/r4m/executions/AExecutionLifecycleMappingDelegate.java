@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
+package net.runeduniverse.tools.maven.r4m.executions;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -12,8 +12,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.filter.MvnPluginFilter;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.executions.filter.MvnPluginFilter;
 
 public abstract class AExecutionLifecycleMappingDelegate implements LifecycleMappingDelegate {
 

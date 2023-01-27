@@ -1,10 +1,10 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 
 public class Selection implements ExecutionArchiveSelection {
 

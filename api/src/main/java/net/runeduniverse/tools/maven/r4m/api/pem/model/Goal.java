@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model;
+package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -6,7 +6,7 @@ import java.util.Set;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 
 public class Goal implements Recordable {
 	private String groupId;

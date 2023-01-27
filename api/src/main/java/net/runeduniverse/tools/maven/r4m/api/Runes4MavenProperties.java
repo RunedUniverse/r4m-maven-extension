@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api;
+package net.runeduniverse.tools.maven.r4m.api;
 
 public interface Runes4MavenProperties {
 	public static String GROUP_ID = "net.runeduniverse.tools.runes4tools";

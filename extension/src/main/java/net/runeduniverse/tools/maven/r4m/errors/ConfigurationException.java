@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.errors;
+package net.runeduniverse.tools.maven.r4m.errors;
 
 public class ConfigurationException extends RuntimeException {
 

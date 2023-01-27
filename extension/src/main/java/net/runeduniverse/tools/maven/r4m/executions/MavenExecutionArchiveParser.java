@@ -1,12 +1,12 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
+package net.runeduniverse.tools.maven.r4m.executions;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionArchiveParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchiveParser;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Plugin;
 
 public class MavenExecutionArchiveParser implements ExecutionArchiveParser {
 

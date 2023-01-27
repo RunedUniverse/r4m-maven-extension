@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.dev;
+package net.runeduniverse.tools.maven.r4m.lifecycles.dev;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -16,7 +16,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.Properties;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.LIFECYCLE.DEV.LIFECYCLE_PARTICIPANT_HINT)
 public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {

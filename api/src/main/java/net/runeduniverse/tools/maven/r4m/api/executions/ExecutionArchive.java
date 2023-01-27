@@ -1,8 +1,8 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.executions;
+package net.runeduniverse.tools.maven.r4m.api.executions;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Plugin;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Plugin;
 
 public interface ExecutionArchive {
 	public boolean isRegistered(org.apache.maven.model.Plugin mvnPlugin);

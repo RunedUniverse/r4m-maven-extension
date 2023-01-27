@@ -1,6 +1,6 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.inject;
+package net.runeduniverse.tools.maven.r4m.lifecycles.inject;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.Properties;
 
 public class LifecycleDescriptor {
 	private String prefix;

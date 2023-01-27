@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.executions;
+package net.runeduniverse.tools.maven.r4m.executions;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -8,12 +8,12 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.ExecutionDescriptorBuilderInstance;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.ExecutionDescriptor;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Goal;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model.Phase;
+import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionDescriptorBuilderInstance;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.ExecutionDescriptor;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.executions.model.Phase;
 
 public class ExecutionDescriptorBuilder {
 

@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -9,9 +9,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSelector;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 
 @Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
 public class Archive implements ExecutionArchive {

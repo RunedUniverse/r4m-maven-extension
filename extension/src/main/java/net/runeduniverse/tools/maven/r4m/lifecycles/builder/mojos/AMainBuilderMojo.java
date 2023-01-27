@@ -1,10 +1,10 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.mojos;
+package net.runeduniverse.tools.maven.r4m.lifecycles.builder.mojos;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.BuilderRuntime;
-import net.runeduniverse.tools.runes4tools.maven.r4m.lifecycles.builder.ReferenceMap;
+import net.runeduniverse.tools.maven.r4m.lifecycles.builder.BuilderRuntime;
+import net.runeduniverse.tools.maven.r4m.lifecycles.builder.ReferenceMap;
 
 public abstract class AMainBuilderMojo extends AbstractMojo {
 

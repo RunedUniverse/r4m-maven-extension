@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.pem.parser;
+package net.runeduniverse.tools.maven.r4m.pem.parser;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -24,13 +24,13 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.Properties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistry;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistry;
+import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelPluginParser.class, hint = "default")
 public class PluginParser implements ProjectExecutionModelPluginParser {

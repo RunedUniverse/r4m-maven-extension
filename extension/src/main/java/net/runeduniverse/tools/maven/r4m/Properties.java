@@ -1,7 +1,7 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m;
+package net.runeduniverse.tools.maven.r4m;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.MavenProperties;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.Runes4MavenProperties;
+import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 
 public interface Properties extends MavenProperties {
 	public static String VAL_PREFIX = "${";

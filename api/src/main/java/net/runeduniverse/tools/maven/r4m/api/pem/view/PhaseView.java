@@ -1,10 +1,10 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.view;
+package net.runeduniverse.tools.maven.r4m.api.pem.view;
 
 import java.util.Collection;
 import java.util.List;
 
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.Recordable;
-import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 
 public interface PhaseView extends Recordable {
 	public String getId();

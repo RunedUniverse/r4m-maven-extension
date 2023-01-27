@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.runes4tools.maven.r4m.api.executions.model;
+package net.runeduniverse.tools.maven.r4m.api.executions.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

@@ -2,7 +2,9 @@ package net.runeduniverse.tools.runes4tools.maven.r4m.pem;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.runeduniverse.tools.runes4tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
@@ -14,6 +16,7 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 	// TODO must save waaaay more infos!!!
 
 	private Set<Execution> executions = new LinkedHashSet<>(0);
+	private Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>(0);
 
 	@Override
 	public Set<Execution> getExecutions() {
@@ -30,9 +33,10 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 		if (model == null)
 			return;
 
-		// track model?
-
-		this.executions.addAll(model.getExecutions());
+		for (Execution execution : model.getExecutions()) {
+			this.executions.add(execution);
+			this.executionOrigins.put(execution, model);
+		}
 	}
 
 }

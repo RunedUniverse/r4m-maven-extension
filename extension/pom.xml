@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.runeduniverse.tools.runes4tools.r4m</groupId>
+		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
 		<version>0.0.0</version>
 	</parent>

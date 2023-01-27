@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -22,5 +23,9 @@ public class ProjectExecutionModel {
 
 	public void addExecution(Execution execution) {
 		this.executions.add(execution);
+	}
+
+	public void addExecutions(Collection<Execution> executions) {
+		this.executions.addAll(executions);
 	}
 }

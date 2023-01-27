@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -60,7 +61,12 @@ public class Execution {
 		this.packagingProcedures.add(value);
 	}
 
-	public void putLifecycle(Lifecycle lifecycle) {
+	public void addLifecycle(Lifecycle lifecycle) {
 		this.lifecycles.put(lifecycle.getId(), lifecycle);
+	}
+
+	public void addLifecycles(Collection<Lifecycle> lifecycles) {
+		for (Lifecycle lifecycle : lifecycles)
+			this.lifecycles.put(lifecycle.getId(), lifecycle);
 	}
 }

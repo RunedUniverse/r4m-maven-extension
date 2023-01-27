@@ -1,6 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Lifecycle {
@@ -28,5 +29,10 @@ public class Lifecycle {
 
 	public void putPhase(Phase phase) {
 		this.phases.put(phase.getId(), phase);
+	}
+
+	public void addPhases(List<Phase> phases) {
+		for (Phase phase : phases)
+			this.phases.put(phase.getId(), phase);
 	}
 }

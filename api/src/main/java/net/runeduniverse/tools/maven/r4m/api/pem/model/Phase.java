@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,5 +23,9 @@ public class Phase {
 
 	public void addGoal(Goal goal) {
 		this.goals.add(goal);
+	}
+
+	public void addGoals(Collection<Goal> goals) {
+		this.goals.addAll(goals);
 	}
 }

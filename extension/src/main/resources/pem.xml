@@ -24,8 +24,8 @@
 										<default />
 										<dev />
 									</modes>
-									<groupId>net.runeduniverse.tools.runes4tools</groupId>
-									<artifactId>runes4maven-maven-plugin</artifactId>
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
 										<lifecycle id="builder">
 											<executions>
@@ -43,8 +43,8 @@
 										<default />
 										<dev />
 									</modes>
-									<groupId>net.runeduniverse.tools.runes4tools</groupId>
-									<artifactId>runes4maven-maven-plugin</artifactId>
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
 										<lifecycle id="builder">
 											<executions>

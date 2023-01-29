@@ -7,7 +7,7 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 
-public interface ExecutionArchiveSlice {
+public interface ExecutionArchiveSlice extends Recordable {
 	public MavenProject getMvnProject();
 
 	public String getVersion();

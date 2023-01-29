@@ -1,7 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -9,8 +8,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
@@ -19,7 +20,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProfileTrigger;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
@@ -27,21 +28,23 @@ import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 
 public class Selector implements ExecutionArchiveSelector {
 
-	private final Archive archive;
+	private final MavenSession mvnSession;
+	private final ExecutionArchive archive;
 
-	private MavenProject mvnProject = null;
-	private String packagingProcedure = null;
-	private String activeExecution = null;
-	private final Set<String> activeProfiles = new LinkedHashSet<>();
-	private final Set<String> providedProfiles = new LinkedHashSet<>();
-	private final Set<String> modes = new LinkedHashSet<>();
+	private SelectorConfig cnf = null;
 
-	public Selector(final Archive archive) {
+	public Selector(final MavenSession mvnSession, final ExecutionArchive archive) {
+		this(mvnSession, archive, new SelectorConfig());
+	}
+
+	public Selector(final MavenSession mvnSession, final ExecutionArchive archive, SelectorConfig cnf) {
+		this.mvnSession = mvnSession;
 		this.archive = archive;
+		this.cnf = cnf;
 	}
 
 	public ExecutionArchiveSelector selectActiveProject(MavenProject value) {
-		this.mvnProject = value;
+		this.cnf.selectActiveProject(value);
 		return this;
 	}
 
@@ -49,123 +52,111 @@ public class Selector implements ExecutionArchiveSelector {
 	// packaging flags that set the type of how an artifact is packaged. So here we
 	// define it as packaging procedure.
 	public ExecutionArchiveSelector selectPackagingProcedure(String value) {
-		this.packagingProcedure = value;
+		this.cnf.selectPackagingProcedure(value);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectActiveExecution(String value) {
-		this.activeExecution = value;
+		this.cnf.selectActiveExecution(value);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectActiveProfiles(String... values) {
-		for (int i = 0; i < values.length; i++)
-			this.activeProfiles.add(values[i]);
+		this.cnf.selectActiveProfiles(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectActiveProfiles(Collection<String> values) {
-		this.activeProfiles.addAll(values);
+		this.cnf.selectActiveProfiles(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectProvidedProfiles(String... values) {
-		for (int i = 0; i < values.length; i++)
-			this.providedProfiles.add(values[i]);
+		this.cnf.selectProvidedProfiles(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectProvidedProfiles(Collection<String> values) {
-		this.providedProfiles.addAll(values);
+		this.selectProvidedProfiles(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectModes(String... values) {
-		for (int i = 0; i < values.length; i++)
-			this.modes.add(values[i]);
+		this.cnf.selectModes(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector selectModes(Collection<String> values) {
-		this.modes.addAll(values);
+		this.cnf.selectModes(values);
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearActiveProject() {
-		this.mvnProject = null;
+		this.cnf.clearActiveProject();
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearPackagingProcedure() {
-		this.packagingProcedure = null;
+		this.cnf.clearPackagingProcedure();
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearActiveExecution() {
-		this.activeExecution = null;
+		this.cnf.clearActiveExecution();
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearActiveProfiles() {
-		this.activeProfiles.clear();
+		this.cnf.clearActiveProfiles();
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearProvidedProfiles() {
-		this.providedProfiles.clear();
+		this.cnf.clearProvidedProfiles();
 		return this;
 	}
 
 	public ExecutionArchiveSelector clearModes() {
-		this.modes.clear();
+		this.cnf.clearModes();
 		return this;
 	}
 
-	public Archive getArchive() {
+	public ExecutionArchive getArchive() {
 		return this.archive;
 	}
 
+	@Override
+	public MavenSession getMvnSession() {
+		return this.mvnSession;
+	}
+
 	public MavenProject getActiveProject() {
-		return this.mvnProject;
+		return this.cnf.getActiveProject();
 	}
 
 	public String getPackagingProcedure() {
-		return this.packagingProcedure;
+		return this.cnf.getPackagingProcedure();
 	}
 
 	public String getActiveExecution() {
-		return this.activeExecution;
+		return this.cnf.getActiveExecution();
 	}
 
 	public Set<String> getActiveProfiles() {
-		return Collections.unmodifiableSet(this.activeProfiles);
+		return this.cnf.getActiveProfiles();
 	}
 
 	public Set<String> getProvidedProfiles() {
-		return Collections.unmodifiableSet(this.providedProfiles);
+		return this.cnf.getProvidedProfiles();
 	}
 
 	public Set<String> getModes() {
-		return Collections.unmodifiableSet(this.modes);
+		return this.cnf.getModes();
 	}
 
 	@Override
 	public Object clone() {
-		Selector selection = new Selector(archive);
-		selection.selectActiveProject(this.mvnProject);
-		selection.selectPackagingProcedure(this.packagingProcedure);
-		selection.selectActiveProfiles(Collections.unmodifiableSet(this.activeProfiles));
-		selection.selectProvidedProfiles(Collections.unmodifiableSet(this.providedProfiles));
-		selection.selectModes(Collections.unmodifiableSet(this.modes));
-		return selection;
-	}
-
-	public void copy(ExecutionArchiveSelector selection) {
-		this.mvnProject = selection.getActiveProject();
-		this.packagingProcedure = selection.getPackagingProcedure();
-		selectActiveProfiles(selection.getActiveProfiles());
-		selectProvidedProfiles(selection.getProvidedProfiles());
-		selectModes(selection.getModes());
+		return new Selector(this.mvnSession, this.archive, this.cnf.clone());
 	}
 
 	protected Set<Execution> filterSlice(ExecutionArchiveSlice slice) {
@@ -175,20 +166,23 @@ public class Selector implements ExecutionArchiveSelector {
 			if (execution.isAlwaysActive())
 				return true;
 			if (execution.getPackagingProcedures()
-					.contains(this.packagingProcedure))
+					.contains(this.cnf.getPackagingProcedure()))
 				return true;
-			if (execution.getId()
-					.equals(this.activeExecution))
+			if (this.cnf.getActiveExecution() == null) {
+				if (execution.isDefaultActive())
+					return true;
+			} else if (execution.getId()
+					.equals(this.cnf.getActiveExecution()))
 				return true;
-			for (ProfileTrigger trigger : execution.getTrigger())
-				if (trigger.isActive(this.activeProfiles, this.providedProfiles))
+			for (Trigger trigger : execution.getTrigger())
+				if (trigger.isActive(this.cnf))
 					return true;
 			return false;
 		});
 	}
 
 	protected boolean validateGoal(Goal goal) {
-		for (String mode : this.modes)
+		for (String mode : this.cnf.getModes())
 			if (goal.getModes()
 					.contains(mode))
 				return true;
@@ -328,13 +322,14 @@ public class Selector implements ExecutionArchiveSelector {
 	@Override
 	public ExecutionArchiveSelection compile() {
 		Set<ExecutionView> views = new LinkedHashSet<>();
-		if (this.mvnProject == null)
+		if (this.cnf.getActiveProject() == null)
 			return new Selection(views);
 
-		ExecutionArchiveSlice slice = this.archive.getSlice(this.mvnProject);
+		ExecutionArchiveSlice slice = this.archive.getSlice(this.cnf.getActiveProject());
 		if (slice == null)
 			return new Selection(views);
 
+		this.cnf.compile(this.mvnSession);
 		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(slice).entrySet())
 			views.add(reduce(entry.getKey(), entry.getValue()));
 		return new Selection(views);

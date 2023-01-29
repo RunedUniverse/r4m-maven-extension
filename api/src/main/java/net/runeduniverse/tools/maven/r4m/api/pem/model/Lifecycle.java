@@ -4,7 +4,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Lifecycle {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+
+public class Lifecycle implements Recordable {
 	private String id;
 	private Map<String, Phase> phases = new LinkedHashMap<>();
 
@@ -34,5 +37,17 @@ public class Lifecycle {
 	public void addPhases(List<Phase> phases) {
 		for (Phase phase : phases)
 			this.phases.put(phase.getId(), phase);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("Lifecycle");
+
+		tree.append("id", this.id);
+
+		for (Recordable phase : this.phases.values())
+			tree.append(phase.toRecord());
+
+		return tree;
 	}
 }

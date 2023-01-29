@@ -5,7 +5,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class ProjectExecutionModel {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+
+public class ProjectExecutionModel implements Recordable{
 	private String version;
 	private Set<Execution> executions = new LinkedHashSet<>(0);
 
@@ -27,5 +30,15 @@ public class ProjectExecutionModel {
 
 	public void addExecutions(Collection<Execution> executions) {
 		this.executions.addAll(executions);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("ProjectExecutionModel");
+		
+		for (Recordable execution : executions)
+			tree.append(execution.toRecord());
+
+		return tree;
 	}
 }

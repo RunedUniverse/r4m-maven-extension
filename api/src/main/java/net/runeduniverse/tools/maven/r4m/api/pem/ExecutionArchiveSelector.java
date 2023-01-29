@@ -3,6 +3,7 @@ package net.runeduniverse.tools.maven.r4m.api.pem;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
 public interface ExecutionArchiveSelector extends Cloneable {
@@ -46,6 +47,8 @@ public interface ExecutionArchiveSelector extends Cloneable {
 
 	public ExecutionArchive getArchive();
 
+	public MavenSession getMvnSession();
+
 	public MavenProject getActiveProject();
 
 	public String getPackagingProcedure();
@@ -59,6 +62,4 @@ public interface ExecutionArchiveSelector extends Cloneable {
 	public Set<String> getModes();
 
 	public ExecutionArchiveSelection compile();
-
-	public void copy(ExecutionArchiveSelector selection);
 }

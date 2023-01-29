@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
@@ -72,5 +73,25 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 			}
 			col.add(execution);
 		}
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("ArchiveSlice");
+
+		tree.append("version", this.version);
+
+		tree.append("project id", this.mvnProject.getId());
+
+		if (this.parent != null)
+			tree.append("parent project id", this.parent.getMvnProject()
+					.getId());
+
+		for (Map<ExecutionSource, Set<Execution>> valuesBySource : this.executions.values())
+			for (Set<Execution> executions : valuesBySource.values())
+				for (Execution execution : executions)
+					tree.append(execution.toRecord());
+
+		return tree;
 	}
 }

@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.api.pem.model;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -60,6 +61,11 @@ public class Goal implements Recordable {
 		return this;
 	}
 
+	public Goal addModes(Collection<String> modes) {
+		this.modes.addAll(modes);
+		return this;
+	}
+
 	public boolean parseMvnGoalKey(String mvnGoalKey) {
 		String[] keyValues = mvnGoalKey.split(":");
 
@@ -98,7 +104,9 @@ public class Goal implements Recordable {
 	public CompoundTree toRecord() {
 		CompoundTree tree = new CompoundTree("Goal");
 
-		tree.append("groupId", this.groupId).append("artifactId", this.artifactId).append("goalId", this.goalId);
+		tree.append("groupId", this.groupId)
+				.append("artifactId", this.artifactId)
+				.append("goalId", this.goalId);
 
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
 

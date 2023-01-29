@@ -4,7 +4,10 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Phase {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+
+public class Phase implements Recordable {
 	private String id;
 
 	private List<Goal> goals = new LinkedList<>();
@@ -27,5 +30,17 @@ public class Phase {
 
 	public void addGoals(Collection<Goal> goals) {
 		this.goals.addAll(goals);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("Phase");
+
+		tree.append("id", this.id);
+
+		for (Recordable goal : this.goals)
+			tree.append(goal.toRecord());
+
+		return tree;
 	}
 }

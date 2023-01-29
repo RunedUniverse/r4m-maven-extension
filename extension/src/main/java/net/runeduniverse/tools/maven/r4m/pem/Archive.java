@@ -9,6 +9,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
@@ -40,11 +41,23 @@ public class Archive implements ExecutionArchive {
 		return slice;
 	}
 
+	@Override
 	public ExecutionArchiveSlice getSlice(MavenProject mvnProject) {
 		return this.registry.get(mvnProject);
 	}
 
+	@Override
 	public ExecutionArchiveSelector newSelection() {
-		return new Selector(this);
+		return new Selector(this.mvnSession, this);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("ExecutionArchive");
+
+		for (ExecutionArchiveSlice slice : this.registry.values())
+			tree.append(slice.toRecord());
+
+		return tree;
 	}
 }

@@ -90,6 +90,14 @@
 										</xs:documentation>
 									</xs:annotation>
 								</xs:element>
+								<xs:any>
+									<xs:annotation>
+										<xs:documentation>
+											Other extensions may provide additional
+											triggers.
+										</xs:documentation>
+									</xs:annotation>
+								</xs:any>
 							</xs:choice>
 						</xs:sequence>
 					</xs:choice>
@@ -152,6 +160,17 @@
 		<xs:all>
 			<xs:element name="groupId" type="xs:string" />
 			<xs:element name="artifactId" type="xs:string" />
+			<xs:element name="modes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice minOccurs="1" maxOccurs="unbounded">
+							<xs:element name="default" />
+							<xs:element name="dev" />
+							<xs:any />
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="fork" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -165,17 +184,6 @@
 								</xs:sequence>
 							</xs:complexType>
 						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="modes">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:choice minOccurs="1" maxOccurs="unbounded">
-							<xs:element name="default" />
-							<xs:element name="dev" />
-							<xs:any />
-						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>

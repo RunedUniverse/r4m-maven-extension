@@ -4,16 +4,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionTriggerParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.*;
 
@@ -21,6 +26,9 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelParser.class, hint = "default")
 public class PEMParser implements ProjectExecutionModelParser {
+
+	@Requirement
+	private Map<String, ExecutionTriggerParser> execTriggerParser;
 
 	@Override
 	public ProjectExecutionModel parseModel(InputStream input) throws IOException, XmlPullParserException {
@@ -82,8 +90,38 @@ public class PEMParser implements ProjectExecutionModelParser {
 		PlexusConfiguration triggerNodes[] = nodeList.getChildren();
 		if (triggerNodes.length > 0) {
 			for (PlexusConfiguration triggerNode : triggerNodes) {
+				String name = triggerNode.getName();
+				switch (name) {
+				case "on-call":
+					// DO NOTING
+					// every execution is active when called
+					// except when flagged with <never/>
+					break;
+				case "always":
+					exec.setAlwaysActive(true);
+					break;
+				case "default":
+					exec.setDefaultActive(true);
+					break;
+				case "never":
+					exec.setNeverActive(true);
+					break;
+				case "packaging-procedure":
+					String value = triggerNode.getValue();
+					if (!isBlank(value))
+						exec.addPackagingProcedure(value);
+					break;
 
-				// TODO parse trigger
+				default:
+					ExecutionTriggerParser parser = this.execTriggerParser.get(name);
+					if (parser == null)
+						break;
+					Trigger trigger = parser.parse(triggerNode);
+					if (trigger == null)
+						break;
+					exec.addTrigger(trigger);
+					break;
+				}
 			}
 		}
 		return true;
@@ -140,7 +178,7 @@ public class PEMParser implements ProjectExecutionModelParser {
 		Phase phase = new Phase(id);
 		list.add(phase);
 
-		parseGoals(phase, phaseNode);
+		parseGoals(phase, phaseNode.getChild("goals", false));
 
 		return true;
 	}
@@ -165,8 +203,29 @@ public class PEMParser implements ProjectExecutionModelParser {
 		if (isBlank(id))
 			return false;
 
-		Goal goal = new Goal();
-		// TODO parse ???
+		String groupId = goalNode.getChild("groupId")
+				.getValue();
+		String artifactId = goalNode.getChild("artifactId")
+				.getValue();
+		String goalId = goalNode.getAttribute("id");
+		if (isBlank(groupId) || isBlank(artifactId) || isBlank(goalId))
+			return false;
+
+		Goal goal = new Goal(groupId, artifactId, goalId);
+
+		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
+		Set<String> modes = new LinkedHashSet<>(0);
+		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
+			String name = modeNode.getName();
+			if (!isBlank(name))
+				modes.add(name);
+		}
+		// no modes selected!
+		if (modes.isEmpty())
+			return false;
+		goal.addModes(modes);
+
+		// TODO parse fork
 
 		list.add(goal);
 

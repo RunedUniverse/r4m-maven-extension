@@ -3,7 +3,10 @@ package net.runeduniverse.tools.maven.r4m.api.pem.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class TargetPhase {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+
+public class TargetPhase implements Recordable {
 
 	private String id;
 	private Set<String> executions = new LinkedHashSet<>(0);
@@ -22,5 +25,17 @@ public class TargetPhase {
 
 	public void addExecutions(Set<String> executions) {
 		this.executions.addAll(executions);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("Target Phase");
+
+		tree.append("id", this.id);
+
+		if (!this.executions.isEmpty())
+			tree.append("executions", '[' + String.join(", ", this.executions) + ']');
+
+		return tree;
 	}
 }

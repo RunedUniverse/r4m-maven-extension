@@ -13,6 +13,53 @@
 				<on-call />
 			</triggers>
 			<lifecycles>
+				<lifecycle id="lib">
+					<phases>
+						<phase id="compile">
+							<goals>
+								<goal id="build-invoker-summary">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<fork>
+										<executions>
+											<execution id="default" />
+										</executions>
+										<lifecycle id="builder" />
+									</fork>
+								</goal>
+							</goals>
+						</phase>
+						<phase id="test-compile">
+							<goals>
+								<goal id="build-invoker-summary">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+									<fork>
+										<executions>
+											<execution id="test" />
+										</executions>
+										<lifecycle id="builder" />
+										<excludedPhases>
+											<phase id="bin-package">
+												<executions>
+													<execution id="test" />
+												</executions>
+											</phase>
+										</excludedPhases>
+									</fork>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
 				<lifecycle id="builder">
 					<phases>
 						<phase id="scan-references">

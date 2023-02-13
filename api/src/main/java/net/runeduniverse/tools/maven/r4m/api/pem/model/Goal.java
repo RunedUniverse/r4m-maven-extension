@@ -119,8 +119,8 @@ public class Goal implements Recordable {
 
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
 
-		// TODO list targets
-		tree.append("targets", "// TODO list targets");
+		if (this.fork != null)
+			tree.append(this.fork.toRecord());
 
 		return tree;
 	}

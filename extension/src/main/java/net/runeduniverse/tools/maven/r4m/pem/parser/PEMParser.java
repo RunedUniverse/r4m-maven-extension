@@ -69,6 +69,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseExecution(final Collection<Execution> list, final PlexusConfiguration execNode) {
+		if (execNode == null)
+			return false;
+
 		String id = execNode.getAttribute("id");
 		ExecutionSource source = ExecutionSource.create(execNode.getAttribute("source"));
 		if (isBlank(id) || source == null)
@@ -143,6 +146,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseLifecycle(final Collection<Lifecycle> list, final PlexusConfiguration lifecycleNode) {
+		if (lifecycleNode == null)
+			return false;
+
 		String id = lifecycleNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
@@ -171,6 +177,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parsePhase(final Collection<Phase> list, final PlexusConfiguration phaseNode) {
+		if (phaseNode == null)
+			return false;
+
 		String id = phaseNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
@@ -199,6 +208,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseGoal(final Collection<Goal> list, final PlexusConfiguration goalNode) {
+		if (goalNode == null)
+			return false;
+
 		String id = goalNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
@@ -233,6 +245,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseFork(final Goal goal, final PlexusConfiguration forkNode) {
+		if (forkNode == null)
+			return false;
+
 		Fork fork = new Fork();
 
 		final PlexusConfiguration modeNode = forkNode.getChild("mode", false);
@@ -258,6 +273,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseTargetLifecycle(final Fork fork, final PlexusConfiguration lifecycleNode) {
+		if (lifecycleNode == null)
+			return false;
+
 		String id = lifecycleNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
@@ -290,6 +308,9 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseTargetPhase(final Collection<TargetPhase> list, final PlexusConfiguration phaseNode) {
+		if (phaseNode == null)
+			return false;
+
 		String id = phaseNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
@@ -318,11 +339,14 @@ public class PEMParser implements ProjectExecutionModelParser {
 	}
 
 	protected boolean parseTargetExecution(final Collection<String> list, final PlexusConfiguration execNode) {
-		String value = execNode.getValue();
-		if (isBlank(value))
+		if (execNode == null)
 			return false;
 
-		list.add(value);
+		String id = execNode.getAttribute("id");
+		if (isBlank(id))
+			return false;
+
+		list.add(id);
 		return true;
 	}
 }

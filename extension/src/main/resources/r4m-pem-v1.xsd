@@ -173,7 +173,7 @@
 			</xs:element>
 			<xs:element name="fork" minOccurs="0">
 				<xs:complexType>
-					<xs:sequence>
+					<xs:all>
 						<xs:element name="mode" type="xs:string" minOccurs="0"
 							maxOccurs="1">
 							<xs:annotation>
@@ -183,8 +183,8 @@
 								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-						<xs:element name="executions" minOccurs="0"
-							type="TargetExecutions">
+						<xs:element name="executions" type="TargetExecutions"
+							minOccurs="0" maxOccurs="1">
 							<xs:annotation>
 								<xs:documentation>
 									Defined Executions will be inherited by all
@@ -215,7 +215,7 @@
 								</xs:documentation>
 							</xs:annotation>
 						</xs:element>
-					</xs:sequence>
+					</xs:all>
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
@@ -263,11 +263,11 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:all>
+					<xs:attribute name="id" type="xs:string"
+						use="required" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-
-		<xs:attribute name="id" type="xs:string" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="TargetExcludedPhases">
@@ -288,18 +288,23 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:all>
+					<xs:attribute name="id" type="xs:string"
+						use="required" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-
-		<xs:attribute name="id" type="xs:string" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="TargetExecutions">
 		<xs:sequence>
-			<xs:element name="execution" type="xs:string"
-				minOccurs="0" maxOccurs="unbounded" />
+			<xs:element name="execution" minOccurs="0"
+				maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:string"
+						use="required" />
+				</xs:complexType>
+			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
 
-</xs:schema> 
+</xs:schema>

@@ -5,7 +5,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Fork {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+
+public class Fork implements Recordable {
 	private String mode = null;
 	private Set<String> executions = new LinkedHashSet<>(0);
 	private TargetLifecycle lifecycle = null;
@@ -50,6 +53,35 @@ public class Fork {
 
 	public void addExcludedPhases(Set<TargetPhase> excludedPhases) {
 		this.excludePhases.addAll(excludedPhases);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		CompoundTree tree = new CompoundTree("Fork");
+
+		tree.append("mode", this.mode == null ? "inherited" : this.mode);
+
+		if (!this.executions.isEmpty())
+			tree.append("executions", '[' + String.join(", ", this.executions) + ']');
+
+		if (this.lifecycle != null)
+			tree.append(this.lifecycle.toRecord());
+
+		if (this.phases != null && !this.phases.isEmpty()) {
+			CompoundTree phasesTree = new CompoundTree("phases");
+			for (TargetPhase phase : this.phases)
+				phasesTree.append(phase.toRecord());
+			tree.append(phasesTree);
+		}
+
+		if (!this.excludePhases.isEmpty()) {
+			CompoundTree phasesTree = new CompoundTree("excluded phases");
+			for (TargetPhase phase : this.excludePhases)
+				phasesTree.append(phase.toRecord());
+			tree.append(phasesTree);
+		}
+
+		return tree;
 	}
 
 }

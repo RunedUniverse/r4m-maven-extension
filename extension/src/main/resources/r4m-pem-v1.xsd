@@ -174,22 +174,14 @@
 			<xs:element name="fork" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="modes" minOccurs="0" maxOccurs="1">
+						<xs:element name="mode" type="xs:string" minOccurs="0"
+							maxOccurs="1">
 							<xs:annotation>
 								<xs:documentation>
-									Modes under which the forked Executions will
-									be executed.
+									Mode under which the forked Executions will be
+									executed.
 								</xs:documentation>
 							</xs:annotation>
-							<xs:complexType>
-								<xs:sequence>
-									<xs:choice minOccurs="1" maxOccurs="unbounded">
-										<xs:element name="default" />
-										<xs:element name="dev" />
-										<xs:any />
-									</xs:choice>
-								</xs:sequence>
-							</xs:complexType>
 						</xs:element>
 						<xs:element name="executions" minOccurs="0"
 							type="TargetExecutions">

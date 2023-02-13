@@ -27,9 +27,7 @@
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<modes>
-											<default />
-										</modes>
+										<mode>default</mode>
 										<executions>
 											<execution>default</execution>
 										</executions>
@@ -48,9 +46,7 @@
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<modes>
-											<default />
-										</modes>
+										<mode>default</mode>
 										<executions>
 											<execution>test</execution>
 										</executions>

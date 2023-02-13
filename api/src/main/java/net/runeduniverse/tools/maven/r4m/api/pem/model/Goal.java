@@ -13,8 +13,8 @@ public class Goal implements Recordable {
 	private String groupId;
 	private String artifactId;
 	private String goalId;
+	private Fork fork = null;
 	private Set<String> modes = new LinkedHashSet<>();
-	private Set<Target> targets = new LinkedHashSet<>();
 
 	private MojoDescriptor descriptor;
 
@@ -47,8 +47,12 @@ public class Goal implements Recordable {
 		return this.modes;
 	}
 
-	public Set<Target> getTargets() {
-		return this.targets;
+	public boolean hasFork() {
+		return this.fork != null;
+	}
+
+	public Fork getFork() {
+		return this.fork;
 	}
 
 	public MojoDescriptor getDescriptor() {
@@ -63,6 +67,11 @@ public class Goal implements Recordable {
 
 	public Goal addModes(Collection<String> modes) {
 		this.modes.addAll(modes);
+		return this;
+	}
+
+	public Goal setFork(Fork fork) {
+		this.fork = fork;
 		return this;
 	}
 

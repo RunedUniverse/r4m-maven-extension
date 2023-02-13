@@ -225,11 +225,104 @@ public class PEMParser implements ProjectExecutionModelParser {
 			return false;
 		goal.addModes(modes);
 
-		// TODO parse fork
+		parseFork(goal, goalNode.getChild("fork", false));
 
 		list.add(goal);
 
 		return true;
 	}
 
+	protected boolean parseFork(final Goal goal, final PlexusConfiguration forkNode) {
+		Fork fork = new Fork();
+
+		final PlexusConfiguration modeNode = forkNode.getChild("mode", false);
+		if (modeNode != null)
+			fork.setMode(modeNode.getValue());
+
+		Set<String> executions = new LinkedHashSet<>(0);
+		parseTargetExecutions(executions, forkNode.getChild("executions", false));
+		fork.addExecutions(executions);
+
+		parseTargetLifecycle(fork, forkNode.getChild("lifecycle", false));
+
+		List<TargetPhase> phases = new LinkedList<>();
+		parseTargetPhases(phases, forkNode.getChild("phases", false));
+		fork.setPhases(phases);
+
+		Set<TargetPhase> excludedPhases = new LinkedHashSet<>(0);
+		parseTargetPhases(excludedPhases, forkNode.getChild("excludedPhases", false));
+		fork.addExcludedPhases(excludedPhases);
+
+		goal.setFork(fork);
+		return true;
+	}
+
+	protected boolean parseTargetLifecycle(final Fork fork, final PlexusConfiguration lifecycleNode) {
+		String id = lifecycleNode.getAttribute("id");
+		if (isBlank(id))
+			return false;
+
+		TargetLifecycle lifecycle = new TargetLifecycle(id);
+
+		final PlexusConfiguration startNode = lifecycleNode.getChild("startPhase", false);
+		if (startNode != null)
+			lifecycle.setStartPhase(startNode.getValue());
+
+		final PlexusConfiguration stopNode = lifecycleNode.getChild("stopPhase", false);
+		if (startNode != null)
+			lifecycle.setStopPhase(stopNode.getValue());
+
+		fork.setLifecycle(lifecycle);
+		return true;
+	}
+
+	protected boolean parseTargetPhases(final Collection<TargetPhase> targetPhases,
+			final PlexusConfiguration phasesNode) {
+		if (phasesNode == null || phasesNode.getChildCount() == 0)
+			return false;
+
+		PlexusConfiguration phaseNodes[] = phasesNode.getChildren("phase");
+		if (phaseNodes.length > 0) {
+			for (PlexusConfiguration phaseNode : phaseNodes)
+				parseTargetPhase(targetPhases, phaseNode);
+		}
+		return true;
+	}
+
+	protected boolean parseTargetPhase(final Collection<TargetPhase> list, final PlexusConfiguration phaseNode) {
+		String id = phaseNode.getAttribute("id");
+		if (isBlank(id))
+			return false;
+
+		TargetPhase phase = new TargetPhase(id);
+		list.add(phase);
+
+		Set<String> executions = new LinkedHashSet<>(0);
+		parseTargetExecutions(executions, phaseNode.getChild("executions", false));
+		phase.addExecutions(executions);
+
+		return true;
+	}
+
+	protected boolean parseTargetExecutions(final Collection<String> executions,
+			final PlexusConfiguration executionsNode) {
+		if (executionsNode == null || executionsNode.getChildCount() == 0)
+			return false;
+
+		PlexusConfiguration execNodes[] = executionsNode.getChildren("execution");
+		if (execNodes.length > 0) {
+			for (PlexusConfiguration execNode : execNodes)
+				parseTargetExecution(executions, execNode);
+		}
+		return true;
+	}
+
+	protected boolean parseTargetExecution(final Collection<String> list, final PlexusConfiguration execNode) {
+		String value = execNode.getValue();
+		if (isBlank(value))
+			return false;
+
+		list.add(value);
+		return true;
+	}
 }

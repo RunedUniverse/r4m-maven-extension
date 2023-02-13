@@ -3,14 +3,11 @@ package net.runeduniverse.tools.maven.r4m;
 import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 
-public interface Properties extends MavenProperties {
+public interface Properties extends MavenProperties, Runes4MavenProperties {
 	public static String VAL_PREFIX = "${";
 	public static String VAL_POSTFIX = "}";
 
-	public static String PLUGIN_KEY = Runes4MavenProperties.GROUP_ID + ':' + Runes4MavenProperties.ARTIFACT_ID;
-	public static String PREFIX_ID = Runes4MavenProperties.PREFIX_ID;
-
-	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = Runes4MavenProperties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT;
+	public static String PLUGIN_KEY = GROUP_ID + ':' + ARTIFACT_ID;
 
 	public interface PROJECT {
 		public interface BUILD extends MavenProperties.PROJECT.BUILD {

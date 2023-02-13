@@ -9,6 +9,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.MojoNotFoundException;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
@@ -22,6 +29,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
@@ -29,16 +37,20 @@ import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 public class Selector implements ExecutionArchiveSelector {
 
 	private final MavenSession mvnSession;
+	private final MavenPluginManager pluginManager;
 	private final ExecutionArchive archive;
 
 	private SelectorConfig cnf = null;
 
-	public Selector(final MavenSession mvnSession, final ExecutionArchive archive) {
-		this(mvnSession, archive, new SelectorConfig());
+	public Selector(final MavenSession mvnSession, final MavenPluginManager pluginManager,
+			final ExecutionArchive archive) {
+		this(mvnSession, pluginManager, archive, new SelectorConfig());
 	}
 
-	public Selector(final MavenSession mvnSession, final ExecutionArchive archive, SelectorConfig cnf) {
+	public Selector(final MavenSession mvnSession, final MavenPluginManager pluginManager,
+			final ExecutionArchive archive, SelectorConfig cnf) {
 		this.mvnSession = mvnSession;
+		this.pluginManager = pluginManager;
 		this.archive = archive;
 		this.cnf = cnf;
 	}
@@ -156,7 +168,7 @@ public class Selector implements ExecutionArchiveSelector {
 
 	@Override
 	public Object clone() {
-		return new Selector(this.mvnSession, this.archive, this.cnf.clone());
+		return new Selector(this.mvnSession, this.pluginManager, this.archive, this.cnf.clone());
 	}
 
 	protected Set<Execution> filterSlice(ExecutionArchiveSlice slice) {
@@ -189,6 +201,22 @@ public class Selector implements ExecutionArchiveSelector {
 		return false;
 	}
 
+	protected void acquireMojoDescriptor(GoalView goalView) {
+		Plugin plugin = this.cnf.getActiveProject()
+				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
+
+		MojoDescriptor descriptor = null;
+		try {
+			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), this.cnf.getActiveProject()
+					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
+		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
+				| InvalidPluginDescriptorException e) {
+			System.err.println("Failed to acquire MojoDescriptor!");
+			e.printStackTrace();
+		}
+		goalView.setDescriptor(descriptor);
+	}
+
 	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(Collection<Execution> executions) {
 		Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
 
@@ -218,8 +246,15 @@ public class Selector implements ExecutionArchiveSelector {
 						lifecycleView.put(phaseView);
 					}
 					for (Goal goal : phase.getGoals())
-						if (this.validateGoal(goal))
-							phaseView.addGoal(goal);
+						if (this.validateGoal(goal)) {
+							GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
+									goal.getGoalId());
+							goalView.addModes(goal.getModes());
+							goalView.setFork(goal.getFork());
+							acquireMojoDescriptor(goalView);
+							if (goalView.getDescriptor() != null)
+								phaseView.addGoal(goalView);
+						}
 				}
 			}
 		}
@@ -238,18 +273,18 @@ public class Selector implements ExecutionArchiveSelector {
 			}
 
 			// remove all dominant goals from base phases, which can only be executed once
-			Map<Goal, PhaseView> basePhaseIndex = new HashMap<>();
+			Map<GoalView, PhaseView> basePhaseIndex = new HashMap<>();
 			for (PhaseView basePhase : baseLifecycle.getPhases()
 					.values())
-				for (Goal goal : basePhase.getGoals())
+				for (GoalView goal : basePhase.getGoals())
 					basePhaseIndex.put(goal, basePhase);
 
 			for (PhaseView domPhase : domLifecycle.getPhases()
 					.values())
-				for (Goal domGoal : domPhase.getGoals())
+				for (GoalView domGoal : domPhase.getGoals())
 					if (goalOverride || !domGoal.getDescriptor()
 							.alwaysExecute())
-						for (Goal baseGoal : basePhaseIndex.keySet()) {
+						for (GoalView baseGoal : basePhaseIndex.keySet()) {
 							if (domGoal.equals(baseGoal))
 								basePhaseIndex.get(baseGoal)
 										.removeGoal(baseGoal);

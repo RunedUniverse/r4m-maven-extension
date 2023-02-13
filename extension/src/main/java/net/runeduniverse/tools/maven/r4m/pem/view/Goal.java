@@ -1,25 +1,23 @@
-package net.runeduniverse.tools.maven.r4m.api.pem.model;
+package net.runeduniverse.tools.maven.r4m.pem.view;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
-public class Goal implements Recordable {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
+
+public class Goal implements GoalView {
 	private String groupId;
 	private String artifactId;
 	private String goalId;
 	private Fork fork = null;
 	private Set<String> modes = new LinkedHashSet<>();
 
-	public Goal() {
-	}
-
-	public Goal(String mvnGoalKey) {
-		parseMvnGoalKey(mvnGoalKey);
-	}
+	private MojoDescriptor descriptor;
 
 	public Goal(String groupId, String artifactId, String goalId) {
 		this.groupId = groupId;
@@ -27,77 +25,71 @@ public class Goal implements Recordable {
 		this.goalId = goalId;
 	}
 
+	@Override
 	public String getGroupId() {
 		return this.groupId;
 	}
 
+	@Override
 	public String getArtifactId() {
 		return this.artifactId;
 	}
 
+	@Override
 	public String getGoalId() {
 		return this.goalId;
 	}
 
+	@Override
 	public Set<String> getModes() {
 		return this.modes;
 	}
 
+	@Override
 	public boolean hasFork() {
 		return this.fork != null;
 	}
 
+	@Override
 	public Fork getFork() {
 		return this.fork;
 	}
 
-	public Goal addModes(String... modes) {
+	@Override
+	public MojoDescriptor getDescriptor() {
+		return this.descriptor;
+	}
+
+	@Override
+	public void addModes(String... modes) {
 		for (int i = 0; i < modes.length; i++)
 			this.modes.add(modes[i]);
-		return this;
 	}
 
-	public Goal addModes(Collection<String> modes) {
+	@Override
+	public void addModes(Collection<String> modes) {
 		this.modes.addAll(modes);
-		return this;
 	}
 
-	public Goal setFork(Fork fork) {
+	@Override
+	public void setFork(Fork fork) {
 		this.fork = fork;
-		return this;
 	}
 
-	public boolean parseMvnGoalKey(String mvnGoalKey) {
-		String[] keyValues = mvnGoalKey.split(":");
+	@Override
+	public void setDescriptor(MojoDescriptor descriptor) {
+		this.descriptor = descriptor;
+	}
 
-		switch (keyValues.length) {
-		case 2:
-			// prefix:goal
-			// prefix
-			this.goalId = keyValues[1];
-			return true;
-		case 3:
-			// groupId:artifactId:goal
-			this.groupId = keyValues[0];
-			this.artifactId = keyValues[1];
-			this.goalId = keyValues[2];
-			return true;
-		case 4:
-			// groupId:artifactId:version:goal
-			this.groupId = keyValues[0];
-			this.artifactId = keyValues[1];
-			// version
-			this.goalId = keyValues[3];
-			return true;
-		default:
-			return false;
-		}
-
+	@Override
+	public boolean equals(Object obj) {
+		// TODO COMPARE GOALS
+		return super.equals(obj);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Goal");
+		CompoundTree tree = new CompoundTree("GoalView");
 
 		tree.append("groupId", this.groupId)
 				.append("artifactId", this.artifactId)

@@ -224,7 +224,7 @@ public class PEMParser implements ProjectExecutionModelParser {
 			return false;
 
 		Goal goal = new Goal(groupId, artifactId, goalId);
-
+		
 		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
 		Set<String> modes = new LinkedHashSet<>(0);
 		for (PlexusConfiguration modeNode : modesNode.getChildren()) {

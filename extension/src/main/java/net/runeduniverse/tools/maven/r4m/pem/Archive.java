@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectDependencyGraph;
+import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -20,6 +21,9 @@ public class Archive implements ExecutionArchive {
 
 	@Requirement
 	private MavenSession mvnSession;
+
+	@Requirement
+	private MavenPluginManager pluginManager;
 
 	@Override
 	public ExecutionArchiveSlice createSlice(MavenProject mvnProject) {
@@ -48,7 +52,7 @@ public class Archive implements ExecutionArchive {
 
 	@Override
 	public ExecutionArchiveSelector newSelection() {
-		return new Selector(this.mvnSession, this);
+		return new Selector(this.mvnSession, this.pluginManager, this);
 	}
 
 	@Override

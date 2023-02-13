@@ -6,13 +6,13 @@ import java.util.List;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 
 public class Phase implements PhaseView {
 
 	private String id;
-	private List<Goal> goals = new LinkedList<>();
+	private List<GoalView> goals = new LinkedList<>();
 
 	public Phase(String id) {
 		this.id = id;
@@ -24,22 +24,22 @@ public class Phase implements PhaseView {
 	}
 
 	@Override
-	public List<Goal> getGoals() {
+	public List<GoalView> getGoals() {
 		return this.goals;
 	}
 
 	@Override
-	public void addGoal(Goal goal) {
+	public void addGoal(GoalView goal) {
 		this.goals.add(goal);
 	}
 
 	@Override
-	public void removeGoal(Goal goal) {
+	public void removeGoal(GoalView goal) {
 		this.goals.remove(goal);
 	}
 
 	@Override
-	public void addAllGoals(Collection<Goal> goals) {
+	public void addAllGoals(Collection<GoalView> goals) {
 		this.goals.addAll(goals);
 	}
 

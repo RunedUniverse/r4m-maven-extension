@@ -4,16 +4,15 @@ import java.util.Collection;
 import java.util.List;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 
 public interface PhaseView extends Recordable {
 	public String getId();
 
-	public List<Goal> getGoals();
+	public List<GoalView> getGoals();
 
-	public void addGoal(Goal goal);
+	public void addGoal(GoalView goal);
 
-	public void removeGoal(Goal goal);
+	public void removeGoal(GoalView goal);
 
-	public void addAllGoals(Collection<Goal> goals);
+	public void addAllGoals(Collection<GoalView> goals);
 }

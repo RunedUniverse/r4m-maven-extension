@@ -5,6 +5,8 @@ public interface Runes4MavenProperties {
 	public static String ARTIFACT_ID = "r4m-maven-plugin";
 	public static String PREFIX_ID = "r4m";
 
+	public static String PROJECT_EXECUTION_MODEL_FILE = "pem.xml";
+
 	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = "r4m:executions-parser";
 
 	public interface LIFECYCLE {

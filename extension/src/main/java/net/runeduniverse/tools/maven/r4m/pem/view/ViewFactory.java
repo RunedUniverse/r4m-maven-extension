@@ -1,6 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem.view;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 
@@ -18,4 +19,7 @@ public class ViewFactory {
 		return new Phase(id);
 	}
 
+	public static GoalView createGoal(String groupId, String artifactId, String goalId) {
+		return new Goal(groupId, artifactId, goalId);
+	}
 }

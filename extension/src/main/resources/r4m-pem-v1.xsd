@@ -174,15 +174,54 @@
 			<xs:element name="fork" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
-						<xs:element name="lifecycle" type="TragetLifecycle"
-							minOccurs="0" maxOccurs="1" />
-						<xs:element name="phases" minOccurs="0" maxOccurs="1">
+						<xs:element name="modes" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>
+									Modes under which the forked Executions will
+									be executed.
+								</xs:documentation>
+							</xs:annotation>
 							<xs:complexType>
 								<xs:sequence>
-									<xs:element name="phase" type="TragetPhase"
-										minOccurs="0" maxOccurs="unbounded" />
+									<xs:choice minOccurs="1" maxOccurs="unbounded">
+										<xs:element name="default" />
+										<xs:element name="dev" />
+										<xs:any />
+									</xs:choice>
 								</xs:sequence>
 							</xs:complexType>
+						</xs:element>
+						<xs:element name="executions" minOccurs="0"
+							type="TargetExecutions">
+							<xs:annotation>
+								<xs:documentation>
+									Defined Executions will be inherited by all
+									phases.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="lifecycle" type="TragetLifecycle"
+							minOccurs="0" maxOccurs="1" />
+						<xs:element name="phases" type="TragetPhases"
+							minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>
+									Defined Phases will be executed in order of
+									definition. These phases will override definitions
+									phase-execution restrictions inside of lifecycle definition.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="excludedPhases"
+							type="TargetExcludedPhases" minOccurs="0" maxOccurs="1">
+							<xs:annotation>
+								<xs:documentation>
+									Defined Phases will be removed from Lifecycle
+									definitions and Phase definitions. In case Executions are
+									defined, the defined Executions will be removed from predefined
+									Phases.
+								</xs:documentation>
+							</xs:annotation>
 						</xs:element>
 					</xs:sequence>
 				</xs:complexType>
@@ -193,45 +232,82 @@
 
 	<xs:complexType name="TragetLifecycle">
 		<xs:all>
-			<xs:element name="executions" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="execution" type="xs:string"
-							minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
+			<xs:element name="startPhase" type="xs:string"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Start-Phase at which to start executing.
+						Start-Phases not defined in Lifecycle will be ignored!
+					</xs:documentation>
+				</xs:annotation>
 			</xs:element>
-			<xs:element name="startAtPhase" minOccurs="0" />
-			<xs:element name="stopAtPhase" minOccurs="0" />
-			<xs:element name="excludePhases" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="phase" minOccurs="0"
-							maxOccurs="unbounded">
-							<xs:complexType>
-								<xs:attribute name="id" type="xs:string"
-									use="required" />
-							</xs:complexType>
-						</xs:element>
-					</xs:sequence>
-				</xs:complexType>
+			<xs:element name="stopPhase" type="xs:string"
+				minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Stop-Phase at which to stop executing.
+						Stop-Phases not defined in Lifecycle will be ignored!
+					</xs:documentation>
+				</xs:annotation>
 			</xs:element>
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
 	</xs:complexType>
 
-	<xs:complexType name="TragetPhase">
-		<xs:all>
-			<xs:element name="executions" minOccurs="0">
+	<xs:complexType name="TragetPhases">
+		<xs:sequence>
+			<xs:element name="phase" minOccurs="0"
+				maxOccurs="unbounded">
 				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="execution" type="xs:string"
-							minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
+					<xs:all>
+						<xs:element name="executions" minOccurs="0"
+							type="TargetExecutions">
+							<xs:annotation>
+								<xs:documentation>
+									Defined Executions will only be activated in
+									the Phase they are
+									defined in.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:all>
 				</xs:complexType>
 			</xs:element>
-		</xs:all>
+		</xs:sequence>
+
 		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="TargetExcludedPhases">
+		<xs:sequence>
+			<xs:element name="phase" minOccurs="0"
+				maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="executions" minOccurs="0"
+							type="TargetExecutions">
+							<xs:annotation>
+								<xs:documentation>
+									Defined Executions will be removed from
+									predefined Phases. Phases with
+									no remaining active executions
+									will be skipped.
+								</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="TargetExecutions">
+		<xs:sequence>
+			<xs:element name="execution" type="xs:string"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
 	</xs:complexType>
 
 </xs:schema> 

@@ -27,11 +27,13 @@
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<lifecycle id="builder">
-											<executions>
-												<execution>default</execution>
-											</executions>
-										</lifecycle>
+										<modes>
+											<default />
+										</modes>
+										<executions>
+											<execution>default</execution>
+										</executions>
+										<lifecycle id="builder" />
 									</fork>
 								</goal>
 							</goals>
@@ -46,11 +48,13 @@
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<lifecycle id="builder">
-											<executions>
-												<execution>test</execution>
-											</executions>
-										</lifecycle>
+										<modes>
+											<default />
+										</modes>
+										<executions>
+											<execution>test</execution>
+										</executions>
+										<lifecycle id="builder" />
 									</fork>
 								</goal>
 							</goals>

@@ -12,7 +12,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 
 @Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
@@ -21,7 +20,6 @@ public class Archive implements ExecutionArchive {
 
 	@Requirement
 	private MavenSession mvnSession;
-
 	@Requirement
 	private MavenPluginManager pluginManager;
 
@@ -48,11 +46,6 @@ public class Archive implements ExecutionArchive {
 	@Override
 	public ExecutionArchiveSlice getSlice(MavenProject mvnProject) {
 		return this.registry.get(mvnProject);
-	}
-
-	@Override
-	public ExecutionArchiveSelector newSelection() {
-		return new Selector(this.mvnSession, this.pluginManager, this);
 	}
 
 	@Override

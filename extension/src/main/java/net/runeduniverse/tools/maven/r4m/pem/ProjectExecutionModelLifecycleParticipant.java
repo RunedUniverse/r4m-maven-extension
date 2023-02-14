@@ -57,7 +57,7 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			if (!configExec.isEmpty()) {
 				// Project specific config overrides everything!
 				projectSlice.register(configExec);
-				continue;
+				//continue;
 			}
 
 			for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())

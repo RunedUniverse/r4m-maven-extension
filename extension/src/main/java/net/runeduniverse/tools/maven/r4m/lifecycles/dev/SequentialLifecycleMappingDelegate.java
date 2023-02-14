@@ -22,6 +22,12 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
+
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
@@ -34,11 +40,16 @@ import org.codehaus.plexus.component.annotations.Requirement;
 public class SequentialLifecycleMappingDelegate implements LifecycleMappingDelegate {
 	public static final String HINT = "dev";
 
+	@Requirement
+	Logger log;
 	@Requirement(role = Lifecycle.class)
 	protected Map<String, Lifecycle> lifecycles;
-
 	@Requirement
 	private BuildPluginManager pluginManager;
+	@Requirement
+	private ExecutionArchive archive;
+	@Requirement
+	ExecutionArchiveSelector selector;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle devLifecycle, String devLifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
@@ -53,6 +64,21 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 				devLifecycle = lifecycle;
 				break;
 			}
+
+		ExecutionArchiveSelectorConfig cnf = this.selector.createConfig();
+
+		cnf.selectActiveProject(project);
+		cnf.selectModes("dev");
+		cnf.selectPackagingProcedure(project.getPackaging());
+
+		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
+
+		this.log.warn(cnf.toRecord()
+				.toString());
+		this.log.warn("Active Execution Selection:");
+
+		this.log.warn(selection.toRecord()
+				.toString());
 
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos. The key set of this

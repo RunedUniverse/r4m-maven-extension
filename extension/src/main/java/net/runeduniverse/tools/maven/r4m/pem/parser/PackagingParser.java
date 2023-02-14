@@ -53,6 +53,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 						Execution execution = executions.get(executionId);
 						if (execution == null) {
 							execution = new Execution(executionId, ExecutionSource.PACKAGING);
+							execution.setDefaultActive(true);
 							execution.addPackagingProcedure(lifecycleMappingEntry.getKey());
 							executions.put(execution.getId(), execution);
 						}

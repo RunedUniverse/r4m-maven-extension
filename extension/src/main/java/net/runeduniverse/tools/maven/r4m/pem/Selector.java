@@ -16,11 +16,13 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.component.annotations.Component;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
@@ -34,180 +36,62 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 
+@Component(role = ExecutionArchiveSelector.class, hint = "default")
 public class Selector implements ExecutionArchiveSelector {
 
-	private final MavenSession mvnSession;
-	private final MavenPluginManager pluginManager;
-	private final ExecutionArchive archive;
+	@Requirement
+	private MavenSession mvnSession;
+	@Requirement
+	private MavenPluginManager pluginManager;
+	@Requirement
+	private ExecutionArchive archive;
 
-	private SelectorConfig cnf = null;
-
-	public Selector(final MavenSession mvnSession, final MavenPluginManager pluginManager,
-			final ExecutionArchive archive) {
-		this(mvnSession, pluginManager, archive, new SelectorConfig());
-	}
-
-	public Selector(final MavenSession mvnSession, final MavenPluginManager pluginManager,
-			final ExecutionArchive archive, SelectorConfig cnf) {
-		this.mvnSession = mvnSession;
-		this.pluginManager = pluginManager;
-		this.archive = archive;
-		this.cnf = cnf;
-	}
-
-	public ExecutionArchiveSelector selectActiveProject(MavenProject value) {
-		this.cnf.selectActiveProject(value);
-		return this;
-	}
-
-	// used to select for the packaging flag in pom. Keep in mind there are multiple
-	// packaging flags that set the type of how an artifact is packaged. So here we
-	// define it as packaging procedure.
-	public ExecutionArchiveSelector selectPackagingProcedure(String value) {
-		this.cnf.selectPackagingProcedure(value);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectActiveExecution(String value) {
-		this.cnf.selectActiveExecution(value);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectActiveProfiles(String... values) {
-		this.cnf.selectActiveProfiles(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectActiveProfiles(Collection<String> values) {
-		this.cnf.selectActiveProfiles(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectProvidedProfiles(String... values) {
-		this.cnf.selectProvidedProfiles(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectProvidedProfiles(Collection<String> values) {
-		this.selectProvidedProfiles(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectModes(String... values) {
-		this.cnf.selectModes(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector selectModes(Collection<String> values) {
-		this.cnf.selectModes(values);
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearActiveProject() {
-		this.cnf.clearActiveProject();
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearPackagingProcedure() {
-		this.cnf.clearPackagingProcedure();
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearActiveExecution() {
-		this.cnf.clearActiveExecution();
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearActiveProfiles() {
-		this.cnf.clearActiveProfiles();
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearProvidedProfiles() {
-		this.cnf.clearProvidedProfiles();
-		return this;
-	}
-
-	public ExecutionArchiveSelector clearModes() {
-		this.cnf.clearModes();
-		return this;
-	}
-
-	public ExecutionArchive getArchive() {
-		return this.archive;
-	}
-
-	@Override
-	public MavenSession getMvnSession() {
-		return this.mvnSession;
-	}
-
-	public MavenProject getActiveProject() {
-		return this.cnf.getActiveProject();
-	}
-
-	public String getPackagingProcedure() {
-		return this.cnf.getPackagingProcedure();
-	}
-
-	public String getActiveExecution() {
-		return this.cnf.getActiveExecution();
-	}
-
-	public Set<String> getActiveProfiles() {
-		return this.cnf.getActiveProfiles();
-	}
-
-	public Set<String> getProvidedProfiles() {
-		return this.cnf.getProvidedProfiles();
-	}
-
-	public Set<String> getModes() {
-		return this.cnf.getModes();
-	}
-
-	@Override
-	public Object clone() {
-		return new Selector(this.mvnSession, this.pluginManager, this.archive, this.cnf.clone());
-	}
-
-	protected Set<Execution> filterSlice(ExecutionArchiveSlice slice) {
+	protected Set<Execution> filterSlice(final ExecutionArchiveSelectorConfig cnf, ExecutionArchiveSlice slice) {
 		return slice.getExecutions(execution -> {
+			// the use of never-/always-active flags is discouraged and included for
+			// debugging purposes
 			if (execution.isNeverActive())
 				return false;
 			if (execution.isAlwaysActive())
 				return true;
-			if (execution.getPackagingProcedures()
-					.contains(this.cnf.getPackagingProcedure()))
-				return true;
-			if (this.cnf.getActiveExecution() == null) {
+			// if a trigger for a packaging-procedure is set it must match!
+			if (!execution.getPackagingProcedures()
+					.isEmpty()) {
+				if (!execution.getPackagingProcedures()
+						.contains(cnf.getPackagingProcedure()))
+					return false;
+			}
+			// if an active-execution is defined it must match
+			// if not the default-active flag is checked
+			if (cnf.getActiveExecution() == null) {
 				if (execution.isDefaultActive())
 					return true;
 			} else if (execution.getId()
-					.equals(this.cnf.getActiveExecution()))
+					.equals(cnf.getActiveExecution()))
 				return true;
+			// any active trigger activates the execution
 			for (Trigger trigger : execution.getTrigger())
-				if (trigger.isActive(this.cnf))
+				if (trigger.isActive(cnf))
 					return true;
 			return false;
 		});
 	}
 
-	protected boolean validateGoal(Goal goal) {
-		for (String mode : this.cnf.getModes())
+	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, Goal goal) {
+		for (String mode : cnf.getModes())
 			if (goal.getModes()
 					.contains(mode))
 				return true;
 		return false;
 	}
 
-	protected void acquireMojoDescriptor(GoalView goalView) {
-		Plugin plugin = this.cnf.getActiveProject()
+	protected void acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView) {
+		Plugin plugin = cnf.getActiveProject()
 				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
 
 		MojoDescriptor descriptor = null;
 		try {
-			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), this.cnf.getActiveProject()
+			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), cnf.getActiveProject()
 					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
@@ -217,7 +101,8 @@ public class Selector implements ExecutionArchiveSelector {
 		goalView.setDescriptor(descriptor);
 	}
 
-	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(Collection<Execution> executions) {
+	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(final ExecutionArchiveSelectorConfig cnf,
+			Collection<Execution> executions) {
 		Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
 
 		for (Execution execution : executions) {
@@ -246,12 +131,12 @@ public class Selector implements ExecutionArchiveSelector {
 						lifecycleView.put(phaseView);
 					}
 					for (Goal goal : phase.getGoals())
-						if (this.validateGoal(goal)) {
+						if (this.validateGoal(cnf, goal)) {
 							GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
 									goal.getGoalId());
 							goalView.addModes(goal.getModes());
 							goalView.setFork(goal.getFork());
-							acquireMojoDescriptor(goalView);
+							acquireMojoDescriptor(cnf, goalView);
 							if (goalView.getDescriptor() != null)
 								phaseView.addGoal(goalView);
 						}
@@ -261,8 +146,8 @@ public class Selector implements ExecutionArchiveSelector {
 		return map;
 	}
 
-	protected ExecutionView merge(final ExecutionView base, final ExecutionView dominant, boolean lifecycleOverride,
-			boolean goalOverride) {
+	protected ExecutionView merge(final ExecutionArchiveSelectorConfig cnf, final ExecutionView base,
+			final ExecutionView dominant, boolean lifecycleOverride, boolean goalOverride) {
 		for (LifecycleView domLifecycle : dominant.getLifecycles()
 				.values()) {
 			LifecycleView baseLifecycle = base.getLifecycles()
@@ -306,15 +191,16 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	@SuppressWarnings("deprecation")
-	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(ExecutionArchiveSlice slice) {
+	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
+			ExecutionArchiveSlice slice) {
 		Map<String, Map<ExecutionSource, ExecutionView>> baseViews;
 		if (slice.getParent() == null)
 			baseViews = new LinkedHashMap<>();
 		else
-			baseViews = getExecutions(slice.getParent());
+			baseViews = getExecutions(cnf, slice.getParent());
 
-		Set<Execution> applyableExecutions = filterSlice(slice);
-		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(applyableExecutions);
+		Set<Execution> applyableExecutions = filterSlice(cnf, slice);
+		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applyableExecutions);
 
 		for (String executionId : dominantViews.keySet()) {
 			Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
@@ -332,7 +218,7 @@ public class Selector implements ExecutionArchiveSelector {
 					continue;
 				}
 				baseEntries.put(source,
-						merge(baseExecution, domExecution, ExecutionSource.OVERRIDE.equals(source), false));
+						merge(cnf, baseExecution, domExecution, ExecutionSource.OVERRIDE.equals(source), false));
 			}
 		}
 
@@ -340,7 +226,8 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	@SuppressWarnings("deprecation")
-	protected ExecutionView reduce(String id, Map<ExecutionSource, ExecutionView> views) {
+	protected ExecutionView reduce(final ExecutionArchiveSelectorConfig cnf, String id,
+			Map<ExecutionSource, ExecutionView> views) {
 		ExecutionView execution = views.get(ExecutionSource.EFFECTIVE);
 		if (execution != null)
 			return execution;
@@ -348,25 +235,30 @@ public class Selector implements ExecutionArchiveSelector {
 		ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING, ViewFactory.createExecution(id));
 		ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE, ViewFactory.createExecution(id));
 
-		execution = merge(pluginView, packagingView, false, true);
-		execution = merge(execution, overrideView, true, false);
+		execution = merge(cnf, pluginView, packagingView, false, true);
+		execution = merge(cnf, execution, overrideView, true, false);
 
 		return execution;
 	}
 
 	@Override
-	public ExecutionArchiveSelection compile() {
+	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig cnf) {
 		Set<ExecutionView> views = new LinkedHashSet<>();
-		if (this.cnf.getActiveProject() == null)
+		if (cnf.getActiveProject() == null)
 			return new Selection(views);
 
-		ExecutionArchiveSlice slice = this.archive.getSlice(this.cnf.getActiveProject());
+		ExecutionArchiveSlice slice = this.archive.getSlice(cnf.getActiveProject());
 		if (slice == null)
 			return new Selection(views);
 
-		this.cnf.compile(this.mvnSession);
-		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(slice).entrySet())
-			views.add(reduce(entry.getKey(), entry.getValue()));
+		cnf.compile(this.mvnSession);
+		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(cnf, slice).entrySet())
+			views.add(reduce(cnf, entry.getKey(), entry.getValue()));
 		return new Selection(views);
+	}
+
+	@Override
+	public ExecutionArchiveSelectorConfig createConfig() {
+		return new SelectorConfig();
 	}
 }

@@ -13,13 +13,13 @@ public class Execution implements Recordable {
 	private String id = null;
 	private ExecutionSource source = null;
 
-	private Set<Trigger> trigger = new LinkedHashSet<>();
+	private final Set<Trigger> trigger = new LinkedHashSet<>();
 	private boolean activeAlways = false;
 	private boolean activeDefault = false;
 	private boolean activeNever = false;
-	private Set<String> packagingProcedures = new LinkedHashSet<>();
+	private final Set<String> packagingProcedures = new LinkedHashSet<>();
 
-	private Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
+	private final Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
 
 	public Execution() {
 	}

@@ -27,6 +27,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
@@ -41,27 +42,30 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 
 	@Requirement
 	Logger log;
-
 	@Requirement
 	private BuildPluginManager pluginManager;
-
 	@Requirement
 	private ExecutionArchive archive;
+	@Requirement
+	ExecutionArchiveSelector selector;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 
-		ExecutionArchiveSelector selector = archive.newSelection();
+		ExecutionArchiveSelectorConfig cnf = this.selector.createConfig();
 
-		selector.selectActiveProject(project);
-		selector.selectModes("default");
-		selector.selectPackagingProcedure(project.getPackaging());
+		cnf.selectActiveProject(project);
+		cnf.selectModes("default");
+		cnf.selectPackagingProcedure(project.getPackaging());
 
-		ExecutionArchiveSelection selection = selector.compile();
+		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
 
+		this.log.warn(cnf.toRecord()
+				.toString());
 		this.log.warn("Active Execution Selection:");
-		this.log.warn(selection.toRecord().toString());
+		this.log.warn(selection.toRecord()
+				.toString());
 
 		System.out.println("OVERRIDE Sequential >> Lifecycle: " + lifecycle + " Phase: " + lifecyclePhase);
 
@@ -81,7 +85,8 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		 * in the map, we are not interested in any of the executions bound to it.
 		 */
 
-		for (Plugin plugin : project.getBuild().getPlugins()) {
+		for (Plugin plugin : project.getBuild()
+				.getPlugins()) {
 			// System.out.println(plugin);
 			for (PluginExecution execution : plugin.getExecutions()) {
 				// System.out.println("Execution: " + execution.getId());
@@ -128,7 +133,8 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
 			List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-			for (List<MojoExecution> executions : entry.getValue().values()) {
+			for (List<MojoExecution> executions : entry.getValue()
+					.values()) {
 				mojoExecutions.addAll(executions);
 			}
 

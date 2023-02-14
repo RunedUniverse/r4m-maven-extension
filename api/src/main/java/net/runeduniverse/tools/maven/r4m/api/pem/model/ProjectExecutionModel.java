@@ -8,12 +8,30 @@ import java.util.Set;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 
-public class ProjectExecutionModel implements Recordable{
+public class ProjectExecutionModel implements Recordable {
 	private String version;
+	private String parserHint = null;
+	private boolean effective = false;
 	private Set<Execution> executions = new LinkedHashSet<>(0);
+
+	public ProjectExecutionModel() {
+		this.parserHint = null;
+	}
+
+	public ProjectExecutionModel(String parserHint) {
+		this.parserHint = parserHint;
+	}
 
 	public String getVersion() {
 		return this.version;
+	}
+
+	public String getParserHint() {
+		return this.parserHint;
+	}
+
+	public boolean isEffective() {
+		return this.effective;
 	}
 
 	public Set<Execution> getExecutions() {
@@ -22,6 +40,14 @@ public class ProjectExecutionModel implements Recordable{
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public void setParserHint(String hint) {
+		this.parserHint = hint;
+	}
+
+	public void setEffective(boolean value) {
+		this.effective = value;
 	}
 
 	public void addExecution(Execution execution) {
@@ -35,7 +61,7 @@ public class ProjectExecutionModel implements Recordable{
 	@Override
 	public CompoundTree toRecord() {
 		CompoundTree tree = new CompoundTree("ProjectExecutionModel");
-		
+
 		for (Recordable execution : executions)
 			tree.append(execution.toRecord());
 

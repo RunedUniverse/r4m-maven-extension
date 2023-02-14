@@ -8,5 +8,5 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelParser {
-	ProjectExecutionModel parseModel(InputStream input) throws IOException, XmlPullParserException;
+	public void parseModel(ProjectExecutionModel pem, InputStream input) throws IOException, XmlPullParserException;
 }

@@ -31,16 +31,13 @@ public class PEMParser implements ProjectExecutionModelParser {
 	private Map<String, ExecutionTriggerParser> execTriggerParser;
 
 	@Override
-	public ProjectExecutionModel parseModel(InputStream input) throws IOException, XmlPullParserException {
+	public void parseModel(ProjectExecutionModel pem, InputStream input) throws IOException, XmlPullParserException {
 		Reader reader = ReaderFactory.newXmlReader(input);
 
-		ProjectExecutionModel pem = new ProjectExecutionModel();
 		PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
 		parseExecutions(pem, cnf.getChild("executions", false));
-
-		return pem;
 	}
 
 	protected boolean parseModelVersion(final ProjectExecutionModel model, final PlexusConfiguration versionNode) {
@@ -224,7 +221,7 @@ public class PEMParser implements ProjectExecutionModelParser {
 			return false;
 
 		Goal goal = new Goal(groupId, artifactId, goalId);
-		
+
 		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
 		Set<String> modes = new LinkedHashSet<>(0);
 		for (PlexusConfiguration modeNode : modesNode.getChildren()) {

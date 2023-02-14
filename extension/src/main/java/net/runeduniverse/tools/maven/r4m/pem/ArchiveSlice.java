@@ -1,6 +1,5 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -14,12 +13,14 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public class ArchiveSlice implements ExecutionArchiveSlice {
 	private final MavenProject mvnProject;
 	private ExecutionArchiveSlice parent;
 	private String version;
-	private Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
+	private final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
+	private final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
 	public ArchiveSlice(MavenProject mvnProject, String version, ArchiveSlice parent) {
 		this.mvnProject = mvnProject;
@@ -54,13 +55,31 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 	}
 
 	@Override
+	public Set<Execution> getEffectiveExecutions(ExecutionFilter filter) {
+		Set<Execution> executions = new LinkedHashSet<>();
+		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
+			for (Set<Execution> execCol : entry.values())
+				for (Execution execution : execCol) {
+					if (this.executionOrigins.get(execution)
+							.isEffective() && filter.apply(execution))
+						executions.add(execution);
+				}
+		return executions;
+	}
+
+	@Override
 	public void setParent(ExecutionArchiveSlice parent) {
 		this.parent = parent;
 	}
 
 	@Override
-	public void register(Collection<Execution> executions) {
-		for (Execution execution : executions) {
+	public void register(ProjectExecutionModel pem) {
+		if (pem == null)
+			return;
+
+		for (Execution execution : pem.getExecutions()) {
+			this.executionOrigins.put(execution, pem);
+
 			Map<ExecutionSource, Set<Execution>> entry = this.executions.get(execution.getId());
 			if (entry == null) {
 				entry = new LinkedHashMap<>(3);

@@ -1,11 +1,11 @@
 package net.runeduniverse.tools.maven.r4m.api.pem;
 
-import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public interface ExecutionArchiveSlice extends Recordable {
 	public MavenProject getMvnProject();
@@ -16,7 +16,9 @@ public interface ExecutionArchiveSlice extends Recordable {
 
 	public Set<Execution> getExecutions(ExecutionFilter filter);
 
+	public Set<Execution> getEffectiveExecutions(ExecutionFilter filter);
+
 	public void setParent(ExecutionArchiveSlice parent);
 
-	public void register(Collection<Execution> executions);
+	public void register(ProjectExecutionModel pem);
 }

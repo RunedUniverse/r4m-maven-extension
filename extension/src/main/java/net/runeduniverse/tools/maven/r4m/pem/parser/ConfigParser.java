@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
-import java.util.Set;
-
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -17,12 +14,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
-@Component(role = ProjectExecutionModelConfigParser.class, hint = "default")
+@Component(role = ProjectExecutionModelConfigParser.class, hint = ConfigParser.HINT)
 public class ConfigParser implements ProjectExecutionModelConfigParser {
 
+	public static final String HINT = "default";
 	public static final String ERR_MSG_PARSE_PEM = "Failed to parse %s of maven project %s";
 
 	@Requirement
@@ -32,25 +29,24 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 	ProjectExecutionModelParser parser;
 
 	@Override
-	public Set<Execution> parse(MavenProject mvnProject) {
+	public ProjectExecutionModel parse(MavenProject mvnProject) throws Exception {
 
 		File executionXml = new File(mvnProject.getBasedir(), Properties.PROJECT_EXECUTION_MODEL_FILE);
 
-		ProjectExecutionModel model = null;
+		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
+		model.setEffective(true);
+
 		if (executionXml.isFile()) {
 			try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
-				model = this.parser.parseModel(is);
+				this.parser.parseModel(model, is);
 			} catch (IOException | XmlPullParserException e) {
-				this.log.warn(
-						String.format(ERR_MSG_PARSE_PEM, Properties.PROJECT_EXECUTION_MODEL_FILE, mvnProject.getName()),
-						e);
+				this.log.error(String.format(ERR_MSG_PARSE_PEM, Properties.PROJECT_EXECUTION_MODEL_FILE,
+						mvnProject.getName()));
+				throw e;
 			}
 		}
 
-		if (model == null)
-			return new HashSet<>(0);
-
-		return model.getExecutions();
+		return model;
 	}
 
 }

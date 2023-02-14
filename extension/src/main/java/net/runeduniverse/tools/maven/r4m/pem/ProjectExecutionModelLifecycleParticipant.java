@@ -1,9 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
@@ -19,23 +16,18 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	@Requirement
 	private Logger log;
-
 	@Requirement
 	private ExecutionArchive archive;
-
 	@Requirement
 	private Map<String, ProjectExecutionModelConfigParser> pemConfigParser;
-
 	@Requirement
 	private Map<String, ProjectExecutionModelPluginParser> pemPluginParser;
-
 	@Requirement
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
 
@@ -50,25 +42,19 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 		for (MavenProject mvnProject : mvnSession.getAllProjects()) {
 			ExecutionArchiveSlice projectSlice = this.archive.createSlice(mvnProject);
 
-			Set<Execution> configExec = new HashSet<>();
-			for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
-				configExec.addAll(parser.parse(mvnProject));
-			}
-			if (!configExec.isEmpty()) {
-				// Project specific config overrides everything!
-				projectSlice.register(configExec);
-				// make configurable? -> decides if pem.xml is absolut
-				continue;
-			}
+			try {
+				for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
+					projectSlice.register(parser.parse(mvnProject));
 
-			for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-				for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
-					projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-							mvnSession.getRepositorySession(), mvnPlugin));
-				}
+				for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
+					for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
+						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
+								mvnSession.getRepositorySession(), mvnPlugin));
 
-			for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values()) {
-				projectSlice.register(parser.parse());
+				for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
+					projectSlice.register(parser.parse());
+			} catch (Exception e) {
+				throw new MavenExecutionException("", e);
 			}
 		}
 

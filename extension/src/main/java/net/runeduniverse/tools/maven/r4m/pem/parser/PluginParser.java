@@ -5,9 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
@@ -29,12 +27,12 @@ import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistry;
 import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
-@Component(role = ProjectExecutionModelPluginParser.class, hint = "default")
+@Component(role = ProjectExecutionModelPluginParser.class, hint = PluginParser.HINT)
 public class PluginParser implements ProjectExecutionModelPluginParser {
 
+	public static final String HINT = "default";
 	public static final String ERR_MSG_PLUGIN_DESCRIPTOR = "Failed to acquire org.apache.maven.plugin.descriptor.PluginDescriptor!";
 	public static final String ERR_MSG_PARSE_PEM = "Failed to parse pem of %s [%s]";
 
@@ -51,20 +49,19 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 	ProjectExecutionModelParser parser;
 
 	@Override
-	public Set<Execution> parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			Plugin mvnPlugin) {
+	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
+			Plugin mvnPlugin) throws Exception {
 
 		PluginExecutionRegistrySlice slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
+		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
 		if (slice == null)
-			slice = parseSlice(repositories, session, mvnPlugin);
-		if (slice == null)
-			return new HashSet<>(0);
+			slice = parseSlice(repositories, session, mvnPlugin, model);
 
-		return slice.getExecutions();
+		return model;
 	}
 
 	protected PluginExecutionRegistrySlice parseSlice(final List<RemoteRepository> repositories,
-			final RepositorySystemSession session, Plugin mvnPlugin) {
+			final RepositorySystemSession session, Plugin mvnPlugin, ProjectExecutionModel model) throws Exception {
 		PluginDescriptor mvnPluginDescriptor = null;
 
 		try {
@@ -75,7 +72,6 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		}
 
 		PluginExecutionRegistrySlice slice = this.registry.createSlice(mvnPluginDescriptor);
-		ProjectExecutionModel model = null;
 
 		File pluginFile = mvnPluginDescriptor.getPluginArtifact()
 				.getFile();
@@ -90,7 +86,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 
 					if (executionDescriptorEntry != null) {
 						try (InputStream is = pluginJar.getInputStream(executionDescriptorEntry)) {
-							model = this.parser.parseModel(is);
+							this.parser.parseModel(model, is);
 						}
 					}
 				}
@@ -99,12 +95,13 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 
 				if (executionXml.isFile()) {
 					try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
-						model = this.parser.parseModel(is);
+						this.parser.parseModel(model, is);
 					}
 				}
 			}
 		} catch (IOException | XmlPullParserException e) {
-			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPlugin.getKey(), pluginFile.getAbsolutePath()), e);
+			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPlugin.getKey(), pluginFile.getAbsolutePath()));
+			throw e;
 		}
 
 		slice.includeModel(model);

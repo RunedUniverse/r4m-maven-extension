@@ -1,11 +1,9 @@
 package net.runeduniverse.tools.maven.r4m.api.pem;
 
-import java.util.Set;
-
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelPackagingParser {
 
-	Set<Execution> parse();
+	public ProjectExecutionModel parse();
 
 }

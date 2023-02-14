@@ -25,6 +25,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
@@ -49,8 +50,8 @@ public class Selector implements ExecutionArchiveSelector {
 	@Requirement
 	private ExecutionArchive archive;
 
-	protected Set<Execution> filterSlice(final ExecutionArchiveSelectorConfig cnf, ExecutionArchiveSlice slice) {
-		return slice.getExecutions(execution -> {
+	protected ExecutionFilter filterSlice(final ExecutionArchiveSelectorConfig cnf) {
+		return execution -> {
 			// the use of never-/always-active flags is discouraged and included for
 			// debugging purposes
 			if (execution.isNeverActive())
@@ -77,7 +78,7 @@ public class Selector implements ExecutionArchiveSelector {
 				if (trigger.isActive(cnf))
 					return true;
 			return false;
-		});
+		};
 	}
 
 	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, Goal goal) {
@@ -195,23 +196,18 @@ public class Selector implements ExecutionArchiveSelector {
 	@SuppressWarnings("deprecation")
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			ExecutionArchiveSlice slice) {
-		Map<String, Map<ExecutionSource, ExecutionView>> baseViews;
-		if (slice.getParent() == null)
-			baseViews = new LinkedHashMap<>();
-		else
-			baseViews = getExecutions(cnf, slice.getParent());
+		ExecutionFilter filter = filterSlice(cnf);
+		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter);
 
-		Set<Execution> applyableExecutions = filterSlice(cnf, slice);
-		
-		// TODO DEBUG
-		for (Execution execution : applyableExecutions) {
-			this.log.warn(execution.toRecord().toString());
+		Map<String, Map<ExecutionSource, ExecutionView>> baseViews = new LinkedHashMap<>();
+		if (applicableExecutions.isEmpty()) {
+			if (slice.getParent() != null)
+				baseViews = getExecutions(cnf, slice.getParent());
+
+			applicableExecutions = slice.getExecutions(filter);
 		}
-		this.log.info("");
-		this.log.info("");
-		
-		
-		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applyableExecutions);
+
+		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
 
 		for (String executionId : dominantViews.keySet()) {
 			Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
@@ -246,10 +242,6 @@ public class Selector implements ExecutionArchiveSelector {
 		ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
 		ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING, ViewFactory.createExecution(id));
 		ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE, ViewFactory.createExecution(id));
-
-		this.log.warn("PLUGIN" + pluginView.toRecord());
-		this.log.warn("PACKAGING" + packagingView.toRecord());
-		this.log.warn("OVERRIDE" + overrideView.toRecord());
 
 		execution = merge(cnf, pluginView, packagingView, false, true);
 		execution = merge(cnf, execution, overrideView, true, false);

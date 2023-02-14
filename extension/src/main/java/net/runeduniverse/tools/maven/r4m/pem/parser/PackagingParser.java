@@ -20,9 +20,12 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
-@Component(role = ProjectExecutionModelPackagingParser.class, hint = "default")
+@Component(role = ProjectExecutionModelPackagingParser.class, hint = PackagingParser.HINT)
 public class PackagingParser implements ProjectExecutionModelPackagingParser {
+
+	public static final String HINT = "default";
 
 	@Requirement
 	private Logger log;
@@ -31,7 +34,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 	private Map<String, LifecycleMapping> mappings;
 
 	@Override
-	public Set<Execution> parse() {
+	public ProjectExecutionModel parse() {
 		this.log.debug("Scanning PackagingProcedures");
 		Set<Execution> effExecutions = new LinkedHashSet<>();
 
@@ -73,7 +76,10 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 				}
 			effExecutions.addAll(executions.values());
 		}
-		return effExecutions;
+
+		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
+		model.addExecutions(effExecutions);
+		return model;
 	}
 
 }

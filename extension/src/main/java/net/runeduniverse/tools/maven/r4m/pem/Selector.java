@@ -18,6 +18,7 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
@@ -39,6 +40,8 @@ import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 @Component(role = ExecutionArchiveSelector.class, hint = "default")
 public class Selector implements ExecutionArchiveSelector {
 
+	@Requirement
+	private Logger log;
 	@Requirement
 	private MavenSession mvnSession;
 	@Requirement
@@ -95,8 +98,7 @@ public class Selector implements ExecutionArchiveSelector {
 					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
-			System.err.println("Failed to acquire MojoDescriptor!");
-			e.printStackTrace();
+			this.log.error("Failed to acquire MojoDescriptor!", e);
 		}
 		goalView.setDescriptor(descriptor);
 	}
@@ -184,7 +186,7 @@ public class Selector implements ExecutionArchiveSelector {
 					baseLifecycle.put(domPhase);
 					continue;
 				}
-				basePhase.addAllGoals(domPhase.getGoals());
+				basePhase.addNewGoals(domPhase.getGoals());
 			}
 		}
 		return base;
@@ -200,6 +202,15 @@ public class Selector implements ExecutionArchiveSelector {
 			baseViews = getExecutions(cnf, slice.getParent());
 
 		Set<Execution> applyableExecutions = filterSlice(cnf, slice);
+		
+		// TODO DEBUG
+		for (Execution execution : applyableExecutions) {
+			this.log.warn(execution.toRecord().toString());
+		}
+		this.log.info("");
+		this.log.info("");
+		
+		
 		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applyableExecutions);
 
 		for (String executionId : dominantViews.keySet()) {
@@ -231,9 +242,14 @@ public class Selector implements ExecutionArchiveSelector {
 		ExecutionView execution = views.get(ExecutionSource.EFFECTIVE);
 		if (execution != null)
 			return execution;
+
 		ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
 		ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING, ViewFactory.createExecution(id));
 		ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE, ViewFactory.createExecution(id));
+
+		this.log.warn("PLUGIN" + pluginView.toRecord());
+		this.log.warn("PACKAGING" + packagingView.toRecord());
+		this.log.warn("OVERRIDE" + overrideView.toRecord());
 
 		execution = merge(cnf, pluginView, packagingView, false, true);
 		execution = merge(cnf, execution, overrideView, true, false);

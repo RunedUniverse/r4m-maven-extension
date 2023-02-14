@@ -14,5 +14,5 @@ public interface PhaseView extends Recordable {
 
 	public void removeGoal(GoalView goal);
 
-	public void addAllGoals(Collection<GoalView> goals);
+	public void addNewGoals(Collection<GoalView> goals);
 }

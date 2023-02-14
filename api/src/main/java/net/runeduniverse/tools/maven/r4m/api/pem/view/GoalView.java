@@ -19,6 +19,8 @@ public interface GoalView extends Recordable {
 
 	public boolean hasFork();
 
+	public boolean hasValidFork();
+
 	public Fork getFork();
 
 	public MojoDescriptor getDescriptor();

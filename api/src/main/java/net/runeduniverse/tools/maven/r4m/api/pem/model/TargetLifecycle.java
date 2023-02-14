@@ -36,6 +36,33 @@ public class TargetLifecycle implements Recordable {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof TargetLifecycle))
+			return false;
+		TargetLifecycle lifecycle = (TargetLifecycle) obj;
+
+		if (!this.id.equals(lifecycle.getId()))
+			return false;
+
+		if (this.startPhase == null) {
+			if (lifecycle.getStartPhase() != null)
+				return false;
+		} else if (!this.startPhase.equals(lifecycle.getStartPhase()))
+			return false;
+
+		if (this.stopPhase == null) {
+			if (lifecycle.getStopPhase() != null)
+				return false;
+		} else if (!this.stopPhase.equals(lifecycle.getStopPhase()))
+			return false;
+
+		return true;
+	}
+
+	@Override
 	public CompoundTree toRecord() {
 		CompoundTree tree = new CompoundTree("Target Lifecycle");
 

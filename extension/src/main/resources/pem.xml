@@ -29,7 +29,7 @@
 									<fork>
 										<mode>default</mode>
 										<executions>
-											<execution>default</execution>
+											<execution id="default" />
 										</executions>
 										<lifecycle id="builder" />
 									</fork>
@@ -48,7 +48,7 @@
 									<fork>
 										<mode>default</mode>
 										<executions>
-											<execution>test</execution>
+											<execution id="test" />
 										</executions>
 										<lifecycle id="builder" />
 									</fork>

@@ -9,7 +9,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 public class TargetPhase implements Recordable {
 
 	private String id;
-	private Set<String> executions = new LinkedHashSet<>(0);
+	private final Set<String> executions = new LinkedHashSet<>(0);
 
 	public TargetPhase(String id) {
 		this.id = id;
@@ -25,6 +25,22 @@ public class TargetPhase implements Recordable {
 
 	public void addExecutions(Set<String> executions) {
 		this.executions.addAll(executions);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof TargetPhase))
+			return false;
+		TargetPhase phase = (TargetPhase) obj;
+
+		if (!(this.executions.size() == phase.getExecutions()
+				.size() && this.executions.containsAll(phase.getExecutions())))
+			return false;
+
+		return true;
 	}
 
 	@Override

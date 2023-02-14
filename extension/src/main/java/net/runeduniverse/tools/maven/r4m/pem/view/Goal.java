@@ -15,7 +15,7 @@ public class Goal implements GoalView {
 	private String artifactId;
 	private String goalId;
 	private Fork fork = null;
-	private Set<String> modes = new LinkedHashSet<>();
+	private final Set<String> modes = new LinkedHashSet<>();
 
 	private MojoDescriptor descriptor;
 
@@ -51,6 +51,11 @@ public class Goal implements GoalView {
 	}
 
 	@Override
+	public boolean hasValidFork() {
+		return this.fork != null && this.fork.isValid();
+	}
+
+	@Override
 	public Fork getFork() {
 		return this.fork;
 	}
@@ -83,8 +88,25 @@ public class Goal implements GoalView {
 
 	@Override
 	public boolean equals(Object obj) {
-		// TODO COMPARE GOALS
-		return super.equals(obj);
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof GoalView))
+			return false;
+		GoalView view = (GoalView) obj;
+
+		if (!(this.groupId.equals(view.getGroupId()) && this.artifactId.equals(view.getArtifactId())
+				&& this.goalId.equals(view.getGoalId())))
+			return false;
+
+		if (!(this.modes.size() == view.getModes()
+				.size() && this.modes.containsAll(view.getModes())))
+			return false;
+
+		if (this.fork != null)
+			return this.fork.equals(view.getFork());
+
+		return true;
 	}
 
 	@Override

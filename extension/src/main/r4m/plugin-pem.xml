@@ -11,9 +11,10 @@
 			<triggers>
 				<default />
 				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
-				<lifecycle id="lib">
+				<lifecycle id="default">
 					<phases>
 						<phase id="compile">
 							<goals>
@@ -81,6 +82,7 @@
 		<execution source="plugin" id="test">
 			<triggers>
 				<on-call />
+				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
 				<lifecycle id="builder">

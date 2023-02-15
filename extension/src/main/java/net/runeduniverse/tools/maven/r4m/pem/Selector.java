@@ -208,20 +208,19 @@ public class Selector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			ExecutionArchiveSlice slice) {
 		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, views, slice);
+		getExecutions(cnf, filterSlice(cnf), views, slice);
 		return views;
 	}
 
 	@SuppressWarnings("deprecation")
-	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
+	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final ExecutionFilter filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, ExecutionArchiveSlice slice) {
-		ExecutionFilter filter = filterSlice(cnf);
 		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
 			if (slice.getParent() != null)
-				effExecDetected = getExecutions(cnf, baseViews, slice.getParent());
+				effExecDetected = getExecutions(cnf, filter, baseViews, slice.getParent());
 
 			if (!effExecDetected)
 				applicableExecutions = slice.getExecutions(filter);

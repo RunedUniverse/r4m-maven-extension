@@ -41,6 +41,8 @@ import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 @Component(role = ExecutionArchiveSelector.class, hint = "default")
 public class Selector implements ExecutionArchiveSelector {
 
+	public static final String WARN_SKIPPING_UNKNOWN_GOAL = "skipping unknown goal » %s:%s:%s";
+
 	@Requirement
 	private Logger log;
 	@Requirement
@@ -89,9 +91,12 @@ public class Selector implements ExecutionArchiveSelector {
 		return false;
 	}
 
-	protected void acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView) {
+	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView) {
 		Plugin plugin = cnf.getActiveProject()
 				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
+
+		if (plugin == null)
+			return false;
 
 		MojoDescriptor descriptor = null;
 		try {
@@ -100,8 +105,13 @@ public class Selector implements ExecutionArchiveSelector {
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
 			this.log.error("Failed to acquire MojoDescriptor!", e);
+			return false;
 		}
+		if (descriptor == null)
+			return false;
+
 		goalView.setDescriptor(descriptor);
+		return true;
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(final ExecutionArchiveSelectorConfig cnf,
@@ -139,9 +149,11 @@ public class Selector implements ExecutionArchiveSelector {
 									goal.getGoalId());
 							goalView.addModes(goal.getModes());
 							goalView.setFork(goal.getFork());
-							acquireMojoDescriptor(cnf, goalView);
-							if (goalView.getDescriptor() != null)
+							if (acquireMojoDescriptor(cnf, goalView))
 								phaseView.addGoal(goalView);
+							else
+								this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_GOAL, goalView.getGroupId(),
+										goalView.getArtifactId(), goalView.getGoalId()));
 						}
 				}
 			}
@@ -193,19 +205,28 @@ public class Selector implements ExecutionArchiveSelector {
 		return base;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			ExecutionArchiveSlice slice) {
+		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
+		getExecutions(cnf, views, slice);
+		return views;
+	}
+
+	@SuppressWarnings("deprecation")
+	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, ExecutionArchiveSlice slice) {
 		ExecutionFilter filter = filterSlice(cnf);
 		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter);
+		boolean effExecDetected = false;
 
-		Map<String, Map<ExecutionSource, ExecutionView>> baseViews = new LinkedHashMap<>();
 		if (applicableExecutions.isEmpty()) {
 			if (slice.getParent() != null)
-				baseViews = getExecutions(cnf, slice.getParent());
+				effExecDetected = getExecutions(cnf, baseViews, slice.getParent());
 
-			applicableExecutions = slice.getExecutions(filter);
-		}
+			if (!effExecDetected)
+				applicableExecutions = slice.getExecutions(filter);
+		} else
+			effExecDetected = true;
 
 		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
 
@@ -229,7 +250,7 @@ public class Selector implements ExecutionArchiveSelector {
 			}
 		}
 
-		return baseViews;
+		return effExecDetected;
 	}
 
 	@SuppressWarnings("deprecation")

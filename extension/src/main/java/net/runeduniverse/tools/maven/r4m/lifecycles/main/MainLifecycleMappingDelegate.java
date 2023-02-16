@@ -42,13 +42,13 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 	public static final String HINT = "default";
 
 	@Requirement
-	Logger log;
+	private Logger log;
 	@Requirement
 	private BuildPluginManager pluginManager;
 	@Requirement
 	private ExecutionArchive archive;
 	@Requirement
-	ExecutionArchiveSelector selector;
+	private ExecutionArchiveSelector selector;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
@@ -67,8 +67,6 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 		this.log.warn("Active Execution Selection:");
 		this.log.warn(selection.toRecord()
 				.toString());
-
-		System.out.println("OVERRIDE Sequential >> Lifecycle: " + lifecycle + " Phase: " + lifecyclePhase);
 
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos.

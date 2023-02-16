@@ -42,7 +42,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 	public static final String HINT = "dev";
 
 	@Requirement
-	Logger log;
+	private Logger log;
 	@Requirement(role = Lifecycle.class)
 	protected Map<String, Lifecycle> lifecycles;
 	@Requirement
@@ -50,7 +50,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 	@Requirement
 	private ExecutionArchive archive;
 	@Requirement
-	ExecutionArchiveSelector selector;
+	private ExecutionArchiveSelector selector;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle devLifecycle, String devLifecyclePhase) throws PluginNotFoundException, PluginResolutionException,

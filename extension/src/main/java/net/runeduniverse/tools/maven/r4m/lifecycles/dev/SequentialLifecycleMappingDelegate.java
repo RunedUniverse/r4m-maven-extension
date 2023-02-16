@@ -5,12 +5,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -18,7 +17,7 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.MojoExecution.Source;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -28,6 +27,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
@@ -81,9 +82,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 				.toString());
 
 		/*
-		 * Initialize mapping from lifecycle phase to bound mojos. The key set of this
-		 * map denotes the phases the caller is interested in, i.e. all phases up to and
-		 * including the specified phase.
+		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */
 
 		Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
@@ -98,43 +97,21 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 			}
 		}
 
-		/*
-		 * Grab plugin executions that are bound to the selected lifecycle phases from
-		 * project. The effective model of the project already contains the plugin
-		 * executions induced by the project's packaging type. Remember, all phases of
-		 * interest and only those are in the lifecycle mapping, if a phase has no value
-		 * in the map, we are not interested in any of the executions bound to it.
-		 */
+		// select all lifecycle phases and exclude afterwards
+		for (Entry<String, Map<ExecutionView, List<GoalView>>> phaseEntry : selection
+				.selectPhases(devLifecycle.getPhases())
+				.entrySet()) {
 
-		for (Plugin plugin : project.getBuild()
-				.getPlugins()) {
-			for (PluginExecution execution : plugin.getExecutions()) {
-				// if the phase is specified then I don't have to go fetch the plugin yet and
-				// pull it down
-				// to examine the phase it is associated to.
-				if (execution.getPhase() != null) {
-					Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
+			for (Entry<ExecutionView, List<GoalView>> execEntry : phaseEntry.getValue()
+					.entrySet()) {
+				for (GoalView goal : execEntry.getValue()) {
+					Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(phaseEntry.getKey());
 					if (phaseBindings != null) {
-						for (String goal : execution.getGoals()) {
-							MojoExecution mojoExecution = new MojoExecution(plugin, goal, execution.getId());
-							mojoExecution.setLifecyclePhase(execution.getPhase());
-							addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
-						}
-					}
-				}
-				// if not then i need to grab the mojo descriptor and look at the phase that is
-				// specified
-				else {
-					for (String goal : execution.getGoals()) {
-						MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(plugin, goal,
-								project.getRemotePluginRepositories(), session.getRepositorySession());
-
-						Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
-						if (phaseBindings != null) {
-							MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
-							mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-							addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
-						}
+						MojoExecution mojoExecution = new MojoExecution(goal.getDescriptor(), execEntry.getKey()
+								.getId(), Source.LIFECYCLE);
+						mojoExecution.setLifecyclePhase(phaseEntry.getKey());
+						// TODO implement forking !!!
+						addMojoExecution(phaseBindings, mojoExecution, 0);
 					}
 				}
 			}

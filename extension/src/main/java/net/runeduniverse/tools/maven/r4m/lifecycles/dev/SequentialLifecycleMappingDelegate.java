@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
-import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -23,7 +22,6 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
@@ -45,10 +43,6 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 	private Logger log;
 	@Requirement(role = Lifecycle.class)
 	protected Map<String, Lifecycle> lifecycles;
-	@Requirement
-	private BuildPluginManager pluginManager;
-	@Requirement
-	private ExecutionArchive archive;
 	@Requirement
 	private ExecutionArchiveSelector selector;
 

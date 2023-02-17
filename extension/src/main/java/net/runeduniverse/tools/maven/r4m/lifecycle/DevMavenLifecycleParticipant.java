@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.r4m.lifecycles.dev;
+package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import java.util.LinkedList;
 import java.util.List;

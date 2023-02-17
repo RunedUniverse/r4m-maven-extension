@@ -81,7 +81,10 @@ public class Fork implements Recordable {
 			return false;
 		Fork fork = (Fork) obj;
 
-		if (!this.mode.equals(fork.getMode()))
+		if (this.mode == null) {
+			if (fork.getMode() != null)
+				return false;
+		} else if (!this.mode.equals(fork.getMode()))
 			return false;
 
 		if (this.lifecycle == null) {

@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.r4m.lifecycles.main;
+package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

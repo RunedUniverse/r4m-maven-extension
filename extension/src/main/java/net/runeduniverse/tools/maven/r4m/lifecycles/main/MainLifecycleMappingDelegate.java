@@ -60,12 +60,6 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 
 		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
 
-		this.log.warn(cnf.toRecord()
-				.toString());
-		this.log.warn("Active Execution Selection:");
-		this.log.warn(selection.toRecord()
-				.toString());
-
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */

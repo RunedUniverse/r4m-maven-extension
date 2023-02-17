@@ -12,7 +12,7 @@
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Bill of Sources</name>
-	<url>https://github.com/RunedUniverse/r4m</url>
+	<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 	<inceptionYear>2022</inceptionYear>
 
 	<properties>

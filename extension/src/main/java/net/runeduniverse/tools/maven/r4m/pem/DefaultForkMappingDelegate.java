@@ -34,6 +34,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 @Component(role = ForkMappingDelegate.class, hint = DefaultForkMappingDelegate.HINT)
 public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	public static final String HINT = "default";
+	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";
 
 	@Requirement
 	private Logger log;
@@ -55,8 +56,12 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		TargetLifecycle lifecycle = fork.getLifecycle();
 		if (lifecycle != null && phases.isEmpty()) {
 			boolean includePhase = isBlank(lifecycle.getStartPhase());
-			for (String phaseId : this.lifecycles.get(lifecycle.getId())
-					.getPhases()) {
+			Lifecycle mvnLifecycle = this.lifecycles.get(lifecycle.getId());
+			if (mvnLifecycle == null) {
+				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, lifecycle.getId()));
+				return phases;
+			}
+			for (String phaseId : mvnLifecycle.getPhases()) {
 				if (includePhase) {
 					phases.add(phaseId);
 					executionsPerPhase.put(phaseId, new LinkedHashSet<>(0));

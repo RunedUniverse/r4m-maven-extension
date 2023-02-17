@@ -1,8 +1,8 @@
 package net.runeduniverse.tools.maven.r4m.api;
 
 public interface Runes4MavenProperties {
-	public static String GROUP_ID = "net.runeduniverse.tools.runes4tools";
-	public static String ARTIFACT_ID = "r4m-maven-plugin";
+	public static String GROUP_ID = "net.runeduniverse.tools.maven.r4m";
+	public static String ARTIFACT_ID = "r4m-maven-extension";
 	public static String PREFIX_ID = "r4m";
 
 	public static String PROJECT_EXECUTION_MODEL_FILE = "pem.xml";
@@ -23,15 +23,6 @@ public interface Runes4MavenProperties {
 			public static String PARAM_SOURCE_DIR = "r4m-builder.main.source.dir";
 			public static String PARAM_TEST_SOURCE_DIR = "r4m-builder.test.source.dir";
 			public static String PARAM_TARGET_DIR = "r4m-builder.target.dir";
-
-			public interface INVOKER {
-				public static String LIFECYCLE_INVOKER_HINT = "build-invoker";
-
-				public static String PHASE_BUILD = "build";
-				public static String PHASE_BUILD_TEST = PHASE_BUILD + "-test";
-
-				public static String MOJO_SUMMARY = "build-invoker-summary";
-			}
 		}
 	}
 

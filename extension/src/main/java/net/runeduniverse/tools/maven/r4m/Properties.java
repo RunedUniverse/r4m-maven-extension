@@ -25,9 +25,6 @@ public interface Properties extends MavenProperties, Runes4MavenProperties {
 					+ Properties.PROJECT.BUILD.PARAM_TEST_SOURCE_DIR + VAL_POSTFIX;
 			public static String DEFAULT_VAL_TARGET_DIR = VAL_PREFIX + Properties.PROJECT.BUILD.PARAM_OUTPUT_DIR
 					+ VAL_POSTFIX;
-
-			public interface INVOKER extends Runes4MavenProperties.LIFECYCLE.BUILDER.INVOKER {
-			}
 		}
 	}
 

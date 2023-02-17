@@ -3,18 +3,6 @@
 		<component>
 			<role>org.apache.maven.lifecycle.Lifecycle</role>
 			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
-			<role-hint>build-invoker</role-hint>
-			<configuration>
-				<id>build-invoker</id>
-				<phases>
-					<phase>build</phase>
-					<phase>build-test</phase>
-				</phases>
-			</configuration>
-		</component>
-		<component>
-			<role>org.apache.maven.lifecycle.Lifecycle</role>
-			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
 			<role-hint>builder</role-hint>
 			<configuration>
 				<id>builder</id>

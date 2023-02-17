@@ -69,11 +69,12 @@ public class Selector implements ExecutionArchiveSelector {
 			}
 			// if an active-execution is defined it must match
 			// if not the default-active flag is checked
-			if (cnf.getActiveExecution() == null) {
+			if (cnf.getActiveExecutions()
+					.isEmpty()) {
 				if (execution.isDefaultActive())
 					return true;
-			} else if (execution.getId()
-					.equals(cnf.getActiveExecution()))
+			} else if (cnf.getActiveExecutions()
+					.contains(execution.getId()))
 				return true;
 			// any active trigger activates the execution
 			for (Trigger trigger : execution.getTrigger())

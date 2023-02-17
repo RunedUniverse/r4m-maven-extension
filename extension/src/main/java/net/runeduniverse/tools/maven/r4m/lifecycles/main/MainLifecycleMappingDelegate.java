@@ -10,6 +10,7 @@ import java.util.TreeMap;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecution.Source;
@@ -25,6 +26,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
@@ -43,6 +45,8 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 	private Logger log;
 	@Requirement
 	private ExecutionArchiveSelector selector;
+	@Requirement
+	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
@@ -78,7 +82,9 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 					MojoExecution mojoExecution = new MojoExecution(goal.getDescriptor(), entry.getKey()
 							.getId(), Source.LIFECYCLE);
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
-					// TODO implement forking !!!
+					if (goal.hasValidFork())
+						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
+								this.forkMappingDelegate.calculateForkMappings(session, project, cnf, goal.getFork()));
 					addMojoExecution(phaseBindings, mojoExecution, 0);
 				}
 			}

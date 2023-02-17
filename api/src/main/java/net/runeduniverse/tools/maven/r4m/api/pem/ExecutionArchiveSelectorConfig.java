@@ -19,7 +19,9 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 	 */
 	public ExecutionArchiveSelectorConfig selectPackagingProcedure(String value);
 
-	public ExecutionArchiveSelectorConfig selectActiveExecution(String value);
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values);
+
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(Collection<String> values);
 
 	public ExecutionArchiveSelectorConfig selectActiveProfiles(String... values);
 
@@ -49,7 +51,7 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public String getPackagingProcedure();
 
-	public String getActiveExecution();
+	public Set<String> getActiveExecutions();
 
 	public Set<String> getActiveProfiles();
 

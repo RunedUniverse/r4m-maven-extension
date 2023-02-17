@@ -39,7 +39,7 @@ public class InjectLifecycleMappingDelegate extends AExecutionLifecycleMappingDe
 		}
 
 		// TODO add correct data
-		Plugin thisPlugin = mvnProject.getPlugin("net.runeduniverse.tools.runes4tools:runes4maven-maven-plugin");
+		Plugin thisPlugin = mvnProject.getPlugin("net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
 		ExecutionBuilder builder = this.archive.createBuilder(mvnProject, "builder", null,
 				ForkMojoDescriptor.create(thisPlugin, "scan-references", "builder-scan-references", null));
 

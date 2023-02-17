@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -25,6 +26,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
@@ -45,6 +47,8 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 	protected Map<String, Lifecycle> lifecycles;
 	@Requirement
 	private ExecutionArchiveSelector selector;
+	@Requirement
+	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle devLifecycle, String devLifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
@@ -91,7 +95,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 			}
 		}
 
-		// select all lifecycle phases and exclude afterwards
+		// select all lifecycle phases and exclude based on seeded mappings
 		for (Entry<String, Map<ExecutionView, List<GoalView>>> phaseEntry : selection
 				.selectPhases(devLifecycle.getPhases())
 				.entrySet()) {
@@ -104,7 +108,9 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 						MojoExecution mojoExecution = new MojoExecution(goal.getDescriptor(), execEntry.getKey()
 								.getId(), Source.LIFECYCLE);
 						mojoExecution.setLifecyclePhase(phaseEntry.getKey());
-						// TODO implement forking !!!
+						if (goal.hasValidFork())
+							mojoExecution.setForkedExecutions(BuilderCommon.getKey(project), this.forkMappingDelegate
+									.calculateForkMappings(session, project, cnf, goal.getFork()));
 						addMojoExecution(phaseBindings, mojoExecution, 0);
 					}
 				}

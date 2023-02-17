@@ -15,7 +15,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
-	private String activeExecution = null;
+	private final Set<String> activeExecutions = new LinkedHashSet<>();
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 	private final Set<String> providedProfiles = new LinkedHashSet<>();
 	private final Set<String> modes = new LinkedHashSet<>();
@@ -41,9 +41,17 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveExecution(String value) {
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
 		this.dirty = true;
-		this.activeExecution = value;
+		for (int i = 0; i < values.length; i++)
+			this.activeExecutions.add(values[i]);
+		return this;
+	}
+
+	@Override
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(Collection<String> values) {
+		this.dirty = true;
+		this.activeExecutions.addAll(values);
 		return this;
 	}
 
@@ -109,7 +117,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public ExecutionArchiveSelectorConfig clearActiveExecution() {
 		this.dirty = true;
-		this.activeExecution = null;
+		this.activeExecutions.clear();
 		return this;
 	}
 
@@ -145,8 +153,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public String getActiveExecution() {
-		return this.activeExecution;
+	public Set<String> getActiveExecutions() {
+		return Collections.unmodifiableSet(this.activeExecutions);
 	}
 
 	@Override
@@ -221,8 +229,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 		if (this.packagingProcedure != null)
 			tree.append("packaging procedure", this.packagingProcedure);
-		if (this.activeExecution != null)
-			tree.append("active execution", this.activeExecution);
+		if (!this.activeExecutions.isEmpty())
+			tree.append("active executions", '[' + String.join(", ", this.activeExecutions) + ']');
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
 		tree.append("active profiles", '[' + String.join(", ", this.activeProfiles) + ']');
 		tree.append("provided profiles", '[' + String.join(", ", this.providedProfiles) + ']');

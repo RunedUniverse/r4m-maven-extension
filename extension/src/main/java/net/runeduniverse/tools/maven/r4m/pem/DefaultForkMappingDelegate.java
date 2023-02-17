@@ -2,6 +2,7 @@ package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -56,8 +57,10 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 			boolean includePhase = isBlank(lifecycle.getStartPhase());
 			for (String phaseId : this.lifecycles.get(lifecycle.getId())
 					.getPhases()) {
-				if (includePhase)
+				if (includePhase) {
 					phases.add(phaseId);
+					executionsPerPhase.put(phaseId, new LinkedHashSet<>(0));
+				}
 				if (phaseId != null && phaseId.equals(lifecycle.getStopPhase()))
 					break;
 			}

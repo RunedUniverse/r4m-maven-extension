@@ -5,18 +5,17 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 /**
- * Maps out all references of the source files to later be able to compile
- * source files in order
+ * Summarizes a forked builder lifecycle
  * 
  * @author Pl4yingNight
- * @goal build-invoker-summary
+ * @goal compiler-summary
  */
-public class InvokerSummaryMojo extends AbstractMojo{
+public class CompilerSummaryMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

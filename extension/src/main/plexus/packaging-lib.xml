@@ -28,12 +28,12 @@
 							<process-sources></process-sources>
 							<generate-resources></generate-resources>
 							<process-resources></process-resources>
-							<build></build>
+							<compile></compile>
 							<generate-test-sources></generate-test-sources>
 							<process-test-sources></process-test-sources>
 							<generate-test-resources></generate-test-resources>
 							<process-test-resources></process-test-resources>
-							<build-test></build-test>
+							<test-compile></test-compile>
 							<test></test>
 							<prepare-package></prepare-package>
 							<package></package>

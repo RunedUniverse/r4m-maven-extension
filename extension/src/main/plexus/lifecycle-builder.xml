@@ -20,7 +20,7 @@
 					<phase>pre-linker</phase>
 					<phase>linker</phase>
 					<phase>post-linker</phase>
-					<phase>bin-package</phase>
+					<phase>package-binary</phase>
 				</phases>
 			</configuration>
 		</component>

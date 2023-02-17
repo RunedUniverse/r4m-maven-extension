@@ -105,7 +105,7 @@ public class Selector implements ExecutionArchiveSelector {
 					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
-			this.log.error("Failed to acquire MojoDescriptor!", e);
+			this.log.debug("Failed to acquire MojoDescriptor!", e);
 			return false;
 		}
 		if (descriptor == null)

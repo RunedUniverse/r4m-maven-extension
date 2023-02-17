@@ -52,7 +52,7 @@
 				<id>post-linker</id>
 			</phase>
 			<phase>
-				<id>bin-package</id>
+				<id>package-binary</id>
 			</phase>
 		</phases>
 	</lifecycle>

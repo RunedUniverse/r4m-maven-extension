@@ -29,11 +29,11 @@ public class ScanTestReferencesMojo extends ATestBuilderMojo {
 		 * scanner.inject(this.runtime) .inject(this.fileScanner)
 		 * .inject(this.references);
 		 */
-		getLog().info("mapping references of source-files");
+		getLog().info("mapping references of test-source-files");
 		// scanner.logInfo(getLog());
 		// TODO collect collectors from compiler plugins and run those
 		// scanner.logAnalisis(getLog());
-		getLog().info("finished mapping references of source-files");
+		getLog().info("finished mapping references of test-source-files");
 	}
 
 }

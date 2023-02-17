@@ -19,7 +19,7 @@
 					<phases>
 						<phase id="compile">
 							<goals>
-								<goal id="build-invoker-summary">
+								<goal id="compiler-summary">
 									<modes>
 										<default />
 										<dev />
@@ -38,7 +38,7 @@
 						</phase>
 						<phase id="test-compile">
 							<goals>
-								<goal id="build-invoker-summary">
+								<goal id="compiler-summary">
 									<modes>
 										<default />
 										<dev />

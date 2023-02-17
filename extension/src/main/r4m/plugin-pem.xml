@@ -5,8 +5,8 @@
 	https://api.runeduniverse.net/runes4tools/r4m-pem-v1.xsd">
 
 	<modelVersion>1.0.0</modelVersion>
-
 	<executions>
+
 		<execution source="plugin" id="default">
 			<triggers>
 				<default />
@@ -29,7 +29,7 @@
 										<executions>
 											<execution id="default" />
 										</executions>
-										<lifecycle id="builder" />
+										<lifecycle id="compiler" />
 									</fork>
 								</goal>
 							</goals>
@@ -47,25 +47,18 @@
 										<executions>
 											<execution id="test" />
 										</executions>
-										<lifecycle id="builder" />
-										<excludedPhases>
-											<phase id="package-binary">
-												<executions>
-													<execution id="test" />
-												</executions>
-											</phase>
-										</excludedPhases>
+										<lifecycle id="compiler" />
 									</fork>
 								</goal>
 							</goals>
 						</phase>
 					</phases>
 				</lifecycle>
-				<lifecycle id="builder">
+				<lifecycle id="compiler">
 					<phases>
 						<phase id="scan-references">
 							<goals>
-								<goal id="builder-scan-references">
+								<goal id="compiler-scan-references">
 									<modes>
 										<default />
 										<dev />
@@ -79,17 +72,18 @@
 				</lifecycle>
 			</lifecycles>
 		</execution>
+
 		<execution source="plugin" id="test">
 			<triggers>
 				<on-call />
 				<packaging-procedure>lib</packaging-procedure>
 			</triggers>
 			<lifecycles>
-				<lifecycle id="builder">
+				<lifecycle id="compiler">
 					<phases>
 						<phase id="scan-references">
 							<goals>
-								<goal id="builder-scan-test-references">
+								<goal id="compiler-scan-test-references">
 									<modes>
 										<default />
 										<dev />
@@ -103,5 +97,6 @@
 				</lifecycle>
 			</lifecycles>
 		</execution>
+
 	</executions>
 </project-execution-model>

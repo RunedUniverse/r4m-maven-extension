@@ -3,9 +3,9 @@
 		<component>
 			<role>org.apache.maven.lifecycle.Lifecycle</role>
 			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
-			<role-hint>builder</role-hint>
+			<role-hint>compiler</role-hint>
 			<configuration>
-				<id>builder</id>
+				<id>compiler</id>
 				<phases>
 					<phase>scan-references</phase>
 					<phase>pre-preprocessor</phase>

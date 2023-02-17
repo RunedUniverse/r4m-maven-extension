@@ -7,7 +7,6 @@
 	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem r4m-pem-v1.xsd">
 
 	<modelVersion>1.0.0</modelVersion>
-
 	<executions>
 
 		<execution id="default" source="override">
@@ -31,7 +30,7 @@
 										<executions>
 											<execution id="default" />
 										</executions>
-										<lifecycle id="builder" />
+										<lifecycle id="compiler" />
 									</fork>
 								</goal>
 							</goals>
@@ -50,7 +49,7 @@
 										<executions>
 											<execution id="test" />
 										</executions>
-										<lifecycle id="builder" />
+										<lifecycle id="compiler" />
 									</fork>
 								</goal>
 							</goals>
@@ -59,5 +58,6 @@
 				</lifecycle>
 			</lifecycles>
 		</execution>
+
 	</executions>
 </project-execution-model>

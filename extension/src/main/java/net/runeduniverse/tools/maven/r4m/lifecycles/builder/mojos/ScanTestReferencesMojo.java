@@ -14,7 +14,7 @@ import net.runeduniverse.tools.maven.r4m.lifecycles.builder.ReferenceScanner;
  * source files in order
  * 
  * @author Pl4yingNight
- * @goal builder-scan-test-references
+ * @goal compiler-scan-test-references
  */
 public class ScanTestReferencesMojo extends ATestBuilderMojo {
 

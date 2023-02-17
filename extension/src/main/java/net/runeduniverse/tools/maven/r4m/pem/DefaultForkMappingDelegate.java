@@ -41,12 +41,15 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	@Requirement
 	private ExecutionArchiveSelector selector;
 
-	protected List<String> calculateExecutingPhases(final Fork fork) {
+	protected List<String> calculateExecutingPhases(final Map<String, Set<String>> executionsPerPhase,
+			final Fork fork) {
 		// seed executing phases which might be defined
 		List<String> phases = new LinkedList<>();
 		if (fork.getPhases() != null)
-			for (TargetPhase phase : fork.getPhases())
+			for (TargetPhase phase : fork.getPhases()) {
 				phases.add(phase.getId());
+				executionsPerPhase.put(phase.getId(), phase.getExecutions());
+			}
 		// seed phases if not set & existent from lifecycle
 		TargetLifecycle lifecycle = fork.getLifecycle();
 		if (lifecycle != null && phases.isEmpty()) {
@@ -72,17 +75,22 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 	protected List<MojoExecution> calculateForkMappings(final Fork fork, final ExecutionArchiveSelection selection) {
 
-		List<String> phases = calculateExecutingPhases(fork);
+		Map<String, Set<String>> executionsPerPhase = new LinkedHashMap<>();
+		List<String> orderedPhases = calculateExecutingPhases(executionsPerPhase, fork);
 		Map<String, Set<String>> excludePhases = calculateExcludedPhases(fork);
 
 		// Initialize mapping from lifecycle phase to bound mojos.
 		Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
-		for (String phase : phases) {
+		for (String phase : orderedPhases) {
 			mappings.put(phase, new TreeMap<>());
+			Set<String> requiredExecutions = executionsPerPhase.get(phase);
 			for (Entry<ExecutionView, List<GoalView>> entry : selection.selectPhase(phase)
 					.entrySet()) {
 				String executionId = entry.getKey()
 						.getId();
+				// if executions are explicitly defined, only run those
+				if (!requiredExecutions.isEmpty() && !requiredExecutions.contains(executionId))
+					continue;
 				if (excludePhases.containsKey(executionId)) {
 					Set<String> excludedExecutions = excludePhases.get(executionId);
 					if (excludedExecutions.isEmpty())
@@ -106,7 +114,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		// reduce and order MojoExecution's
 		List<MojoExecution> lifecycleMappings = new LinkedList<>();
 
-		for (String phase : phases)
+		for (String phase : orderedPhases)
 			for (List<MojoExecution> entryExecutions : mappings.get(phase)
 					.values())
 				lifecycleMappings.addAll(entryExecutions);

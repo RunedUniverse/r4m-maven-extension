@@ -1,6 +1,18 @@
 <component-set>
 	<components>
-		
+
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>dev</role-hint>
+			<configuration>
+				<id>dev</id>
+				<phases>
+					<phase>all-the-phases-get-defined-at-runtime</phase>
+				</phases>
+			</configuration>
+		</component>
+
 		<!-- DEFAULT :: LIFECYCLE -->
 		<!-- <phases> <phase>validate</phase> <phase>initialize</phase> <phase>generate-sources</phase> 
 			<phase>process-sources</phase> <phase>generate-resources</phase> <phase>process-resources</phase> 

@@ -32,7 +32,7 @@ public class BuilderLifecycleMappingDelegate extends AExecutionLifecycleMappingD
 			MojoNotFoundException, InvalidPluginDescriptorException {
 
 		Lifecycle targetLifecycle = this.lifecycles.get(Properties.LIFECYCLE.BUILDER.LIFECYCLE_HINT);
-		ConfigExecutionArchiveParser parser = new ConfigExecutionArchiveParser(this.pluginManager, this.logger);
+		ConfigExecutionArchiveParser parser = new ConfigExecutionArchiveParser(this.pluginManager, this.log);
 
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			parser.parsePlugin(this.archive, mvnSession, mvnProject, mvnPlugin);

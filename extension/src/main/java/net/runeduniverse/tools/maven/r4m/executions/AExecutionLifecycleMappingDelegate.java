@@ -24,7 +24,7 @@ public abstract class AExecutionLifecycleMappingDelegate implements LifecycleMap
 	protected MavenPluginManager pluginManager;
 
 	@Requirement
-	protected Logger logger;
+	protected Logger log;
 
 	@Requirement
 	protected ExecutionArchive archive;

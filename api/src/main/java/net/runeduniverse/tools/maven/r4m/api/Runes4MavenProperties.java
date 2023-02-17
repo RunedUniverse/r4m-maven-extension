@@ -14,14 +14,6 @@ public interface Runes4MavenProperties {
 			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:dev-lifecycle";
 		}
 
-		public interface INJECT {
-			public static String LIFECYCLE_HINT = PREFIX_ID + "-inject";
-
-			public static String PHASE_BUILDER = LIFECYCLE_HINT + "#builder";
-			public static String PHASE_BUILDER_default = PHASE_BUILDER + "@default";
-			public static String PHASE_BUILDER_test = PHASE_BUILDER + "@test";
-		}
-
 		public interface BUILDER {
 			public static String LIFECYCLE_HINT = "builder";
 

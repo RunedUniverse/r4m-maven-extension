@@ -13,7 +13,6 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionArchiveSubset;
 import net.runeduniverse.tools.maven.r4m.api.executions.ExecutionBuilder;
 import net.runeduniverse.tools.maven.r4m.api.executions.ForkMojoDescriptor;
@@ -32,7 +31,7 @@ public class DefaultExecutionBuilder implements ExecutionBuilder{
 
 	protected List<String> lifecyclePhases = new ArrayList<>();
 	protected MvnPluginFilter mvnPluginFilter = null;
-	protected String executionId = Properties.LIFECYCLE.INJECT.DEFAULT_EXECUTION_ID;
+	protected String executionId = "";
 
 	public DefaultExecutionBuilder(final ExecutionArchiveSubset archiveSubset, final MavenProject mvnProject,
 			final String executingLifecyclePhase, final ForkMojoDescriptor preForkMojo,

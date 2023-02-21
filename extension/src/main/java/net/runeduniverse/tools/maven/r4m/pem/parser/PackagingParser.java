@@ -29,11 +29,11 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 	public static final String HINT = "default";
 
 	@Requirement
-	private Logger log;
-	@Requirement
-	private Map<String, org.apache.maven.lifecycle.Lifecycle> defaultLifecycles;
-	@Requirement
-	private Map<String, LifecycleMapping> mappings;
+	protected Logger log;
+	@Requirement(role = org.apache.maven.lifecycle.Lifecycle.class)
+	protected Map<String, org.apache.maven.lifecycle.Lifecycle> defaultLifecycles;
+	@Requirement(role = LifecycleMapping.class)
+	protected Map<String, LifecycleMapping> mappings;
 
 	@Override
 	public ProjectExecutionModel parse() {

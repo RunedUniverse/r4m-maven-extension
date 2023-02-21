@@ -38,16 +38,13 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 	public static final String ERR_MSG_PARSE_PEM = "Failed to parse pem of %s [%s]";
 
 	@Requirement
-	Logger log;
-
+	protected Logger log;
 	@Requirement
-	MavenPluginManager manager;
-
+	protected MavenPluginManager manager;
 	@Requirement
-	PluginExecutionRegistry registry;
-
+	protected PluginExecutionRegistry registry;
 	@Requirement
-	ProjectExecutionModelParser parser;
+	protected ProjectExecutionModelParser parser;
 
 	@Override
 	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
@@ -113,31 +110,30 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 				// go fetch the plugin yet and
 				// pull it down
 				// to examine the phase it is associated to.
-				/*if (execution.getPhase() != null) {
-					Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(execution.getPhase());
-					if (phaseBindings != null) {
-						for (String goal : execution.getGoals()) {
-							MojoExecution mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
-							mojoExecution.setLifecyclePhase(execution.getPhase());
-							addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
-						}
-					}
-				}*/
+				/*
+				 * if (execution.getPhase() != null) { Map<Integer, List<MojoExecution>>
+				 * phaseBindings = mappings.get(execution.getPhase()); if (phaseBindings !=
+				 * null) { for (String goal : execution.getGoals()) { MojoExecution
+				 * mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
+				 * mojoExecution.setLifecyclePhase(execution.getPhase());
+				 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+				 * }
+				 */
 				// if not then i need to grab the mojo descriptor and look at the phase that is
 				// specified
-				/*else {
-					for (String goal : execution.getGoals()) {
-						MojoDescriptor mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
-								mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
-
-						Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(mojoDescriptor.getPhase());
-						if (phaseBindings != null) {
-							MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
-							mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-							addMojoExecution(phaseBindings, mojoExecution, execution.getPriority());
-						}
-					}
-				}*/
+				/*
+				 * else { for (String goal : execution.getGoals()) { MojoDescriptor
+				 * mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
+				 * mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
+				 * 
+				 * Map<Integer, List<MojoExecution>> phaseBindings =
+				 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
+				 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
+				 * execution.getId());
+				 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
+				 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+				 * }
+				 */
 			}
 
 		slice.includeModel(model);

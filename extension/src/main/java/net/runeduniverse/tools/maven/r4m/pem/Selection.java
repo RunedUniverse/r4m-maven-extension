@@ -17,7 +17,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 
 public class Selection implements ExecutionArchiveSelection {
 
-	private final Set<ExecutionView> views;
+	protected final Set<ExecutionView> views;
 
 	public Selection(Set<ExecutionView> views) {
 		this.views = views;

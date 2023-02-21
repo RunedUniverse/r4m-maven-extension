@@ -13,7 +13,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
 public class RegistrySlice implements PluginExecutionRegistrySlice {
 
-	// TODO must save waaaay more infos!!!
+	// save more infos???
 
 	private Set<Execution> executions = new LinkedHashSet<>(0);
 	private Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>(0);

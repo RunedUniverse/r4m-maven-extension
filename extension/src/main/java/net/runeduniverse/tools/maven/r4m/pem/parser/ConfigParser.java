@@ -23,10 +23,9 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 	public static final String ERR_MSG_PARSE_PEM = "Failed to parse %s of maven project %s";
 
 	@Requirement
-	Logger log;
-
+	protected Logger log;
 	@Requirement
-	ProjectExecutionModelParser parser;
+	protected ProjectExecutionModelParser parser;
 
 	@Override
 	public ProjectExecutionModel parse(MavenProject mvnProject) throws Exception {

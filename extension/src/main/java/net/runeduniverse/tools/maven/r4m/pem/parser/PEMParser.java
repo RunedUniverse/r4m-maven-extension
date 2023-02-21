@@ -27,8 +27,8 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 @Component(role = ProjectExecutionModelParser.class, hint = "default")
 public class PEMParser implements ProjectExecutionModelParser {
 
-	@Requirement
-	private Map<String, ExecutionTriggerParser> execTriggerParser;
+	@Requirement(role = ExecutionTriggerParser.class)
+	protected Map<String, ExecutionTriggerParser> execTriggerParser;
 
 	@Override
 	public void parseModel(ProjectExecutionModel pem, InputStream input) throws IOException, XmlPullParserException {

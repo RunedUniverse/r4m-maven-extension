@@ -24,11 +24,11 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	private Logger log;
 	@Requirement
 	private ExecutionArchive archive;
-	@Requirement
+	@Requirement(role = ProjectExecutionModelConfigParser.class)
 	private Map<String, ProjectExecutionModelConfigParser> pemConfigParser;
-	@Requirement
+	@Requirement(role = ProjectExecutionModelPluginParser.class)
 	private Map<String, ProjectExecutionModelPluginParser> pemPluginParser;
-	@Requirement
+	@Requirement(role = ProjectExecutionModelPackagingParser.class)
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
 
 	/**

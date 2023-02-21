@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -29,57 +30,68 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 	@Requirement
 	private Logger log;
-
+	@Requirement
+	private Map<String, org.apache.maven.lifecycle.Lifecycle> defaultLifecycles;
 	@Requirement
 	private Map<String, LifecycleMapping> mappings;
 
 	@Override
 	public ProjectExecutionModel parse() {
-		this.log.debug("Scanning PackagingProcedures");
 		Set<Execution> effExecutions = new LinkedHashSet<>();
 
 		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : mappings.entrySet()) {
+			Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
 			Map<String, Execution> executions = new LinkedHashMap<>();
-			this.log.debug("PackagingProcedure: " + lifecycleMappingEntry.getKey());
-
 			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
 					.getLifecycles()
-					.values())
-				for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecycleMapping.getLifecyclePhases()
-						.entrySet()) {
-
-					String executionId = String.join("-", Properties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
-							phaseMappingEntry.getKey());
-
-					for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
-							.getMojos()) {
-						Execution execution = executions.get(executionId);
-						if (execution == null) {
-							execution = new Execution(executionId, ExecutionSource.PACKAGING);
-							execution.setDefaultActive(true);
-							execution.addPackagingProcedure(lifecycleMappingEntry.getKey());
-							executions.put(execution.getId(), execution);
-						}
-						Lifecycle lifecycle = execution.getLifecycle(lifecycleMapping.getId());
-						if (lifecycle == null) {
-							lifecycle = new Lifecycle(lifecycleMapping.getId());
-							execution.addLifecycle(lifecycle);
-						}
-						Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
-						if (phase == null) {
-							phase = new Phase(phaseMappingEntry.getKey());
-							lifecycle.putPhase(phase);
-						}
-
-						phase.addGoal(new Goal(mojoMapping.getGoal()).addModes("default", "dev"));
-					}
-				}
+					.values()) {
+				allLifecycleIds.remove(lifecycleMapping.getId());
+				parse(executions, lifecycleMappingEntry.getKey(), lifecycleMapping.getId(),
+						lifecycleMapping.getLifecyclePhases());
+			}
+			for (String lifecycleId : allLifecycleIds)
+				parse(executions, lifecycleMappingEntry.getKey(), lifecycleId, this.defaultLifecycles.get(lifecycleId)
+						.getDefaultLifecyclePhases());
 			effExecutions.addAll(executions.values());
 		}
 
 		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
 		model.addExecutions(effExecutions);
 		return model;
+	}
+
+	protected void parse(final Map<String, Execution> executions, final String packagingProcedure,
+			final String lifecycleId, final Map<String, LifecyclePhase> lifecyclePhases) {
+		if (lifecyclePhases == null)
+			return;
+		for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecyclePhases.entrySet()) {
+
+			String executionId = String.join("-", Properties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
+					phaseMappingEntry.getKey());
+
+			for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
+					.getMojos()) {
+				Execution execution = executions.get(executionId);
+				if (execution == null) {
+					execution = new Execution(executionId, ExecutionSource.PACKAGING);
+					execution.setDefaultActive(true);
+					execution.addPackagingProcedure(packagingProcedure);
+					executions.put(execution.getId(), execution);
+				}
+				Lifecycle lifecycle = execution.getLifecycle(lifecycleId);
+				if (lifecycle == null) {
+					lifecycle = new Lifecycle(lifecycleId);
+					execution.addLifecycle(lifecycle);
+				}
+				Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
+				if (phase == null) {
+					phase = new Phase(phaseMappingEntry.getKey());
+					lifecycle.putPhase(phase);
+				}
+
+				phase.addGoal(new Goal(mojoMapping.getGoal()).addModes("default", "dev"));
+			}
+		}
 	}
 
 }

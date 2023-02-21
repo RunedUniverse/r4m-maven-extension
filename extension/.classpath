@@ -7,6 +7,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src/main/plexus"/>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/maven">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/r4m">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

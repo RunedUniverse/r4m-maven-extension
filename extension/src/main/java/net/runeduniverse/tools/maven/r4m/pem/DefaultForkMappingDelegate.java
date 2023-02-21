@@ -31,7 +31,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ForkMappingDelegate.class, hint = DefaultForkMappingDelegate.HINT)
+@Component(role = ForkMappingDelegate.class, hint = DefaultForkMappingDelegate.HINT, instantiationStrategy = "singleton")
 public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	public static final String HINT = "default";
 	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";

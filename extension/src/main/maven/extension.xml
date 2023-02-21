@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension>
+
+	<exportedPackages>
+		<!-- r4m-maven-extension -->
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem.model
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem.view
+		</exportedPackage>
+
+		<!-- runeduniverse-utils -->
+		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
+		</exportedPackage>
+	</exportedPackages>
+
+	<exportedArtifacts>
+		<!-- r4m-maven-extension -->
+		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-maven-extension
+		</exportedArtifact>
+
+		<!-- runeduniverse-utils -->
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
+		</exportedArtifact>
+	</exportedArtifacts>
+
+</extension>

@@ -131,6 +131,10 @@
 	<build>
 		<resources>
 			<resource>
+				<directory>src/main/maven</directory>
+				<targetPath>META-INF/maven</targetPath>
+			</resource>
+			<resource>
 				<directory>src/main/r4m</directory>
 				<targetPath>META-INF/r4m</targetPath>
 			</resource>

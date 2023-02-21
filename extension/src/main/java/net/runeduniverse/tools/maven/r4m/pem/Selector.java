@@ -38,7 +38,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 
-@Component(role = ExecutionArchiveSelector.class, hint = "default")
+@Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
 public class Selector implements ExecutionArchiveSelector {
 
 	public static final String WARN_SKIPPING_UNKNOWN_GOAL = "skipping unknown goal » %s:%s:%s";

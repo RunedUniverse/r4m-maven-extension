@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -12,12 +12,18 @@ import java.util.Map.Entry;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.MojoExecutionConfigurator;
+import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecution.Source;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.codehaus.plexus.util.StringUtils;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
@@ -37,11 +43,13 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";
 
 	@Requirement
-	private Logger log;
+	protected Logger log;
+	@Requirement(role = MojoExecutionConfigurator.class)
+	private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 	@Requirement(role = Lifecycle.class)
 	protected Map<String, Lifecycle> lifecycles;
 	@Requirement
-	private ExecutionArchiveSelector selector;
+	protected ExecutionArchiveSelector selector;
 
 	protected List<String> calculateExecutingPhases(final Map<String, Set<String>> executionsPerPhase,
 			final Fork fork) {
@@ -81,7 +89,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		return excludePhases;
 	}
 
-	protected List<MojoExecution> calculateForkMappings(final Fork fork, final ExecutionArchiveSelection selection) {
+	protected List<MojoExecution> calculateForkMappings(final MavenProject mvnProject, final Fork fork,
+			final ExecutionArchiveSelection selection) {
 
 		Map<String, Set<String>> executionsPerPhase = new LinkedHashMap<>();
 		List<String> orderedPhases = calculateExecutingPhases(executionsPerPhase, fork);
@@ -114,6 +123,11 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 								Source.LIFECYCLE);
 						mojoExecution.setLifecyclePhase(phase);
 						addMojoExecution(phaseBindings, mojoExecution, 0);
+						// call goal bound MojoExecutionConfigurator
+						selectExecutionConfigurator(goal.getDescriptor()
+								.getComponentConfigurator()).configure(mvnProject, mojoExecution, false);
+						// complete with default values
+						finalizeMojoConfiguration(mojoExecution);
 					}
 				}
 			}
@@ -147,11 +161,11 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		// select executions
 		cnf.selectActiveExecutions(fork.getExecutions());
 
-		return calculateForkMappings(fork, this.selector.compileSelection(cnf));
+		return calculateForkMappings(mvnProject, fork, this.selector.compileSelection(cnf));
 	}
 
-	private void addMojoExecution(Map<Integer, List<MojoExecution>> phaseBindings, MojoExecution mojoExecution,
-			int priority) {
+	protected void addMojoExecution(final Map<Integer, List<MojoExecution>> phaseBindings,
+			final MojoExecution mojoExecution, int priority) {
 		List<MojoExecution> mojoExecutions = phaseBindings.get(priority);
 
 		if (mojoExecutions == null) {
@@ -160,5 +174,71 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		}
 
 		mojoExecutions.add(mojoExecution);
+	}
+
+	protected MojoExecutionConfigurator selectExecutionConfigurator(String configuratorId) {
+		if (configuratorId == null)
+			configuratorId = "default";
+
+		MojoExecutionConfigurator mojoExecutionConfigurator = mojoExecutionConfigurators.get(configuratorId);
+
+		if (mojoExecutionConfigurator == null) {
+			//
+			// The plugin has a custom component configurator but does not have a custom
+			// mojo execution configurator
+			// so fall back to the default mojo execution configurator.
+			//
+			mojoExecutionConfigurator = mojoExecutionConfigurators.get("default");
+		}
+		return mojoExecutionConfigurator;
+	}
+
+	/**
+	 * Post-processes the effective configuration for the specified mojo execution.
+	 * This step discards all parameters from the configuration that are not
+	 * applicable to the mojo and injects the default values for any missing
+	 * parameters.
+	 *
+	 * @param mojoExecution The mojo execution whose configuration should be
+	 *                      finalized, must not be {@code null}.
+	 */
+	protected void finalizeMojoConfiguration(final MojoExecution mojoExecution) {
+		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+
+		Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
+		if (executionConfiguration == null) {
+			executionConfiguration = new Xpp3Dom("configuration");
+		}
+
+		Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
+
+		Xpp3Dom finalConfiguration = new Xpp3Dom("configuration");
+
+		if (mojoDescriptor.getParameters() != null) {
+			for (Parameter parameter : mojoDescriptor.getParameters()) {
+				Xpp3Dom parameterConfiguration = executionConfiguration.getChild(parameter.getName());
+
+				if (parameterConfiguration == null) {
+					parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
+				}
+
+				Xpp3Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+
+				parameterConfiguration = Xpp3Dom.mergeXpp3Dom(parameterConfiguration, parameterDefaults, Boolean.TRUE);
+
+				if (parameterConfiguration != null) {
+					parameterConfiguration = new Xpp3Dom(parameterConfiguration, parameter.getName());
+
+					if (StringUtils.isEmpty(parameterConfiguration.getAttribute("implementation"))
+							&& StringUtils.isNotEmpty(parameter.getImplementation())) {
+						parameterConfiguration.setAttribute("implementation", parameter.getImplementation());
+					}
+
+					finalConfiguration.addChild(parameterConfiguration);
+				}
+			}
+		}
+
+		mojoExecution.setConfiguration(finalConfiguration);
 	}
 }

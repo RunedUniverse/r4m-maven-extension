@@ -57,8 +57,5 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 				throw new MavenExecutionException("", e);
 			}
 		}
-
-		this.log.debug(this.archive.toRecord()
-				.toString());
 	}
 }

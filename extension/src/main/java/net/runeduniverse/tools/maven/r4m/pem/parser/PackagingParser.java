@@ -42,6 +42,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : mappings.entrySet()) {
 			Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
 			Map<String, Execution> executions = new LinkedHashMap<>();
+			this.log.info("Packaging: " + lifecycleMappingEntry.getKey());
 			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
 					.getLifecycles()
 					.values()) {
@@ -64,6 +65,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 			final String lifecycleId, final Map<String, LifecyclePhase> lifecyclePhases) {
 		if (lifecyclePhases == null)
 			return;
+		this.log.info("  Lifecycle: " + lifecycleId);
 		for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecyclePhases.entrySet()) {
 
 			String executionId = String.join("-", Properties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,

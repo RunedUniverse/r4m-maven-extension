@@ -11,9 +11,10 @@ import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
@@ -21,8 +22,18 @@ import net.runeduniverse.tools.maven.r4m.Properties;
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.LIFECYCLE.DEV.LIFECYCLE_PARTICIPANT_HINT)
 public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
+	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
+
 	@Requirement
 	private Logger log;
+	@Requirement
+	private PlexusContainer container;
+	@Requirement(role = Lifecycle.class)
+	private Map<String, Lifecycle> lifecycles;
+	@Requirement(role = LifecycleMappingDelegate.class)
+	private Map<String, LifecycleMappingDelegate> mappedDelegates;
+
+	private boolean coreExtension = false;
 
 	/**
 	 * Invoked after MavenSession instance has been created.
@@ -33,8 +44,8 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 	 */
 	// TODO This is too early for build extensions, so maybe just remove it?
 	public void afterSessionStart(MavenSession session) throws MavenExecutionException {
-		// do nothing
-		// NEVER GETS CALLED!!!
+		this.coreExtension = true;
+		// only gets called when loaded as core-extension
 	}
 
 	/**
@@ -43,16 +54,21 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 	 * This callback is intended to allow extensions to manipulate MavenProjects
 	 * before they are sorted and actual build execution starts.
 	 */
-	@SuppressWarnings("deprecation")
 	public void afterProjectsRead(MavenSession session) throws MavenExecutionException {
-		PlexusContainer container = session.getContainer();
-
-		log.debug("Generating DEV Phases:");
-
-		Lifecycle devLifecycle = null;
+		ClassLoader currentClassLoader = Thread.currentThread()
+				.getContextClassLoader();
 		try {
-			Map<String, Lifecycle> lifecycles = container.lookupMap(Lifecycle.class);
-			Map<String, LifecycleMappingDelegate> mappedDelegates = container.lookupMap(LifecycleMappingDelegate.class);
+			if (this.coreExtension) {
+				ClassRealm mavenExtRealm = this.container.getContainerRealm()
+						.getWorld()
+						.getRealm("maven.ext");
+				Thread.currentThread()
+						.setContextClassLoader(mavenExtRealm);
+			}
+
+			log.debug("Generating DEV Phases:");
+
+			Lifecycle devLifecycle = null;
 
 			devLifecycle = lifecycles.get("dev");
 			devLifecycle.getPhases()
@@ -76,11 +92,12 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 				}
 				log.debug(lifecycle.getId() + " -> [" + String.join(", ", devPhases) + "]");
 			}
-
-		} catch (ComponentLookupException e) {
-			log.error("Failed interaction with PlexusContainer", e);
+		} catch (NoSuchRealmException e) {
+			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
+		} finally {
+			Thread.currentThread()
+					.setContextClassLoader(currentClassLoader);
 		}
-
 	}
 
 	/**
@@ -94,7 +111,6 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 	 * @since 3.2.1, MNG-5389
 	 */
 	public void afterSessionEnd(MavenSession session) throws MavenExecutionException {
-		// do nothing
-		// NEVER GETS CALLED!!!
+		// only gets called when loaded as core-extension
 	}
 }

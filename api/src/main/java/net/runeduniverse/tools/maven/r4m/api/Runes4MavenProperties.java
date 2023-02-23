@@ -13,17 +13,6 @@ public interface Runes4MavenProperties {
 		public interface DEV {
 			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:dev-lifecycle";
 		}
-
-		public interface BUILDER {
-			public static String LIFECYCLE_HINT = "builder";
-
-			public static String EXECUTION_DEFAULT_ID = "default";
-			public static String EXECUTION_TEST_ID = "test";
-
-			public static String PARAM_SOURCE_DIR = "r4m-builder.main.source.dir";
-			public static String PARAM_TEST_SOURCE_DIR = "r4m-builder.test.source.dir";
-			public static String PARAM_TARGET_DIR = "r4m-builder.target.dir";
-		}
 	}
 
 	public interface METAINF extends MavenProperties.METAINF {

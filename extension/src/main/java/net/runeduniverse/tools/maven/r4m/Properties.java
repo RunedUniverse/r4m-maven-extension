@@ -17,15 +17,6 @@ public interface Properties extends MavenProperties, Runes4MavenProperties {
 	public interface LIFECYCLE {
 		public interface DEV extends Runes4MavenProperties.LIFECYCLE.DEV {
 		}
-
-		public interface BUILDER extends Runes4MavenProperties.LIFECYCLE.BUILDER {
-			public static String DEFAULT_VAL_SOURCE_DIR = VAL_PREFIX + Properties.PROJECT.BUILD.PARAM_SOURCE_DIR
-					+ VAL_POSTFIX;
-			public static String DEFAULT_VAL_TEST_SOURCE_DIR = VAL_PREFIX
-					+ Properties.PROJECT.BUILD.PARAM_TEST_SOURCE_DIR + VAL_POSTFIX;
-			public static String DEFAULT_VAL_TARGET_DIR = VAL_PREFIX + Properties.PROJECT.BUILD.PARAM_OUTPUT_DIR
-					+ VAL_POSTFIX;
-		}
 	}
 
 	public interface METAINF extends MavenProperties.METAINF {

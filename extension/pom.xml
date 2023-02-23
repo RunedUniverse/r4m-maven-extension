@@ -86,6 +86,7 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-utils</artifactId>
+			<scope>provided</scope>
 			<!-- maven doesn't provide it to extensions -->
 		</dependency>
 
@@ -105,13 +106,6 @@
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-component-annotations</artifactId>
 			<version>${plexus-component-version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- dependency for maven annotation -->
-		<dependency>
-			<groupId>org.apache.maven.plugin-tools</groupId>
-			<artifactId>maven-plugin-annotations</artifactId>
-			<version>${maven-plugin-annotations-version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

@@ -1,6 +1,5 @@
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Collection;
@@ -10,13 +9,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-import org.codehaus.plexus.util.ReaderFactory;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionTriggerParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
@@ -31,8 +29,19 @@ public class PEMParser implements ProjectExecutionModelParser {
 	protected Map<String, ExecutionTriggerParser> execTriggerParser;
 
 	@Override
-	public void parseModel(ProjectExecutionModel pem, InputStream input) throws IOException, XmlPullParserException {
-		Reader reader = ReaderFactory.newXmlReader(input);
+	public void parseModel(ProjectExecutionModel pem, InputStream input) throws Exception {
+		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
+
+		// Apache Maven 3.8.4
+		// injects the wrong or no plexus-utils
+		// as such we forcefully load it with a different ClassRealm see
+		// net.runeduniverse.tools.maven.r4m.pem.ProjectExecutionModelLifecycleParticipant
+		// and pull the class directly from parent
+		// Reader reader = new XmlStreamReader(input);
+		Class<?> xmlStreamReader = currentRealm.loadClassFromParent("org.codehaus.plexus.util.xml.XmlStreamReader");
+		Reader reader = (Reader) xmlStreamReader.getConstructor(InputStream.class)
+				.newInstance(input);
 
 		PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 

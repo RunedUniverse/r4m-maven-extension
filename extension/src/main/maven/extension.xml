@@ -11,6 +11,8 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem.view
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos
+		</exportedPackage>
 
 		<!-- runeduniverse-utils -->
 		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>

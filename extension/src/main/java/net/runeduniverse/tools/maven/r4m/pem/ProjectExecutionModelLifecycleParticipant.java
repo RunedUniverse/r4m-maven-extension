@@ -61,8 +61,12 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 		try {
 			ClassRealm realm;
+			Collection<Plugin> extPlugins = new HashSet<Plugin>();
+
 			if (this.coreExtension) {
 				realm = world.getRealm("maven.ext");
+				for (ClassRealm cr : realm.getImportRealms())
+					extPlugins.add(fromExtRealm(cr));
 			} else {
 				// we need to reinitiate the r4m-maven-extension realm because maven injects an
 				// outdated version of the plexus-utils
@@ -74,10 +78,16 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
 				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
 			}
+
 			Thread.currentThread()
 					.setContextClassLoader(realm);
 
-			crawlModels(realm, mvnSession);
+			// scan root node first
+			scanProject(mvnSession, extPlugins, mvnSession.getCurrentProject());
+
+			for (MavenProject mvnProject : mvnSession.getAllProjects())
+				scanProject(mvnSession, extPlugins, mvnProject);
+
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
 		} finally {
@@ -86,29 +96,28 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 		}
 	}
 
-	private void crawlModels(final ClassRealm activeRealm, final MavenSession mvnSession) throws Exception {
-		Collection<Plugin> extPlugins = new HashSet<Plugin>();
-		if (this.coreExtension)
-			for (ClassRealm realm : activeRealm.getImportRealms())
-				extPlugins.add(fromExtRealm(realm));
+	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
+			final MavenProject mvnProject) throws Exception {
+		ExecutionArchiveSlice projectSlice = this.archive.getSlice(mvnProject);
+		if (projectSlice == null)
+			projectSlice = this.archive.createSlice(mvnProject);
+		else
+			return;
 
-		for (MavenProject mvnProject : mvnSession.getAllProjects()) {
-			ExecutionArchiveSlice projectSlice = this.archive.createSlice(mvnProject);
-			mvnProject.getBuild()
-					.getPlugins()
-					.addAll(extPlugins);
+		mvnProject.getBuild()
+				.getPlugins()
+				.addAll(extPlugins);
 
-			for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
-				projectSlice.register(parser.parse(mvnProject));
+		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
+			projectSlice.register(parser.parse(mvnProject));
 
-			for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-				for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-					projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-							mvnSession.getRepositorySession(), mvnPlugin));
+		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
+			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
+				projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
+						mvnSession.getRepositorySession(), mvnPlugin));
 
-			for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
-				projectSlice.register(parser.parse());
-		}
+		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
+			projectSlice.register(parser.parse());
 	}
 
 	private static Plugin fromExtRealm(ClassRealm realm) {

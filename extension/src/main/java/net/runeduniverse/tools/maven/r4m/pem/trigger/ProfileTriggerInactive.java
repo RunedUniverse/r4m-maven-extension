@@ -11,7 +11,8 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 
 	@Override
 	public boolean isActive(ExecutionArchiveSelectorConfig config) {
-		return config.getInactiveProfiles().contains(this.profileId);
+		return config.getInactiveProfiles()
+				.contains(this.profileId);
 	}
 
 	@Override
@@ -23,4 +24,16 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 		return tree;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+		if (!(obj instanceof ProfileTriggerInactive))
+			return false;
+		ProfileTriggerInactive trigger = (ProfileTriggerInactive) obj;
+		if (getProfileId() == null)
+			if (trigger.getProfileId() != null)
+				return false;
+		return getProfileId().equals(trigger.getProfileId());
+	}
 }

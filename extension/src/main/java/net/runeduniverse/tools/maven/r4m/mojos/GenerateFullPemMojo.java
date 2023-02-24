@@ -18,6 +18,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
 
 /**
@@ -56,24 +58,65 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		Set<Execution> executions = new HashSet<>();
 		collectExecutions(executions, projectSlice);
 
-		for (Execution execution : executions) {
-			getLog().info(String.format("id: %s\tsource: %s", execution.getId(), execution.getSource()));
-		}
+		Map<String, Map<ExecutionSource, List<Execution>>> map = new LinkedHashMap<>();
+		reduce(map, executions);
 
+		/*
+		 * getLog().warn("all"); for (Execution execution : executions) {
+		 * getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]",
+		 * execution.getId(), execution.getSource(), String.join(", ",
+		 * execution.getPackagingProcedures()))); }
+		 */
+		getLog().warn("reduced");
+		for (Map<ExecutionSource, List<Execution>> x : map.values()) {
+			for (List<Execution> y : x.values()) {
+				for (Execution execution : y) {
+					getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(),
+							execution.getSource(), String.join(", ", execution.getPackagingProcedures())));
+				}
+			}
+
+		}
 	}
 
-	private void reduce(Map<String, Map<ExecutionSource, List<Execution>>> map, Set<Execution> executions) {
-
+	private void reduce(final Map<String, Map<ExecutionSource, List<Execution>>> map, final Set<Execution> executions) {
 		for (Execution sExec : executions) {
 			Map<ExecutionSource, List<Execution>> sourceMap = map.get(sExec.getId());
-			if (sourceMap == null)
+			if (sourceMap == null) {
 				sourceMap = new LinkedHashMap<>();
+				map.put(sExec.getId(), sourceMap);
+			}
 			List<Execution> execPool = sourceMap.get(sExec.getSource());
-			if (execPool == null)
+			if (execPool == null) {
 				execPool = new LinkedList<>();
+				sourceMap.put(sExec.getSource(), execPool);
+			}
 			Execution exec = getEquivalent(execPool, sExec);
-		}
+			if (exec == null) {
+				exec = createEquivalent(sExec);
+				execPool.add(exec);
+			}
 
+			for (Lifecycle sLifecycle : sExec.getLifecycles()
+					.values()) {
+				Lifecycle lifecycle = exec.getLifecycle(sLifecycle.getId());
+				if (lifecycle == null) {
+					lifecycle = new Lifecycle(sLifecycle.getId());
+					exec.addLifecycle(lifecycle);
+				}
+
+				for (Phase sPhase : sLifecycle.getPhases()
+						.values()) {
+					Phase phase = lifecycle.getPhase(sPhase.getId());
+					if (phase == null) {
+						phase = new Phase(sPhase.getId());
+						lifecycle.putPhase(phase);
+					}
+
+					phase.addGoals(sPhase.getGoals());
+				}
+			}
+		}
 	}
 
 	private Execution getEquivalent(final List<Execution> pool, final Execution original) {
@@ -102,21 +145,22 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			if (execPackagingProcedures.size() != original.getPackagingProcedures()
 					.size())
 				continue;
-			for (String procedure : original.getPackagingProcedures())
-				if (!execPackagingProcedures.contains(procedure))
-					continue;
+			if (!execPackagingProcedures.containsAll(original.getPackagingProcedures()))
+				continue;
 			// trigger
 			final List<Trigger> execTrigger = new LinkedList<>(exec.getTrigger());
 			if (execTrigger.size() != original.getTrigger()
 					.size())
 				continue;
-			for (Trigger trigger : original.getTrigger())
-				if (!execTrigger.contains(trigger))
-					continue;
+			if (!execTrigger.containsAll(original.getTrigger()))
+				continue;
 			// equal metadata
 			return exec;
 		}
+		return null;
+	}
 
+	private Execution createEquivalent(final Execution original) {
 		Execution equivalent = new Execution(original.getId(), original.getSource());
 		equivalent.setAlwaysActive(original.isAlwaysActive());
 		equivalent.setDefaultActive(original.isDefaultActive());
@@ -125,7 +169,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				.addAll(original.getPackagingProcedures());
 		equivalent.getTrigger()
 				.addAll(original.getTrigger());
-
 		return equivalent;
 	}
 

@@ -24,4 +24,16 @@ public class ProfileTriggerActive extends ProfileTrigger {
 		return tree;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == this)
+			return true;
+		if (!(obj instanceof ProfileTriggerActive))
+			return false;
+		ProfileTriggerActive trigger = (ProfileTriggerActive) obj;
+		if (getProfileId() == null)
+			if (trigger.getProfileId() != null)
+				return false;
+		return getProfileId().equals(trigger.getProfileId());
+	}
 }

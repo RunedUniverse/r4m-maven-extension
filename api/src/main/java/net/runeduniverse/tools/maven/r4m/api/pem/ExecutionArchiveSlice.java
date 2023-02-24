@@ -14,6 +14,10 @@ public interface ExecutionArchiveSlice extends Recordable {
 
 	public ExecutionArchiveSlice getParent();
 
+	public ProjectExecutionModel getModel(Execution execution);
+
+	public Set<Execution> getExecutions();
+
 	public Set<Execution> getExecutions(ExecutionFilter filter);
 
 	public Set<Execution> getEffectiveExecutions(ExecutionFilter filter);

@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -41,6 +42,16 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 	@Override
 	public ExecutionArchiveSlice getParent() {
 		return this.parent;
+	}
+
+	@Override
+	public ProjectExecutionModel getModel(Execution execution) {
+		return this.executionOrigins.get(execution);
+	}
+
+	@Override
+	public Set<Execution> getExecutions() {
+		return Collections.unmodifiableSet(this.executionOrigins.keySet());
 	}
 
 	@Override

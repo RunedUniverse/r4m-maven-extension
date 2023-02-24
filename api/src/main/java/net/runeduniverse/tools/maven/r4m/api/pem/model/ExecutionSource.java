@@ -35,6 +35,11 @@ public class ExecutionSource {
 		return this.key.equals(((ExecutionSource) obj).key());
 	}
 
+	@Override
+	public String toString() {
+		return this.key;
+	}
+
 	public static ExecutionSource create(String key) {
 		if (isBlank(key))
 			return null;

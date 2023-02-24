@@ -12,7 +12,7 @@ public class Goal implements Recordable {
 	private String artifactId;
 	private String goalId;
 	private Fork fork = null;
-	private Set<String> modes = new LinkedHashSet<>();
+	private final Set<String> modes = new LinkedHashSet<>();
 
 	public Goal() {
 	}
@@ -92,7 +92,43 @@ public class Goal implements Recordable {
 		default:
 			return false;
 		}
+	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Goal))
+			return false;
+		Goal goal = (Goal) obj;
+
+		if (this.groupId == null) {
+			if (goal.getGroupId() != null)
+				return false;
+		} else if (!this.groupId.equals(goal.getGroupId()))
+			return false;
+
+		if (this.artifactId == null) {
+			if (goal.getArtifactId() != null)
+				return false;
+		} else if (!this.artifactId.equals(goal.getArtifactId()))
+			return false;
+
+		if (this.goalId == null) {
+			if (goal.getGoalId() != null)
+				return false;
+		} else if (!this.goalId.equals(goal.getGoalId()))
+			return false;
+
+		if (!(this.modes.size() == goal.getModes()
+				.size() && this.modes.containsAll(goal.getModes())))
+			return false;
+
+		if (this.fork != null)
+			return this.fork.equals(goal.getFork());
+
+		return true;
 	}
 
 	@Override

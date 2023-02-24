@@ -85,7 +85,7 @@ public class Execution implements Recordable {
 		this.packagingProcedures.add(value);
 	}
 
-	public void addLifecycle(Lifecycle lifecycle) {
+	public void putLifecycle(Lifecycle lifecycle) {
 		this.lifecycles.put(lifecycle.getId(), lifecycle);
 	}
 

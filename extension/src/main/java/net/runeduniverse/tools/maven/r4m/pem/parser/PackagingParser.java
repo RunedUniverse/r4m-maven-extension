@@ -81,7 +81,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 				Lifecycle lifecycle = execution.getLifecycle(lifecycleId);
 				if (lifecycle == null) {
 					lifecycle = new Lifecycle(lifecycleId);
-					execution.addLifecycle(lifecycle);
+					execution.putLifecycle(lifecycle);
 				}
 				Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
 				if (phase == null) {

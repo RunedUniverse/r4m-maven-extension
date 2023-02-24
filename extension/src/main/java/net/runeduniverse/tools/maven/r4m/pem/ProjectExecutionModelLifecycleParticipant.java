@@ -82,9 +82,6 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			Thread.currentThread()
 					.setContextClassLoader(realm);
 
-			// scan root node first
-			scanProject(mvnSession, extPlugins, mvnSession.getCurrentProject());
-
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 

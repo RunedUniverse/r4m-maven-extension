@@ -50,16 +50,6 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
 			Plugin mvnPlugin) throws Exception {
 
-		PluginExecutionRegistrySlice slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
-		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
-		if (slice == null)
-			slice = parseSlice(repositories, session, mvnPlugin, model);
-
-		return model;
-	}
-
-	protected PluginExecutionRegistrySlice parseSlice(final List<RemoteRepository> repositories,
-			final RepositorySystemSession session, Plugin mvnPlugin, ProjectExecutionModel model) throws Exception {
 		PluginDescriptor mvnPluginDescriptor = null;
 
 		try {
@@ -69,11 +59,29 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return null;
 		}
 
-		PluginExecutionRegistrySlice slice = this.registry.createSlice(mvnPluginDescriptor);
+		PluginExecutionRegistrySlice slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
+		if (slice == null)
+			slice = this.registry.createSlice(mvnPluginDescriptor);
+
+		ProjectExecutionModel model = slice.getModel(HINT);
+		if (model != null)
+			return model;
+
+		model = new ProjectExecutionModel(HINT);
+
+		if (parseModel(slice, mvnPluginDescriptor, model))
+			return model;
+
+		parseModel(slice, mvnPlugin, model);
+		return model;
+	}
+
+	protected boolean parseModel(final PluginExecutionRegistrySlice slice, final PluginDescriptor mvnPluginDescriptor,
+			final ProjectExecutionModel model) throws Exception {
 
 		File pluginFile = mvnPluginDescriptor.getPluginArtifact()
 				.getFile();
-		boolean pemMissing = true;
+		boolean pemLocated = false;
 
 		try {
 			if (pluginFile.isFile()) {
@@ -83,7 +91,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 					if (executionDescriptorEntry != null) {
 						try (InputStream is = pluginJar.getInputStream(executionDescriptorEntry)) {
 							this.parser.parseModel(model, is);
-							pemMissing = false;
+							pemLocated = true;
 						}
 					}
 				}
@@ -93,51 +101,57 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 				if (executionXml.isFile()) {
 					try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
 						this.parser.parseModel(model, is);
-						pemMissing = false;
+						pemLocated = true;
 					}
 				}
 			}
 		} catch (IOException | XmlPullParserException e) {
-			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPlugin.getKey(), pluginFile.getAbsolutePath()));
+			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPluginDescriptor.getPlugin()
+					.getKey(), pluginFile.getAbsolutePath()));
 			throw e;
 		}
 
+		slice.includeModel(model);
+		return pemLocated;
+	}
+
+	protected void parseModel(final PluginExecutionRegistrySlice slice, final Plugin mvnPlugin,
+			final ProjectExecutionModel model) throws Exception {
+
 		// TODO parse mvn plugin bound default executions in case config file does not
 		// exist!!!
-		if (pemMissing)
-			for (PluginExecution execution : mvnPlugin.getExecutions()) {
-				// if the phase is specified then I don't have to
-				// go fetch the plugin yet and
-				// pull it down
-				// to examine the phase it is associated to.
-				/*
-				 * if (execution.getPhase() != null) { Map<Integer, List<MojoExecution>>
-				 * phaseBindings = mappings.get(execution.getPhase()); if (phaseBindings !=
-				 * null) { for (String goal : execution.getGoals()) { MojoExecution
-				 * mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
-				 * mojoExecution.setLifecyclePhase(execution.getPhase());
-				 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-				 * }
-				 */
-				// if not then i need to grab the mojo descriptor and look at the phase that is
-				// specified
-				/*
-				 * else { for (String goal : execution.getGoals()) { MojoDescriptor
-				 * mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
-				 * mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
-				 * 
-				 * Map<Integer, List<MojoExecution>> phaseBindings =
-				 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
-				 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
-				 * execution.getId());
-				 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-				 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-				 * }
-				 */
-			}
+		for (PluginExecution execution : mvnPlugin.getExecutions()) {
+			// if the phase is specified then I don't have to
+			// go fetch the plugin yet and
+			// pull it down
+			// to examine the phase it is associated to.
+			/*
+			 * if (execution.getPhase() != null) { Map<Integer, List<MojoExecution>>
+			 * phaseBindings = mappings.get(execution.getPhase()); if (phaseBindings !=
+			 * null) { for (String goal : execution.getGoals()) { MojoExecution
+			 * mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
+			 * mojoExecution.setLifecyclePhase(execution.getPhase());
+			 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+			 * }
+			 */
+			// if not then i need to grab the mojo descriptor and look at the phase that is
+			// specified
+			/*
+			 * else { for (String goal : execution.getGoals()) { MojoDescriptor
+			 * mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
+			 * mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
+			 * 
+			 * Map<Integer, List<MojoExecution>> phaseBindings =
+			 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
+			 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
+			 * execution.getId());
+			 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
+			 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+			 * }
+			 */
+		}
 
 		slice.includeModel(model);
-		return slice;
 	}
 
 }

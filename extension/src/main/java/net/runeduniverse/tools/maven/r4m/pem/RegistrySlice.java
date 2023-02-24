@@ -17,6 +17,7 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 
 	private Set<Execution> executions = new LinkedHashSet<>(0);
 	private Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>(0);
+	private Map<String, ProjectExecutionModel> hintedOrigins = new LinkedHashMap<>(0);
 
 	@Override
 	public Set<Execution> getExecutions() {
@@ -32,11 +33,26 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 	public void includeModel(ProjectExecutionModel model) {
 		if (model == null)
 			return;
+		if (model.getExecutions()
+				.isEmpty())
+			return;
+
+		this.hintedOrigins.put(model.getParserHint(), model);
 
 		for (Execution execution : model.getExecutions()) {
 			this.executions.add(execution);
 			this.executionOrigins.put(execution, model);
 		}
+	}
+
+	@Override
+	public ProjectExecutionModel getModel(String parserHint) {
+		return this.hintedOrigins.get(parserHint);
+	}
+
+	@Override
+	public Set<ProjectExecutionModel> getModels() {
+		return new LinkedHashSet<>(this.hintedOrigins.values());
 	}
 
 }

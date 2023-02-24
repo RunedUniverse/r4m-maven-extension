@@ -10,6 +10,10 @@ public interface PluginExecutionRegistrySlice {
 	public Set<Execution> getExecutions();
 
 	public void addExecutions(Collection<Execution> values);
-	
+
 	public void includeModel(ProjectExecutionModel model);
+
+	public ProjectExecutionModel getModel(String parserHint);
+
+	public Set<ProjectExecutionModel> getModels();
 }

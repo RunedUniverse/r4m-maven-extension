@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
@@ -58,26 +60,24 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 		ClassWorld world = currentRealm.getWorld();
 
 		try {
+			ClassRealm realm;
 			if (this.coreExtension) {
-				ClassRealm mavenExtRealm = this.container.getContainerRealm()
-						.getWorld()
-						.getRealm("maven.ext");
-				Thread.currentThread()
-						.setContextClassLoader(mavenExtRealm);
+				realm = world.getRealm("maven.ext");
 			} else {
 				// we need to reinitiate the r4m-maven-extension realm because maven injects an
 				// outdated version of the plexus-utils
-				ClassRealm realm = world.getRealm("plexus.core")
+				realm = world.getRealm("plexus.core")
 						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.api.pem");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.api.pem.model");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
 				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
-				Thread.currentThread()
-						.setContextClassLoader(realm);
 			}
-			crawlModels(mvnSession);
+			Thread.currentThread()
+					.setContextClassLoader(realm);
+
+			crawlModels(realm, mvnSession);
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
 		} finally {
@@ -86,9 +86,17 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 		}
 	}
 
-	private void crawlModels(MavenSession mvnSession) throws Exception {
+	private void crawlModels(final ClassRealm activeRealm, final MavenSession mvnSession) throws Exception {
+		Collection<Plugin> extPlugins = new HashSet<Plugin>();
+		if (this.coreExtension)
+			for (ClassRealm realm : activeRealm.getImportRealms())
+				extPlugins.add(fromExtRealm(realm));
+
 		for (MavenProject mvnProject : mvnSession.getAllProjects()) {
 			ExecutionArchiveSlice projectSlice = this.archive.createSlice(mvnProject);
+			mvnProject.getBuild()
+					.getPlugins()
+					.addAll(extPlugins);
 
 			for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
 				projectSlice.register(parser.parse(mvnProject));
@@ -101,5 +109,21 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 				projectSlice.register(parser.parse());
 		}
+	}
+
+	private static Plugin fromExtRealm(ClassRealm realm) {
+		String id = realm.getId();
+		Plugin plugin = new Plugin();
+		plugin.setExtensions(true);
+		if (!id.startsWith("coreExtension>"))
+			return null;
+		id = id.substring(14);
+		int idx = id.indexOf(':');
+		plugin.setGroupId(id.substring(0, idx));
+		id = id.substring(idx + 1);
+		idx = id.indexOf(':');
+		plugin.setArtifactId(id.substring(0, idx));
+		plugin.setVersion(id.substring(idx + 1));
+		return plugin;
 	}
 }

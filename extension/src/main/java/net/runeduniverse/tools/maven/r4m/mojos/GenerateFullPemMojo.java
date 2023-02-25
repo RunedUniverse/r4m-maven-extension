@@ -1,6 +1,5 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -58,32 +57,33 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		ExecutionArchiveSlice projectSlice = this.archive.getSlice(this.mvnProject);
 
-		Set<Execution> executions = new HashSet<>();
-		collectExecutions(executions, projectSlice);
+		Set<Execution> executions = new LinkedHashSet<>();
+		int sliceCnt = collectExecutions(executions, projectSlice);
 
-		Set<Execution> reducedCol = new HashSet<>();
-		reduce(executions, reducedCol);
+		getLog().info("");
+		getLog().info("Discovery");
+		getLog().info(String.format("    project depth:      %s", sliceCnt));
+		getLog().info(String.format("    executions:         %s", executions.size()));
+		getLog().info("    ------------------------");
 
-		getLog().warn("reduced");
-		for (Execution execution : reducedCol) {
-			getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(), execution.getSource(),
-					String.join(", ", execution.getPackagingProcedures())));
-		}
+		reduce(executions);
 
-		getLog().error("original:\t" + executions.size());
-		getLog().error("reduced: \t" + reducedCol.size());
+		getLog().info(String.format("    reduced executions: %s", executions.size()));
+		getLog().info("");
 
 		ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
-		model.addExecutions(reducedCol);
+		model.addExecutions(executions);
 
 		getLog().warn(model.toRecord()
 				.toString());
 	}
 
-	private void reduce(final Set<Execution> origCol, final Set<Execution> mergeCol) {
-		Set<Execution> execSet = new LinkedHashSet<>(origCol);
-		for (Execution origExec : origCol) {
+	private void reduce(final Set<Execution> executions) {
+		final Set<Execution> mergeCol = new LinkedHashSet<>();
+		final Set<Execution> execSet = new LinkedHashSet<>(executions);
+		final Set<Execution> remSet = new LinkedHashSet<>();
+		for (Execution origExec : executions) {
 			// we don't merge yourself with yourself
 			if (execSet.contains(origExec))
 				execSet.remove(origExec);
@@ -95,7 +95,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.isEmpty();
 			// clone! originals must not be modified!!!
 			Execution mergeExec = createEquivalent(origExec);
-			reduce(origExec, mergeExec);
+			mergeExec = reduce(origExec, null, false);
 			mergeCol.add(mergeExec);
 
 			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
@@ -107,45 +107,100 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					if (!exec.getPackagingProcedures()
 							.isEmpty())
 						continue;
-				mergeExec.getPackagingProcedures()
-						.addAll(exec.getPackagingProcedures());
-				reduce(exec, mergeExec);
+
+				Execution rem = reduce(exec, mergeExec, false);
+				if (rem != null)
+					remSet.add(rem);
 				t.remove();
 			}
 		}
+
+		execSet.clear();
+		execSet.addAll(remSet);
+		for (Execution remExec : remSet) {
+			// we don't merge yourself with yourself
+			if (execSet.contains(remExec))
+				execSet.remove(remExec);
+			else
+				// cant find yourself -> already merged
+				continue;
+			mergeCol.add(remExec);
+
+			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
+				Execution exec = (Execution) t.next();
+
+				if (!isSimilar(remExec, exec, true))
+					continue;
+
+				reduce(exec, remExec, true);
+				t.remove();
+			}
+		}
+
+		executions.clear();
+		executions.addAll(mergeCol);
 	}
 
-	private void reduce(final Execution exec, final Execution mergeExec) {
+	private Execution reduce(final Execution exec, final Execution mergeExec, boolean force) {
+		if (mergeExec == null)
+			force = false;
+		Execution remExecution = createEquivalent(exec);
+
+		boolean reduction = false;
+
 		for (Lifecycle lifecycle : exec.getLifecycles()
 				.values()) {
-			Lifecycle mergeLifecycle = mergeExec.getLifecycle(lifecycle.getId());
+			Lifecycle mergeLifecycle = mergeExec == null ? null : mergeExec.getLifecycle(lifecycle.getId());
+			Lifecycle remLifecycle = new Lifecycle(lifecycle.getId());
 			if (mergeLifecycle == null) {
 				mergeLifecycle = new Lifecycle(lifecycle.getId());
-				mergeExec.putLifecycle(mergeLifecycle);
+				if (force)
+					mergeExec.putLifecycle(mergeLifecycle);
 			}
 
 			for (Phase phase : lifecycle.getPhases()
 					.values()) {
 				Phase mergePhase = mergeLifecycle.getPhase(phase.getId());
+				Phase remPhase = new Phase(phase.getId());
 				if (mergePhase == null) {
 					mergePhase = new Phase(phase.getId());
-					mergeLifecycle.putPhase(mergePhase);
+					if (force)
+						mergeLifecycle.putPhase(mergePhase);
 				}
 
-				List<Goal> mergeGoals = mergePhase.getGoals();
 				for (Goal goal : phase.getGoals()) {
 					boolean missing = true;
-					for (Goal mergeGoal : mergeGoals)
+					for (Goal mergeGoal : mergePhase.getGoals())
 						if (isSimilar(goal, mergeGoal, false)) {
 							mergeGoal.addModes(goal.getModes());
 							missing = false;
+							reduction = true;
 							break;
 						}
-					if (missing)
-						mergeGoals.add(createEquivalent(goal));
+					if (missing) {
+						Goal equivalent = createEquivalent(goal);
+						remPhase.addGoal(equivalent);
+						if (force)
+							mergePhase.addGoal(equivalent);
+					}
 				}
+				if (!remPhase.getGoals()
+						.isEmpty())
+					remLifecycle.putPhase(remPhase);
 			}
+			if (!remLifecycle.getPhases()
+					.isEmpty())
+				remExecution.putLifecycle(remLifecycle);
 		}
+
+		if (reduction)
+			mergeExec.getPackagingProcedures()
+					.addAll(exec.getPackagingProcedures());
+
+		if (remExecution.getLifecycles()
+				.isEmpty())
+			return null;
+		return remExecution;
 	}
 
 	private boolean isSimilar(final Execution origExec, final Execution exec, final boolean checkPackagingProcedures) {
@@ -245,10 +300,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		return equivalent;
 	}
 
-	private void collectExecutions(Set<Execution> executions, final ExecutionArchiveSlice slice) {
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {
 		if (slice == null)
-			return;
+			return 0;
 		executions.addAll(slice.getExecutions());
-		collectExecutions(executions, slice.getParent());
+		return collectExecutions(executions, slice.getParent()) + 1;
 	}
 }

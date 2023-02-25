@@ -63,11 +63,11 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		if (slice == null)
 			slice = this.registry.createSlice(mvnPluginDescriptor);
 
-		ProjectExecutionModel model = slice.getModel(HINT);
+		ProjectExecutionModel model = slice.getModel(PluginParser.class, PluginParser.HINT);
 		if (model != null)
 			return model;
 
-		model = new ProjectExecutionModel(HINT);
+		model = new ProjectExecutionModel(PluginParser.class, PluginParser.HINT);
 
 		if (parseModel(slice, mvnPluginDescriptor, model))
 			return model;

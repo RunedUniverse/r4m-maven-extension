@@ -10,6 +10,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 
 public class ProjectExecutionModel implements Recordable {
 	private String version;
+	private Class<?> parserType = null;
 	private String parserHint = null;
 	private boolean effective = false;
 	private Set<Execution> executions = new LinkedHashSet<>(0);
@@ -18,12 +19,17 @@ public class ProjectExecutionModel implements Recordable {
 		this.parserHint = null;
 	}
 
-	public ProjectExecutionModel(String parserHint) {
+	public ProjectExecutionModel(final Class<?> parserType, final String parserHint) {
+		this.parserType = parserType;
 		this.parserHint = parserHint;
 	}
 
 	public String getVersion() {
 		return this.version;
+	}
+
+	public Class<?> getParserType() {
+		return this.parserType;
 	}
 
 	public String getParserHint() {
@@ -42,7 +48,8 @@ public class ProjectExecutionModel implements Recordable {
 		this.version = version;
 	}
 
-	public void setParserHint(String hint) {
+	public void setParser(Class<?> type, String hint) {
+		this.parserType = type;
 		this.parserHint = hint;
 	}
 

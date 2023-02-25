@@ -13,7 +13,7 @@ public interface PluginExecutionRegistrySlice {
 
 	public void includeModel(ProjectExecutionModel model);
 
-	public ProjectExecutionModel getModel(String parserHint);
+	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint);
 
 	public Set<ProjectExecutionModel> getModels();
 }

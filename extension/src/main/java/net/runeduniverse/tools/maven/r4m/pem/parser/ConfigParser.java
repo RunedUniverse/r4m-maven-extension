@@ -32,7 +32,7 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 
 		File executionXml = new File(mvnProject.getBasedir(), Properties.PROJECT_EXECUTION_MODEL_FILE);
 
-		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
+		ProjectExecutionModel model = new ProjectExecutionModel(ConfigParser.class, ConfigParser.HINT);
 		model.setEffective(true);
 
 		if (executionXml.isFile()) {

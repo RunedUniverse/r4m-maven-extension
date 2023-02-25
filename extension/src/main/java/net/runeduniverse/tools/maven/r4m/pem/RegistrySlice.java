@@ -11,6 +11,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 public class RegistrySlice implements PluginExecutionRegistrySlice {
 
 	// save more infos???
@@ -37,7 +39,7 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 				.isEmpty())
 			return;
 
-		this.hintedOrigins.put(model.getParserHint(), model);
+		this.hintedOrigins.put(createKey(model.getParserType(), model.getParserHint()), model);
 
 		for (Execution execution : model.getExecutions()) {
 			this.executions.add(execution);
@@ -46,8 +48,8 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 	}
 
 	@Override
-	public ProjectExecutionModel getModel(String parserHint) {
-		return this.hintedOrigins.get(parserHint);
+	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint) {
+		return this.hintedOrigins.get(createKey(parserType, parserHint));
 	}
 
 	@Override
@@ -55,4 +57,11 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 		return new LinkedHashSet<>(this.hintedOrigins.values());
 	}
 
+	protected static String createKey(Class<?> parserType, String parserHint) {
+		if (isBlank(parserHint))
+			parserHint = "default";
+		if (parserType == null)
+			return parserHint;
+		return String.join(":", parserType.getCanonicalName(), parserHint);
+	}
 }

@@ -15,6 +15,7 @@ import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -72,7 +73,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		if (parseModel(slice, mvnPluginDescriptor, model))
 			return model;
 
-		parseModel(slice, mvnPlugin, model);
+		parseDescriptor(slice, mvnPluginDescriptor, model);
 		return model;
 	}
 
@@ -115,42 +116,48 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		return pemLocated;
 	}
 
-	protected void parseModel(final PluginExecutionRegistrySlice slice, final Plugin mvnPlugin,
+	protected void parseDescriptor(final PluginExecutionRegistrySlice slice, final PluginDescriptor mvnPluginDescriptor,
 			final ProjectExecutionModel model) throws Exception {
 		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 
+		log.warn(String.join(":", mvnPluginDescriptor.getGroupId(), mvnPluginDescriptor.getArtifactId()));
+		for (MojoDescriptor mojo : mvnPluginDescriptor.getMojos()) {
+			log.warn(String.format("  phase: %s\texec phase: %s\tgoal: %s\texec goal: %s", mojo.getPhase(),
+					mojo.getExecutePhase(), mojo.getGoal(), mojo.getExecuteGoal()));
+		}
+
 		// TODO parse mvn plugin bound default executions in case config file does not
 		// exist!!!
-		for (PluginExecution execution : mvnPlugin.getExecutions()) {
-			// if the phase is specified then I don't have to
-			// go fetch the plugin yet and
-			// pull it down
-			// to examine the phase it is associated to.
-			/*
-			 * if (execution.getPhase() != null) { Map<Integer, List<MojoExecution>>
-			 * phaseBindings = mappings.get(execution.getPhase()); if (phaseBindings !=
-			 * null) { for (String goal : execution.getGoals()) { MojoExecution
-			 * mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
-			 * mojoExecution.setLifecyclePhase(execution.getPhase());
-			 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-			 * }
-			 */
-			// if not then i need to grab the mojo descriptor and look at the phase that is
-			// specified
-			/*
-			 * else { for (String goal : execution.getGoals()) { MojoDescriptor
-			 * mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
-			 * mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
-			 * 
-			 * Map<Integer, List<MojoExecution>> phaseBindings =
-			 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
-			 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
-			 * execution.getId());
-			 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
-			 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
-			 * }
-			 */
-		}
+		// for (PluginExecution execution : mvnPlugin.getExecutions()) {
+		// if the phase is specified then I don't have to
+		// go fetch the plugin yet and
+		// pull it down
+		// to examine the phase it is associated to.
+		/*
+		 * if (execution.getPhase() != null) { Map<Integer, List<MojoExecution>>
+		 * phaseBindings = mappings.get(execution.getPhase()); if (phaseBindings !=
+		 * null) { for (String goal : execution.getGoals()) { MojoExecution
+		 * mojoExecution = new MojoExecution(mvnPlugin, goal, execution.getId());
+		 * mojoExecution.setLifecyclePhase(execution.getPhase());
+		 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+		 * }
+		 */
+		// if not then i need to grab the mojo descriptor and look at the phase that is
+		// specified
+		/*
+		 * else { for (String goal : execution.getGoals()) { MojoDescriptor
+		 * mojoDescriptor = pluginManager.getMojoDescriptor(mvnPlugin, goal,
+		 * mvnProject.getRemotePluginRepositories(), session.getRepositorySession());
+		 * 
+		 * Map<Integer, List<MojoExecution>> phaseBindings =
+		 * mappings.get(mojoDescriptor.getPhase()); if (phaseBindings != null) {
+		 * MojoExecution mojoExecution = new MojoExecution(mojoDescriptor,
+		 * execution.getId());
+		 * mojoExecution.setLifecyclePhase(mojoDescriptor.getPhase());
+		 * addMojoExecution(phaseBindings, mojoExecution, execution.getPriority()); } }
+		 * }
+		 */
+		// }
 
 		slice.includeModel(model);
 	}

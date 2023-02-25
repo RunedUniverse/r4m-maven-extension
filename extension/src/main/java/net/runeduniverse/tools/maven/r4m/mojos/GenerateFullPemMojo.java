@@ -12,7 +12,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
@@ -25,6 +25,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
 
+import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.acquireExecutionArchive;
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.mojoFailureExtensionLoading;
 
 /**
@@ -58,7 +59,17 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		// TODO Auto-generated method stub
 		getLog().info("building full pem.xml");
 
-		ExecutionArchiveSlice projectSlice = this.archive.getSlice(this.mvnProject);
+		ExecutionArchiveSlice projectSlice = null;
+		if (this.archive != null)
+			projectSlice = this.archive.getSlice(this.mvnProject);
+
+		if (projectSlice == null) {
+			// try loading via build-extension classrealm
+			this.archive = acquireExecutionArchive(mvnSession, (ClassRealm) Thread.currentThread()
+					.getContextClassLoader());
+		}
+		if (this.archive != null)
+			projectSlice = this.archive.getSlice(this.mvnProject);
 
 		if (projectSlice == null)
 			mojoFailureExtensionLoading(getLog());

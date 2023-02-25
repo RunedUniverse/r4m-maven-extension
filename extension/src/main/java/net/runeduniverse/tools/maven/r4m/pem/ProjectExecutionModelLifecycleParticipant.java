@@ -1,7 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
@@ -61,13 +61,9 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 		try {
 			ClassRealm realm;
-			Collection<Plugin> extPlugins = new HashSet<Plugin>();
-
-			if (this.coreExtension) {
+			if (this.coreExtension)
 				realm = world.getRealm("maven.ext");
-				for (ClassRealm cr : realm.getImportRealms())
-					extPlugins.add(fromExtRealm(cr));
-			} else {
+			else {
 				// we need to reinitiate the r4m-maven-extension realm because maven injects an
 				// outdated version of the plexus-utils
 				realm = world.getRealm("plexus.core")
@@ -78,6 +74,8 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
 				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
 			}
+
+			Collection<Plugin> extPlugins = scanCoreExtensions(world.getRealms());
 
 			Thread.currentThread()
 					.setContextClassLoader(realm);
@@ -115,6 +113,17 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 			projectSlice.register(parser.parse());
+	}
+
+	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {
+		Collection<Plugin> extPlugins = new LinkedHashSet<Plugin>();
+		for (ClassRealm realm : realms) {
+			Plugin plugin = fromExtRealm(realm);
+			if (plugin == null)
+				continue;
+			extPlugins.add(plugin);
+		}
+		return extPlugins;
 	}
 
 	private static Plugin fromExtRealm(ClassRealm realm) {

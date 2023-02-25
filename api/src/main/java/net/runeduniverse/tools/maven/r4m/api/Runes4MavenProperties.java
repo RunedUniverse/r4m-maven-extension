@@ -10,6 +10,8 @@ public interface Runes4MavenProperties {
 
 	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = "r4m:executions-parser";
 
+	public static String BUILD_EXTENSION_REALM_ID = "extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension";
+
 	public interface LIFECYCLE {
 		public interface DEV {
 			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:dev-lifecycle";

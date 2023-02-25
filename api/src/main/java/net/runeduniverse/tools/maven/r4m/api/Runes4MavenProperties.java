@@ -6,6 +6,7 @@ public interface Runes4MavenProperties {
 	public static String PREFIX_ID = "r4m";
 
 	public static String PROJECT_EXECUTION_MODEL_FILE = "pem.xml";
+	public static String PROJECT_EXECUTION_MODEL_VERSION = "1.0.0";
 
 	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = "r4m:executions-parser";
 

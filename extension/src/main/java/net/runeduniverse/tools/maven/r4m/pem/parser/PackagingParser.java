@@ -56,6 +56,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 		}
 
 		ProjectExecutionModel model = new ProjectExecutionModel(HINT);
+		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(effExecutions);
 		return model;
 	}

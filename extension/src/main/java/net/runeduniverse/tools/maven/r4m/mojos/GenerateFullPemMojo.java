@@ -2,13 +2,9 @@ package net.runeduniverse.tools.maven.r4m.mojos;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -17,6 +13,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
@@ -25,6 +22,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
 
 /**
@@ -63,40 +61,27 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		Set<Execution> executions = new HashSet<>();
 		collectExecutions(executions, projectSlice);
 
-		Map<String, Map<ExecutionSource, List<Execution>>> map = new LinkedHashMap<>();
-		reduce(map, executions);
-
-		int reducedCnt = 0;
+		Set<Execution> reducedCol = new HashSet<>();
+		reduce(executions, reducedCol);
 
 		getLog().warn("reduced");
-		for (Map<ExecutionSource, List<Execution>> x : map.values()) {
-			for (List<Execution> y : x.values()) {
-				for (Execution execution : y) {
-					getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(),
-							execution.getSource(), String.join(", ", execution.getPackagingProcedures())));
-					reducedCnt++;
-				}
-			}
-		}
-
-		int mergedCnt = 0;
-
-		Set<Execution> mergedCol = new HashSet<>();
-		merge(executions, mergedCol);
-
-		getLog().warn("merged");
-		for (Execution execution : mergedCol) {
+		for (Execution execution : reducedCol) {
 			getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(), execution.getSource(),
 					String.join(", ", execution.getPackagingProcedures())));
-			mergedCnt++;
 		}
 
 		getLog().error("original:\t" + executions.size());
-		getLog().error("reduced: \t" + reducedCnt);
-		getLog().error("merged:  \t" + mergedCnt);
+		getLog().error("reduced: \t" + reducedCol.size());
+
+		ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.addExecutions(reducedCol);
+
+		getLog().warn(model.toRecord()
+				.toString());
 	}
 
-	private void merge(final Set<Execution> origCol, final Set<Execution> mergeCol) {
+	private void reduce(final Set<Execution> origCol, final Set<Execution> mergeCol) {
 		Set<Execution> execSet = new LinkedHashSet<>(origCol);
 		for (Execution origExec : origCol) {
 			// we don't merge yourself with yourself
@@ -110,7 +95,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.isEmpty();
 			// clone! originals must not be modified!!!
 			Execution mergeExec = createEquivalent(origExec);
-			merge(origExec, mergeExec);
+			reduce(origExec, mergeExec);
 			mergeCol.add(mergeExec);
 
 			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
@@ -124,13 +109,13 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						continue;
 				mergeExec.getPackagingProcedures()
 						.addAll(exec.getPackagingProcedures());
-				merge(exec, mergeExec);
+				reduce(exec, mergeExec);
 				t.remove();
 			}
 		}
 	}
 
-	private void merge(final Execution exec, final Execution mergeExec) {
+	private void reduce(final Execution exec, final Execution mergeExec) {
 		for (Lifecycle lifecycle : exec.getLifecycles()
 				.values()) {
 			Lifecycle mergeLifecycle = mergeExec.getLifecycle(lifecycle.getId());
@@ -158,46 +143,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						}
 					if (missing)
 						mergeGoals.add(createEquivalent(goal));
-				}
-			}
-		}
-	}
-
-	private void reduce(final Map<String, Map<ExecutionSource, List<Execution>>> map, final Set<Execution> executions) {
-		for (Execution sExec : executions) {
-			Map<ExecutionSource, List<Execution>> sourceMap = map.get(sExec.getId());
-			if (sourceMap == null) {
-				sourceMap = new LinkedHashMap<>();
-				map.put(sExec.getId(), sourceMap);
-			}
-			List<Execution> execPool = sourceMap.get(sExec.getSource());
-			if (execPool == null) {
-				execPool = new LinkedList<>();
-				sourceMap.put(sExec.getSource(), execPool);
-			}
-			Execution exec = getEquivalent(execPool, sExec);
-			if (exec == null) {
-				exec = createEquivalent(sExec);
-				execPool.add(exec);
-			}
-
-			for (Lifecycle sLifecycle : sExec.getLifecycles()
-					.values()) {
-				Lifecycle lifecycle = exec.getLifecycle(sLifecycle.getId());
-				if (lifecycle == null) {
-					lifecycle = new Lifecycle(sLifecycle.getId());
-					exec.putLifecycle(lifecycle);
-				}
-
-				for (Phase sPhase : sLifecycle.getPhases()
-						.values()) {
-					Phase phase = lifecycle.getPhase(sPhase.getId());
-					if (phase == null) {
-						phase = new Phase(sPhase.getId());
-						lifecycle.putPhase(phase);
-					}
-
-					phase.addGoals(sPhase.getGoals());
 				}
 			}
 		}
@@ -279,13 +224,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.equals(goal.getFork());
 
 		return true;
-	}
-
-	private Execution getEquivalent(final List<Execution> pool, final Execution original) {
-		for (Execution exec : pool)
-			if (isSimilar(original, exec, true))
-				return exec;
-		return null;
 	}
 
 	private Execution createEquivalent(final Execution original) {

@@ -117,6 +117,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 
 	protected void parseModel(final PluginExecutionRegistrySlice slice, final Plugin mvnPlugin,
 			final ProjectExecutionModel model) throws Exception {
+		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 
 		// TODO parse mvn plugin bound default executions in case config file does not
 		// exist!!!

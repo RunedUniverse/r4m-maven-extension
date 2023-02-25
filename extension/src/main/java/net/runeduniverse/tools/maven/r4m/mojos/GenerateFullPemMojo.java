@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -65,105 +66,98 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		Map<String, Map<ExecutionSource, List<Execution>>> map = new LinkedHashMap<>();
 		reduce(map, executions);
 
+		int reducedCnt = 0;
+
 		getLog().warn("reduced");
 		for (Map<ExecutionSource, List<Execution>> x : map.values()) {
 			for (List<Execution> y : x.values()) {
 				for (Execution execution : y) {
 					getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(),
 							execution.getSource(), String.join(", ", execution.getPackagingProcedures())));
+					reducedCnt++;
 				}
 			}
 		}
 
-		Map<String, Map<ExecutionSource, List<Execution>>> mergedMap = new LinkedHashMap<>();
-		merge(map, mergedMap);
+		int mergedCnt = 0;
+
+		Set<Execution> mergedCol = new HashSet<>();
+		merge(executions, mergedCol);
 
 		getLog().warn("merged");
-		for (Map<ExecutionSource, List<Execution>> x : mergedMap.values()) {
-			for (List<Execution> y : x.values()) {
-				for (Execution execution : y) {
-					getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(),
-							execution.getSource(), String.join(", ", execution.getPackagingProcedures())));
-				}
+		for (Execution execution : mergedCol) {
+			getLog().info(String.format("id: %s\tsource: %s\tpackaging: [%s]", execution.getId(), execution.getSource(),
+					String.join(", ", execution.getPackagingProcedures())));
+			mergedCnt++;
+		}
+
+		getLog().error("original:\t" + executions.size());
+		getLog().error("reduced: \t" + reducedCnt);
+		getLog().error("merged:  \t" + mergedCnt);
+	}
+
+	private void merge(final Set<Execution> origCol, final Set<Execution> mergeCol) {
+		Set<Execution> execSet = new LinkedHashSet<>(origCol);
+		for (Execution origExec : origCol) {
+			// we don't merge yourself with yourself
+			if (execSet.contains(origExec))
+				execSet.remove(origExec);
+			else
+				// cant find yourself -> already merged
+				continue;
+			// check if special condition is active!
+			boolean matchAnyPackagingProcedure = origExec.getPackagingProcedures()
+					.isEmpty();
+			// clone! originals must not be modified!!!
+			Execution mergeExec = createEquivalent(origExec);
+			merge(origExec, mergeExec);
+			mergeCol.add(mergeExec);
+
+			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
+				Execution exec = (Execution) t.next();
+
+				if (!isSimilar(mergeExec, exec, false))
+					continue;
+				if (matchAnyPackagingProcedure)
+					if (!exec.getPackagingProcedures()
+							.isEmpty())
+						continue;
+				mergeExec.getPackagingProcedures()
+						.addAll(exec.getPackagingProcedures());
+				merge(exec, mergeExec);
+				t.remove();
 			}
 		}
 	}
 
-	private void merge(final Map<String, Map<ExecutionSource, List<Execution>>> map,
-			final Map<String, Map<ExecutionSource, List<Execution>>> mergeMap) {
-		for (Entry<String, Map<ExecutionSource, List<Execution>>> origSourceEntry : map.entrySet()) {
-			Map<ExecutionSource, List<Execution>> mergeSource = mergeMap.get(origSourceEntry.getKey());
-			if (mergeSource == null) {
-				mergeSource = new LinkedHashMap<>();
-				mergeMap.put(origSourceEntry.getKey(), mergeSource);
+	private void merge(final Execution exec, final Execution mergeExec) {
+		for (Lifecycle lifecycle : exec.getLifecycles()
+				.values()) {
+			Lifecycle mergeLifecycle = mergeExec.getLifecycle(lifecycle.getId());
+			if (mergeLifecycle == null) {
+				mergeLifecycle = new Lifecycle(lifecycle.getId());
+				mergeExec.putLifecycle(mergeLifecycle);
 			}
 
-			for (Entry<ExecutionSource, List<Execution>> origColEntry : origSourceEntry.getValue()
-					.entrySet()) {
-				List<Execution> mergeCol = mergeSource.get(origColEntry.getKey());
-				if (mergeCol == null) {
-					mergeCol = new LinkedList<>();
-					mergeSource.put(origColEntry.getKey(), mergeCol);
+			for (Phase phase : lifecycle.getPhases()
+					.values()) {
+				Phase mergePhase = mergeLifecycle.getPhase(phase.getId());
+				if (mergePhase == null) {
+					mergePhase = new Phase(phase.getId());
+					mergeLifecycle.putPhase(mergePhase);
 				}
 
-				List<Execution> execCol = new LinkedList<>(origColEntry.getValue());
-				for (Iterator<Execution> i = origColEntry.getValue()
-						.iterator(); i.hasNext();) {
-					Execution origExec = i.next();
-					// we don't merge yourself with yourself
-					if (execCol.contains(origExec))
-						execCol.remove(origExec);
-					else
-						// cant find yourself -> already merged
-						continue;
-					// check if special condition is active!
-					boolean matchAnyPackagingProcedure = origExec.getPackagingProcedures()
-							.isEmpty();
-					mergeCol.add(origExec);
-
-					for (Iterator<Execution> t = execCol.iterator(); t.hasNext();) {
-						Execution exec = (Execution) t.next();
-
-						// origExec similar to exec?
-						if (!isSimilar(origExec, exec, false))
-							continue;
-						if (matchAnyPackagingProcedure)
-							if (!exec.getPackagingProcedures()
-									.isEmpty())
-								continue;
-						t.remove();
-						origExec.getPackagingProcedures()
-								.addAll(exec.getPackagingProcedures());
-
-						for (Lifecycle lifecycle : exec.getLifecycles()
-								.values()) {
-							Lifecycle mergeLifecycle = origExec.getLifecycle(lifecycle.getId());
-							if (mergeLifecycle == null) {
-								origExec.putLifecycle(lifecycle);
-								continue;
-							}
-
-							for (Phase phase : lifecycle.getPhases()
-									.values()) {
-								Phase mergePhase = mergeLifecycle.getPhase(phase.getId());
-								if (mergePhase == null) {
-									mergeLifecycle.putPhase(phase);
-									continue;
-								}
-
-								for (Iterator<Goal> g = phase.getGoals()
-										.iterator(); g.hasNext();) {
-									Goal goal = (Goal) g.next();
-									for (Goal mergeGoal : mergePhase.getGoals())
-										if (isSimilar(mergeGoal, goal, false)) {
-											mergeGoal.addModes(goal.getModes());
-											g.remove();
-										}
-								}
-								mergePhase.addGoals(phase.getGoals());
-							}
+				List<Goal> mergeGoals = mergePhase.getGoals();
+				for (Goal goal : phase.getGoals()) {
+					boolean missing = true;
+					for (Goal mergeGoal : mergeGoals)
+						if (isSimilar(goal, mergeGoal, false)) {
+							mergeGoal.addModes(goal.getModes());
+							missing = false;
+							break;
 						}
-					}
+					if (missing)
+						mergeGoals.add(createEquivalent(goal));
 				}
 			}
 		}
@@ -303,6 +297,13 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				.addAll(original.getPackagingProcedures());
 		equivalent.getTrigger()
 				.addAll(original.getTrigger());
+		return equivalent;
+	}
+
+	private Goal createEquivalent(final Goal original) {
+		Goal equivalent = new Goal(original.getGroupId(), original.getArtifactId(), original.getGoalId());
+		equivalent.addModes(original.getModes());
+		equivalent.setFork(original.getFork());
 		return equivalent;
 	}
 

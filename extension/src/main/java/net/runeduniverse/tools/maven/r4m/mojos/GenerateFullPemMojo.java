@@ -1,5 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -23,6 +24,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
+
+import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.mojoFailureExtensionLoading;
 
 /**
  * generates the full pem.xml from all active maven defaults
@@ -57,6 +60,9 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		ExecutionArchiveSlice projectSlice = this.archive.getSlice(this.mvnProject);
 
+		if (projectSlice == null)
+			mojoFailureExtensionLoading(getLog());
+
 		Set<Execution> executions = new LinkedHashSet<>();
 		int sliceCnt = collectExecutions(executions, projectSlice);
 
@@ -75,8 +81,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		getLog().warn(model.toRecord()
-				.toString());
+		OutputStream stream = this.writer.writeModel(model);
 	}
 
 	private void reduce(final Set<Execution> executions) {

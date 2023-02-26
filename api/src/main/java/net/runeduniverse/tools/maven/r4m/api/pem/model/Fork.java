@@ -43,7 +43,7 @@ public class Fork implements Recordable {
 			return true;
 		if (this.lifecycle != null)
 			return true;
-		if (!this.phases.isEmpty())
+		if (this.phases != null && !this.phases.isEmpty())
 			return true;
 		// this.excludePhases are irrelevant
 		return false;

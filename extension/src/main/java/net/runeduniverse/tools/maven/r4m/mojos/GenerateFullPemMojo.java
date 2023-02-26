@@ -13,17 +13,19 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
 import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.acquireExecutionArchive;
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.mojoFailureExtensionLoading;
@@ -100,14 +102,14 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		final Set<Execution> execSet = new LinkedHashSet<>(executions);
 		final Set<Execution> remSet = new LinkedHashSet<>();
 		for (Execution origExec : executions) {
-			// we don't merge yourself with yourself
+			// don't merge it with itself
 			if (execSet.contains(origExec))
 				execSet.remove(origExec);
 			else
-				// cant find yourself -> already merged
+				// cant find it -> already merged
 				continue;
 			// check if special condition is active!
-			boolean matchAnyPackagingProcedure = origExec.getPackagingProcedures()
+			boolean matchRestrictions = origExec.getRestrictions()
 					.isEmpty();
 			// clone! originals must not be modified!!!
 			Execution mergeExec = createEquivalent(origExec);
@@ -119,8 +121,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 				if (!isSimilar(mergeExec, exec, false))
 					continue;
-				if (matchAnyPackagingProcedure)
-					if (!exec.getPackagingProcedures()
+				if (matchRestrictions)
+					if (!exec.getRestrictions()
 							.isEmpty())
 						continue;
 
@@ -134,11 +136,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		execSet.clear();
 		execSet.addAll(remSet);
 		for (Execution remExec : remSet) {
-			// we don't merge yourself with yourself
+			// don't merge it with itself
 			if (execSet.contains(remExec))
 				execSet.remove(remExec);
 			else
-				// cant find yourself -> already merged
+				// cant find it -> already merged
 				continue;
 			mergeCol.add(remExec);
 
@@ -210,8 +212,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		}
 
 		if (reduction)
-			mergeExec.getPackagingProcedures()
-					.addAll(exec.getPackagingProcedures());
+			mergeExec.getRestrictions()
+					.addAll(exec.getRestrictions());
 
 		if (remExecution.getLifecycles()
 				.isEmpty())
@@ -219,7 +221,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		return remExecution;
 	}
 
-	private boolean isSimilar(final Execution origExec, final Execution exec, final boolean checkPackagingProcedures) {
+	private boolean isSimilar(final Execution origExec, final Execution exec, final boolean checkRestrictions) {
 		// id
 		final String id = origExec.getId();
 		if (id == null) {
@@ -234,21 +236,24 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				return false;
 		} else if (!source.equals(exec.getSource()))
 			return false;
+		// inherited
+		if (origExec.isInherited() != exec.isInherited())
+			return false;
 		// active flags
 		if (origExec.isAlwaysActive() != exec.isAlwaysActive() || origExec.isDefaultActive() != exec.isDefaultActive()
 				|| origExec.isNeverActive() != exec.isNeverActive())
 			return false;
-		// packagingProcedures
-		if (checkPackagingProcedures) {
-			final Set<String> execPackagingProcedures = exec.getPackagingProcedures();
-			if (execPackagingProcedures.size() != origExec.getPackagingProcedures()
+		// restrictions
+		if (checkRestrictions) {
+			final List<ExecutionRestriction> execRestrictions = new LinkedList<>(exec.getRestrictions());
+			if (execRestrictions.size() != origExec.getRestrictions()
 					.size())
 				return false;
-			if (!execPackagingProcedures.containsAll(origExec.getPackagingProcedures()))
+			if (!execRestrictions.containsAll(origExec.getRestrictions()))
 				return false;
 		}
 		// trigger
-		final List<Trigger> execTrigger = new LinkedList<>(exec.getTrigger());
+		final List<ExecutionTrigger> execTrigger = new LinkedList<>(exec.getTrigger());
 		if (execTrigger.size() != origExec.getTrigger()
 				.size())
 			return false;
@@ -299,11 +304,12 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 	private Execution createEquivalent(final Execution original) {
 		Execution equivalent = new Execution(original.getId(), original.getSource());
+		equivalent.setInherited(original.isInherited());
 		equivalent.setAlwaysActive(original.isAlwaysActive());
 		equivalent.setDefaultActive(original.isDefaultActive());
 		equivalent.setNeverActive(original.isNeverActive());
-		equivalent.getPackagingProcedures()
-				.addAll(original.getPackagingProcedures());
+		equivalent.getRestrictions()
+				.addAll(original.getRestrictions());
 		equivalent.getTrigger()
 				.addAll(original.getTrigger());
 		return equivalent;
@@ -317,9 +323,14 @@ public class GenerateFullPemMojo extends AbstractMojo {
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {
+		return collectExecutions(executions, slice, false);
+	}
+
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+			final boolean onlyInherited) {
 		if (slice == null)
 			return 0;
-		executions.addAll(slice.getExecutions());
-		return collectExecutions(executions, slice.getParent()) + 1;
+		executions.addAll(slice.getExecutions(e -> true, onlyInherited));
+		return collectExecutions(executions, slice.getParent(), true) + 1;
 	}
 }

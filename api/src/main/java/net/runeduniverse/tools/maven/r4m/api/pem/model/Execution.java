@@ -13,11 +13,12 @@ public class Execution implements Recordable {
 	private String id = null;
 	private ExecutionSource source = null;
 
-	private final Set<Trigger> trigger = new LinkedHashSet<>();
+	private final Set<ExecutionRestriction> restrictions = new LinkedHashSet<>();
+	private final Set<ExecutionTrigger> trigger = new LinkedHashSet<>();
+	private boolean inherited = true;
 	private boolean activeAlways = false;
 	private boolean activeDefault = false;
 	private boolean activeNever = false;
-	private final Set<String> packagingProcedures = new LinkedHashSet<>();
 
 	private final Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
 
@@ -37,8 +38,12 @@ public class Execution implements Recordable {
 		return this.source;
 	}
 
-	public Set<Trigger> getTrigger() {
+	public Set<ExecutionTrigger> getTrigger() {
 		return this.trigger;
+	}
+
+	public boolean isInherited() {
+		return this.inherited;
 	}
 
 	public boolean isAlwaysActive() {
@@ -53,8 +58,8 @@ public class Execution implements Recordable {
 		return this.activeNever;
 	}
 
-	public Set<String> getPackagingProcedures() {
-		return this.packagingProcedures;
+	public Set<ExecutionRestriction> getRestrictions() {
+		return this.restrictions;
 	}
 
 	public Lifecycle getLifecycle(String lifecycleId) {
@@ -63,6 +68,10 @@ public class Execution implements Recordable {
 
 	public Map<String, Lifecycle> getLifecycles() {
 		return this.lifecycles;
+	}
+
+	public void setInherited(boolean value) {
+		this.inherited = value;
 	}
 
 	public void setAlwaysActive(boolean value) {
@@ -77,12 +86,12 @@ public class Execution implements Recordable {
 		this.activeNever = value;
 	}
 
-	public void addTrigger(Trigger trigger) {
+	public void addTrigger(ExecutionTrigger trigger) {
 		this.trigger.add(trigger);
 	}
 
-	public void addPackagingProcedure(String value) {
-		this.packagingProcedures.add(value);
+	public void addRestriction(ExecutionRestriction value) {
+		this.restrictions.add(value);
 	}
 
 	public void putLifecycle(Lifecycle lifecycle) {
@@ -100,6 +109,19 @@ public class Execution implements Recordable {
 
 		tree.append("id", this.id);
 		tree.append("source", this.source.key());
+		tree.append("inherited", Boolean.toString(this.inherited));
+
+		CompoundTree restrictionsTree = new CompoundTree("Restrictions");
+		boolean restrictionsExist = false;
+
+		if (!this.restrictions.isEmpty()) {
+			restrictionsExist = true;
+			for (Recordable restriction : this.restrictions)
+				restrictionsTree.append(restriction.toRecord());
+		}
+
+		if (restrictionsExist)
+			tree.append(restrictionsTree);
 
 		CompoundTree triggerTree = new CompoundTree("Trigger");
 		boolean triggerExist = false;
@@ -120,11 +142,6 @@ public class Execution implements Recordable {
 			triggerExist = true;
 			for (Recordable trigger : this.trigger)
 				triggerTree.append(trigger.toRecord());
-		}
-		if (!this.packagingProcedures.isEmpty()) {
-			triggerExist = true;
-			for (String procedure : this.packagingProcedures)
-				triggerTree.append("packaging procedure", procedure);
 		}
 
 		if (triggerExist)

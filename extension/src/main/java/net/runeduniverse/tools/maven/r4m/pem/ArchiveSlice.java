@@ -55,22 +55,27 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 	}
 
 	@Override
-	public Set<Execution> getExecutions(ExecutionFilter filter) {
-		Set<Execution> executions = new LinkedHashSet<>();
-		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
-			for (Set<Execution> execCol : entry.values())
-				for (Execution execution : execCol)
-					if (filter.apply(execution))
-						executions.add(execution);
-		return executions;
-	}
-
-	@Override
-	public Set<Execution> getEffectiveExecutions(ExecutionFilter filter) {
+	public Set<Execution> getExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
 		Set<Execution> executions = new LinkedHashSet<>();
 		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
 			for (Set<Execution> execCol : entry.values())
 				for (Execution execution : execCol) {
+					if (onlyInherited && !execution.isInherited())
+						continue;
+					if (filter.apply(execution))
+						executions.add(execution);
+				}
+		return executions;
+	}
+
+	@Override
+	public Set<Execution> getEffectiveExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
+		Set<Execution> executions = new LinkedHashSet<>();
+		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
+			for (Set<Execution> execCol : entry.values())
+				for (Execution execution : execCol) {
+					if (onlyInherited && !execution.isInherited())
+						continue;
 					if (this.executionOrigins.get(execution)
 							.isEffective() && filter.apply(execution))
 						executions.add(execution);

@@ -27,11 +27,12 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Trigger;
+import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
@@ -60,11 +61,18 @@ public class Selector implements ExecutionArchiveSelector {
 				return false;
 			if (execution.isAlwaysActive())
 				return true;
-			// if a trigger for a packaging-procedure is set it must match!
-			if (!execution.getPackagingProcedures()
+			// if restrictions are set at least one of each must match!
+			if (!execution.getRestrictions()
 					.isEmpty()) {
-				if (!execution.getPackagingProcedures()
-						.contains(cnf.getPackagingProcedure()))
+				Map<String, Boolean> map = new LinkedHashMap<>();
+				for (ExecutionRestriction restriction : execution.getRestrictions()) {
+					Boolean state = map.get(restriction.getId());
+					// state can be null
+					if (state == true)
+						continue;
+					map.put(restriction.getId(), restriction.isActive(cnf));
+				}
+				if (map.containsValue(false))
 					return false;
 			}
 			// if an active-execution is defined it must match
@@ -77,7 +85,7 @@ public class Selector implements ExecutionArchiveSelector {
 					.contains(execution.getId()))
 				return true;
 			// any active trigger activates the execution
-			for (Trigger trigger : execution.getTrigger())
+			for (ExecutionTrigger trigger : execution.getTrigger())
 				if (trigger.isActive(cnf))
 					return true;
 			return false;
@@ -207,24 +215,25 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
-			ExecutionArchiveSlice slice) {
+			final ExecutionArchiveSlice slice) {
 		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, filterSlice(cnf), views, slice);
+		getExecutions(cnf, filterSlice(cnf), views, slice, false);
 		return views;
 	}
 
 	@SuppressWarnings("deprecation")
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final ExecutionFilter filter,
-			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, ExecutionArchiveSlice slice) {
-		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter);
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSlice slice,
+			final boolean onlyInherited) {
+		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter, onlyInherited);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
 			if (slice.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, slice.getParent());
+				effExecDetected = getExecutions(cnf, filter, baseViews, slice.getParent(), true);
 
 			if (!effExecDetected)
-				applicableExecutions = slice.getExecutions(filter);
+				applicableExecutions = slice.getExecutions(filter, onlyInherited);
 		} else
 			effExecDetected = true;
 

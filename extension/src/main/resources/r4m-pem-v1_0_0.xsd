@@ -36,103 +36,10 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:element>
-			<xs:element name="restrictions">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:choice>
-							<xs:element name="packaging-procedure"
-								type="xs:string">
-								<xs:annotation>
-									<xs:documentation>
-										Used to select packaging flag in POM. Keep in
-										mind the POM's packaging flag only indirectly defines the
-										Artifacts Type.
-									</xs:documentation>
-								</xs:annotation>
-							</xs:element>
-							<xs:any namespace="##other">
-								<xs:annotation>
-									<xs:documentation>
-										Other extensions may provide additional
-										restrictions.
-									</xs:documentation>
-								</xs:annotation>
-							</xs:any>
-						</xs:choice>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
-			<xs:element name="triggers" minOccurs="0">
-				<xs:complexType>
-					<xs:choice>
-						<xs:element name="always" minOccurs="0" maxOccurs="1" />
-						<xs:element name="never" minOccurs="0" maxOccurs="1" />
-						<xs:sequence>
-							<xs:element name="default" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-									<xs:documentation>
-										Execute when explicitly specified or no other
-										Execution got explicitly specified via maven '@execution-id'.
-									</xs:documentation>
-								</xs:annotation>
-							</xs:element>
-							<xs:element name="on-call" minOccurs="0" maxOccurs="1">
-								<xs:annotation>
-									<xs:documentation>
-										Execute when explicitly called by via maven
-										'@execution-id'.
-									</xs:documentation>
-								</xs:annotation>
-							</xs:element>
-							<xs:choice minOccurs="0" maxOccurs="unbounded">
-								<xs:element name="active-profile" type="Profile">
-									<xs:annotation>
-										<xs:documentation>
-											Trigger is successful when the Profile got
-											explicitly mentioned
-											by executing 'mvn -Pactive-profile'.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="inactive-profile" type="Profile">
-									<xs:annotation>
-										<xs:documentation>
-											Trigger is successful when the Profile was
-											defined somewhere in the POM hierarchy and was not explicitly
-											mentioned to maven.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="provided-profile" type="Profile">
-									<xs:annotation>
-										<xs:documentation>
-											Trigger is successful when the Profile was
-											defined somewhere in the POM hierarchy.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:element name="missing-profile" type="Profile">
-									<xs:annotation>
-										<xs:documentation>
-											Trigger is successful when the Profile was
-											neither explicitly mentioned to maven nor defined somewhere
-											in the POM hierarchy.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:any namespace="##other">
-									<xs:annotation>
-										<xs:documentation>
-											Other extensions may provide additional
-											triggers.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:any>
-							</xs:choice>
-						</xs:sequence>
-					</xs:choice>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="restrictions"
+				type="ExecutionRestrictions" minOccurs="0" />
+			<xs:element name="triggers" type="ExecutionTriggers"
+				minOccurs="0" />
 			<xs:element name="lifecycles" minOccurs="0">
 				<xs:complexType>
 					<xs:sequence>
@@ -152,6 +59,99 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="ExecutionRestrictions">
+		<xs:sequence>
+			<xs:choice minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="packaging-procedure" type="xs:string">
+					<xs:annotation>
+						<xs:documentation>
+							Used to select packaging flag in POM. Keep in
+							mind the POM's packaging flag only indirectly defines the
+							Artifacts Type.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:any namespace="##other">
+					<xs:annotation>
+						<xs:documentation>
+							Other extensions may provide additional
+							restrictions.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:any>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ExecutionTriggers">
+		<xs:choice>
+			<xs:element name="always" minOccurs="0" maxOccurs="1" />
+			<xs:element name="never" minOccurs="0" maxOccurs="1" />
+			<xs:sequence>
+				<xs:element name="default" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>
+							Execute when explicitly specified or no other
+							Execution got explicitly specified via maven '@execution-id'.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="on-call" minOccurs="0" maxOccurs="1">
+					<xs:annotation>
+						<xs:documentation>
+							Execute when explicitly called by via maven
+							'@execution-id'.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:choice minOccurs="0" maxOccurs="unbounded">
+					<xs:element name="active-profile" type="Profile">
+						<xs:annotation>
+							<xs:documentation>
+								Trigger is successful when the Profile got
+								explicitly mentioned by executing 'mvn -Pactive-profile'.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="inactive-profile" type="Profile">
+						<xs:annotation>
+							<xs:documentation>
+								Trigger is successful when the Profile was
+								defined somewhere in the POM hierarchy and was not explicitly
+								mentioned to maven.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="provided-profile" type="Profile">
+						<xs:annotation>
+							<xs:documentation>
+								Trigger is successful when the Profile was
+								defined somewhere in the POM hierarchy.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="missing-profile" type="Profile">
+						<xs:annotation>
+							<xs:documentation>
+								Trigger is successful when the Profile was
+								neither explicitly mentioned to maven nor defined somewhere in
+								the POM hierarchy.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:any namespace="##other">
+						<xs:annotation>
+							<xs:documentation>
+								Other extensions may provide additional
+								triggers.
+							</xs:documentation>
+						</xs:annotation>
+					</xs:any>
+				</xs:choice>
+			</xs:sequence>
+		</xs:choice>
 	</xs:complexType>
 
 	<xs:complexType name="Profile">
@@ -201,55 +201,57 @@
 					</xs:sequence>
 				</xs:complexType>
 			</xs:element>
-			<xs:element name="fork" minOccurs="0">
-				<xs:complexType>
-					<xs:all>
-						<xs:element name="mode" type="xs:string" minOccurs="0"
-							maxOccurs="1">
-							<xs:annotation>
-								<xs:documentation>
-									Mode under which the forked Executions will be
-									executed.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="executions" type="TargetExecutions"
-							minOccurs="0" maxOccurs="1">
-							<xs:annotation>
-								<xs:documentation>
-									Defined Executions will be inherited by all
-									phases.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="lifecycle" type="TragetLifecycle"
-							minOccurs="0" maxOccurs="1" />
-						<xs:element name="phases" type="TragetPhases"
-							minOccurs="0" maxOccurs="1">
-							<xs:annotation>
-								<xs:documentation>
-									Defined Phases will be executed in order of
-									definition. These phases will override definitions
-									phase-execution restrictions inside of lifecycle definition.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-						<xs:element name="excludedPhases"
-							type="TargetExcludedPhases" minOccurs="0" maxOccurs="1">
-							<xs:annotation>
-								<xs:documentation>
-									Defined Phases will be removed from Lifecycle
-									definitions and Phase definitions. In case Executions are
-									defined, the defined Executions will be removed from predefined
-									Phases.
-								</xs:documentation>
-							</xs:annotation>
-						</xs:element>
-					</xs:all>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="fork" type="Fork" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="Fork">
+		<xs:all>
+			<xs:element name="mode" type="xs:string" minOccurs="0"
+				maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Mode under which the forked Executions will be
+						executed.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="executions" type="TargetExecutions"
+				minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Defined Executions will be inherited by all
+						phases.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="lifecycle" type="TragetLifecycle"
+				minOccurs="0" maxOccurs="1" />
+			<xs:element name="phases" type="TragetPhases"
+				minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Defined Phases will be executed in order of
+						definition. These phases will override definitions
+						phase-execution
+						restrictions inside of lifecycle definition.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="excludedPhases"
+				type="TargetExcludedPhases" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Defined Phases will be removed from Lifecycle
+						definitions and Phase definitions. In case Executions are
+						defined,
+						the defined Executions will be removed from predefined
+						Phases.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
 	</xs:complexType>
 
 	<xs:complexType name="TragetLifecycle">

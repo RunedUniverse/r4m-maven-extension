@@ -18,9 +18,9 @@ public interface ExecutionArchiveSlice extends Recordable {
 
 	public Set<Execution> getExecutions();
 
-	public Set<Execution> getExecutions(ExecutionFilter filter);
+	public Set<Execution> getExecutions(final ExecutionFilter filter, final boolean onlyInherited);
 
-	public Set<Execution> getEffectiveExecutions(ExecutionFilter filter);
+	public Set<Execution> getEffectiveExecutions(final ExecutionFilter filter, final boolean onlyInherited);
 
 	public void setParent(ExecutionArchiveSlice parent);
 

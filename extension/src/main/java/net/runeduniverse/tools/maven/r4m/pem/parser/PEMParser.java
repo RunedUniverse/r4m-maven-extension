@@ -16,6 +16,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionRestrictionParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionTriggerParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.*;
@@ -25,6 +26,8 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 @Component(role = ProjectExecutionModelParser.class, hint = "default")
 public class PEMParser implements ProjectExecutionModelParser {
 
+	@Requirement(role = ExecutionRestrictionParser.class)
+	protected Map<String, ExecutionRestrictionParser> execRestrictionParser;
 	@Requirement(role = ExecutionTriggerParser.class)
 	protected Map<String, ExecutionTriggerParser> execTriggerParser;
 
@@ -86,9 +89,46 @@ public class PEMParser implements ProjectExecutionModelParser {
 		Execution execution = new Execution(id, source);
 		list.add(execution);
 
+		parseInherited(execution, execNode.getChild("inherited", false));
+		parseRestrictions(execution, execNode.getChild("restrictions", false));
 		parseTriggers(execution, execNode.getChild("triggers", false));
 		parseLifecycles(execution, execNode.getChild("lifecycles", false));
 
+		return true;
+	}
+
+	protected boolean parseInherited(final Execution exec, final PlexusConfiguration inheritedNode) {
+		if (inheritedNode == null)
+			return false;
+		String value = inheritedNode.getValue();
+		if (isBlank(value))
+			return false;
+		if (value.equalsIgnoreCase("true"))
+			exec.setInherited(true);
+		else if (value.equalsIgnoreCase("false"))
+			exec.setInherited(false);
+		else
+			return false;
+		return true;
+	}
+
+	protected boolean parseRestrictions(final Execution exec, final PlexusConfiguration nodeList) {
+		if (nodeList == null || nodeList.getChildCount() == 0)
+			return false;
+
+		PlexusConfiguration triggerNodes[] = nodeList.getChildren();
+		if (triggerNodes.length > 0) {
+			for (PlexusConfiguration triggerNode : triggerNodes) {
+				String name = triggerNode.getName();
+				ExecutionRestrictionParser parser = this.execRestrictionParser.get(name);
+				if (parser == null)
+					continue;
+				ExecutionRestriction restriction = parser.parse(triggerNode);
+				if (restriction == null)
+					continue;
+				exec.addRestriction(restriction);
+			}
+		}
 		return true;
 	}
 
@@ -115,17 +155,12 @@ public class PEMParser implements ProjectExecutionModelParser {
 				case "never":
 					exec.setNeverActive(true);
 					break;
-				case "packaging-procedure":
-					String value = triggerNode.getValue();
-					if (!isBlank(value))
-						exec.addPackagingProcedure(value);
-					break;
 
 				default:
 					ExecutionTriggerParser parser = this.execTriggerParser.get(name);
 					if (parser == null)
 						break;
-					Trigger trigger = parser.parse(triggerNode);
+					ExecutionTrigger trigger = parser.parse(triggerNode);
 					if (trigger == null)
 						break;
 					exec.addTrigger(trigger);

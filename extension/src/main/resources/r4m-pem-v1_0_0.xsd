@@ -22,6 +22,46 @@
 
 	<xs:complexType name="Execution">
 		<xs:all>
+			<xs:element name="inherited" default="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Whether the execution should be propagated to
+						downstream projects.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="true" />
+						<xs:enumeration value="false" />
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="restrictions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="packaging-procedure"
+								type="xs:string">
+								<xs:annotation>
+									<xs:documentation>
+										Used to select packaging flag in POM. Keep in
+										mind the POM's packaging flag only indirectly defines the
+										Artifacts Type.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:any namespace="##other">
+								<xs:annotation>
+									<xs:documentation>
+										Other extensions may provide additional
+										restrictions.
+									</xs:documentation>
+								</xs:annotation>
+							</xs:any>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
 			<xs:element name="triggers" minOccurs="0">
 				<xs:complexType>
 					<xs:choice>
@@ -80,17 +120,7 @@
 										</xs:documentation>
 									</xs:annotation>
 								</xs:element>
-								<xs:element name="packaging-procedure"
-									type="xs:string">
-									<xs:annotation>
-										<xs:documentation>
-											Used to select packaging flag in POM. Keep
-											in mind the POM's packaging flag only indirectly defines the
-											Artifacts Type.
-										</xs:documentation>
-									</xs:annotation>
-								</xs:element>
-								<xs:any>
+								<xs:any namespace="##other">
 									<xs:annotation>
 										<xs:documentation>
 											Other extensions may provide additional
@@ -166,7 +196,7 @@
 						<xs:choice minOccurs="1" maxOccurs="unbounded">
 							<xs:element name="default" />
 							<xs:element name="dev" />
-							<xs:any />
+							<xs:any namespace="##other" />
 						</xs:choice>
 					</xs:sequence>
 				</xs:complexType>

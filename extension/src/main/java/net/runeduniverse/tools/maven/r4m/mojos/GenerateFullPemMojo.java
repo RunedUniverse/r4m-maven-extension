@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -105,20 +106,22 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (executions.size() < 2)
 			return;
 		final Set<Execution> mergeCol = new LinkedHashSet<>();
-		final Set<Execution> execSet = new LinkedHashSet<>(executions);
-		final Set<Execution> remSet = new LinkedHashSet<>();
-		for (Execution origExec : executions) {
+		final List<Execution> execCol = new LinkedList<>(executions);
+		final Set<Execution> remCol = new LinkedHashSet<>();
+		final List<Execution> origCol = new LinkedList<>(executions);
+		for (ListIterator<Execution> iOrig = origCol.listIterator(); iOrig.hasNext();) {
+			Execution origExec = (Execution) iOrig.next();
 			// don't merge it with itself
-			if (execSet.contains(origExec))
-				execSet.remove(origExec);
+			if (execCol.contains(origExec))
+				execCol.remove(origExec);
 			else
 				// cant find it -> already merged
 				continue;
 			// check if special condition is active!
 			boolean matchRestrictions = origExec.getRestrictions().isEmpty();
 
-			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
-				Execution exec = (Execution) t.next();
+			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
+				Execution exec = (Execution) iExec.next();
 
 				if (!isSimilar(origExec, exec, false))
 					continue;
@@ -127,13 +130,13 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						continue;
 
 				Execution reduced = reduce(origExec, exec, false);
-				if (reduced != null)
-					mergeCol.add(reduced);
 				if (!origExec.getLifecycles().isEmpty())
-					remSet.add(origExec);
+					remCol.add(origExec);
+				if (!reduced.getLifecycles().isEmpty())
+					origExec = reduced;
 				if (!exec.getLifecycles().isEmpty())
-					remSet.add(exec);
-				t.remove();
+					remCol.add(exec);
+				iExec.remove();
 			}
 		}
 		/*
@@ -217,8 +220,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			if (!mergeLifecycle.getPhases().isEmpty())
 				mergeExecution.putLifecycle(mergeLifecycle);
 		}
-		if (mergeExecution.getLifecycles().isEmpty())
-			return null;
 		return mergeExecution;
 	}
 

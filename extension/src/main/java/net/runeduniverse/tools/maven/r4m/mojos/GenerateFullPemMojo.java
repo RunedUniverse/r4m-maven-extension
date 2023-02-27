@@ -78,6 +78,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		Set<Execution> executions = new LinkedHashSet<>();
 		int sliceCnt = collectExecutions(executions, projectSlice);
+		// clone! originals must not be modified!!!
+		replaceWithEquivalents(executions);
 
 		getLog().info("");
 		getLog().info("Discovery");
@@ -94,10 +96,15 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
+		getLog().warn(model.toRecord()
+				.toString());
+
 		OutputStream stream = this.writer.writeModel(model);
 	}
 
 	private void reduce(final Set<Execution> executions) {
+		if (executions.size() < 2)
+			return;
 		final Set<Execution> mergeCol = new LinkedHashSet<>();
 		final Set<Execution> execSet = new LinkedHashSet<>(executions);
 		final Set<Execution> remSet = new LinkedHashSet<>();
@@ -111,114 +118,128 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			// check if special condition is active!
 			boolean matchRestrictions = origExec.getRestrictions()
 					.isEmpty();
-			// clone! originals must not be modified!!!
-			Execution mergeExec = createEquivalent(origExec);
-			mergeExec = reduce(origExec, null, false);
-			mergeCol.add(mergeExec);
 
 			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
 				Execution exec = (Execution) t.next();
 
-				if (!isSimilar(mergeExec, exec, false))
+				if (!isSimilar(origExec, exec, false))
 					continue;
 				if (matchRestrictions)
 					if (!exec.getRestrictions()
 							.isEmpty())
 						continue;
 
-				Execution rem = reduce(exec, mergeExec, false);
-				if (rem != null)
-					remSet.add(rem);
+				Execution reduced = reduce(origExec, exec, false);
+				if (reduced != null)
+					mergeCol.add(reduced);
+				if (!origExec.getLifecycles()
+						.isEmpty())
+					remSet.add(origExec);
+				if (!exec.getLifecycles()
+						.isEmpty())
+					remSet.add(exec);
 				t.remove();
 			}
 		}
-
-		execSet.clear();
-		execSet.addAll(remSet);
-		for (Execution remExec : remSet) {
-			// don't merge it with itself
-			if (execSet.contains(remExec))
-				execSet.remove(remExec);
-			else
-				// cant find it -> already merged
-				continue;
-			mergeCol.add(remExec);
-
-			for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) {
-				Execution exec = (Execution) t.next();
-
-				if (!isSimilar(remExec, exec, true))
-					continue;
-
-				reduce(exec, remExec, true);
-				t.remove();
-			}
-		}
+		/*
+		 * execSet.clear(); execSet.addAll(remSet); for (Execution remExec : remSet) {
+		 * // don't merge it with itself if (execSet.contains(remExec))
+		 * execSet.remove(remExec); else // cant find it -> already merged continue;
+		 * 
+		 * for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) { Execution
+		 * exec = (Execution) t.next();
+		 * 
+		 * if (!isSimilar(remExec, exec, true)) continue;
+		 * 
+		 * Execution reduced = reduce(remExec, exec, true); if (reduced != null)
+		 * mergeCol.add(reduced); t.remove(); } }
+		 */
 
 		executions.clear();
 		executions.addAll(mergeCol);
 	}
 
-	private Execution reduce(final Execution exec, final Execution mergeExec, boolean force) {
-		if (mergeExec == null)
-			force = false;
-		Execution remExecution = createEquivalent(exec);
+	private Execution reduce(final Execution domExec, final Execution secExec, boolean force) {
+		Execution mergeExecution = createEquivalent(domExec);
 
-		boolean reduction = false;
-
-		for (Lifecycle lifecycle : exec.getLifecycles()
-				.values()) {
-			Lifecycle mergeLifecycle = mergeExec == null ? null : mergeExec.getLifecycle(lifecycle.getId());
-			Lifecycle remLifecycle = new Lifecycle(lifecycle.getId());
-			if (mergeLifecycle == null) {
-				mergeLifecycle = new Lifecycle(lifecycle.getId());
+		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles()
+				.values()
+				.iterator(); iDomLifecycle.hasNext();) {
+			Lifecycle domLifecycle = (Lifecycle) iDomLifecycle.next();
+			Lifecycle secLifecycle = secExec.getLifecycle(domLifecycle.getId());
+			if (secLifecycle == null)
 				if (force)
-					mergeExec.putLifecycle(mergeLifecycle);
-			}
+					secLifecycle = new Lifecycle(domLifecycle.getId());
+				else
+					continue;
+			Lifecycle mergeLifecycle = mergeExecution.getLifecycle(domLifecycle.getId());
+			if (mergeLifecycle == null)
+				mergeLifecycle = new Lifecycle(domLifecycle.getId());
 
-			for (Phase phase : lifecycle.getPhases()
-					.values()) {
-				Phase mergePhase = mergeLifecycle.getPhase(phase.getId());
-				Phase remPhase = new Phase(phase.getId());
-				if (mergePhase == null) {
-					mergePhase = new Phase(phase.getId());
+			for (Iterator<Phase> iDomPhase = domLifecycle.getPhases()
+					.values()
+					.iterator(); iDomPhase.hasNext();) {
+				Phase domPhase = (Phase) iDomPhase.next();
+				Phase secPhase = secLifecycle.getPhase(domPhase.getId());
+				if (secPhase == null)
 					if (force)
-						mergeLifecycle.putPhase(mergePhase);
-				}
+						secPhase = new Phase(domPhase.getId());
+					else
+						continue;
+				Phase mergePhase = mergeLifecycle.getPhase(domPhase.getId());
+				if (mergePhase == null)
+					mergePhase = new Phase(domPhase.getId());
 
-				for (Goal goal : phase.getGoals()) {
-					boolean missing = true;
-					for (Goal mergeGoal : mergePhase.getGoals())
-						if (isSimilar(goal, mergeGoal, false)) {
-							mergeGoal.addModes(goal.getModes());
-							missing = false;
-							reduction = true;
-							break;
+				for (Iterator<Goal> iDomGoal = domPhase.getGoals()
+						.iterator(); iDomGoal.hasNext();) {
+					Goal domGoal = (Goal) iDomGoal.next();
+					for (Iterator<Goal> iSecGoal = secPhase.getGoals()
+							.iterator(); iSecGoal.hasNext();) {
+						Goal secGoal = (Goal) iSecGoal.next();
+						if (isSimilar(domGoal, secGoal, false)) {
+							Goal mergeGoal = createEquivalent(domGoal);
+							mergeGoal.addModes(secGoal.getModes());
+							mergePhase.addGoal(mergeGoal);
+							iSecGoal.remove();
+							iDomGoal.remove();
 						}
-					if (missing) {
-						Goal equivalent = createEquivalent(goal);
-						remPhase.addGoal(equivalent);
-						if (force)
-							mergePhase.addGoal(equivalent);
+					}
+					if (force) {
+						mergePhase.addGoals(secPhase.getGoals());
+						mergePhase.addGoals(domPhase.getGoals());
 					}
 				}
-				if (!remPhase.getGoals()
+				if (secPhase.getGoals()
 						.isEmpty())
-					remLifecycle.putPhase(remPhase);
+					secLifecycle.getPhases()
+							.remove(secPhase.getId());
+				if (domPhase.getGoals()
+						.isEmpty())
+					iDomPhase.remove();
+				if (!mergePhase.getGoals()
+						.isEmpty())
+					mergeLifecycle.putPhase(mergePhase);
 			}
-			if (!remLifecycle.getPhases()
+			if (secLifecycle.getPhases()
 					.isEmpty())
-				remExecution.putLifecycle(remLifecycle);
+				secExec.getLifecycles()
+						.remove(secLifecycle.getId());
+			if (domLifecycle.getPhases()
+					.isEmpty())
+				iDomLifecycle.remove();
+			if (!mergeLifecycle.getPhases()
+					.isEmpty())
+				mergeExecution.putLifecycle(mergeLifecycle);
 		}
-
-		if (reduction)
-			mergeExec.getRestrictions()
-					.addAll(exec.getRestrictions());
-
-		if (remExecution.getLifecycles()
+		if (mergeExecution.getLifecycles()
 				.isEmpty())
 			return null;
-		return remExecution;
+		// force contains via equals
+		final List<ExecutionRestriction> restrictions = new LinkedList<>(secExec.getRestrictions());
+		for (ExecutionRestriction restriction : domExec.getRestrictions())
+			if (!restrictions.contains(restriction))
+				mergeExecution.addRestriction(restriction);
+		return mergeExecution;
 	}
 
 	private boolean isSimilar(final Execution origExec, final Execution exec, final boolean checkRestrictions) {
@@ -300,6 +321,18 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.equals(goal.getFork());
 
 		return true;
+	}
+
+	private void replaceWithEquivalents(final Set<Execution> executions) {
+		final Set<Execution> equivalents = new LinkedHashSet<>();
+		for (Execution exec : executions) {
+			Execution equivalent = createEquivalent(exec);
+			equivalent.addLifecycles(exec.getLifecycles()
+					.values());
+			equivalents.add(equivalent);
+		}
+		executions.clear();
+		executions.addAll(equivalents);
 	}
 
 	private Execution createEquivalent(final Execution original) {

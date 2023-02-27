@@ -121,6 +121,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			// check if special condition is active!
 			boolean matchRestrictions = origExec.getRestrictions()
 					.isEmpty();
+			boolean gotReduced = false;
 
 			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
 				Execution exec = (Execution) iExec.next();
@@ -133,34 +134,35 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						continue;
 
 				Execution reduced = reduce(origExec, exec, false);
+				boolean isReduced = !reduced.getLifecycles()
+						.isEmpty();
 
 				if (exec.getLifecycles()
 						.isEmpty())
 					iExec.remove();
-				if (!origExec.getLifecycles()
-						.isEmpty() && !execCol.contains(origExec)) {
+				if (!gotReduced && !origExec.getLifecycles()
+						.isEmpty()) {
 					// getLog().warn(origExec.toRecord().toString());
 					iExec.add(origExec);
 				}
-				if (!reduced.getLifecycles()
-						.isEmpty()) {
+				if (isReduced) {
 					// getLog().warn(reduced.toRecord().toString());
 					origExec = reduced;
+					gotReduced = true;
 				}
 			}
-			// detect if reference changed -> reduction happened
-			if (!executions.contains(origExec))
-				mergeCol.add(origExec);
+			mergeCol.add(origExec);
 		}
 		mergeCol.addAll(execCol);
 		executions.clear();
 		executions.addAll(mergeCol);
+
 		/*
-		 * execSet.clear(); execSet.addAll(remSet); for (Execution remExec : remSet) {
-		 * // don't merge it with itself if (execSet.contains(remExec))
-		 * execSet.remove(remExec); else // cant find it -> already merged continue;
+		 * execCol.clear(); execCol.addAll(remCol); for (Execution remExec : remCol) {
+		 * // don't merge it with itself if (execCol.contains(remExec))
+		 * execCol.remove(remExec); else // cant find it -> already merged continue;
 		 * 
-		 * for (Iterator<Execution> t = execSet.iterator(); t.hasNext();) { Execution
+		 * for (Iterator<Execution> t = execCol.iterator(); t.hasNext();) { Execution
 		 * exec = (Execution) t.next();
 		 * 
 		 * if (!isSimilar(remExec, exec, true)) continue;

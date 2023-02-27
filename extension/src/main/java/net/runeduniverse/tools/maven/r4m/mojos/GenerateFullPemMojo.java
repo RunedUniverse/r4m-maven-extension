@@ -138,17 +138,13 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						.isEmpty())
 					iExec.remove();
 				if (!gotReduced && !origExec.getLifecycles()
-						.isEmpty()) {
-					// getLog().warn(origExec.toRecord().toString());
+						.isEmpty())
 					iExec.add(origExec);
-				}
 				if (isReduced) {
-					// getLog().warn(reduced.toRecord().toString());
 					origExec = reduced;
 					gotReduced = true;
 				}
 			}
-			// getLog().warn(origExec.toRecord().toString());
 			mergeCol.add(origExec);
 		}
 
@@ -173,12 +169,9 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 				iExec.remove();
 				if (!reduced.getLifecycles()
-						.isEmpty()) {
-					// getLog().warn(reduced.toRecord().toString());
+						.isEmpty())
 					remExec = reduced;
-				}
 			}
-			// getLog().warn(remExec.toRecord().toString());
 			if (!remExec.getLifecycles()
 					.isEmpty())
 				mergeCol.add(remExec);

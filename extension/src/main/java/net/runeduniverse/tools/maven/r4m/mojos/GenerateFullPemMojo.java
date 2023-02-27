@@ -156,6 +156,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 	private Execution reduce(final Execution domExec, final Execution secExec, boolean force) {
 		Execution mergeExecution = createEquivalent(domExec);
+		// force contains via equals
+		final List<ExecutionRestriction> restrictions = new LinkedList<>(secExec.getRestrictions());
+		restrictions.removeAll(mergeExecution.getRestrictions());
+		mergeExecution.getRestrictions().addAll(restrictions);
 
 		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles().values().iterator(); iDomLifecycle
 				.hasNext();) {
@@ -215,11 +219,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		}
 		if (mergeExecution.getLifecycles().isEmpty())
 			return null;
-		// force contains via equals
-		final List<ExecutionRestriction> restrictions = new LinkedList<>(secExec.getRestrictions());
-		for (ExecutionRestriction restriction : domExec.getRestrictions())
-			if (!restrictions.contains(restriction))
-				mergeExecution.addRestriction(restriction);
 		return mergeExecution;
 	}
 

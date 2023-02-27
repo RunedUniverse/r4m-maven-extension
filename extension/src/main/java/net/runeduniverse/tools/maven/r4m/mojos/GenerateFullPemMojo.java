@@ -15,7 +15,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
@@ -68,8 +68,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		if (projectSlice == null) {
 			// try loading via build-extension classrealm
-			this.archive = acquireExecutionArchive(mvnSession,
-					(ClassRealm) Thread.currentThread().getContextClassLoader());
+			this.archive = acquireExecutionArchive(mvnSession, (ClassRealm) Thread.currentThread()
+					.getContextClassLoader());
 		}
 		if (this.archive != null)
 			projectSlice = this.archive.getSlice(this.mvnProject);
@@ -94,10 +94,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		getLog().info("");
 
 		ProjectExecutionModel model = new ProjectExecutionModel();
-		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		getLog().debug(model.toRecord().toString());
+		getLog().debug(model.toRecord()
+				.toString());
 
 		OutputStream stream = this.writer.writeModel(model);
 	}
@@ -118,7 +119,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				// cant find it -> already merged
 				continue;
 			// check if special condition is active!
-			boolean matchRestrictions = origExec.getRestrictions().isEmpty();
+			boolean matchRestrictions = origExec.getRestrictions()
+					.isEmpty();
 
 			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
 				Execution exec = (Execution) iExec.next();
@@ -126,19 +128,32 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				if (!isSimilar(origExec, exec, false))
 					continue;
 				if (matchRestrictions)
-					if (!exec.getRestrictions().isEmpty())
+					if (!exec.getRestrictions()
+							.isEmpty())
 						continue;
 
 				Execution reduced = reduce(origExec, exec, false);
-				if (!origExec.getLifecycles().isEmpty())
-					remCol.add(origExec);
-				if (!reduced.getLifecycles().isEmpty())
+				if (exec.getLifecycles()
+						.isEmpty())
+					iExec.remove();
+				if (!origExec.getLifecycles()
+						.isEmpty()) {
+					// getLog().warn(origExec.toRecord().toString());
+					// remCol.add(origExec);
+					iExec.add(origExec);
+				}
+				if (!reduced.getLifecycles()
+						.isEmpty()) {
+					// getLog().warn(reduced.toRecord().toString());
 					origExec = reduced;
-				if (!exec.getLifecycles().isEmpty())
-					remCol.add(exec);
-				iExec.remove();
+				}
 			}
+			// detect if reference changed -> reduction happened
+			if (!origCol.contains(origExec))
+				mergeCol.add(origExec);
 		}
+		executions.clear();
+		executions.addAll(mergeCol);
 		/*
 		 * execSet.clear(); execSet.addAll(remSet); for (Execution remExec : remSet) {
 		 * // don't merge it with itself if (execSet.contains(remExec))
@@ -151,10 +166,9 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		 * 
 		 * Execution reduced = reduce(remExec, exec, true); if (reduced != null)
 		 * mergeCol.add(reduced); t.remove(); } }
+		 * 
+		 * executions.clear(); executions.addAll(mergeCol);
 		 */
-
-		executions.clear();
-		executions.addAll(mergeCol);
 	}
 
 	private Execution reduce(final Execution domExec, final Execution secExec, boolean force) {
@@ -162,10 +176,12 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		// force contains via equals
 		final List<ExecutionRestriction> restrictions = new LinkedList<>(secExec.getRestrictions());
 		restrictions.removeAll(mergeExecution.getRestrictions());
-		mergeExecution.getRestrictions().addAll(restrictions);
+		mergeExecution.getRestrictions()
+				.addAll(restrictions);
 
-		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles().values().iterator(); iDomLifecycle
-				.hasNext();) {
+		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles()
+				.values()
+				.iterator(); iDomLifecycle.hasNext();) {
 			Lifecycle domLifecycle = (Lifecycle) iDomLifecycle.next();
 			Lifecycle secLifecycle = secExec.getLifecycle(domLifecycle.getId());
 			if (secLifecycle == null)
@@ -177,7 +193,9 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			if (mergeLifecycle == null)
 				mergeLifecycle = new Lifecycle(domLifecycle.getId());
 
-			for (Iterator<Phase> iDomPhase = domLifecycle.getPhases().values().iterator(); iDomPhase.hasNext();) {
+			for (Iterator<Phase> iDomPhase = domLifecycle.getPhases()
+					.values()
+					.iterator(); iDomPhase.hasNext();) {
 				Phase domPhase = (Phase) iDomPhase.next();
 				Phase secPhase = secLifecycle.getPhase(domPhase.getId());
 				if (secPhase == null)
@@ -189,9 +207,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				if (mergePhase == null)
 					mergePhase = new Phase(domPhase.getId());
 
-				for (Iterator<Goal> iDomGoal = domPhase.getGoals().iterator(); iDomGoal.hasNext();) {
+				for (Iterator<Goal> iDomGoal = domPhase.getGoals()
+						.iterator(); iDomGoal.hasNext();) {
 					Goal domGoal = (Goal) iDomGoal.next();
-					for (Iterator<Goal> iSecGoal = secPhase.getGoals().iterator(); iSecGoal.hasNext();) {
+					for (Iterator<Goal> iSecGoal = secPhase.getGoals()
+							.iterator(); iSecGoal.hasNext();) {
 						Goal secGoal = (Goal) iSecGoal.next();
 						if (isSimilar(domGoal, secGoal, false)) {
 							Goal mergeGoal = createEquivalent(domGoal);
@@ -206,18 +226,26 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						mergePhase.addGoals(domPhase.getGoals());
 					}
 				}
-				if (secPhase.getGoals().isEmpty())
-					secLifecycle.getPhases().remove(secPhase.getId());
-				if (domPhase.getGoals().isEmpty())
+				if (secPhase.getGoals()
+						.isEmpty())
+					secLifecycle.getPhases()
+							.remove(secPhase.getId());
+				if (domPhase.getGoals()
+						.isEmpty())
 					iDomPhase.remove();
-				if (!mergePhase.getGoals().isEmpty())
+				if (!mergePhase.getGoals()
+						.isEmpty())
 					mergeLifecycle.putPhase(mergePhase);
 			}
-			if (secLifecycle.getPhases().isEmpty())
-				secExec.getLifecycles().remove(secLifecycle.getId());
-			if (domLifecycle.getPhases().isEmpty())
+			if (secLifecycle.getPhases()
+					.isEmpty())
+				secExec.getLifecycles()
+						.remove(secLifecycle.getId());
+			if (domLifecycle.getPhases()
+					.isEmpty())
 				iDomLifecycle.remove();
-			if (!mergeLifecycle.getPhases().isEmpty())
+			if (!mergeLifecycle.getPhases()
+					.isEmpty())
 				mergeExecution.putLifecycle(mergeLifecycle);
 		}
 		return mergeExecution;
@@ -248,14 +276,16 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		// restrictions
 		if (checkRestrictions) {
 			final List<ExecutionRestriction> execRestrictions = new LinkedList<>(exec.getRestrictions());
-			if (execRestrictions.size() != origExec.getRestrictions().size())
+			if (execRestrictions.size() != origExec.getRestrictions()
+					.size())
 				return false;
 			if (!execRestrictions.containsAll(origExec.getRestrictions()))
 				return false;
 		}
 		// trigger
 		final List<ExecutionTrigger> execTrigger = new LinkedList<>(exec.getTrigger());
-		if (execTrigger.size() != origExec.getTrigger().size())
+		if (execTrigger.size() != origExec.getTrigger()
+				.size())
 			return false;
 		if (!execTrigger.containsAll(origExec.getTrigger()))
 			return false;
@@ -270,27 +300,34 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (origGoal.getGroupId() == null) {
 			if (goal.getGroupId() != null)
 				return false;
-		} else if (!origGoal.getGroupId().equals(goal.getGroupId()))
+		} else if (!origGoal.getGroupId()
+				.equals(goal.getGroupId()))
 			return false;
 
 		if (origGoal.getArtifactId() == null) {
 			if (goal.getArtifactId() != null)
 				return false;
-		} else if (!origGoal.getArtifactId().equals(goal.getArtifactId()))
+		} else if (!origGoal.getArtifactId()
+				.equals(goal.getArtifactId()))
 			return false;
 
 		if (origGoal.getGoalId() == null) {
 			if (goal.getGoalId() != null)
 				return false;
-		} else if (!origGoal.getGoalId().equals(goal.getGoalId()))
+		} else if (!origGoal.getGoalId()
+				.equals(goal.getGoalId()))
 			return false;
 
-		if (checkModes && !(origGoal.getModes().size() == goal.getModes().size()
-				&& origGoal.getModes().containsAll(goal.getModes())))
+		if (checkModes && !(origGoal.getModes()
+				.size() == goal.getModes()
+						.size()
+				&& origGoal.getModes()
+						.containsAll(goal.getModes())))
 			return false;
 
 		if (origGoal.getFork() != null)
-			return origGoal.getFork().equals(goal.getFork());
+			return origGoal.getFork()
+					.equals(goal.getFork());
 
 		return true;
 	}
@@ -299,10 +336,12 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		final Set<Execution> equivalents = new LinkedHashSet<>();
 		for (Execution exec : executions) {
 			Execution equivalentExec = createEquivalent(exec);
-			for (Lifecycle lifecycle : exec.getLifecycles().values()) {
+			for (Lifecycle lifecycle : exec.getLifecycles()
+					.values()) {
 				Lifecycle equivalentLifecycle = new Lifecycle(lifecycle.getId());
 				equivalentExec.putLifecycle(equivalentLifecycle);
-				for (Phase phase : lifecycle.getPhases().values()) {
+				for (Phase phase : lifecycle.getPhases()
+						.values()) {
 					Phase equivalentPhase = new Phase(phase.getId());
 					equivalentLifecycle.putPhase(equivalentPhase);
 					equivalentPhase.addGoals(phase.getGoals());
@@ -320,8 +359,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		equivalent.setAlwaysActive(original.isAlwaysActive());
 		equivalent.setDefaultActive(original.isDefaultActive());
 		equivalent.setNeverActive(original.isNeverActive());
-		equivalent.getRestrictions().addAll(original.getRestrictions());
-		equivalent.getTrigger().addAll(original.getTrigger());
+		equivalent.getRestrictions()
+				.addAll(original.getRestrictions());
+		equivalent.getTrigger()
+				.addAll(original.getTrigger());
 		return equivalent;
 	}
 

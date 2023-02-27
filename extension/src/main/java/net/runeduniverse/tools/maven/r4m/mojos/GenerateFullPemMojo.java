@@ -17,6 +17,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
@@ -26,6 +27,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.SelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.acquireExecutionArchive;
@@ -109,9 +111,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		final Set<Execution> mergeCol = new LinkedHashSet<>();
 		final List<Execution> execCol = new LinkedList<>(executions);
 		final Set<Execution> remCol = new LinkedHashSet<>();
-		final List<Execution> origCol = new LinkedList<>(executions);
-		for (ListIterator<Execution> iOrig = origCol.listIterator(); iOrig.hasNext();) {
-			Execution origExec = (Execution) iOrig.next();
+		for (Execution origExec : executions) {
 			// don't merge it with itself
 			if (execCol.contains(origExec))
 				execCol.remove(origExec);
@@ -133,6 +133,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						continue;
 
 				Execution reduced = reduce(origExec, exec, false);
+
 				if (exec.getLifecycles()
 						.isEmpty())
 					iExec.remove();
@@ -149,9 +150,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				}
 			}
 			// detect if reference changed -> reduction happened
-			if (!origCol.contains(origExec))
+			if (!executions.contains(origExec))
 				mergeCol.add(origExec);
 		}
+		mergeCol.addAll(execCol);
 		executions.clear();
 		executions.addAll(mergeCol);
 		/*

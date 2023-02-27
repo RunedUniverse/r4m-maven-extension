@@ -96,7 +96,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		getLog().warn(model.toRecord()
+		getLog().debug(model.toRecord()
 				.toString());
 
 		OutputStream stream = this.writer.writeModel(model);

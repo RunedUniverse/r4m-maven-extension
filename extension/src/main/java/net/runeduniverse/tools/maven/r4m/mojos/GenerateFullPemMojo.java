@@ -17,7 +17,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
@@ -27,7 +26,6 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.SelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.acquireExecutionArchive;
@@ -150,6 +148,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					gotReduced = true;
 				}
 			}
+			// getLog().warn(origExec.toRecord().toString());
 			mergeCol.add(origExec);
 		}
 
@@ -170,7 +169,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				if (!isSimilar(remExec, exec, true))
 					continue;
 
-				Execution reduced = reduce(remExec, exec, false);
+				Execution reduced = reduce(remExec, exec, true);
 
 				iExec.remove();
 				if (!reduced.getLifecycles()
@@ -179,7 +178,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					remExec = reduced;
 				}
 			}
-			mergeCol.add(remExec);
+			// getLog().warn(remExec.toRecord().toString());
+			if (!remExec.getLifecycles()
+					.isEmpty())
+				mergeCol.add(remExec);
 		}
 
 		executions.clear();
@@ -188,11 +190,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 	private Execution reduce(final Execution domExec, final Execution secExec, boolean force) {
 		Execution mergeExecution = createEquivalent(domExec);
-		// force contains via equals
-		final List<ExecutionRestriction> restrictions = new LinkedList<>(secExec.getRestrictions());
-		restrictions.removeAll(mergeExecution.getRestrictions());
-		mergeExecution.getRestrictions()
-				.addAll(restrictions);
+		mergeExecution.addRestrictions(secExec.getRestrictions());
 
 		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles()
 				.values()
@@ -415,8 +413,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		equivalent.setAlwaysActive(original.isAlwaysActive());
 		equivalent.setDefaultActive(original.isDefaultActive());
 		equivalent.setNeverActive(original.isNeverActive());
-		equivalent.getRestrictions()
-				.addAll(original.getRestrictions());
+		equivalent.addRestrictions(original.getRestrictions());
 		equivalent.getTrigger()
 				.addAll(original.getTrigger());
 		return equivalent;

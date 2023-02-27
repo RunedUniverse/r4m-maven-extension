@@ -91,7 +91,15 @@ public class Execution implements Recordable {
 	}
 
 	public void addRestriction(ExecutionRestriction value) {
+		for (ExecutionRestriction restriction : this.restrictions)
+			if (restriction != null && restriction.equals(value))
+				return;
 		this.restrictions.add(value);
+	}
+
+	public void addRestrictions(Collection<ExecutionRestriction> values) {
+		for (ExecutionRestriction value : values)
+			addRestriction(value);
 	}
 
 	public void putLifecycle(Lifecycle lifecycle) {

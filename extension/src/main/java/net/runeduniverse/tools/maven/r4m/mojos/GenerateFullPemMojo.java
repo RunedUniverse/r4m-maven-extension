@@ -138,9 +138,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 						.isEmpty())
 					iExec.remove();
 				if (!origExec.getLifecycles()
-						.isEmpty()) {
+						.isEmpty() && !execCol.contains(origExec)) {
 					// getLog().warn(origExec.toRecord().toString());
-					// remCol.add(origExec);
 					iExec.add(origExec);
 				}
 				if (!reduced.getLifecycles()

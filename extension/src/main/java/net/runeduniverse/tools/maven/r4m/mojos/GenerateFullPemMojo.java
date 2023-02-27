@@ -222,25 +222,17 @@ public class GenerateFullPemMojo extends AbstractMojo {
 				if (mergePhase == null)
 					mergePhase = new Phase(domPhase.getId());
 
-				for (Iterator<Goal> iDomGoal = domPhase.getGoals()
-						.iterator(); iDomGoal.hasNext();) {
-					Goal domGoal = (Goal) iDomGoal.next();
-					for (Iterator<Goal> iSecGoal = secPhase.getGoals()
-							.iterator(); iSecGoal.hasNext();) {
-						Goal secGoal = (Goal) iSecGoal.next();
-						if (isSimilar(domGoal, secGoal, false)) {
-							Goal mergeGoal = createEquivalent(domGoal);
-							mergeGoal.addModes(secGoal.getModes());
-							mergePhase.addGoal(mergeGoal);
-							iSecGoal.remove();
-							iDomGoal.remove();
-						}
-					}
-					if (force) {
-						mergePhase.addGoals(secPhase.getGoals());
-						mergePhase.addGoals(domPhase.getGoals());
-					}
+				merge(domPhase, secPhase, mergePhase, false);
+
+				if (force) {
+					mergePhase.addGoals(domPhase.getGoals());
+					domPhase.getGoals()
+							.clear();
+					mergePhase.addGoals(secPhase.getGoals());
+					secPhase.getGoals()
+							.clear();
 				}
+
 				if (secPhase.getGoals()
 						.isEmpty())
 					secLifecycle.getPhases()
@@ -263,7 +255,56 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.isEmpty())
 				mergeExecution.putLifecycle(mergeLifecycle);
 		}
+
+		if (force)
+			for (Iterator<Lifecycle> iSecLifecycle = secExec.getLifecycles()
+					.values()
+					.iterator(); iSecLifecycle.hasNext();) {
+				Lifecycle secLifecycle = iSecLifecycle.next();
+				Lifecycle mergeLifecycle = mergeExecution.getLifecycle(secLifecycle.getId());
+				if (mergeLifecycle == null)
+					mergeLifecycle = new Lifecycle(secLifecycle.getId());
+
+				for (Iterator<Phase> iSecPhase = secLifecycle.getPhases()
+						.values()
+						.iterator(); iSecPhase.hasNext();) {
+					Phase secPhase = iSecPhase.next();
+					Phase mergePhase = mergeLifecycle.getPhase(secPhase.getId());
+					if (mergePhase == null)
+						mergePhase = new Phase(secPhase.getId());
+
+					mergePhase.addGoals(secPhase.getGoals());
+					iSecPhase.remove();
+
+					if (!mergePhase.getGoals()
+							.isEmpty())
+						mergeLifecycle.putPhase(mergePhase);
+				}
+				iSecLifecycle.remove();
+				if (!mergeLifecycle.getPhases()
+						.isEmpty())
+					mergeExecution.putLifecycle(mergeLifecycle);
+			}
 		return mergeExecution;
+	}
+
+	private void merge(final Phase domPhase, final Phase secPhase, final Phase mergePhase,
+			final boolean checkGoalModes) {
+		for (Iterator<Goal> iDomGoal = domPhase.getGoals()
+				.iterator(); iDomGoal.hasNext();) {
+			Goal domGoal = iDomGoal.next();
+			for (Iterator<Goal> iSecGoal = secPhase.getGoals()
+					.iterator(); iSecGoal.hasNext();) {
+				Goal secGoal = iSecGoal.next();
+				if (!isSimilar(domGoal, secGoal, checkGoalModes))
+					continue;
+				Goal mergeGoal = createEquivalent(domGoal);
+				mergeGoal.addModes(secGoal.getModes());
+				mergePhase.addGoal(mergeGoal);
+				iSecGoal.remove();
+				iDomGoal.remove();
+			}
+		}
 	}
 
 	private boolean isSimilar(final Execution origExec, final Execution exec, final boolean checkRestrictions) {

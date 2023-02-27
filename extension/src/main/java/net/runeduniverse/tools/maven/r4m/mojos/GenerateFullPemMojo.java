@@ -110,7 +110,6 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			return;
 		final Set<Execution> mergeCol = new LinkedHashSet<>();
 		final List<Execution> execCol = new LinkedList<>(executions);
-		final Set<Execution> remCol = new LinkedHashSet<>();
 		for (Execution origExec : executions) {
 			// don't merge it with itself
 			if (execCol.contains(origExec))
@@ -153,25 +152,38 @@ public class GenerateFullPemMojo extends AbstractMojo {
 			}
 			mergeCol.add(origExec);
 		}
-		mergeCol.addAll(execCol);
+
+		// implicit unique collection
+		final Set<Execution> remCol = new LinkedHashSet<>(execCol);
+		execCol.clear();
+		execCol.addAll(remCol);
+		for (Execution remExec : remCol) {
+			// don't merge it with itself
+			if (execCol.contains(remExec))
+				execCol.remove(remExec);
+			else // cant find it -> already merged
+				continue;
+
+			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
+				Execution exec = (Execution) iExec.next();
+
+				if (!isSimilar(remExec, exec, true))
+					continue;
+
+				Execution reduced = reduce(remExec, exec, false);
+
+				iExec.remove();
+				if (!reduced.getLifecycles()
+						.isEmpty()) {
+					// getLog().warn(reduced.toRecord().toString());
+					remExec = reduced;
+				}
+			}
+			mergeCol.add(remExec);
+		}
+
 		executions.clear();
 		executions.addAll(mergeCol);
-
-		/*
-		 * execCol.clear(); execCol.addAll(remCol); for (Execution remExec : remCol) {
-		 * // don't merge it with itself if (execCol.contains(remExec))
-		 * execCol.remove(remExec); else // cant find it -> already merged continue;
-		 * 
-		 * for (Iterator<Execution> t = execCol.iterator(); t.hasNext();) { Execution
-		 * exec = (Execution) t.next();
-		 * 
-		 * if (!isSimilar(remExec, exec, true)) continue;
-		 * 
-		 * Execution reduced = reduce(remExec, exec, true); if (reduced != null)
-		 * mergeCol.add(reduced); t.remove(); } }
-		 * 
-		 * executions.clear(); executions.addAll(mergeCol);
-		 */
 	}
 
 	private Execution reduce(final Execution domExec, final Execution secExec, boolean force) {

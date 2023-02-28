@@ -119,7 +119,8 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 	}
 
 	private Goal createGoal(final Plugin mvnPlugin, final MojoDescriptor mvnMojoDescriptor) {
-		Goal goal = new Goal(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal());
+		Goal goal = new Goal(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal())
+				.addModes("default", "dev");
 		Fork fork = new Fork();
 
 		String executeGoal = mvnMojoDescriptor.getExecuteGoal();

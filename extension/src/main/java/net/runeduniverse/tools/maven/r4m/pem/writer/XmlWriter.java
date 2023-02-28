@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetPhase;
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelWriter.class, hint = "default")
-public class XMLWriter implements ProjectExecutionModelWriter {
+public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Requirement(role = ExecutionRestrictionWriter.class)
 	private Map<String, ExecutionRestrictionWriter> restrictionWriter;
@@ -66,14 +66,17 @@ public class XMLWriter implements ProjectExecutionModelWriter {
 		if (!execution.isInherited())
 			node.addChild("inherited", "false");
 
-		PlexusConfiguration restrictionNodes = node.getChild("restrictions", true);
-		for (ExecutionRestriction restriction : execution.getRestrictions()) {
-			ExecutionRestrictionWriter writer = this.restrictionWriter.get(restriction.getHint());
-			if (writer != null)
-				writer.append(restrictionNodes, restriction);
+		if (!execution.getRestrictions()
+				.isEmpty()) {
+			PlexusConfiguration restrictionNodes = node.getChild("restrictions", true);
+			for (ExecutionRestriction restriction : execution.getRestrictions()) {
+				ExecutionRestrictionWriter writer = this.restrictionWriter.get(restriction.getHint());
+				if (writer != null)
+					writer.append(restrictionNodes, restriction);
+			}
 		}
 
-		PlexusConfiguration triggerNodes = node.getChild("triggers", true);
+		PlexusConfiguration triggerNodes = new XmlPlexusConfiguration("triggers");
 		if (execution.isAlwaysActive())
 			triggerNodes.addChild("always", null);
 		if (execution.isDefaultActive())
@@ -85,6 +88,8 @@ public class XMLWriter implements ProjectExecutionModelWriter {
 			if (writer != null)
 				writer.append(triggerNodes, trigger);
 		}
+		if (0 < triggerNodes.getChildCount())
+			node.addChild(triggerNodes);
 
 		PlexusConfiguration lifecycleNodes = node.getChild("lifecycles", true);
 		for (Lifecycle lifecycle : execution.getLifecycles()
@@ -126,9 +131,12 @@ public class XMLWriter implements ProjectExecutionModelWriter {
 		node.addChild("groupId", goal.getGroupId());
 		node.addChild("artifactId", goal.getArtifactId());
 
-		PlexusConfiguration modeNodes = node.getChild("modes", true);
-		for (String mode : goal.getModes())
-			modeNodes.addChild(mode, null);
+		if (!goal.getModes()
+				.isEmpty()) {
+			PlexusConfiguration modeNodes = node.getChild("modes", true);
+			for (String mode : goal.getModes())
+				modeNodes.addChild(mode, null);
+		}
 
 		if (goal.hasFork())
 			node.addChild(convert(goal.getFork()));

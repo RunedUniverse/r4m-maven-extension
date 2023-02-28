@@ -24,7 +24,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.*;
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelParser.class, hint = "default")
-public class PEMParser implements ProjectExecutionModelParser {
+public class XmlParser implements ProjectExecutionModelParser {
 
 	@Requirement(role = ExecutionRestrictionParser.class)
 	protected Map<String, ExecutionRestrictionParser> execRestrictionParser;

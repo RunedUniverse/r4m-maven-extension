@@ -99,6 +99,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		getLog().debug(model.toRecord().toString());
 
 		PlexusConfiguration xml = this.writer.convert(model);
+		
+		getLog().warn(xml.toString());
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {

@@ -12,7 +12,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 public class ProfileTriggerMissingParser implements ExecutionTriggerParser {
 
 	@Override
-	public ExecutionTrigger parse(PlexusConfiguration node) {
+	public ExecutionTrigger parse(final PlexusConfiguration node) {
 		String id = node.getAttribute("id");
 		if (isBlank(id))
 			return null;

@@ -2,8 +2,6 @@ package net.runeduniverse.tools.maven.r4m.pem.writer.restrictions;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionRestrictionWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRestriction;
@@ -12,14 +10,14 @@ import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRest
 public class PackagingProcedureRestrictionWriter implements ExecutionRestrictionWriter {
 
 	@Override
-	public PlexusConfiguration convert(final ExecutionRestriction restriction) {
+	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction restriction) {
 		if (restriction == null || !(restriction instanceof PackagingProcedureRestriction))
-			return null;
+			return false;
 
-		PlexusConfiguration node = new XmlPlexusConfiguration(PackagingProcedureRestriction.HINT);
-		node.setValue(((PackagingProcedureRestriction) restriction).getPackagingProcedure());
+		restrictionsNode.addChild(PackagingProcedureRestriction.HINT,
+				((PackagingProcedureRestriction) restriction).getPackagingProcedure());
 
-		return node;
+		return true;
 	}
 
 }

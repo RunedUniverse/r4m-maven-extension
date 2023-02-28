@@ -65,10 +65,10 @@ public class Selector implements ExecutionArchiveSelector {
 			if (!execution.getRestrictions().isEmpty()) {
 				Map<String, Boolean> map = new LinkedHashMap<>();
 				for (ExecutionRestriction restriction : execution.getRestrictions()) {
-					Boolean state = map.get(restriction.getId());
+					Boolean state = map.get(restriction.getHint());
 					if (state != null && state)
 						continue;
-					map.put(restriction.getId(), restriction.isActive(cnf));
+					map.put(restriction.getHint(), restriction.isActive(cnf));
 				}
 				if (map.containsValue(false))
 					return false;

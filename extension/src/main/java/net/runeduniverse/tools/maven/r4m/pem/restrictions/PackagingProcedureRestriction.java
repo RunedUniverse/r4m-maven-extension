@@ -6,7 +6,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionRestriction;
 
 public class PackagingProcedureRestriction implements ExecutionRestriction {
 
-	public static final String ID = "packaging-procedure";
+	public static final String HINT = "packaging-procedure";
 
 	protected final String procedure;
 
@@ -19,12 +19,12 @@ public class PackagingProcedureRestriction implements ExecutionRestriction {
 	}
 
 	@Override
-	public String getId() {
-		return PackagingProcedureRestriction.ID;
+	public String getHint() {
+		return PackagingProcedureRestriction.HINT;
 	}
 
 	@Override
-	public boolean isActive(ExecutionArchiveSelectorConfig config) {
+	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
 		if (this.procedure == null)
 			if (config.getPackagingProcedure() != null)
 				return false;

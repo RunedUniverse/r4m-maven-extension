@@ -9,7 +9,7 @@ import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerInactive;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ExecutionTriggerParser.class, hint = "inactive-profile")
+@Component(role = ExecutionTriggerParser.class, hint = ProfileTriggerInactive.HINT)
 public class ProfileTriggerInactiveParser implements ExecutionTriggerParser {
 
 	@Override

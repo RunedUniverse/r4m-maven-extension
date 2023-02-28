@@ -5,12 +5,19 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
 public class ProfileTriggerMissing extends ProfileTrigger {
 
+	public static final String HINT = "missing-profile";
+
 	public ProfileTriggerMissing(String profileId) {
 		super(profileId);
 	}
 
 	@Override
-	public boolean isActive(ExecutionArchiveSelectorConfig config) {
+	public String getHint() {
+		return HINT;
+	}
+
+	@Override
+	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
 		return !config.getProvidedProfiles()
 				.contains(this.profileId);
 	}

@@ -8,7 +8,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerMissing;
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ExecutionTriggerParser.class, hint = "missing-profile")
+@Component(role = ExecutionTriggerParser.class, hint = ProfileTriggerMissing.HINT)
 public class ProfileTriggerMissingParser implements ExecutionTriggerParser {
 
 	@Override

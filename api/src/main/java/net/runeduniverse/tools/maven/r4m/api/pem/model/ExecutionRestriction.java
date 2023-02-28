@@ -5,7 +5,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
 
 public interface ExecutionRestriction extends Recordable {
 
-	public String getId();
+	public String getHint();
 
-	public boolean isActive(ExecutionArchiveSelectorConfig config);
+	public boolean isActive(final ExecutionArchiveSelectorConfig config);
+
 }

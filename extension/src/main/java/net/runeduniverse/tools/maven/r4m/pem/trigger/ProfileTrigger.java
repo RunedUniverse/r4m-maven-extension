@@ -3,6 +3,7 @@ package net.runeduniverse.tools.maven.r4m.pem.trigger;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 
 public abstract class ProfileTrigger implements ExecutionTrigger {
+
 	protected String profileId;
 
 	public ProfileTrigger(String profileId) {
@@ -12,4 +13,5 @@ public abstract class ProfileTrigger implements ExecutionTrigger {
 	public String getProfileId() {
 		return this.profileId;
 	}
+
 }

@@ -5,12 +5,19 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
 public class ProfileTriggerActive extends ProfileTrigger {
 
-	public ProfileTriggerActive(String id) {
-		super(id);
+	public static final String HINT = "active-profile";
+
+	public ProfileTriggerActive(String profileId) {
+		super(profileId);
 	}
 
 	@Override
-	public boolean isActive(ExecutionArchiveSelectorConfig config) {
+	public String getHint() {
+		return HINT;
+	}
+
+	@Override
+	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
 		return config.getActiveProfiles()
 				.contains(this.profileId);
 	}

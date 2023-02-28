@@ -9,11 +9,11 @@ import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRest
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ExecutionRestrictionParser.class, hint = "packaging-procedure")
+@Component(role = ExecutionRestrictionParser.class, hint = PackagingProcedureRestriction.HINT)
 public class PackagingProcedureRestrictionParser implements ExecutionRestrictionParser {
 
 	@Override
-	public ExecutionRestriction parse(PlexusConfiguration node) {
+	public ExecutionRestriction parse(final PlexusConfiguration node) {
 		String procedure = node.getValue();
 		if (isBlank(procedure))
 			return null;

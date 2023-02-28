@@ -3,32 +3,31 @@ package net.runeduniverse.tools.maven.r4m.mojos;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
 
 /**
- * generates the full pem.xml from all active maven defaults
+ * prints the help-page
  * 
  * @author Pl4yingNight
  * @goal help
+ * @requiresProject false
  */
 public class HelpMojo extends AbstractMojo {
 
-	/**
-     * @component
-     */
-	private ExecutionArchive archive;
-
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
+		getLog().info("");
 		getLog().info("Runes4Maven Help");
-
-		if (this.archive == null) {
-			getLog().warn("ExecutionArchive is null");
-		} else {
-			getLog().info("ExecutionArchive exists!");
-		}
-
+		getLog().info("");
+		getLog().info(" r4m:help");
+		getLog().info("     prints this help-page");
+		getLog().info("");
+		getLog().info(" r4m:generate-full-pem");
+		getLog().info("     Discovers all loaded Executions which influence the current project");
+		getLog().info("     build lifecycles. Discovered Executions will be condensed as much");
+		getLog().info("     as possible and written to the 'full-pem.xml' file in the defined");
+		getLog().info("     build directory.");
+		getLog().info("");
+		getLog().info("");
 	}
 
 }

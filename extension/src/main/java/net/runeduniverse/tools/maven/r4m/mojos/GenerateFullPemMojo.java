@@ -1,7 +1,10 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -25,6 +28,8 @@ import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.mojoFailure
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.replaceWithEquivalents;
 import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.reduce;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 /**
  * generates the full pem.xml from all active maven defaults
  * 
@@ -32,6 +37,9 @@ import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.reduce;
  * @goal generate-full-pem
  */
 public class GenerateFullPemMojo extends AbstractMojo {
+
+	public static final String ERR_MSG_FAILED_TO_WRITE_TO_FILE = "Failed to write to file: %s";
+
 	/**
 	 * @parameter default-value="${session}"
 	 * @readonly
@@ -46,7 +54,12 @@ public class GenerateFullPemMojo extends AbstractMojo {
 	 * @parameter default-value="${project.build.directory}"
 	 * @readonly
 	 */
-	private File builddir;
+	private File buildDir;
+	/**
+	 * @parameter default-value="${project.build.sourceEncoding}"
+	 * @readonly
+	 */
+	private String encoding;
 	/**
 	 * @component
 	 */
@@ -58,8 +71,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		// TODO Auto-generated method stub
-		getLog().info("building full pem.xml");
+		if (isBlank(this.encoding))
+			this.encoding = "UTF-8";
 
 		ExecutionArchiveSlice projectSlice = null;
 		if (this.archive != null)
@@ -67,8 +80,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		if (projectSlice == null) {
 			// try loading via build-extension classrealm
-			this.archive = acquireExecutionArchive(mvnSession,
-					(ClassRealm) Thread.currentThread().getContextClassLoader());
+			this.archive = acquireExecutionArchive(mvnSession, (ClassRealm) Thread.currentThread()
+					.getContextClassLoader());
 		}
 		if (this.archive != null)
 			projectSlice = this.archive.getSlice(this.mvnProject);
@@ -82,7 +95,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		replaceWithEquivalents(executions);
 
 		getLog().info("");
-		getLog().info("Discovery");
+		getLog().info("Discovered");
 		getLog().info(String.format("    project depth:      %s", sliceCnt));
 		getLog().info(String.format("    executions:         %s", executions.size()));
 		getLog().info("    ------------------------");
@@ -90,17 +103,28 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		reduce(executions);
 
 		getLog().info(String.format("    reduced executions: %s", executions.size()));
-		getLog().info("");
 
 		ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		getLog().debug(model.toRecord().toString());
-
 		PlexusConfiguration xml = this.writer.convert(model);
-		
-		getLog().warn(xml.toString());
+		File xmlFile = new File(this.buildDir, "full-pem.xml");
+		buildDir.mkdirs();
+
+		try (OutputStream stream = new FileOutputStream(xmlFile, false)) {
+			stream.write(xml.toString()
+					.getBytes(this.encoding));
+		} catch (IOException e) {
+			throw new MojoFailureException(String.format(ERR_MSG_FAILED_TO_WRITE_TO_FILE, xmlFile.getPath()), e);
+		}
+
+		getLog().info("");
+		getLog().info("Wrote full Project Execution Model (PEM) to:");
+		getLog().info(String.format("    %s", Paths.get(this.mvnSession.getExecutionRootDirectory())
+				.relativize(xmlFile.toPath())
+				.toString()));
+		getLog().info("");
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {

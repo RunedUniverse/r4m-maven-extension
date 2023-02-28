@@ -86,85 +86,74 @@ public class ExtensionUtils {
 		if (executions.size() < 2)
 			return;
 
-		final Set<Execution> mergeCol = new LinkedHashSet<>();
-		final List<Execution> execCol = new LinkedList<>(executions);
-		for (Execution origExec : executions) {
-			// don't merge it with itself
-			if (execCol.contains(origExec))
-				execCol.remove(origExec);
-			else
-				// cant find it -> already merged
-				continue;
-			// check if special condition is active!
-			boolean matchRestrictions = origExec.getRestrictions()
-					.isEmpty();
-			boolean gotReduced = false;
-
-			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-				Execution exec = (Execution) iExec.next();
-
-				if (!isSimilar(origExec, exec, false))
+		synchronized (executions) {
+			final Set<Execution> mergeCol = new LinkedHashSet<>();
+			final List<Execution> execCol = new LinkedList<>(executions);
+			for (Execution origExec : executions) {
+				// don't merge it with itself
+				if (execCol.contains(origExec))
+					execCol.remove(origExec);
+				else
+					// cant find it -> already merged
 					continue;
-				if (matchRestrictions)
-					if (!exec.getRestrictions()
+				// check if special condition is active!
+				boolean matchRestrictions = origExec.getRestrictions()
+						.isEmpty();
+				boolean gotReduced = false;
+
+				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
+					Execution exec = (Execution) iExec.next();
+
+					if (!isSimilar(origExec, exec, false))
+						continue;
+					if (matchRestrictions)
+						if (!exec.getRestrictions()
+								.isEmpty())
+							continue;
+
+					Execution reduced = merge(origExec, exec, false);
+					boolean isReduced = !reduced.getLifecycles()
+							.isEmpty();
+
+					if (exec.getLifecycles()
 							.isEmpty())
+						iExec.remove();
+					if (!gotReduced && !origExec.getLifecycles()
+							.isEmpty())
+						iExec.add(origExec);
+					if (isReduced) {
+						origExec = reduced;
+						gotReduced = true;
+					}
+				}
+				mergeCol.add(origExec);
+			}
+			executions.clear();
+			// implicit unique reduction
+			mergeCol.addAll(execCol);
+			execCol.clear();
+			execCol.addAll(mergeCol);
+			for (Execution remExec : mergeCol) {
+				// don't merge it with itself
+				if (execCol.contains(remExec))
+					execCol.remove(remExec);
+				else // cant find it -> already merged
+					continue;
+
+				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
+					Execution exec = (Execution) iExec.next();
+
+					if (!isSimilar(remExec, exec, true))
 						continue;
 
-				Execution reduced = merge(origExec, exec, false);
-				boolean isReduced = !reduced.getLifecycles()
-						.isEmpty();
-
-				if (exec.getLifecycles()
-						.isEmpty())
+					remExec = merge(remExec, exec, true);
 					iExec.remove();
-				if (!gotReduced && !origExec.getLifecycles()
-						.isEmpty())
-					iExec.add(origExec);
-				if (isReduced) {
-					origExec = reduced;
-					gotReduced = true;
 				}
+				if (!remExec.getLifecycles()
+						.isEmpty())
+					executions.add(remExec);
 			}
-			mergeCol.add(origExec);
 		}
-
-		// implicit unique collection
-		final Set<Execution> remCol = new LinkedHashSet<>(execCol);
-		execCol.clear();
-		execCol.addAll(remCol);
-		for (Execution remExec : remCol) {
-			// don't merge it with itself
-			if (execCol.contains(remExec))
-				execCol.remove(remExec);
-			else // cant find it -> already merged
-				continue;
-
-			for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-				Execution exec = (Execution) iExec.next();
-
-				if (!isSimilar(remExec, exec, true))
-					continue;
-
-				Execution reduced = merge(remExec, exec, true);
-
-				iExec.remove();
-				if (remExec.getLifecycles()
-						.isEmpty())
-					mergeCol.remove(remExec);
-				if (exec.getLifecycles()
-						.isEmpty())
-					mergeCol.remove(exec);
-				if (!reduced.getLifecycles()
-						.isEmpty())
-					remExec = reduced;
-			}
-			if (!remExec.getLifecycles()
-					.isEmpty())
-				mergeCol.add(remExec);
-		}
-
-		executions.clear();
-		executions.addAll(mergeCol);
 	}
 
 	/***

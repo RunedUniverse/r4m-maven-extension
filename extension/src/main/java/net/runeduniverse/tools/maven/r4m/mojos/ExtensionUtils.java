@@ -148,6 +148,12 @@ public class ExtensionUtils {
 				Execution reduced = merge(remExec, exec, true);
 
 				iExec.remove();
+				if (remExec.getLifecycles()
+						.isEmpty())
+					mergeCol.remove(remExec);
+				if (exec.getLifecycles()
+						.isEmpty())
+					mergeCol.remove(exec);
 				if (!reduced.getLifecycles()
 						.isEmpty())
 					remExec = reduced;

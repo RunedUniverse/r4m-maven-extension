@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
 
-public class ExtensionUtils {
+public interface ExtensionUtils {
 
 	public static void mojoFailureExtensionLoading(final Log log) throws MojoFailureException {
 		log.error("");

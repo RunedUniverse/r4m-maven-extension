@@ -23,12 +23,11 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
 
-import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.acquireExecutionArchive;
-import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.mojoFailureExtensionLoading;
-import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.mojos.ExtensionUtils.reduce;
-
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.acquireExecutionArchive;
+import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.mojoFailureExtensionLoading;
+import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.reduce;
+import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.replaceWithEquivalents;
 
 /**
  * generates the full pem.xml from all active maven defaults

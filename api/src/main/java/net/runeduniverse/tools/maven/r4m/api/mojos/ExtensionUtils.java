@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.r4m.mojos;
+package net.runeduniverse.tools.maven.r4m.api.mojos;
 
 import java.util.Collection;
 import java.util.Iterator;

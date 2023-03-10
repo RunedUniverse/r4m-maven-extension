@@ -27,17 +27,17 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
+
+import static net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilterUtils.defaultActiveFilter;;
 
 @Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
 public class Selector implements ExecutionArchiveSelector {
@@ -53,58 +53,25 @@ public class Selector implements ExecutionArchiveSelector {
 	@Requirement
 	private ExecutionArchive archive;
 
-	protected ExecutionFilter filterSlice(final ExecutionArchiveSelectorConfig cnf) {
-		return execution -> {
-			// the use of never-/always-active flags is discouraged and included for
-			// debugging purposes
-			if (execution.isNeverActive())
-				return false;
-			if (execution.isAlwaysActive())
-				return true;
-			// if restrictions are set at least one of each must match!
-			if (!execution.getRestrictions().isEmpty()) {
-				Map<String, Boolean> map = new LinkedHashMap<>();
-				for (ExecutionRestriction restriction : execution.getRestrictions()) {
-					Boolean state = map.get(restriction.getHint());
-					if (state != null && state)
-						continue;
-					map.put(restriction.getHint(), restriction.isActive(cnf));
-				}
-				if (map.containsValue(false))
-					return false;
-			}
-			// if an active-execution is defined it must match
-			// if not the default-active flag is checked
-			if (cnf.getActiveExecutions().isEmpty()) {
-				if (execution.isDefaultActive())
-					return true;
-			} else if (cnf.getActiveExecutions().contains(execution.getId()))
-				return true;
-			// any active trigger activates the execution
-			for (ExecutionTrigger trigger : execution.getTrigger())
-				if (trigger.isActive(cnf))
-					return true;
-			return false;
-		};
-	}
-
 	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, Goal goal) {
 		for (String mode : cnf.getModes())
-			if (goal.getModes().contains(mode))
+			if (goal.getModes()
+					.contains(mode))
 				return true;
 		return false;
 	}
 
 	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView) {
-		Plugin plugin = cnf.getActiveProject().getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
+		Plugin plugin = cnf.getActiveProject()
+				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
 
 		if (plugin == null)
 			return false;
 
 		MojoDescriptor descriptor = null;
 		try {
-			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(),
-					cnf.getActiveProject().getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
+			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), cnf.getActiveProject()
+					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
 			this.log.debug("Failed to acquire MojoDescriptor!", e);
@@ -132,13 +99,15 @@ public class Selector implements ExecutionArchiveSelector {
 				executionView = ViewFactory.createExecution(execution.getId());
 				entry.put(execution.getSource(), executionView);
 			}
-			for (Lifecycle lifecycle : execution.getLifecycles().values()) {
+			for (Lifecycle lifecycle : execution.getLifecycles()
+					.values()) {
 				LifecycleView lifecycleView = executionView.getLifecycle(lifecycle.getId());
 				if (lifecycleView == null) {
 					lifecycleView = ViewFactory.createLifecycle(lifecycle.getId());
 					executionView.put(lifecycleView);
 				}
-				for (Phase phase : lifecycle.getPhases().values()) {
+				for (Phase phase : lifecycle.getPhases()
+						.values()) {
 					PhaseView phaseView = lifecycleView.getPhase(phase.getId());
 					if (phaseView == null) {
 						phaseView = ViewFactory.createPhase(phase.getId());
@@ -164,8 +133,10 @@ public class Selector implements ExecutionArchiveSelector {
 
 	protected ExecutionView merge(final ExecutionArchiveSelectorConfig cnf, final ExecutionView base,
 			final ExecutionView dominant, boolean lifecycleOverride, boolean goalOverride) {
-		for (LifecycleView domLifecycle : dominant.getLifecycles().values()) {
-			LifecycleView baseLifecycle = base.getLifecycles().get(domLifecycle.getId());
+		for (LifecycleView domLifecycle : dominant.getLifecycles()
+				.values()) {
+			LifecycleView baseLifecycle = base.getLifecycles()
+					.get(domLifecycle.getId());
 			if (lifecycleOverride || baseLifecycle == null) {
 				base.put(domLifecycle);
 				continue;
@@ -173,21 +144,27 @@ public class Selector implements ExecutionArchiveSelector {
 
 			// remove all dominant goals from base phases, which can only be executed once
 			Map<GoalView, PhaseView> basePhaseIndex = new HashMap<>();
-			for (PhaseView basePhase : baseLifecycle.getPhases().values())
+			for (PhaseView basePhase : baseLifecycle.getPhases()
+					.values())
 				for (GoalView goal : basePhase.getGoals())
 					basePhaseIndex.put(goal, basePhase);
 
-			for (PhaseView domPhase : domLifecycle.getPhases().values())
+			for (PhaseView domPhase : domLifecycle.getPhases()
+					.values())
 				for (GoalView domGoal : domPhase.getGoals())
-					if (goalOverride || !domGoal.getDescriptor().alwaysExecute())
+					if (goalOverride || !domGoal.getDescriptor()
+							.alwaysExecute())
 						for (GoalView baseGoal : basePhaseIndex.keySet()) {
 							if (domGoal.equals(baseGoal))
-								basePhaseIndex.get(baseGoal).removeGoal(baseGoal);
+								basePhaseIndex.get(baseGoal)
+										.removeGoal(baseGoal);
 						}
 
 			// push all dominant phases and goals into base lifecycles
-			for (PhaseView domPhase : domLifecycle.getPhases().values()) {
-				PhaseView basePhase = baseLifecycle.getPhases().get(domPhase.getId());
+			for (PhaseView domPhase : domLifecycle.getPhases()
+					.values()) {
+				PhaseView basePhase = baseLifecycle.getPhases()
+						.get(domPhase.getId());
 				if (basePhase == null) {
 					baseLifecycle.put(domPhase);
 					continue;
@@ -201,7 +178,7 @@ public class Selector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSlice slice) {
 		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, filterSlice(cnf), views, slice, false);
+		getExecutions(cnf, defaultActiveFilter(cnf), views, slice, false);
 		return views;
 	}
 

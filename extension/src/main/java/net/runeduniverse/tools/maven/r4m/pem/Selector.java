@@ -256,8 +256,4 @@ public class Selector implements ExecutionArchiveSelector {
 		return new Selection(views);
 	}
 
-	@Override
-	public ExecutionArchiveSelectorConfig createConfig() {
-		return new SelectorConfig();
-	}
 }

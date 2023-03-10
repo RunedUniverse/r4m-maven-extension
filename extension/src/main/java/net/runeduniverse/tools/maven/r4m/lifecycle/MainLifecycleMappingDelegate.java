@@ -26,6 +26,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
@@ -39,6 +40,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
  */
 @Component(role = LifecycleMappingDelegate.class, hint = MainLifecycleMappingDelegate.HINT)
 public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
+
 	public static final String HINT = "default";
 
 	@Requirement
@@ -46,13 +48,15 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 	@Requirement
 	private ExecutionArchiveSelector selector;
 	@Requirement
+	private ExecutionArchiveSelectorConfigFactory cnfFactory;
+	@Requirement
 	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 
-		ExecutionArchiveSelectorConfig cnf = this.selector.createConfig();
+		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
 
 		cnf.selectActiveProject(project);
 		cnf.selectModes("default");

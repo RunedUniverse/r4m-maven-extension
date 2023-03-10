@@ -4,5 +4,4 @@ public interface ExecutionArchiveSelector {
 
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig cnf);
 
-	public ExecutionArchiveSelectorConfig createConfig();
 }

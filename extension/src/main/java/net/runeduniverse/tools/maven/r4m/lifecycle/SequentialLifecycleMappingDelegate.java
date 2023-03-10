@@ -26,6 +26,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
@@ -39,6 +40,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
  */
 @Component(role = LifecycleMappingDelegate.class, hint = SequentialLifecycleMappingDelegate.HINT)
 public class SequentialLifecycleMappingDelegate implements LifecycleMappingDelegate {
+
 	public static final String HINT = "dev";
 
 	@Requirement
@@ -47,6 +49,8 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 	protected Map<String, Lifecycle> lifecycles;
 	@Requirement
 	private ExecutionArchiveSelector selector;
+	@Requirement
+	private ExecutionArchiveSelectorConfigFactory cnfFactory;
 	@Requirement
 	private ForkMappingDelegate forkMappingDelegate;
 
@@ -64,7 +68,7 @@ public class SequentialLifecycleMappingDelegate implements LifecycleMappingDeleg
 				break;
 			}
 
-		ExecutionArchiveSelectorConfig cnf = this.selector.createConfig();
+		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
 
 		cnf.selectActiveProject(project);
 		cnf.selectModes("dev");

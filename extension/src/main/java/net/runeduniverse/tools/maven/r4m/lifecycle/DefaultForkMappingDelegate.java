@@ -28,6 +28,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetLifecycle;
@@ -39,6 +40,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ForkMappingDelegate.class, hint = DefaultForkMappingDelegate.HINT, instantiationStrategy = "singleton")
 public class DefaultForkMappingDelegate implements ForkMappingDelegate {
+
 	public static final String HINT = "default";
 	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";
 
@@ -50,6 +52,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	protected Map<String, Lifecycle> lifecycles;
 	@Requirement
 	protected ExecutionArchiveSelector selector;
+	@Requirement
+	private ExecutionArchiveSelectorConfigFactory cnfFactory;
 
 	protected List<String> calculateExecutingPhases(final Map<String, Set<String>> executionsPerPhase,
 			final Fork fork) {
@@ -148,7 +152,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	public List<MojoExecution> calculateForkMappings(final MavenSession mvnSession, final MavenProject mvnProject,
 			final ExecutionArchiveSelectorConfig baseCnf, final Fork fork) {
 
-		ExecutionArchiveSelectorConfig cnf = this.selector.createConfig();
+		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
 		// select mvnProject
 		cnf.selectActiveProject(mvnProject);
 		// select packaging-procedure

@@ -18,7 +18,10 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
@@ -28,14 +31,15 @@ import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.acquire
 import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.mojoFailureExtensionLoading;
 import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.reduce;
 import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.replaceWithEquivalents;
+import static net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilterUtils.defaultRelevanceFilter;
 
 /**
- * generates the full pem.xml from all active maven defaults
+ * generates the rel-pem.xml from all relevant executions
  * 
  * @author Pl4yingNight
- * @goal gen-full-pem
+ * @goal gen-rel-pem
  */
-public class GenerateFullPemMojo extends AbstractMojo {
+public class GenerateRelevantPemMojo extends AbstractMojo {
 
 	public static final String ERR_MSG_FAILED_TO_WRITE_TO_FILE = "Failed to write to file: %s";
 
@@ -67,6 +71,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 	 * @component
 	 */
 	private ProjectExecutionModelWriter writer;
+	/**
+	 * @component
+	 */
+	private ExecutionArchiveSelectorConfigFactory cnfFactory;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -88,13 +96,18 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (projectSlice == null)
 			mojoFailureExtensionLoading(getLog());
 
+		final ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
+		cnf.selectActiveProject(this.mvnProject);
+		cnf.selectPackagingProcedure(this.mvnProject.getPackaging());
+		cnf.compile(this.mvnSession);
+
 		Set<Execution> executions = new LinkedHashSet<>();
-		int sliceCnt = collectExecutions(executions, projectSlice);
+		int sliceCnt = collectExecutions(executions, projectSlice, cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
 		getLog().info("");
-		getLog().info("Discovered");
+		getLog().info("Discovered & Relevant");
 		getLog().info(String.format("    project depth:      %s", sliceCnt));
 		getLog().info(String.format("    executions:         %s", executions.size()));
 		getLog().info("    ------------------------");
@@ -108,7 +121,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		model.addExecutions(executions);
 
 		PlexusConfiguration xml = this.writer.convert(model);
-		File xmlFile = new File(this.buildDir, "full-pem.xml");
+		File xmlFile = new File(this.buildDir, "rel-pem.xml");
 		buildDir.mkdirs();
 
 		try (OutputStream stream = new FileOutputStream(xmlFile, false)) {
@@ -119,22 +132,61 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		}
 
 		getLog().info("");
-		getLog().info("Wrote full Project Execution Model (PEM) to:");
+		getLog().info("Wrote relevant Project Execution Model (PEM) to:");
 		getLog().info(String.format("    %s", Paths.get(this.mvnSession.getExecutionRootDirectory())
 				.relativize(xmlFile.toPath())
 				.toString()));
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {
-		return collectExecutions(executions, slice, false);
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+			final ExecutionArchiveSelectorConfig cnf) {
+		Data data = new Data();
+		collectExecutions(executions, slice, defaultRelevanceFilter(cnf), false, data);
+		return data.getDepth();
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
-			final boolean onlyInherited) {
+	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+			final ExecutionFilter filter, final boolean onlyInherited, final Data data) {
 		if (slice == null)
-			return 0;
-		executions.addAll(slice.getExecutions(e -> true, onlyInherited));
-		return collectExecutions(executions, slice.getParent(), true) + 1;
+			return;
+
+		data.incrementDepth();
+		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter, onlyInherited);
+
+		if (applicableExecutions.isEmpty()) {
+			if (slice.getParent() != null)
+				collectExecutions(executions, slice.getParent(), filter, true, data);
+
+			if (!data.isEffExecDetected())
+				applicableExecutions = slice.getExecutions(filter, onlyInherited);
+		} else
+			data.setEffExecDetected(true);
+
+		executions.addAll(applicableExecutions);
 	}
+
+	private static class Data {
+
+		private int depth = 0;
+		private boolean effExecDetected = false;
+
+		public int getDepth() {
+			return depth;
+		}
+
+		public boolean isEffExecDetected() {
+			return effExecDetected;
+		}
+
+		public void incrementDepth() {
+			this.depth = this.depth + 1;
+		}
+
+		public void setEffExecDetected(boolean effExecDetected) {
+			this.effExecDetected = effExecDetected;
+		}
+
+	}
+
 }

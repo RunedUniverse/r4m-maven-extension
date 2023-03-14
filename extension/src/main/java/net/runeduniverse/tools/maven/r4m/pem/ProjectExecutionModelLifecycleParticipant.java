@@ -3,6 +3,8 @@ package net.runeduniverse.tools.maven.r4m.pem;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
+
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
@@ -25,6 +27,7 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginPars
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
+	public static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED = "Unidentifiable plugin detected » %s:%s";
 
 	@Requirement
 	private Logger log;
@@ -38,6 +41,8 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
 	@Requirement
 	private PlexusContainer container;
+	
+	private final Set<Plugin> unidentifiablePlugins = new LinkedHashSet<>();
 
 	private boolean coreExtension = false;
 
@@ -89,10 +94,13 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			Thread.currentThread()
 					.setContextClassLoader(currentRealm);
 		}
+
+		logUnidentifiablePlugins();
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final MavenProject mvnProject) throws Exception {
+
 		ExecutionArchiveSlice projectSlice = this.archive.getSlice(mvnProject);
 		if (projectSlice == null)
 			projectSlice = this.archive.createSlice(mvnProject);
@@ -107,12 +115,31 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			projectSlice.register(parser.parse(mvnProject));
 
 		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-				projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-						mvnSession.getRepositorySession(), mvnPlugin));
+			for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
+				if(isIdentifiable(mvnPlugin))
+					projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
+							mvnSession.getRepositorySession(), mvnPlugin));
+			}
 
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 			projectSlice.register(parser.parse());
+	}
+
+	private boolean isIdentifiable(Plugin mvnPlugin) {
+		if(this.unidentifiablePlugins.contains(mvnPlugin))
+			return false;
+
+		if(mvnPlugin.getVersion() == null) {
+			this.unidentifiablePlugins.add(mvnPlugin);
+			return false;
+		}
+
+		return true;
+	}
+
+	private void logUnidentifiablePlugins() {
+		for (Plugin mvnPlugin : this.unidentifiablePlugins)
+			this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(), mvnPlugin.getArtifactId()));
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {

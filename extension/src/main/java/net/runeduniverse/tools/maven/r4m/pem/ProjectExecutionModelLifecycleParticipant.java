@@ -9,6 +9,7 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -27,7 +28,12 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginPars
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
-	public static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED = "Unidentifiable plugin detected » %s:%s";
+	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = 
+			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
+			+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
+			+ "This failure was cached in the local repository and resolution is not reattempted until the update interval "
+			+ "of central has elapsed or updates are forced\u001B[0m";
+	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED = "Unidentifiable plugin detected » %s:%s:%s";
 
 	@Requirement
 	private Logger log;
@@ -115,11 +121,14 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			projectSlice.register(parser.parse(mvnProject));
 
 		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-			for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
+			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
 				if(isIdentifiable(mvnPlugin))
-					projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-							mvnSession.getRepositorySession(), mvnPlugin));
-			}
+					try {
+						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
+								mvnSession.getRepositorySession(), mvnPlugin));
+					} catch (PluginResolutionException e) {
+						this.unidentifiablePlugins.add(mvnPlugin);
+					}
 
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 			projectSlice.register(parser.parse());
@@ -138,8 +147,9 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	}
 
 	private void logUnidentifiablePlugins() {
+		this.log.error(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
 		for (Plugin mvnPlugin : this.unidentifiablePlugins)
-			this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(), mvnPlugin.getArtifactId()));
+			this.log.error(String.format(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {

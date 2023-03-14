@@ -13,7 +13,6 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
-import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -53,7 +52,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 
 		try {
 			mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);
-		} catch (PluginResolutionException | PluginDescriptorParsingException | InvalidPluginDescriptorException e) {
+		} catch (PluginDescriptorParsingException | InvalidPluginDescriptorException e) {
 			this.log.error(ERR_MSG_PLUGIN_DESCRIPTOR, e);
 			return null;
 		}

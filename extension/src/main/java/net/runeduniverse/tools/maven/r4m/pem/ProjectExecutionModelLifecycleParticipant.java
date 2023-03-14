@@ -147,6 +147,9 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	}
 
 	private void logUnidentifiablePlugins() {
+		if(this.unidentifiablePlugins.isEmpty())
+			return;
+
 		this.log.error(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
 		for (Plugin mvnPlugin : this.unidentifiablePlugins)
 			this.log.error(String.format(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));

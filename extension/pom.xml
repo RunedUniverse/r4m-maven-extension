@@ -19,11 +19,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<!-- ARTIFACT VERSIONS -->
+		<!-- VERSIONS -->
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
-		<maven-plugin-annotations-version>3.6.4</maven-plugin-annotations-version>
 		<!-- ARTIFACT VERSIONS - COMPILER -->
 		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
 		<plexus-component-version>1.7.1</plexus-component-version>
@@ -136,7 +135,7 @@
 
 		<plugins>
 			<plugin>
-				<!-- don't add groupId here it bricks inherited version' -->
+				<!-- don't add groupId here it bricks inherited version -->
 				<artifactId>maven-plugin-plugin</artifactId>
 				<version>${maven-plugin-plugin-version}</version>
 				<configuration>

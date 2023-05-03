@@ -1,16 +1,9 @@
 package net.runeduniverse.tools.maven.r4m.lifecycle;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
-import org.apache.maven.lifecycle.internal.DefaultLifecycleMappingDelegate;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -24,7 +17,7 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.Properties;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.LIFECYCLE.DEV.LIFECYCLE_PARTICIPANT_HINT)
-public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
+public class MavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
 	public static final String WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT = "[r4m] Component<%s> could not be located in PlexusContainer!";
@@ -37,10 +30,6 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 	private Logger log;
 	@Requirement
 	private PlexusContainer container;
-	@Requirement(role = Lifecycle.class)
-	private Map<String, Lifecycle> lifecycles;
-	@Requirement(role = LifecycleMappingDelegate.class)
-	private Map<String, LifecycleMappingDelegate> mappedDelegates;
 
 	private boolean coreExtension = false;
 
@@ -76,32 +65,6 @@ public class DevMavenLifecycleParticipant extends AbstractMavenLifecycleParticip
 
 			modifyLifecycleExecutionPlanCalculator();
 
-			log.debug("[r4m] Generating DEV Phases:");
-
-			Lifecycle devLifecycle = null;
-
-			devLifecycle = lifecycles.get("dev");
-			devLifecycle.getPhases()
-					.clear();
-
-			for (Lifecycle lifecycle : lifecycles.values()) {
-				if (lifecycle == devLifecycle)
-					continue;
-
-				// ignore specifically mapped lifecycles except default
-				if (!lifecycle.getId()
-						.equals(DefaultLifecycleMappingDelegate.HINT) && mappedDelegates.containsKey(lifecycle.getId()))
-					continue;
-
-				List<String> devPhases = new LinkedList<>();
-				for (String phase : lifecycle.getPhases()) {
-					phase = "dev-" + phase;
-					devPhases.add(phase);
-					devLifecycle.getPhases()
-							.add(phase);
-				}
-				log.debug("[r4m] " + lifecycle.getId() + " -> [" + String.join(", ", devPhases) + "]");
-			}
 		} catch (NoSuchRealmException e) {
 			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
 		} finally {

@@ -215,8 +215,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (lifecycle == null) {
 			throw new LifecyclePhaseNotFoundException("[r4m] Unknown lifecycle phase \"" + lifecyclePhase
 					+ "\". You must specify a valid lifecycle phase in the format [<mode>#][+]<phase>[@<execution>]"
-					+ " or a goal in the format <plugin-prefix>:<goal> or"
-					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
+					+ " or a goal in the format <plugin-prefix>:<goal>[@<execution>] or"
+					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]. Available lifecycle phases are: "
 					+ defaultLifeCycles.getLifecyclePhaseList() + ".", lifecyclePhase);
 		}
 

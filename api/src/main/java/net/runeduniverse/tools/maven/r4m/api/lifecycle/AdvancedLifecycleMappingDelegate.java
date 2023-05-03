@@ -30,16 +30,17 @@ import org.apache.maven.project.MavenProject;
  */
 public interface AdvancedLifecycleMappingDelegate extends LifecycleMappingDelegate {
 
-	Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
+	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
 			Lifecycle lifecycle, String lifecyclePhase, String mode, String execution)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException;
 
 	@Override
-	default Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
-		return calculateLifecycleMappings(session, project, lifecycle, lifecyclePhase, null, null);
+	default public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession,
+			MavenProject mvnProject, Lifecycle lifecycle, String lifecyclePhase)
+			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+			MojoNotFoundException, InvalidPluginDescriptorException {
+		return calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, lifecyclePhase, null, null);
 	}
 
 }

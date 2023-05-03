@@ -32,6 +32,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
  * execution plan given {@link Lifecycle} and lifecycle phase. Standard
@@ -61,8 +63,10 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
 
 		cnf.selectActiveProject(project);
-		cnf.selectModes("default");
+		cnf.selectModes(isBlank(mode) ? "default" : mode);
 		cnf.selectPackagingProcedure(project.getPackaging());
+		if (!isBlank(execution))
+			cnf.selectActiveExecutions(execution);
 
 		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
 

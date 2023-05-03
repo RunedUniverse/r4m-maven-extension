@@ -23,6 +23,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
@@ -38,8 +39,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
  * phase to calculate the execution plan, but custom lifecycles can use
  * alternative mapping strategies.
  */
-@Component(role = LifecycleMappingDelegate.class, hint = MainLifecycleMappingDelegate.HINT)
-public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
+@Component(role = LifecycleMappingDelegate.class, hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
+public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycleMappingDelegate {
 
 	public static final String HINT = "default";
 
@@ -53,8 +54,9 @@ public class MainLifecycleMappingDelegate implements LifecycleMappingDelegate {
 	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
+			Lifecycle lifecycle, String lifecyclePhase, String mode, String execution)
+			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+			MojoNotFoundException, InvalidPluginDescriptorException {
 
 		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
 

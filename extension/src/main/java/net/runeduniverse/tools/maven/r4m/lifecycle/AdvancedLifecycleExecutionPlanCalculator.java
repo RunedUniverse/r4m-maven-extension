@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.lifecycle;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,7 +56,10 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
+import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 
 @Component(role = LifecycleExecutionPlanCalculator.class)
 public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
@@ -70,6 +75,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement
 	private MojoDescriptorCreator mojoDescriptorCreator;
+
+	@Requirement
+	private ExecutionArchiveSelectorConfigFactory selectorConfigFactory;
 
 	@Requirement
 	private LifecyclePluginResolver lifecyclePluginResolver;
@@ -179,7 +187,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 				MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(pluginGoal, session, project);
 
-				MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, executionId, MojoExecution.Source.CLI);
+				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, executionId,
+						MojoExecution.Source.CLI, this.selectorConfigFactory.createEmptyConfig()
+								.selectActiveProject(project)
+								.selectModes("default")
+								.selectPackagingProcedure(project.getPackaging())
+								.selectActiveExecutions(executionId));
 
 				mojoExecutions.add(mojoExecution);
 			} else if (task instanceof LifecycleTask) {
@@ -514,7 +527,17 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			return Collections.emptyList();
 		}
 
-		MojoExecution forkedExecution = new MojoExecution(forkedMojoDescriptor, forkedGoal);
+		MojoExecutionAdapter forkedExecution;
+		if (mojoExecution instanceof MojoExecutionData)
+			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, forkedGoal,
+					((MojoExecutionData) mojoExecution).getExecutionArchiveSelectorConfig());
+		else
+			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, forkedGoal,
+					this.selectorConfigFactory.createEmptyConfig()
+							.selectActiveProject(project)
+							.selectModes("default")
+							.selectPackagingProcedure(project.getPackaging())
+							.selectActiveExecutions(mojoExecution.getExecutionId()));
 
 		mojoExecutionConfigurator(forkedExecution).configure(project, forkedExecution, true);
 

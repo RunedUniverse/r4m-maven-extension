@@ -83,9 +83,10 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 			for (GoalView goal : entry.getValue()) {
 				Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(lifecyclePhase);
 				if (phaseBindings != null) {
-					MojoExecution mojoExecution = new MojoExecution(goal.getDescriptor(), entry.getKey()
-							.getId(), Source.LIFECYCLE);
+					MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(goal.getDescriptor(), entry.getKey()
+							.getId(), Source.LIFECYCLE, cnf);
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
+					mojoExecution.setFork(goal.getFork());
 					if (goal.hasValidFork())
 						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
 								this.forkMappingDelegate.calculateForkMappings(session, project, cnf, goal.getFork()));

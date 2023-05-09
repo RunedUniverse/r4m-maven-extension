@@ -32,8 +32,6 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
  * execution plan given {@link Lifecycle} and lifecycle phase. Standard
@@ -56,17 +54,15 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase, String mode, String execution)
+			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelectorConfig cnf)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException {
 
-		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
-
-		cnf.selectActiveProject(project);
-		cnf.selectModes(isBlank(mode) ? "default" : mode);
-		cnf.selectPackagingProcedure(project.getPackaging());
-		if (!isBlank(execution))
-			cnf.selectActiveExecutions(execution);
+		if (cnf == null)
+			cnf = this.cnfFactory.createEmptyConfig()
+					.selectActiveProject(project)
+					.selectModes("default")
+					.selectPackagingProcedure(project.getPackaging());
 
 		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
 

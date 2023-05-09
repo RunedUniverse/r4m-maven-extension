@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.lifecycle;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,6 +57,8 @@ import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingD
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 
 @Component(role = LifecycleExecutionPlanCalculator.class)
 public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
@@ -79,6 +83,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement
 	private Map<String, PhaseSequenceCalculatorDelegate> phaseSequenceDelegates;
+
+	@Requirement
+	private ExecutionArchiveSelectorConfigFactory selectorConfigFactory;
 
 	@Requirement(hint = DefaultLifecycleMappingDelegate.HINT)
 	private LifecycleMappingDelegate standardDelegate;
@@ -243,11 +250,17 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throw new LifecyclePhaseNotFoundException(
 					"[r4m] PhaseSequenceCalculatorDelegate<" + selectedPhaseSeqCalc + "> not found!", lifecyclePhase);
 
+		ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+				.selectActiveProject(mvnProject)
+				.selectModes(isBlank(mode) ? "default" : mode)
+				.selectPackagingProcedure(mvnProject.getPackaging())
+				.selectActiveExecutions(execution);
+
 		Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
 
 		for (String phase : phaseSeqCalcDelegate.calculatePhaseSequence(lifecycle, lifecyclePhase))
 			for (Entry<String, List<MojoExecution>> item : calculateLifecycleMappings(delegate, mvnSession, mvnProject,
-					lifecycle, phase, mode, execution).entrySet()) {
+					lifecycle, phase, selectorConfig).entrySet()) {
 				List<MojoExecution> col = phaseToMojoMapping.get(item.getKey());
 				if (col == null)
 					phaseToMojoMapping.put(item.getKey(), item.getValue());
@@ -260,13 +273,13 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	protected Map<String, List<MojoExecution>> calculateLifecycleMappings(final LifecycleMappingDelegate delegate,
 			final MavenSession mvnSession, final MavenProject mvnProject, final Lifecycle lifecycle,
-			final String lifecyclePhase, final String mode, final String execution)
+			final String lifecyclePhase, final ExecutionArchiveSelectorConfig selectorConfig)
 			throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 
 		if (delegate instanceof AdvancedLifecycleMappingDelegate)
 			return ((AdvancedLifecycleMappingDelegate) delegate).calculateLifecycleMappings(mvnSession, mvnProject,
-					lifecycle, lifecyclePhase, mode, execution);
+					lifecycle, lifecyclePhase, selectorConfig);
 
 		return delegate.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, lifecyclePhase);
 	}

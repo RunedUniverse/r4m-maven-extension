@@ -12,10 +12,7 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
-
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
 	private final Set<String> activeExecutions = new LinkedHashSet<>();
@@ -47,17 +44,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			if (!isBlank(values[i]))
-				this.activeExecutions.add(values[i]);
+			this.activeExecutions.add(values[i]);
 		return this;
 	}
 
 	@Override
 	public ExecutionArchiveSelectorConfig selectActiveExecutions(Collection<String> values) {
 		this.dirty = true;
-		for (String value : values)
-			if (!isBlank(value))
-				this.activeExecutions.add(value);
+		this.activeExecutions.addAll(values);
 		return this;
 	}
 
@@ -244,5 +238,4 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 		return tree;
 	}
-
 }

@@ -9,8 +9,8 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
 
 public interface ForkMappingDelegate {
-	public List<MojoExecution> calculateForkMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject,
-			final ExecutionArchiveSelectorConfig baseCnf, final Fork fork);
+
+	public List<MojoExecution> calculateForkMappings(MojoExecution mojoExecution, final MavenSession mvnSession,
+			final MavenProject mvnProject, final ExecutionArchiveSelectorConfig baseCnf, final Fork fork);
 
 }

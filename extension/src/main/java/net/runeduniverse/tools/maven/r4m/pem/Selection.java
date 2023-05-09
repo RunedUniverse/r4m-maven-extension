@@ -34,8 +34,8 @@ public class Selection implements ExecutionArchiveSelection {
 					.values())
 				for (PhaseView phase : lifecycle.getPhases()
 						.values())
-					for (GoalView goal : phase.getGoals())
-						if (selected.equals(phase.getId())) {
+					if (selected.equals(phase.getId()))
+						for (GoalView goal : phase.getGoals()) {
 							List<GoalView> goals = goalMap.get(exec);
 							if (goals == null) {
 								goals = new LinkedList<>();

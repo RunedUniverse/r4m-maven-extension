@@ -14,6 +14,8 @@ import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
  * execution plan given {@link Lifecycle} and lifecycle phase. Standard
@@ -25,13 +27,13 @@ import org.apache.maven.project.MavenProject;
  * {@code @Named("lifecycle-id")} or equivalent plexus {@code @Component}
  * annotations.
  *
- * @since 0.0.0
+ * @since 1.0.0
  * @author VenaNocta
  */
 public interface AdvancedLifecycleMappingDelegate extends LifecycleMappingDelegate {
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
-			Lifecycle lifecycle, String lifecyclePhase, String mode, String execution)
+			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelectorConfig selectorConfig)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException;
 
@@ -40,7 +42,7 @@ public interface AdvancedLifecycleMappingDelegate extends LifecycleMappingDelega
 			MavenProject mvnProject, Lifecycle lifecycle, String lifecyclePhase)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException {
-		return calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, lifecyclePhase, null, null);
+		return calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, lifecyclePhase, null);
 	}
 
 }

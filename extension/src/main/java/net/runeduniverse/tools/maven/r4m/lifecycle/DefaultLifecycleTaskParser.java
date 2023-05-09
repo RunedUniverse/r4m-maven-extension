@@ -9,15 +9,15 @@ import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
 public class DefaultLifecycleTaskParser implements LifecycleTaskParser {
 
 	/**
-	 * Split task of format {@code [<mode>#][+]<phase>[@<execution>]}
+	 * Split task of format {@code [<mode>/][+]<phase>[@<execution>]}
 	 */
 	@Override
 	public LifecycleTaskData parse(final LifecycleTask lifecycleTask) {
 		String task = lifecycleTask.getLifecyclePhase();
 		String mode = null;
 
-		int splitIdx = task.indexOf('#');
-		if (0 < splitIdx) {
+		int splitIdx = task.indexOf('/');
+		if (0 <= splitIdx) {
 			mode = task.substring(0, splitIdx);
 			task = task.substring(splitIdx + 1);
 		}

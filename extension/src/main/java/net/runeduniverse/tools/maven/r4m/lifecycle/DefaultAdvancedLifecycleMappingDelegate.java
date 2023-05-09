@@ -88,8 +88,8 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
 					mojoExecution.setFork(goal.getFork());
 					if (goal.hasValidFork())
-						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
-								this.forkMappingDelegate.calculateForkMappings(session, project, cnf, goal.getFork()));
+						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project), this.forkMappingDelegate
+								.calculateForkMappings(mojoExecution, session, project, cnf, goal.getFork()));
 					addMojoExecution(phaseBindings, mojoExecution, 0);
 				}
 			}

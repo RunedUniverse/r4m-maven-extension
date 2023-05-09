@@ -357,11 +357,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 			List<MojoExecution> forkedExecutions;
 
-			if (StringUtils.isNotEmpty(mojoDescriptor.getExecutePhase())) {
+			// TODO INJECT HERE
+			if (StringUtils.isEmpty(mojoDescriptor.getExecutePhase())) {
+				forkedExecutions = calculateForkedGoal(mojoExecution, session, forkedProject, alreadyForkedExecutions);
+			} else {
 				forkedExecutions = calculateForkedLifecycle(mojoExecution, session, forkedProject,
 						alreadyForkedExecutions);
-			} else {
-				forkedExecutions = calculateForkedGoal(mojoExecution, session, forkedProject, alreadyForkedExecutions);
 			}
 
 			mojoExecution.setForkedExecutions(BuilderCommon.getKey(forkedProject), forkedExecutions);

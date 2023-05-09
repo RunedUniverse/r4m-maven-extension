@@ -67,13 +67,17 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		// seed phases if not set & existent from lifecycle
 		TargetLifecycle lifecycle = fork.getLifecycle();
 		if (lifecycle != null && phases.isEmpty()) {
-			boolean includePhase = isBlank(lifecycle.getStartPhase());
 			Lifecycle mvnLifecycle = this.lifecycles.get(lifecycle.getId());
 			if (mvnLifecycle == null) {
 				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, lifecycle.getId()));
 				return phases;
 			}
+			
+			boolean includePhase = isBlank(lifecycle.getStartPhase());
 			for (String phaseId : mvnLifecycle.getPhases()) {
+				if (!includePhase && lifecycle.getStartPhase()
+						.equals(phaseId))
+					includePhase = true;
 				if (includePhase) {
 					phases.add(phaseId);
 					executionsPerPhase.put(phaseId, new LinkedHashSet<>(0));

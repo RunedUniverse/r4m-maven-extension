@@ -59,6 +59,8 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 @Component(role = LifecycleExecutionPlanCalculator.class)
 public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
 
@@ -199,10 +201,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				mojoExecutions.add(mojoExecution);
 			} else if (task instanceof LifecycleTask) {
 				LifecycleTaskData taskData = this.lifecycleTaskParser.parse((LifecycleTask) task);
+				String mode = taskData.getMode();
 
 				Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
 						taskData.getLifecyclePhase(),
-						this.selector.compileSelection(selectorConfig.selectModes(taskData.getMode())
+						this.selector.compileSelection(selectorConfig.selectModes(isBlank(mode) ? "default" : mode)
 								.selectActiveExecutions(taskData.getExecution())));
 
 				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {

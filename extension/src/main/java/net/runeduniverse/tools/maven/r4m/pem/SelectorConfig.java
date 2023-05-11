@@ -12,6 +12,8 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	private MavenProject mvnProject = null;
@@ -45,7 +47,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			if (values[i] != null)
+			if (!isBlank(values[i]))
 				this.activeExecutions.add(values[i]);
 		return this;
 	}
@@ -61,7 +63,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectActiveProfiles(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			if (values[i] != null)
+			if (!isBlank(values[i]))
 				this.activeProfiles.add(values[i]);
 		return this;
 	}
@@ -77,7 +79,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			if (values[i] != null)
+			if (!isBlank(values[i]))
 				this.providedProfiles.add(values[i]);
 		return this;
 	}
@@ -93,7 +95,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectModes(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			if (values[i] != null)
+			if (!isBlank(values[i]))
 				this.modes.add(values[i]);
 		return this;
 	}

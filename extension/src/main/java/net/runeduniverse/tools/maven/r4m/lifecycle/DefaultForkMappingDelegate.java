@@ -18,6 +18,7 @@ import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -64,6 +65,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 	@Requirement
 	protected Logger log;
+	@Requirement
+	private BuildPluginManager pluginManager;
 	@Requirement
 	private MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement(role = MojoExecutionConfigurator.class)
@@ -224,29 +227,43 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 		Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(mvnSession, mvnProject, fork, cnf);
 
+		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
+			for (MojoExecution forkedExecution : forkedExecutions) {
+				if (forkedExecution.getMojoDescriptor() == null) {
+					MojoDescriptor forkedMojoDescriptor = this.pluginManager.getMojoDescriptor(
+							forkedExecution.getPlugin(), forkedExecution.getGoal(),
+							mvnProject.getRemotePluginRepositories(), mvnSession.getRepositorySession());
+
+					forkedExecution.setMojoDescriptor(forkedMojoDescriptor);
+				}
+
+				selectExecutionConfigurator(mojoExecution.getMojoDescriptor()
+						.getComponentConfigurator()).configure(mvnProject, forkedExecution, false);
+			}
+		}
+
 		// seed configuration with plugin-lifecycle specific settings
 		// (defined by the plugin that defines the lifecycle/phase)
-		try {
-			injectLifecycleOverlay(lifecycleMappings, mvnSession, mvnProject, mojoExecution, fork.getLifecycleId());
-		} catch (PluginNotFoundException | PluginDescriptorParsingException | LifecycleNotFoundException
-				| MojoNotFoundException | PluginResolutionException | NoPluginFoundForPrefixException
-				| InvalidPluginDescriptorException | PluginVersionResolutionException e) {
-
-			String msg = String.format(WARN_FAILED_TO_LOAD_PLUGIN_LIFECYCLE_CONFIGURATION, mojoExecution.toString());
-			if (this.log.isDebugEnabled())
-				this.log.warn(msg, e);
-			else
-				this.log.warn(msg);
-		}
+		// TODO move to PEM parsing >> double injection issue
+		//try {
+		//	injectLifecycleOverlay(lifecycleMappings, mvnSession, mvnProject, mojoExecution, fork.getLifecycleId());
+		//} catch (PluginNotFoundException | PluginDescriptorParsingException | LifecycleNotFoundException
+		//		| MojoNotFoundException | PluginResolutionException | NoPluginFoundForPrefixException
+		//		| InvalidPluginDescriptorException | PluginVersionResolutionException e) {
+		//
+		//	String msg = String.format(WARN_FAILED_TO_LOAD_PLUGIN_LIFECYCLE_CONFIGURATION, mojoExecution.toString());
+		//	if (this.log.isDebugEnabled())
+		//		this.log.warn(msg, e);
+		//	else
+		//		this.log.warn(msg);
+		//}
 
 		List<MojoExecution> mappings = new LinkedList<>();
 		for (Entry<String, List<MojoExecution>> entry : lifecycleMappings.entrySet())
 			if (entry.getValue() != null)
 				for (MojoExecution exec : entry.getValue()) {
-					selectExecutionConfigurator(exec.getMojoDescriptor()
-							.getComponentConfigurator()).configure(mvnProject, mojoExecution, false);
 					// complete with default values
-					finalizeMojoConfiguration(mojoExecution);
+					finalizeMojoConfiguration(exec);
 					mappings.add(exec);
 				}
 		return mappings;

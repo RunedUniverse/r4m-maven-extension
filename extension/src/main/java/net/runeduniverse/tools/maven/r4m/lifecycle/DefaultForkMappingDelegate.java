@@ -60,7 +60,6 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 	public static final String HINT = "default";
 	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";
-	public static final String WARN_CONFIGURATION_OVERRIDES_APPLIED = "Applying configuration overrides for forked-lifecycle<%s> provided by %s:%s:%s";
 
 	@Requirement
 	protected Logger log;
@@ -281,8 +280,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		if (lifecycleOverlay == null)
 			return;
 
-		this.log.warn(String.format(WARN_CONFIGURATION_OVERRIDES_APPLIED, forkedLifecycleId,
-				pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion()));
+		if (mojoExecution instanceof MojoExecutionData)
+			((MojoExecutionData) mojoExecution).setLifecycleOverlayOrigin(pluginDescriptor);
 
 		for (Phase phase : lifecycleOverlay.getPhases()) {
 			List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());

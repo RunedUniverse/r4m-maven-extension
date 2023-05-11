@@ -2,6 +2,7 @@ package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
@@ -17,10 +19,45 @@ import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 
 public class Selection implements ExecutionArchiveSelection {
 
+	protected final ExecutionArchiveSelectorConfig selectorConfig;
 	protected final Set<ExecutionView> views;
 
-	public Selection(Set<ExecutionView> views) {
+	public Selection(final ExecutionArchiveSelectorConfig selectorConfig, final Set<ExecutionView> views) {
+		this.selectorConfig = selectorConfig;
 		this.views = views;
+	}
+
+	@Override
+	public void modify(Modification mod) {
+		mod.modify(this.views);
+		cleanup();
+	}
+
+	protected void cleanup() {
+		for (Iterator<ExecutionView> iExec = views.iterator(); iExec.hasNext();) {
+			ExecutionView exec = iExec.next();
+
+			for (Iterator<LifecycleView> iLifecycle = exec.getLifecycles()
+					.values()
+					.iterator(); iLifecycle.hasNext();) {
+				LifecycleView lifecycle = iLifecycle.next();
+
+				for (Iterator<PhaseView> iPhase = lifecycle.getPhases()
+						.values()
+						.iterator(); iPhase.hasNext();) {
+					PhaseView phase = iPhase.next();
+					if (phase.getGoals()
+							.isEmpty())
+						iPhase.remove();
+				}
+				if (lifecycle.getPhases()
+						.isEmpty())
+					iLifecycle.remove();
+			}
+			if (exec.getLifecycles()
+					.isEmpty())
+				iExec.remove();
+		}
 	}
 
 	@Override
@@ -75,6 +112,11 @@ public class Selection implements ExecutionArchiveSelection {
 						}
 				}
 		return map;
+	}
+
+	@Override
+	public ExecutionArchiveSelectorConfig getSelectorConfig() {
+		return this.selectorConfig;
 	}
 
 	@Override

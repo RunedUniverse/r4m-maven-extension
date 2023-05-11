@@ -54,6 +54,9 @@ import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 
 @Component(role = LifecycleExecutionPlanCalculator.class)
@@ -79,6 +82,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement
 	private LifecycleTaskParser lifecycleTaskParser;
+
+	@Requirement
+	protected ExecutionArchiveSelector selector;
 
 	@Requirement
 	private Map<String, PhaseSequenceCalculatorDelegate> phaseSequenceDelegates;
@@ -171,6 +177,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
 		for (Object task : tasks) {
+			ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+					.selectActiveProject(project)
+					.selectPackagingProcedure(project.getPackaging());
+
 			if (task instanceof GoalTask) {
 				String pluginGoal = ((GoalTask) task).toString();
 
@@ -183,10 +193,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(pluginGoal, session, project);
 
 				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, executionId,
-						MojoExecution.Source.CLI, this.selectorConfigFactory.createEmptyConfig()
-								.selectActiveProject(project)
-								.selectModes("default")
-								.selectPackagingProcedure(project.getPackaging())
+						MojoExecution.Source.CLI, selectorConfig.selectModes("default")
 								.selectActiveExecutions(executionId));
 
 				mojoExecutions.add(mojoExecution);
@@ -194,7 +201,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				LifecycleTaskData taskData = this.lifecycleTaskParser.parse((LifecycleTask) task);
 
 				Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
-						taskData.getLifecyclePhase(), taskData.getMode(), taskData.getExecution());
+						taskData.getLifecyclePhase(),
+						this.selector.compileSelection(selectorConfig.selectModes(taskData.getMode())
+								.selectActiveExecutions(taskData.getExecution())));
 
 				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
 					mojoExecutions.addAll(mojoExecutionsFromLifecycle);
@@ -207,7 +216,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, String lifecyclePhase, final String mode, final String execution)
+			final MavenProject mvnProject, String lifecyclePhase, final ExecutionArchiveSelection selection)
 			throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 		/*
@@ -255,7 +264,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		for (String phase : phaseSeqCalcDelegate.calculatePhaseSequence(lifecycle, lifecyclePhase))
 			for (Entry<String, List<MojoExecution>> item : delegate
-					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, mode, execution)
+					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection)
 					.entrySet()) {
 				List<MojoExecution> col = phaseToMojoMapping.get(item.getKey());
 				if (col == null)
@@ -378,7 +387,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		// TODO integrate DefaultForkMappingDelegate
 		Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings(session, project, forkedPhase,
-				null, null);
+				null);
 
 		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
 			for (MojoExecution forkedExecution : forkedExecutions) {

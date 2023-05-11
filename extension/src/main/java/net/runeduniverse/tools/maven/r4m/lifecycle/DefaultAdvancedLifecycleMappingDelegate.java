@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecution.Source;
@@ -17,8 +16,6 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
-import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -26,7 +23,6 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
 
@@ -44,8 +40,6 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 
 	@Requirement
 	private Logger log;
-	@Requirement
-	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
@@ -68,14 +62,6 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 							.getId(), Source.LIFECYCLE, selection.getSelectorConfig());
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
 					mojoExecution.setFork(goal.getFork());
-					if (goal.hasValidFork())
-						try {
-							mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
-									this.forkMappingDelegate.calculateForkMappings(mojoExecution, session, project));
-						} catch (MojoNotFoundException | NoPluginFoundForPrefixException
-								| PluginVersionResolutionException e) {
-							this.log.error("Unable to fork!", e);
-						}
 					addMojoExecution(phaseBindings, mojoExecution, 0);
 				}
 			}

@@ -1,14 +1,18 @@
 package net.runeduniverse.tools.maven.r4m.lifecycle;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.maven.execution.MavenSession;
@@ -37,14 +41,19 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.Parameter;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.lifecycle.Execution;
+import org.apache.maven.plugin.lifecycle.Phase;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+
+import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
@@ -57,26 +66,43 @@ import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigF
 import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetPhase;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = LifecycleExecutionPlanCalculator.class)
+@Component(role = LifecycleExecutionPlanCalculator.class, instantiationStrategy = "singleton")
 public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
 
+	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = //
+			"[%s] skipping unknown lifecycle » %s";
+	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK = //
+			"[%s] Unknown lifecycle phase \"%s\" detected when forking";
+	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE = //
+			"[%s] Unknown lifecycle phase \"%s\". "
+					+ "You must specify a valid lifecycle phase in the format [<mode>/][+]<phase>[@<execution>] "
+					+ "or a goal in the format <plugin-prefix>:<goal>[@<execution>] or"
+					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]. "
+					+ "Available lifecycle phases are: %s.";
+
 	@Requirement
-	private PluginVersionResolver pluginVersionResolver;
+	protected Logger log;
 
 	@Requirement
 	private BuildPluginManager pluginManager;
-
-	@Requirement
-	private DefaultLifecycles defaultLifeCycles;
 
 	@Requirement
 	private MojoDescriptorCreator mojoDescriptorCreator;
 
 	@Requirement
 	private ExecutionArchiveSelectorConfigFactory selectorConfigFactory;
+
+	@Requirement
+	private DefaultLifecycles defaultLifeCycles;
+
+	@Requirement(role = Lifecycle.class)
+	protected Map<String, Lifecycle> lifecycles;
 
 	@Requirement
 	private LifecyclePluginResolver lifecyclePluginResolver;
@@ -87,16 +113,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	@Requirement
 	protected ExecutionArchiveSelector selector;
 
-	@Requirement
+	@Requirement(role = PhaseSequenceCalculatorDelegate.class)
 	private Map<String, PhaseSequenceCalculatorDelegate> phaseSequenceDelegates;
 
 	@Requirement(hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
 	private AdvancedLifecycleMappingDelegate standardDelegate;
 
-	@Requirement
+	@Requirement(role = AdvancedLifecycleMappingDelegate.class)
 	private Map<String, AdvancedLifecycleMappingDelegate> lifecycleMappingDelegates;
 
-	@Requirement
+	@Requirement(role = MojoExecutionConfigurator.class)
 	private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
 	public AdvancedLifecycleExecutionPlanCalculator() {
@@ -140,7 +166,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return calculateExecutionPlan(session, project, tasks, true);
 	}
 
-	private void setupMojoExecutions(MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions)
+	protected void setupMojoExecutions(MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -193,7 +219,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					executionId = pluginGoal.substring(executionIdx + 1);
 				}
 
-				MojoDescriptor mojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(pluginGoal, session, project);
+				MojoDescriptor mojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(pluginGoal, session,
+						project);
 
 				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, executionId,
 						MojoExecution.Source.CLI, selectorConfig.selectModes("default")
@@ -212,9 +239,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
 					mojoExecutions.addAll(mojoExecutionsFromLifecycle);
 				}
-			} else {
+			} else
 				throw new IllegalStateException("unexpected task " + task);
-			}
 		}
 		return mojoExecutions;
 	}
@@ -231,14 +257,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (isFlagged)
 			lifecyclePhase = lifecyclePhase.substring(1);
 
-		Lifecycle lifecycle = defaultLifeCycles.get(lifecyclePhase);
+		Lifecycle lifecycle = this.defaultLifeCycles.get(lifecyclePhase);
 
 		if (lifecycle == null) {
-			throw new LifecyclePhaseNotFoundException("[r4m] Unknown lifecycle phase \"" + lifecyclePhase
-					+ "\". You must specify a valid lifecycle phase in the format [<mode>/][+]<phase>[@<execution>]"
-					+ " or a goal in the format <plugin-prefix>:<goal>[@<execution>] or"
-					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]. Available lifecycle phases are: "
-					+ defaultLifeCycles.getLifecyclePhaseList() + ".", lifecyclePhase);
+			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE, Properties.PREFIX_ID,
+					lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()), lifecyclePhase);
 		}
 
 		AdvancedLifecycleMappingDelegate delegate;
@@ -289,7 +312,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	 * @param mojoExecution The mojo execution whose configuration should be
 	 *                      finalized, must not be {@code null}.
 	 */
-	private void finalizeMojoConfiguration(MojoExecution mojoExecution) {
+	protected void finalizeMojoConfiguration(final MojoExecution mojoExecution) {
 		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
 		Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
@@ -297,7 +320,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			executionConfiguration = new Xpp3Dom("configuration");
 		}
 
-		Xpp3Dom defaultConfiguration = getMojoConfiguration(mojoDescriptor);
+		Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
 
 		Xpp3Dom finalConfiguration = new Xpp3Dom("configuration");
 
@@ -329,10 +352,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		mojoExecution.setConfiguration(finalConfiguration);
 	}
 
-	private Xpp3Dom getMojoConfiguration(MojoDescriptor mojoDescriptor) {
-		return MojoDescriptorCreator.convert(mojoDescriptor);
-	}
-
 	@Override
 	public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session)
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
@@ -356,7 +375,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			isForkingGoal = isBlank(mojoDescriptor.getExecutePhase());
 
 		Fork fork = null;
-		ExecutionArchiveSelectorConfig selectorConfig;
+		ExecutionArchiveSelectorConfig selectorConfig = null;
 		if (mojoExecution instanceof MojoExecutionData) {
 			MojoExecutionData data = (MojoExecutionData) mojoExecution;
 			fork = data.getFork();
@@ -408,13 +427,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 			List<MojoExecution> forkedExecutions;
 
-			// TODO INJECT HERE
 			if (isForkingGoal) {
 				forkedExecutions = calculateForkedGoal(session, forkedProject, mojoExecution, alreadyForkedForks,
 						alreadyForkedMojos);
 			} else {
-				forkedExecutions = calculateForkedLifecycle(session, forkedProject, mojoExecution, alreadyForkedForks,
-						alreadyForkedMojos);
+				forkedExecutions = calculateForkedLifecycle(session, forkedProject, mojoExecution, fork, selectorConfig,
+						alreadyForkedForks, alreadyForkedMojos);
 			}
 
 			mojoExecution.setForkedExecutions(BuilderCommon.getKey(forkedProject), forkedExecutions);
@@ -426,51 +444,254 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			alreadyForkedForks.remove(fork);
 	}
 
-	private List<MojoExecution> calculateForkedLifecycle(final MavenSession session, final MavenProject project,
-			final MojoExecution mojoExecution, final Collection<Fork> alreadyForkedForks,
-			final Collection<MojoDescriptor> alreadyForkedMojos)
+	protected List<MojoExecution> calculateForkedLifecycle(final MavenSession session, final MavenProject project,
+			final MojoExecution mojoExecution, final Fork fork, final ExecutionArchiveSelectorConfig baseSelectorConfig,
+			final Collection<Fork> alreadyForkedForks, final Collection<MojoDescriptor> alreadyForkedMojos)
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		ExecutionArchiveSelectorConfig cnf = this.selectorConfigFactory.createEmptyConfig();
 
-		String forkedPhase = mojoDescriptor.getExecutePhase();
+		// select mvnProject
+		cnf.selectActiveProject(project);
+		// select packaging-procedure
+		cnf.selectPackagingProcedure(baseSelectorConfig.getPackagingProcedure());
+		// select modes
+		if (isBlank(fork.getMode()))
+			cnf.selectModes(baseSelectorConfig.getModes());
+		else
+			cnf.selectModes(fork.getMode());
+		// select executions
+		cnf.selectActiveExecutions(fork.getExecutions());
 
-		// TODO integrate DefaultForkMappingDelegate
-		Map<String, List<MojoExecution>> lifecycleMappings = calculateLifecycleMappings(session, project, forkedPhase,
-				null);
+		Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork, cnf);
 
 		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
 			for (MojoExecution forkedExecution : forkedExecutions) {
 				if (forkedExecution.getMojoDescriptor() == null) {
-					MojoDescriptor forkedMojoDescriptor = pluginManager.getMojoDescriptor(forkedExecution.getPlugin(),
-							forkedExecution.getGoal(), project.getRemotePluginRepositories(),
-							session.getRepositorySession());
+					MojoDescriptor forkedMojoDescriptor = this.pluginManager.getMojoDescriptor(
+							forkedExecution.getPlugin(), forkedExecution.getGoal(),
+							project.getRemotePluginRepositories(), session.getRepositorySession());
 
 					forkedExecution.setMojoDescriptor(forkedMojoDescriptor);
 				}
 
-				selectExecutionConfigurator(forkedExecution).configure(project, forkedExecution, false);
+				selectExecutionConfigurator(mojoExecution).configure(project, forkedExecution, false);
 			}
 		}
 
-		// injectLifecycleOverlay(lifecycleMappings, mojoExecution, session, project);
+		// seed configuration with plugin-lifecycle specific settings
+		// (defined by the plugin that forks & defines configs for lifecycle/phase)
+		injectLifecycleOverlay(lifecycleMappings, session, project, mojoExecution, fork.getLifecycleId());
 
-		List<MojoExecution> mojoExecutions = new ArrayList<>();
+		List<MojoExecution> mappings = new LinkedList<>();
+		for (Entry<String, List<MojoExecution>> entry : lifecycleMappings.entrySet())
+			if (entry.getValue() != null)
+				for (MojoExecution exec : entry.getValue()) {
+					// complete with default values
+					finalizeMojoConfiguration(exec);
+					calculateForks(session, project, exec, alreadyForkedForks, alreadyForkedMojos);
+					mappings.add(exec);
+				}
+		return mappings;
+	}
 
-		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
-			for (MojoExecution forkedExecution : forkedExecutions) {
-				if (!alreadyForkedMojos.contains(forkedExecution.getMojoDescriptor())) {
-					finalizeMojoConfiguration(forkedExecution);
-
-					calculateForks(session, project, forkedExecution, alreadyForkedForks, alreadyForkedMojos);
-
-					mojoExecutions.add(forkedExecution);
+	protected List<String> calculateExecutingPhasesByFork(final ExecutionArchiveSelection selection, final Fork fork) {
+		final Map<String, Set<String>> definedExecutionsPerPhase = new LinkedHashMap<>();
+		final Map<String, Set<String>> excludedExecutionsPerPhase = new LinkedHashMap<>(0);
+		// seed executing phases which might be defined
+		List<String> phases = new LinkedList<>();
+		if (fork.getPhases() != null)
+			for (TargetPhase phase : fork.getPhases()) {
+				phases.add(phase.getId());
+				definedExecutionsPerPhase.put(phase.getId(), phase.getExecutions());
+			}
+		// seed phases if not set & existent from lifecycle
+		TargetLifecycle targetLifecycle = fork.getLifecycle();
+		if (targetLifecycle != null && phases.isEmpty()) {
+			Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
+			if (mvnLifecycle == null) {
+				this.log.warn(
+						String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, Properties.PREFIX_ID, targetLifecycle.getId()));
+			} else {
+				boolean includePhase = isBlank(targetLifecycle.getStartPhase());
+				for (String phaseId : mvnLifecycle.getPhases()) {
+					if (!includePhase && targetLifecycle.getStartPhase()
+							.equals(phaseId))
+						includePhase = true;
+					if (includePhase) {
+						phases.add(phaseId);
+						definedExecutionsPerPhase.put(phaseId, new LinkedHashSet<>(0));
+					}
+					if (phaseId != null && phaseId.equals(targetLifecycle.getStopPhase()))
+						break;
 				}
 			}
 		}
+		// seed excluded phases which might be defined
+		for (TargetPhase phase : fork.getExcludedPhases())
+			excludedExecutionsPerPhase.put(phase.getId(), phase.getExecutions());
 
-		return mojoExecutions;
+		selection.modify(views -> {
+			for (ExecutionView exec : views) {
+				String executionId = exec.getId();
+				for (LifecycleView lifecycle : exec.getLifecycles()
+						.values())
+					for (Iterator<PhaseView> iPhase = lifecycle.getPhases()
+							.values()
+							.iterator(); iPhase.hasNext();) {
+						String phaseId = iPhase.next()
+								.getId();
+						Set<String> requiredExecutions = definedExecutionsPerPhase.get(phaseId);
+						// if executions are explicitly defined, only run those
+						if (requiredExecutions == null
+								|| !requiredExecutions.isEmpty() && !requiredExecutions.contains(executionId)) {
+							iPhase.remove();
+							continue;
+						}
+						Set<String> excludedExecutions = excludedExecutionsPerPhase.get(phaseId);
+						if (excludedExecutions != null) {
+							if (excludedExecutions.isEmpty())
+								iPhase.remove();
+							else if (excludedExecutions.contains(executionId))
+								iPhase.remove();
+						}
+					}
+			}
+		});
+		return phases;
+	}
+
+	protected Map<String, List<MojoExecution>> calculateForkMappings(final MavenSession mvnSession,
+			final MavenProject mvnProject, final Fork fork, ExecutionArchiveSelectorConfig cnf)
+			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+			MojoNotFoundException, InvalidPluginDescriptorException, LifecyclePhaseNotFoundException {
+
+		final ExecutionArchiveSelection selection = this.selector.compileSelection(cnf);
+		List<String> orderedPhases = calculateExecutingPhasesByFork(selection, fork);
+
+		// Initialize mapping from lifecycle phase to bound mojos.
+		Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
+		for (String phase : orderedPhases) {
+
+			Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
+			if (lifecycle == null)
+				throw new LifecyclePhaseNotFoundException(
+						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, Properties.PREFIX_ID, phase), phase);
+
+			AdvancedLifecycleMappingDelegate delegate;
+			if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
+				delegate = standardDelegate;
+			} else {
+				delegate = lifecycleMappingDelegates.get(lifecycle.getId());
+				if (delegate == null) {
+					delegate = standardDelegate;
+				}
+			}
+
+			for (Entry<String, List<MojoExecution>> item : delegate
+					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection)
+					.entrySet()) {
+				List<MojoExecution> col = phaseToMojoMapping.get(item.getKey());
+				if (col == null)
+					phaseToMojoMapping.put(item.getKey(), item.getValue());
+				else
+					col.addAll(item.getValue());
+			}
+
+		}
+
+		// reduce and order MojoExecution's
+		Map<String, List<MojoExecution>> lifecycleMappings = new TreeMap<>();
+
+		for (String phase : orderedPhases)
+			lifecycleMappings.put(phase, phaseToMojoMapping.get(phase));
+
+		return lifecycleMappings;
+	}
+
+	protected void injectLifecycleOverlay(final Map<String, List<MojoExecution>> lifecycleMappings,
+			final MavenSession session, final MavenProject project, final MojoExecution mojoExecution,
+			String forkedLifecycleId) throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+			PluginVersionResolutionException {
+		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+
+		if (isBlank(forkedLifecycleId))
+			forkedLifecycleId = mojoDescriptor.getExecuteLifecycle();
+		if (isBlank(forkedLifecycleId))
+			return;
+
+		org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
+
+		try {
+			lifecycleOverlay = pluginDescriptor.getLifecycleMapping(forkedLifecycleId);
+		} catch (IOException | XmlPullParserException e) {
+			return;
+		}
+
+		if (lifecycleOverlay == null)
+			return;
+
+		if (mojoExecution instanceof MojoExecutionData)
+			((MojoExecutionData) mojoExecution).setLifecycleOverlayOrigin(pluginDescriptor);
+
+		for (Phase phase : lifecycleOverlay.getPhases()) {
+			List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
+
+			if (forkedExecutions == null)
+				continue;
+
+			Map<MojoDescriptor, Map<String, Object>> mappedConfigurations = new LinkedHashMap<>();
+			for (Execution execution : phase.getExecutions()) {
+				Object executionConfiguration = execution.getConfiguration();
+
+				for (String goal : execution.getGoals()) {
+					String executionId = null;
+					int splitIdx = goal.indexOf('@');
+					if (0 < splitIdx)
+						executionId = goal.substring(splitIdx + 1);
+
+					MojoDescriptor forkedMojoDescriptor;
+					if (goal.indexOf(':') < 0) {
+						forkedMojoDescriptor = pluginDescriptor.getMojo(goal);
+						if (forkedMojoDescriptor == null)
+							throw new MojoNotFoundException(goal, pluginDescriptor);
+					} else
+						forkedMojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(goal, session, project);
+
+					Map<String, Object> configurations = mappedConfigurations.get(forkedMojoDescriptor);
+					if (configurations == null) {
+						configurations = new LinkedHashMap<>();
+						mappedConfigurations.put(forkedMojoDescriptor, configurations);
+					}
+					configurations.put(executionId, executionConfiguration);
+				}
+			}
+
+			for (MojoExecution mojoExec : forkedExecutions) {
+				MojoDescriptor mojoDesc = mojoExec.getMojoDescriptor();
+				Map<String, Object> configurations = mappedConfigurations.get(mojoDesc);
+				Object configuration = configurations.get(mojoExec.getExecutionId());
+				if (configuration == null)
+					configuration = configurations.get(null);
+				if (configuration == null || !(configuration instanceof Xpp3Dom))
+					continue;
+				mojoExec.setConfiguration((Xpp3Dom) configuration);
+				selectExecutionConfigurator(mojoExec).configure(project, mojoExec, true);
+			}
+
+			Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
+			if (phaseConfiguration != null)
+				for (MojoExecution forkedExecution : forkedExecutions) {
+					Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
+
+					forkedConfiguration = Xpp3Dom.mergeXpp3Dom(phaseConfiguration, forkedConfiguration);
+
+					forkedExecution.setConfiguration(forkedConfiguration);
+				}
+		}
 	}
 
 	// org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
@@ -479,7 +700,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	// fetch remote if something is missing
 	// or the user forces the issue
 
-	private List<MojoExecution> calculateForkedGoal(final MavenSession session, final MavenProject project,
+	protected List<MojoExecution> calculateForkedGoal(final MavenSession session, final MavenProject project,
 			final MojoExecution mojoExecution, final Collection<Fork> alreadyForkedForks,
 			final Collection<MojoDescriptor> alreadyForkedMojos)
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
@@ -521,7 +742,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return Collections.singletonList(forkedExecution);
 	}
 
-	private MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
+	protected MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
 		String configuratorId = mojoExecution.getMojoDescriptor()
 				.getComponentConfigurator();
 		if (configuratorId == null) {
@@ -540,4 +761,5 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 		return mojoExecutionConfigurator;
 	}
+
 }

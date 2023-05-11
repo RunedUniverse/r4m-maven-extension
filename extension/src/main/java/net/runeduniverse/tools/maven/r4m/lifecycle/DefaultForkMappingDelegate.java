@@ -236,8 +236,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 					forkedExecution.setMojoDescriptor(forkedMojoDescriptor);
 				}
 
-				selectExecutionConfigurator(mojoExecution.getMojoDescriptor()
-						.getComponentConfigurator()).configure(mvnProject, forkedExecution, false);
+				selectExecutionConfigurator(mojoExecution).configure(mvnProject, forkedExecution, false);
 			}
 		}
 
@@ -325,7 +324,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 				if (configuration == null || !(configuration instanceof Xpp3Dom))
 					continue;
 				mojoExec.setConfiguration((Xpp3Dom) configuration);
-				selectExecutionConfigurator(mojoDesc.getComponentConfigurator()).configure(project, mojoExec, true);
+				selectExecutionConfigurator(mojoExec).configure(project, mojoExec, true);
 			}
 
 			Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
@@ -340,7 +339,9 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		}
 	}
 
-	protected MojoExecutionConfigurator selectExecutionConfigurator(String configuratorId) {
+	protected MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
+		String configuratorId = mojoExecution.getMojoDescriptor()
+				.getComponentConfigurator();
 		if (configuratorId == null)
 			configuratorId = "default";
 

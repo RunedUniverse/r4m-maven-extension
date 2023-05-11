@@ -9,7 +9,6 @@ import java.util.TreeMap;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.LifecycleMappingDelegate;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
@@ -41,7 +40,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
  * phase to calculate the execution plan, but custom lifecycles can use
  * alternative mapping strategies.
  */
-@Component(role = LifecycleMappingDelegate.class, hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
+@Component(role = AdvancedLifecycleMappingDelegate.class, hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
 public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycleMappingDelegate {
 
 	public static final String HINT = "default";

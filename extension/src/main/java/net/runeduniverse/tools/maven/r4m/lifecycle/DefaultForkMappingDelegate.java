@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
-import org.apache.maven.lifecycle.LifecycleNotFoundException;
 import org.apache.maven.lifecycle.MojoExecutionConfigurator;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.plugin.BuildPluginManager;
@@ -61,7 +60,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 	public static final String HINT = "default";
 	public static final String WARN_SKIPPING_UNKNOWN_LIFECYCLE = "skipping unknown lifecycle » %s";
-	public static final String WARN_FAILED_TO_LOAD_PLUGIN_LIFECYCLE_CONFIGURATION = "Failed to load plugin-lifecycle specific configuration while forking » %s";
+	public static final String WARN_CONFIGURATION_OVERRIDES_APPLIED = "Applying configuration overrides for forked-lifecycle<%s> provided by %s:%s:%s";
 
 	@Requirement
 	protected Logger log;
@@ -204,7 +203,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	@Override
 	public List<MojoExecution> calculateForkMappings(final MojoExecution mojoExecution, final MavenSession mvnSession,
 			final MavenProject mvnProject) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
+			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+			NoPluginFoundForPrefixException, PluginVersionResolutionException {
 		if (!(mojoExecution instanceof MojoExecutionData))
 			return new LinkedList<>();
 
@@ -244,19 +244,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 		// seed configuration with plugin-lifecycle specific settings
 		// (defined by the plugin that defines the lifecycle/phase)
-		// TODO move to PEM parsing >> double injection issue
-		//try {
-		//	injectLifecycleOverlay(lifecycleMappings, mvnSession, mvnProject, mojoExecution, fork.getLifecycleId());
-		//} catch (PluginNotFoundException | PluginDescriptorParsingException | LifecycleNotFoundException
-		//		| MojoNotFoundException | PluginResolutionException | NoPluginFoundForPrefixException
-		//		| InvalidPluginDescriptorException | PluginVersionResolutionException e) {
-		//
-		//	String msg = String.format(WARN_FAILED_TO_LOAD_PLUGIN_LIFECYCLE_CONFIGURATION, mojoExecution.toString());
-		//	if (this.log.isDebugEnabled())
-		//		this.log.warn(msg, e);
-		//	else
-		//		this.log.warn(msg);
-		//}
+		injectLifecycleOverlay(lifecycleMappings, mvnSession, mvnProject, mojoExecution, fork.getLifecycleId());
 
 		List<MojoExecution> mappings = new LinkedList<>();
 		for (Entry<String, List<MojoExecution>> entry : lifecycleMappings.entrySet())
@@ -271,74 +259,85 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 
 	protected void injectLifecycleOverlay(final Map<String, List<MojoExecution>> lifecycleMappings,
 			final MavenSession session, final MavenProject project, final MojoExecution mojoExecution,
-			String forkedLifecycleId) throws PluginDescriptorParsingException, LifecycleNotFoundException,
-			MojoNotFoundException, PluginNotFoundException, PluginResolutionException, NoPluginFoundForPrefixException,
-			InvalidPluginDescriptorException, PluginVersionResolutionException {
+			String forkedLifecycleId) throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
+			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
+			PluginVersionResolutionException {
 		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-
 		PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+
 		if (isBlank(forkedLifecycleId))
 			forkedLifecycleId = mojoDescriptor.getExecuteLifecycle();
-
-		if (StringUtils.isEmpty(forkedLifecycleId)) {
+		if (isBlank(forkedLifecycleId))
 			return;
-		}
 
 		org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
 
 		try {
 			lifecycleOverlay = pluginDescriptor.getLifecycleMapping(forkedLifecycleId);
 		} catch (IOException | XmlPullParserException e) {
-			throw new PluginDescriptorParsingException(pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e);
+			return;
 		}
 
-		if (lifecycleOverlay == null) {
-			throw new LifecycleNotFoundException(forkedLifecycleId);
-		}
+		if (lifecycleOverlay == null)
+			return;
+
+		this.log.warn(String.format(WARN_CONFIGURATION_OVERRIDES_APPLIED, forkedLifecycleId,
+				pluginDescriptor.getGroupId(), pluginDescriptor.getArtifactId(), pluginDescriptor.getVersion()));
 
 		for (Phase phase : lifecycleOverlay.getPhases()) {
 			List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
 
-			if (forkedExecutions != null) {
-				for (Execution execution : phase.getExecutions()) {
-					for (String goal : execution.getGoals()) {
-						MojoDescriptor forkedMojoDescriptor;
+			if (forkedExecutions == null)
+				continue;
 
-						if (goal.indexOf(':') < 0) {
-							forkedMojoDescriptor = pluginDescriptor.getMojo(goal);
-							if (forkedMojoDescriptor == null) {
-								throw new MojoNotFoundException(goal, pluginDescriptor);
-							}
-						} else {
-							forkedMojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(goal, session, project);
-						}
+			Map<MojoDescriptor, Map<String, Object>> mappedConfigurations = new LinkedHashMap<>();
+			for (Execution execution : phase.getExecutions()) {
+				Object executionConfiguration = execution.getConfiguration();
 
-						MojoExecution forkedExecution = new MojoExecution(forkedMojoDescriptor,
-								mojoExecution.getExecutionId());
+				for (String goal : execution.getGoals()) {
+					String executionId = null;
+					int splitIdx = goal.indexOf('@');
+					if (0 < splitIdx)
+						executionId = goal.substring(splitIdx + 1);
 
-						Xpp3Dom forkedConfiguration = (Xpp3Dom) execution.getConfiguration();
+					MojoDescriptor forkedMojoDescriptor;
+					if (goal.indexOf(':') < 0) {
+						forkedMojoDescriptor = pluginDescriptor.getMojo(goal);
+						if (forkedMojoDescriptor == null)
+							throw new MojoNotFoundException(goal, pluginDescriptor);
+					} else
+						forkedMojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(goal, session, project);
 
-						forkedExecution.setConfiguration(forkedConfiguration);
-
-						selectExecutionConfigurator(forkedExecution.getMojoDescriptor()
-								.getComponentConfigurator()).configure(project, forkedExecution, true);
-
-						forkedExecutions.add(forkedExecution);
+					Map<String, Object> configurations = mappedConfigurations.get(forkedMojoDescriptor);
+					if (configurations == null) {
+						configurations = new LinkedHashMap<>();
+						mappedConfigurations.put(forkedMojoDescriptor, configurations);
 					}
-				}
-
-				Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
-
-				if (phaseConfiguration != null) {
-					for (MojoExecution forkedExecution : forkedExecutions) {
-						Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
-
-						forkedConfiguration = Xpp3Dom.mergeXpp3Dom(phaseConfiguration, forkedConfiguration);
-
-						forkedExecution.setConfiguration(forkedConfiguration);
-					}
+					configurations.put(executionId, executionConfiguration);
 				}
 			}
+
+			for (MojoExecution mojoExec : forkedExecutions) {
+				MojoDescriptor mojoDesc = mojoExec.getMojoDescriptor();
+				Map<String, Object> configurations = mappedConfigurations.get(mojoDesc);
+				Object configuration = configurations.get(mojoExec.getExecutionId());
+				if (configuration == null)
+					configuration = configurations.get(null);
+				if (configuration == null || !(configuration instanceof Xpp3Dom))
+					continue;
+				mojoExec.setConfiguration((Xpp3Dom) configuration);
+				selectExecutionConfigurator(mojoDesc.getComponentConfigurator()).configure(project, mojoExec, true);
+			}
+
+			Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
+			if (phaseConfiguration != null)
+				for (MojoExecution forkedExecution : forkedExecutions) {
+					Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
+
+					forkedConfiguration = Xpp3Dom.mergeXpp3Dom(phaseConfiguration, forkedConfiguration);
+
+					forkedExecution.setConfiguration(forkedConfiguration);
+				}
 		}
 	}
 

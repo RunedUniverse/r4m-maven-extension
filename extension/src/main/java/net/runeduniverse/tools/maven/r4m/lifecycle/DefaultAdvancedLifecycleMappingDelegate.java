@@ -17,6 +17,8 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -67,8 +69,13 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
 					mojoExecution.setFork(goal.getFork());
 					if (goal.hasValidFork())
-						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
-								this.forkMappingDelegate.calculateForkMappings(mojoExecution, session, project));
+						try {
+							mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
+									this.forkMappingDelegate.calculateForkMappings(mojoExecution, session, project));
+						} catch (MojoNotFoundException | NoPluginFoundForPrefixException
+								| PluginVersionResolutionException e) {
+							this.log.error("Unable to fork!", e);
+						}
 					addMojoExecution(phaseBindings, mojoExecution, 0);
 				}
 			}

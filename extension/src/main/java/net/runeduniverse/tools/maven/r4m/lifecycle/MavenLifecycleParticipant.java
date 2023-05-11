@@ -19,10 +19,14 @@ import net.runeduniverse.tools.maven.r4m.Properties;
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.LIFECYCLE.DEV.LIFECYCLE_PARTICIPANT_HINT)
 public class MavenLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
-	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
-	public static final String WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT = "[r4m] Component<%s> could not be located in PlexusContainer!";
-	public static final String WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT = "[r4m] Component<%s> could not be released from PlexusContainer!";
-	public static final String DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR = "[r4m] Updating ComponentDescriptor of Component<%s> to Role: %s\tHint: %s";
+	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = //
+			"Failed loading maven-extension ClassRealm";
+	public static final String WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT = //
+			"[%s] Component<%s> could not be located in PlexusContainer!";
+	public static final String WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT = //
+			"[%s] Component<%s> could not be released from PlexusContainer!";
+	public static final String DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR = //
+			"[%s] Updating ComponentDescriptor of Component<%s> to Role: %s\tHint: %s";
 
 	public static final String PLEXUS_DEFAULT_MAVEN_HINT = "maven-default";
 
@@ -99,17 +103,19 @@ public class MavenLifecycleParticipant extends AbstractMavenLifecycleParticipant
 					break;
 				}
 		} catch (ComponentLookupException e) {
-			this.log.warn(String.format(WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT, defaultExecPlanCalcName));
+			this.log.warn(String.format(WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
+					defaultExecPlanCalcName));
 		}
 		if (defaultExecPlanCalc != null)
 			try {
 				this.container.release(defaultExecPlanCalc);
 				this.container.addComponent(defaultExecPlanCalc, DefaultLifecycleExecutionPlanCalculator.class,
 						PLEXUS_DEFAULT_MAVEN_HINT);
-				this.log.debug(String.format(DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, defaultExecPlanCalcName,
-						defaultExecPlanCalcName, PLEXUS_DEFAULT_MAVEN_HINT));
+				this.log.debug(String.format(DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, Properties.PREFIX_ID,
+						defaultExecPlanCalcName, defaultExecPlanCalcName, PLEXUS_DEFAULT_MAVEN_HINT));
 			} catch (ComponentLifecycleException e) {
-				this.log.warn(String.format(WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT, defaultExecPlanCalcName));
+				this.log.warn(String.format(WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
+						defaultExecPlanCalcName));
 			}
 	}
 

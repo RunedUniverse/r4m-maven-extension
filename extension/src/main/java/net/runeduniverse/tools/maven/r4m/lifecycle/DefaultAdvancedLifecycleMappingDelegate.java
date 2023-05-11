@@ -24,14 +24,9 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.api.pem.ForkMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build
@@ -48,27 +43,12 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 	@Requirement
 	private Logger log;
 	@Requirement
-	private ExecutionArchiveSelector selector;
-	@Requirement
-	private ExecutionArchiveSelectorConfigFactory cnfFactory;
-	@Requirement
 	private ForkMappingDelegate forkMappingDelegate;
 
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase, String mode, String execution)
+			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException {
-
-		ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
-
-		cnf.selectActiveProject(project);
-		cnf.selectModes(isBlank(mode) ? "default" : mode);
-		cnf.selectPackagingProcedure(project.getPackaging());
-		if (!isBlank(execution))
-			cnf.selectActiveExecutions(execution);
-
-		ExecutionArchiveSelection selection = selector.compileSelection(cnf);
-
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */
@@ -83,12 +63,12 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 				Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(lifecyclePhase);
 				if (phaseBindings != null) {
 					MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(goal.getDescriptor(), entry.getKey()
-							.getId(), Source.LIFECYCLE, cnf);
+							.getId(), Source.LIFECYCLE, selection.getSelectorConfig());
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
 					mojoExecution.setFork(goal.getFork());
 					if (goal.hasValidFork())
-						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project), this.forkMappingDelegate
-								.calculateForkMappings(mojoExecution, session, project, cnf, goal.getFork()));
+						mojoExecution.setForkedExecutions(BuilderCommon.getKey(project),
+								this.forkMappingDelegate.calculateForkMappings(mojoExecution, session, project));
 					addMojoExecution(phaseBindings, mojoExecution, 0);
 				}
 			}

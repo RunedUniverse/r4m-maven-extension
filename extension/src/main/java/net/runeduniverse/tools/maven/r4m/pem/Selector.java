@@ -241,19 +241,19 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	@Override
-	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig cnf) {
+	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
 		Set<ExecutionView> views = new LinkedHashSet<>();
-		if (cnf.getActiveProject() == null)
-			return new Selection(views);
+		if (selectorConfig.getActiveProject() == null)
+			return new Selection(selectorConfig.clone(), views);
 
-		ExecutionArchiveSlice slice = this.archive.getSlice(cnf.getActiveProject());
+		ExecutionArchiveSlice slice = this.archive.getSlice(selectorConfig.getActiveProject());
 		if (slice == null)
-			return new Selection(views);
+			return new Selection(selectorConfig.clone(), views);
 
-		cnf.compile(this.mvnSession);
-		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(cnf, slice).entrySet())
-			views.add(reduce(cnf, entry.getKey(), entry.getValue()));
-		return new Selection(views);
+		selectorConfig.compile(this.mvnSession);
+		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, slice).entrySet())
+			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
+		return new Selection(selectorConfig.clone(), views);
 	}
 
 }

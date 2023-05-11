@@ -20,6 +20,12 @@ public class Fork implements Recordable {
 		return this.lifecycle;
 	}
 
+	public String getLifecycleId() {
+		if (this.lifecycle == null)
+			return null;
+		return this.lifecycle.getId();
+	}
+
 	public String getMode() {
 		return this.mode;
 	}

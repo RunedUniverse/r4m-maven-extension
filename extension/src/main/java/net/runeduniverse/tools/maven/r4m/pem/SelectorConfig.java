@@ -13,6 +13,7 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
 
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
+
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
 	private final Set<String> activeExecutions = new LinkedHashSet<>();
@@ -44,7 +45,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			this.activeExecutions.add(values[i]);
+			if (values[i] != null)
+				this.activeExecutions.add(values[i]);
 		return this;
 	}
 
@@ -59,7 +61,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectActiveProfiles(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			this.activeProfiles.add(values[i]);
+			if (values[i] != null)
+				this.activeProfiles.add(values[i]);
 		return this;
 	}
 
@@ -74,7 +77,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			this.providedProfiles.add(values[i]);
+			if (values[i] != null)
+				this.providedProfiles.add(values[i]);
 		return this;
 	}
 
@@ -89,7 +93,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectModes(String... values) {
 		this.dirty = true;
 		for (int i = 0; i < values.length; i++)
-			this.modes.add(values[i]);
+			if (values[i] != null)
+				this.modes.add(values[i]);
 		return this;
 	}
 
@@ -238,4 +243,5 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 		return tree;
 	}
+
 }

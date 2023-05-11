@@ -3,6 +3,7 @@ package net.runeduniverse.tools.maven.r4m.lifecycle;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
@@ -14,6 +15,7 @@ public class MojoExecutionAdapter extends MojoExecution implements MojoExecution
 	private final ExecutionArchiveSelectorConfig selectorConfig;
 
 	private Fork fork = null;
+	private PluginDescriptor lifecycleOverlayOrigin = null;
 
 	public MojoExecutionAdapter(Plugin plugin, String goal, String executionId,
 			ExecutionArchiveSelectorConfig selectorConfig) {
@@ -59,8 +61,18 @@ public class MojoExecutionAdapter extends MojoExecution implements MojoExecution
 		return this.fork;
 	}
 
+	@Override
+	public PluginDescriptor getLifecycleOverlayOrigin() {
+		return this.lifecycleOverlayOrigin;
+	}
+
 	public void setFork(Fork fork) {
 		this.fork = fork;
+	}
+
+	@Override
+	public void setLifecycleOverlayOrigin(PluginDescriptor overlayOrigin) {
+		this.lifecycleOverlayOrigin = overlayOrigin;
 	}
 
 }

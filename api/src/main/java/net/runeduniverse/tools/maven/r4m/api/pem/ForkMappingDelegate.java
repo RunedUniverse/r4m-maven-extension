@@ -9,12 +9,15 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 public interface ForkMappingDelegate {
 
 	public List<MojoExecution> calculateForkMappings(MojoExecution mojoExecution, final MavenSession mvnSession,
 			final MavenProject mvnProject) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
+			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
+			NoPluginFoundForPrefixException, PluginVersionResolutionException;
 
 }

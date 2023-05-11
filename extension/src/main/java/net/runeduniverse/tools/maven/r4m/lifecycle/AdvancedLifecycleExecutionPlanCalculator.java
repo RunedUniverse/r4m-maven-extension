@@ -673,6 +673,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			for (MojoExecution mojoExec : forkedExecutions) {
 				MojoDescriptor mojoDesc = mojoExec.getMojoDescriptor();
 				Map<String, Object> configurations = mappedConfigurations.get(mojoDesc);
+				if (configurations == null)
+					continue;
 				Object configuration = configurations.get(mojoExec.getExecutionId());
 				if (configuration == null)
 					configuration = configurations.get(null);

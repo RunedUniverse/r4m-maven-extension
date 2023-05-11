@@ -15,8 +15,8 @@ import org.apache.maven.project.MavenProject;
 
 public interface ForkMappingDelegate {
 
-	public List<MojoExecution> calculateForkMappings(MojoExecution mojoExecution, final MavenSession mvnSession,
-			final MavenProject mvnProject) throws PluginNotFoundException, PluginResolutionException,
+	public List<MojoExecution> calculateForkMappings(final MavenSession mvnSession, final MavenProject mvnProject,
+			final MojoExecution mojoExecution) throws PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
 			NoPluginFoundForPrefixException, PluginVersionResolutionException;
 

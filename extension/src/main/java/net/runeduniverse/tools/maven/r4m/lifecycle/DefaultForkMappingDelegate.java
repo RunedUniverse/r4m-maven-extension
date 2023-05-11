@@ -200,8 +200,8 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 	}
 
 	@Override
-	public List<MojoExecution> calculateForkMappings(final MojoExecution mojoExecution, final MavenSession mvnSession,
-			final MavenProject mvnProject) throws PluginNotFoundException, PluginResolutionException,
+	public List<MojoExecution> calculateForkMappings(final MavenSession mvnSession, final MavenProject mvnProject,
+			final MojoExecution mojoExecution) throws PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
 			NoPluginFoundForPrefixException, PluginVersionResolutionException {
 		if (!(mojoExecution instanceof MojoExecutionData))
@@ -241,7 +241,7 @@ public class DefaultForkMappingDelegate implements ForkMappingDelegate {
 		}
 
 		// seed configuration with plugin-lifecycle specific settings
-		// (defined by the plugin that defines the lifecycle/phase)
+		// (defined by the plugin that forks & defines configs for lifecycle/phase)
 		injectLifecycleOverlay(lifecycleMappings, mvnSession, mvnProject, mojoExecution, fork.getLifecycleId());
 
 		List<MojoExecution> mappings = new LinkedList<>();

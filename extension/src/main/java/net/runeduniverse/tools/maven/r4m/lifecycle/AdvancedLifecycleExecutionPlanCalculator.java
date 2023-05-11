@@ -164,7 +164,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			mojoExecution.setMojoDescriptor(mojoDescriptor);
 		}
 
-		mojoExecutionConfigurator(mojoExecution).configure(project, mojoExecution,
+		selectExecutionConfigurator(mojoExecution).configure(project, mojoExecution,
 				MojoExecution.Source.CLI.equals(mojoExecution.getSource()));
 
 		finalizeMojoConfiguration(mojoExecution);
@@ -402,11 +402,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					forkedExecution.setMojoDescriptor(forkedMojoDescriptor);
 				}
 
-				mojoExecutionConfigurator(forkedExecution).configure(project, forkedExecution, false);
+				selectExecutionConfigurator(forkedExecution).configure(project, forkedExecution, false);
 			}
 		}
 
-		injectLifecycleOverlay(lifecycleMappings, mojoExecution, session, project);
+		//injectLifecycleOverlay(lifecycleMappings, mojoExecution, session, project);
 
 		List<MojoExecution> mojoExecutions = new ArrayList<>();
 
@@ -425,76 +425,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return mojoExecutions;
 	}
 
-	private void injectLifecycleOverlay(Map<String, List<MojoExecution>> lifecycleMappings, MojoExecution mojoExecution,
-			MavenSession session, MavenProject project) throws PluginDescriptorParsingException,
-			LifecycleNotFoundException, MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
-			NoPluginFoundForPrefixException, InvalidPluginDescriptorException, PluginVersionResolutionException {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-		PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
-
-		String forkedLifecycle = mojoDescriptor.getExecuteLifecycle();
-
-		if (StringUtils.isEmpty(forkedLifecycle)) {
-			return;
-		}
-
-		org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
-
-		try {
-			lifecycleOverlay = pluginDescriptor.getLifecycleMapping(forkedLifecycle);
-		} catch (IOException | XmlPullParserException e) {
-			throw new PluginDescriptorParsingException(pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e);
-		}
-
-		if (lifecycleOverlay == null) {
-			throw new LifecycleNotFoundException(forkedLifecycle);
-		}
-
-		for (Phase phase : lifecycleOverlay.getPhases()) {
-			List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
-
-			if (forkedExecutions != null) {
-				for (Execution execution : phase.getExecutions()) {
-					for (String goal : execution.getGoals()) {
-						MojoDescriptor forkedMojoDescriptor;
-
-						if (goal.indexOf(':') < 0) {
-							forkedMojoDescriptor = pluginDescriptor.getMojo(goal);
-							if (forkedMojoDescriptor == null) {
-								throw new MojoNotFoundException(goal, pluginDescriptor);
-							}
-						} else {
-							forkedMojoDescriptor = mojoDescriptorCreator.getMojoDescriptor(goal, session, project);
-						}
-
-						MojoExecution forkedExecution = new MojoExecution(forkedMojoDescriptor,
-								mojoExecution.getExecutionId());
-
-						Xpp3Dom forkedConfiguration = (Xpp3Dom) execution.getConfiguration();
-
-						forkedExecution.setConfiguration(forkedConfiguration);
-
-						mojoExecutionConfigurator(forkedExecution).configure(project, forkedExecution, true);
-
-						forkedExecutions.add(forkedExecution);
-					}
-				}
-
-				Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
-
-				if (phaseConfiguration != null) {
-					for (MojoExecution forkedExecution : forkedExecutions) {
-						Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
-
-						forkedConfiguration = Xpp3Dom.mergeXpp3Dom(phaseConfiguration, forkedConfiguration);
-
-						forkedExecution.setConfiguration(forkedConfiguration);
-					}
-				}
-			}
-		}
-	}
 
 	// org.apache.maven.plugins:maven-remote-resources-plugin:1.0:process
 	// take repo mans into account as one may be aggregating prefixes of many
@@ -534,7 +465,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 							.selectPackagingProcedure(project.getPackaging())
 							.selectActiveExecutions(mojoExecution.getExecutionId()));
 
-		mojoExecutionConfigurator(forkedExecution).configure(project, forkedExecution, true);
+		selectExecutionConfigurator(forkedExecution).configure(project, forkedExecution, true);
 
 		finalizeMojoConfiguration(forkedExecution);
 
@@ -543,7 +474,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return Collections.singletonList(forkedExecution);
 	}
 
-	private MojoExecutionConfigurator mojoExecutionConfigurator(MojoExecution mojoExecution) {
+	private MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
 		String configuratorId = mojoExecution.getMojoDescriptor()
 				.getComponentConfigurator();
 		if (configuratorId == null) {

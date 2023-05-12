@@ -3,9 +3,10 @@ package net.runeduniverse.tools.maven.r4m.pem.view.api;
 import java.util.Collection;
 import java.util.List;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public interface PhaseView extends Recordable {
+
 	public String getId();
 
 	public List<GoalView> getGoals();
@@ -15,4 +16,5 @@ public interface PhaseView extends Recordable {
 	public void removeGoal(GoalView goal);
 
 	public void addNewGoals(Collection<GoalView> goals);
+
 }

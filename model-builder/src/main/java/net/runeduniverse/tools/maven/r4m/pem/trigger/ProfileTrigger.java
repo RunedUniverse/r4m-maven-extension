@@ -15,4 +15,9 @@ public abstract class ProfileTrigger implements ExecutionTrigger<ExecutionArchiv
 		return this.profileId;
 	}
 
+	@Override
+	public Class<ExecutionArchiveSelectorConfig> getDataType() {
+		return ExecutionArchiveSelectorConfig.class;
+	}
+
 }

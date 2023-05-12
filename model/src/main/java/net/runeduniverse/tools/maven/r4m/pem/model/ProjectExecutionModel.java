@@ -6,9 +6,10 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class ProjectExecutionModel implements Recordable {
+
 	private String version;
 	private Class<?> parserType = null;
 	private String parserHint = null;
@@ -74,4 +75,5 @@ public class ProjectExecutionModel implements Recordable {
 
 		return tree;
 	}
+
 }

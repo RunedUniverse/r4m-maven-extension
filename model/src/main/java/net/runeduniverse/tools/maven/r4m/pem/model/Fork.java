@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class Fork implements Recordable {
+
 	private String mode = null;
 	private final Set<String> executions = new LinkedHashSet<>(0);
 	private TargetLifecycle lifecycle = null;

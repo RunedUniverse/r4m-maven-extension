@@ -5,9 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class Lifecycle implements Recordable {
+
 	private String id;
 	private Map<String, Phase> phases = new LinkedHashMap<>();
 
@@ -50,4 +51,5 @@ public class Lifecycle implements Recordable {
 
 		return tree;
 	}
+
 }

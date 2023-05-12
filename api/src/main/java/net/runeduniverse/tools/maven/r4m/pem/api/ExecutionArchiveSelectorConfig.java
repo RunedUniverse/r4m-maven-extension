@@ -6,6 +6,8 @@ import java.util.Set;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
 public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig selectActiveProject(MavenProject value);

@@ -20,7 +20,6 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
@@ -333,7 +332,7 @@ public interface ExtensionUtils {
 			return false;
 		// restrictions
 		if (checkRestrictions) {
-			final List<ExecutionRestriction> execRestrictions = new LinkedList<>(exec.getRestrictions());
+			final List<ExecutionRestriction<?>> execRestrictions = new LinkedList<>(exec.getRestrictions());
 			if (execRestrictions.size() != origExec.getRestrictions()
 					.size())
 				return false;
@@ -341,7 +340,7 @@ public interface ExtensionUtils {
 				return false;
 		}
 		// trigger
-		final List<ExecutionTrigger> execTrigger = new LinkedList<>(exec.getTrigger());
+		final List<?> execTrigger = new LinkedList<>(exec.getTrigger());
 		if (execTrigger.size() != origExec.getTrigger()
 				.size())
 			return false;

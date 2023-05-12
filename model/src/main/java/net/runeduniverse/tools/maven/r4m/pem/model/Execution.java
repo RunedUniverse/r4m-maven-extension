@@ -10,11 +10,12 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
 
 public class Execution implements Recordable {
+
 	private String id = null;
 	private ExecutionSource source = null;
 
-	private final Set<ExecutionRestriction> restrictions = new LinkedHashSet<>();
-	private final Set<ExecutionTrigger> trigger = new LinkedHashSet<>();
+	private final Set<ExecutionRestriction<?>> restrictions = new LinkedHashSet<>();
+	private final Set<ExecutionTrigger<?>> trigger = new LinkedHashSet<>();
 	private boolean inherited = true;
 	private boolean activeAlways = false;
 	private boolean activeDefault = false;
@@ -38,8 +39,17 @@ public class Execution implements Recordable {
 		return this.source;
 	}
 
-	public Set<ExecutionTrigger> getTrigger() {
+	public Set<ExecutionTrigger<?>> getTrigger() {
 		return this.trigger;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Set<ExecutionTrigger<T>> getTrigger(Class<T> dataType) {
+		Set<ExecutionTrigger<T>> result = new LinkedHashSet<>();
+		for (ExecutionTrigger<?> trigger : this.trigger)
+			if (dataType.isAssignableFrom(trigger.getDataType()))
+				result.add((ExecutionTrigger<T>) trigger);
+		return result;
 	}
 
 	public boolean isInherited() {
@@ -58,8 +68,17 @@ public class Execution implements Recordable {
 		return this.activeNever;
 	}
 
-	public Set<ExecutionRestriction> getRestrictions() {
+	public Set<ExecutionRestriction<?>> getRestrictions() {
 		return this.restrictions;
+	}
+
+	@SuppressWarnings("unchecked")
+	public <T> Set<ExecutionRestriction<T>> getRestrictions(Class<T> dataType) {
+		Set<ExecutionRestriction<T>> result = new LinkedHashSet<>();
+		for (ExecutionRestriction<?> restriction : this.restrictions)
+			if (dataType.isAssignableFrom(restriction.getDataType()))
+				result.add((ExecutionRestriction<T>) restriction);
+		return result;
 	}
 
 	public Lifecycle getLifecycle(String lifecycleId) {
@@ -86,19 +105,19 @@ public class Execution implements Recordable {
 		this.activeNever = value;
 	}
 
-	public void addTrigger(ExecutionTrigger trigger) {
+	public void addTrigger(ExecutionTrigger<?> trigger) {
 		this.trigger.add(trigger);
 	}
 
-	public void addRestriction(ExecutionRestriction value) {
-		for (ExecutionRestriction restriction : this.restrictions)
+	public void addRestriction(ExecutionRestriction<?> value) {
+		for (ExecutionRestriction<?> restriction : this.restrictions)
 			if (restriction != null && restriction.equals(value))
 				return;
 		this.restrictions.add(value);
 	}
 
-	public void addRestrictions(Collection<ExecutionRestriction> values) {
-		for (ExecutionRestriction value : values)
+	public void addRestrictions(Collection<ExecutionRestriction<?>> values) {
+		for (ExecutionRestriction<?> value : values)
 			addRestriction(value);
 	}
 
@@ -160,4 +179,5 @@ public class Execution implements Recordable {
 
 		return tree;
 	}
+
 }

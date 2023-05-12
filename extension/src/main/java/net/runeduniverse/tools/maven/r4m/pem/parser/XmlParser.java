@@ -123,7 +123,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 				ExecutionRestrictionParser parser = this.execRestrictionParser.get(name);
 				if (parser == null)
 					continue;
-				ExecutionRestriction restriction = parser.parse(triggerNode);
+				ExecutionRestriction<?> restriction = parser.parse(triggerNode);
 				if (restriction == null)
 					continue;
 				exec.addRestriction(restriction);
@@ -160,7 +160,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 					ExecutionTriggerParser parser = this.execTriggerParser.get(name);
 					if (parser == null)
 						break;
-					ExecutionTrigger trigger = parser.parse(triggerNode);
+					ExecutionTrigger<?> trigger = parser.parse(triggerNode);
 					if (trigger == null)
 						break;
 					exec.addTrigger(trigger);

@@ -6,6 +6,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
 public interface ExecutionRestrictionWriter {
 
-	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction restriction);
+	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction<?> restriction);
 
 }

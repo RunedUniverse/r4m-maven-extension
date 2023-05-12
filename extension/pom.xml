@@ -23,6 +23,7 @@
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
+		<model-builder-version>0</model-builder-version>
 	</properties>
 
 	<licenses>
@@ -71,6 +72,12 @@
 			<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 			<artifactId>r4m-api</artifactId>
 			<version>${major-version}.${minor-version}.${api-version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+			<artifactId>r4m-model-builder</artifactId>
+			<version>${major-version}.${minor-version}.${model-builder-version}</version>
 			<scope>compile</scope>
 		</dependency>
 

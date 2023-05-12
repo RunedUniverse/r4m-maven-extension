@@ -11,7 +11,7 @@ import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRest
 public class PackagingProcedureRestrictionWriter implements ExecutionRestrictionWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction restriction) {
+	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction<?> restriction) {
 		if (restriction == null || !(restriction instanceof PackagingProcedureRestriction))
 			return false;
 

@@ -119,4 +119,24 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-metadata</artifactId>
+				<configuration>
+					<staticMetadataDirectory>src/main/plexus</staticMetadataDirectory>
+					<testStaticMetadataDirectory>src/test/plexus</testStaticMetadataDirectory>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate-metadata</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

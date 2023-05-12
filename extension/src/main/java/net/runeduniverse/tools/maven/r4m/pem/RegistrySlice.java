@@ -7,9 +7,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

@@ -1,6 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.pem.trigger;
 
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 
 public abstract class ProfileTrigger implements ExecutionTrigger {
 

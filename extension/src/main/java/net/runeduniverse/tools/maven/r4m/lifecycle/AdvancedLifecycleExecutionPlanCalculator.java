@@ -54,21 +54,21 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.PhaseSequenceCalculatorDelegate;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelector;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetLifecycle;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetPhase;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskParser;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

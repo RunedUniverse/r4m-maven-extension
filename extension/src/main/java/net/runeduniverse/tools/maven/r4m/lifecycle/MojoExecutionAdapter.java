@@ -6,9 +6,9 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 
 public class MojoExecutionAdapter extends MojoExecution implements MojoExecutionData {
 

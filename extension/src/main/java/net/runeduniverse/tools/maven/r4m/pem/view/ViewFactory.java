@@ -1,9 +1,9 @@
 package net.runeduniverse.tools.maven.r4m.pem.view;
 
-import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 public class ViewFactory {
 

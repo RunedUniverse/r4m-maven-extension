@@ -9,8 +9,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.MojoExecutionData;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 
 @Component(role = EventSpy.class, hint = MojoExecutionEventSpy.HINT)
 public class MojoExecutionEventSpy implements EventSpy {

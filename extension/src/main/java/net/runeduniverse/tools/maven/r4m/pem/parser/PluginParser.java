@@ -22,11 +22,11 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistry;
-import net.runeduniverse.tools.maven.r4m.api.pem.PluginExecutionRegistrySlice;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelPluginParser.class, hint = PluginParser.HINT)
 public class PluginParser implements ProjectExecutionModelPluginParser {

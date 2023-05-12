@@ -10,11 +10,11 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public class ArchiveSlice implements ExecutionArchiveSlice {
 	private final MavenProject mvnProject;

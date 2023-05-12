@@ -16,10 +16,10 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionRestrictionParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionTriggerParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.*;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.*;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

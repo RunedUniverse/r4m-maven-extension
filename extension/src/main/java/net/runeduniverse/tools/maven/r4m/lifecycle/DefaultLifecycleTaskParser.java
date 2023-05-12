@@ -2,8 +2,9 @@ package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.codehaus.plexus.component.annotations.Component;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskData;
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.LifecycleTaskParser;
+
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskParser;
 
 @Component(role = LifecycleTaskParser.class)
 public class DefaultLifecycleTaskParser implements LifecycleTaskParser {

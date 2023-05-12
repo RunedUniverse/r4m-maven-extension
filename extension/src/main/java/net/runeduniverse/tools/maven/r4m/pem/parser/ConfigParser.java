@@ -12,9 +12,9 @@ import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelConfigParser.class, hint = ConfigParser.HINT)
 public class ConfigParser implements ProjectExecutionModelConfigParser {

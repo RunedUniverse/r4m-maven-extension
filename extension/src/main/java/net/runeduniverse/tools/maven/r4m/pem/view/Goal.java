@@ -7,8 +7,8 @@ import java.util.Set;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
 public class Goal implements GoalView {
 	private String groupId;

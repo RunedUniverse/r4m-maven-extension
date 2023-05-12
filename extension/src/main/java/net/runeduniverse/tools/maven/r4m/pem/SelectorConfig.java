@@ -10,7 +10,7 @@ import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

@@ -18,11 +18,11 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelConfigParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPackagingParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {

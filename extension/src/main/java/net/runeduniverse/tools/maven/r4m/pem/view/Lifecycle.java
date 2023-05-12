@@ -4,9 +4,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.Recordable;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.LifecycleView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.PhaseView;
+import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 public class Lifecycle implements LifecycleView {
 

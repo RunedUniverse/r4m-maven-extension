@@ -19,16 +19,16 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionSource;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Goal;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Lifecycle;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Phase;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetLifecycle;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.TargetPhase;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 

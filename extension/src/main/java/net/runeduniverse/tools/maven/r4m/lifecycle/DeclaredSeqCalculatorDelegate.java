@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
 
 @Component(role = PhaseSequenceCalculatorDelegate.class, hint = DeclaredSeqCalculatorDelegate.HINT)
 public class DeclaredSeqCalculatorDelegate implements PhaseSequenceCalculatorDelegate {

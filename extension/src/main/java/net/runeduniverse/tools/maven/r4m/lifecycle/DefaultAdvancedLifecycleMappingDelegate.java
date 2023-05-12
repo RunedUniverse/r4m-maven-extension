@@ -21,10 +21,10 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.api.lifecycle.AdvancedLifecycleMappingDelegate;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelection;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.ExecutionView;
-import net.runeduniverse.tools.maven.r4m.api.pem.view.GoalView;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
 /**
  * Lifecycle mapping delegate component interface. Calculates project build

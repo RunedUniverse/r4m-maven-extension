@@ -5,15 +5,17 @@
 		<!-- r4m-maven-extension -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.lifecycle
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem.model
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.api.pem.view
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.view.api
 		</exportedPackage>
 
 		<!-- runeduniverse-utils -->

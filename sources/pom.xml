@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>0.0.0</version>
+		<version>1.0.0</version>
 	</parent>
 
 	<artifactId>r4m-bom-sources</artifactId>
@@ -24,8 +24,8 @@
 		<!-- VERSIONS -->
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>[1.0.1,)</runeduniverse-utils-common-version>
-		<runeduniverse-utils-logging-version>[1.0.1,)</runeduniverse-utils-logging-version>
+		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
+		<runeduniverse-utils-logging-version>1.0.1</runeduniverse-utils-logging-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
 	</properties>

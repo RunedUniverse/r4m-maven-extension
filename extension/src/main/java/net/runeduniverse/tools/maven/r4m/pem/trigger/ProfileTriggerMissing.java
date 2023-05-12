@@ -1,7 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem.trigger;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 public class ProfileTriggerMissing extends ProfileTrigger {
 

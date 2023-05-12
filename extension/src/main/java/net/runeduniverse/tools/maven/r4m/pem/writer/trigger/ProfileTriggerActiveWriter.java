@@ -2,8 +2,9 @@ package net.runeduniverse.tools.maven.r4m.pem.writer.trigger;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionTriggerWriter;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ExecutionTrigger;
+
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerWriter;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerActive;
 
 @Component(role = ExecutionTriggerWriter.class, hint = ProfileTriggerActive.HINT)

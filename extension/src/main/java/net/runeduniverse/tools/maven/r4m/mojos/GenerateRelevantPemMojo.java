@@ -17,21 +17,21 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionArchiveSlice;
-import net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilter;
-import net.runeduniverse.tools.maven.r4m.api.pem.ProjectExecutionModelWriter;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.api.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.acquireExecutionArchive;
-import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.mojoFailureExtensionLoading;
-import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.reduce;
-import static net.runeduniverse.tools.maven.r4m.api.mojos.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.api.pem.ExecutionFilterUtils.defaultRelevanceFilter;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.acquireExecutionArchive;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.mojoFailureExtensionLoading;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.reduce;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.replaceWithEquivalents;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
 
 /**
  * generates the rel-pem.xml from all relevant executions

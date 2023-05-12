@@ -3,7 +3,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>1.0.0</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>

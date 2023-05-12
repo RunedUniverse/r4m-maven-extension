@@ -1,12 +1,15 @@
 package net.runeduniverse.tools.maven.r4m.api;
 
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
+
 public interface Runes4MavenProperties {
+
 	public static String GROUP_ID = "net.runeduniverse.tools.maven.r4m";
 	public static String ARTIFACT_ID = "r4m-maven-extension";
 	public static String PREFIX_ID = "r4m";
 
 	public static String PROJECT_EXECUTION_MODEL_FILE = "pem.xml";
-	public static String PROJECT_EXECUTION_MODEL_VERSION = "1.0.0";
+	public static String PROJECT_EXECUTION_MODEL_VERSION = ModelProperties.MODEL_VERSION;
 
 	public static String EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT = "r4m:executions-parser";
 
@@ -24,4 +27,5 @@ public interface Runes4MavenProperties {
 			public static String EXECUTIONS = PATH + "plugin-pem.xml";
 		}
 	}
+
 }

@@ -14,12 +14,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRestriction;
@@ -57,7 +58,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 		}
 
 		ProjectExecutionModel model = new ProjectExecutionModel(PackagingParser.class, PackagingParser.HINT);
-		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setVersion(ModelProperties.MODEL_VERSION);
 		model.addExecutions(effExecutions);
 		return model;
 	}
@@ -68,7 +69,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 			return;
 		for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecyclePhases.entrySet()) {
 
-			String executionId = String.join("-", Properties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
+			String executionId = String.join("-", MavenProperties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
 					phaseMappingEntry.getKey());
 
 			for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()

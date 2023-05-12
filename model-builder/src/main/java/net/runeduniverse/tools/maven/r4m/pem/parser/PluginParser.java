@@ -21,7 +21,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
@@ -77,7 +77,8 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		try {
 			if (pluginFile.isFile()) {
 				try (JarFile pluginJar = new JarFile(pluginFile, false)) {
-					ZipEntry executionDescriptorEntry = pluginJar.getEntry(Properties.METAINF.RUNES4MAVEN.EXECUTIONS);
+					ZipEntry executionDescriptorEntry = pluginJar
+							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
 
 					if (executionDescriptorEntry != null) {
 						try (InputStream is = pluginJar.getInputStream(executionDescriptorEntry)) {
@@ -86,7 +87,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 					}
 				}
 			} else {
-				File executionXml = new File(pluginFile, Properties.METAINF.RUNES4MAVEN.EXECUTIONS);
+				File executionXml = new File(pluginFile, Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
 
 				if (executionXml.isFile()) {
 					try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {

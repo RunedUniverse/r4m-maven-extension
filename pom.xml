@@ -13,6 +13,8 @@
 	<modules>
 		<module>sources</module>
 		<module>api</module>
+		<module>model</module>
+		<module>model-builder</module>
 		<module>extension</module>
 	</modules>
 

@@ -1,6 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.api;
 
 public interface MavenProperties {
+
 	public static String DEFAULT_LIFECYCLE_ID = "default";
 	public static String DEFAULT_EXECUTION_ID = "default";
 	public static String DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX = "default";
@@ -36,4 +37,5 @@ public interface MavenProperties {
 			public static String NAMED_CONFIG = PATH + "javax.inject.Named";
 		}
 	}
+
 }

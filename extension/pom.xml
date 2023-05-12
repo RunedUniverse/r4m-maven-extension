@@ -23,9 +23,6 @@
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
-		<!-- ARTIFACT VERSIONS - COMPILER -->
-		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
-		<plexus-component-version>1.7.1</plexus-component-version>
 	</properties>
 
 	<licenses>
@@ -104,7 +101,6 @@
 		<dependency>
 			<groupId>org.codehaus.plexus</groupId>
 			<artifactId>plexus-component-annotations</artifactId>
-			<version>${plexus-component-version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -137,7 +133,6 @@
 			<plugin>
 				<!-- don't add groupId here it bricks inherited version -->
 				<artifactId>maven-plugin-plugin</artifactId>
-				<version>${maven-plugin-plugin-version}</version>
 				<configuration>
 					<goalPrefix>r4m</goalPrefix>
 				</configuration>
@@ -145,7 +140,6 @@
 			<plugin>
 				<groupId>org.codehaus.plexus</groupId>
 				<artifactId>plexus-component-metadata</artifactId>
-				<version>${plexus-component-version}</version>
 				<configuration>
 					<staticMetadataDirectory>src/main/plexus</staticMetadataDirectory>
 					<testStaticMetadataDirectory>src/test/plexus</testStaticMetadataDirectory>

@@ -84,6 +84,15 @@
 				<artifactId>utils-logging</artifactId>
 				<version>${runeduniverse-utils-logging-version}</version>
 			</dependency>
+
+			<!-- COMPILER -->
+			<!-- dependency for plexus annotation -->
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-annotations</artifactId>
+				<version>${plexus-component-version}</version>
+				<scope>provided</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 </project>

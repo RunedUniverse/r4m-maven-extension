@@ -4,7 +4,7 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
-public class PackagingProcedureRestriction implements ExecutionRestriction {
+public class PackagingProcedureRestriction implements ExecutionRestriction<ExecutionArchiveSelectorConfig> {
 
 	public static final String HINT = "packaging-procedure";
 
@@ -21,6 +21,11 @@ public class PackagingProcedureRestriction implements ExecutionRestriction {
 	@Override
 	public String getHint() {
 		return PackagingProcedureRestriction.HINT;
+	}
+
+	@Override
+	public Class<ExecutionArchiveSelectorConfig> getDataType() {
+		return ExecutionArchiveSelectorConfig.class;
 	}
 
 	@Override

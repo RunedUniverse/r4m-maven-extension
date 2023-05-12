@@ -7,7 +7,7 @@
 		<version>1.0.0</version>
 	</parent>
 
-	<artifactId>r4m-api</artifactId>
+	<artifactId>r4m-model</artifactId>
 	<version>${major-version}.${minor-version}.${artifact-version}</version>
 	<packaging>jar</packaging>
 
@@ -22,7 +22,6 @@
 		<!-- ARTIFACT VERSIONS -->
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
-		<model-version>0</model-version>
 	</properties>
 
 	<licenses>
@@ -62,24 +61,7 @@
 		<url>https://github.com/RunedUniverse/r4m-maven-extension/issues</url>
 	</issueManagement>
 
-	<prerequisites>
-		<maven>${maven-version-min}</maven>
-	</prerequisites>
-
 	<dependencies>
-		<dependency>
-			<groupId>net.runeduniverse.tools.maven.r4m</groupId>
-			<artifactId>r4m-model</artifactId>
-			<version>${major-version}.${minor-version}.${model-version}</version>
-			<scope>compile</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.maven</groupId>
-			<artifactId>maven-core</artifactId>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- logging utilities-->
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>

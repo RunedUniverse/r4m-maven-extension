@@ -11,7 +11,7 @@ import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerInactive;
 public class ProfileTriggerInactiveWriter implements ExecutionTriggerWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger trigger) {
+	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger<?> trigger) {
 		if (trigger == null || !(trigger instanceof ProfileTriggerInactive))
 			return false;
 

@@ -32,7 +32,8 @@ public interface ExecutionFilterUtils {
 			if (!execution.getRestrictions()
 					.isEmpty()) {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
-				for (ExecutionRestriction restriction : execution.getRestrictions()) {
+				for (ExecutionRestriction<ExecutionArchiveSelectorConfig> restriction : execution
+						.getRestrictions(ExecutionArchiveSelectorConfig.class)) {
 					Boolean state = map.get(restriction.getHint());
 					if (state != null && state)
 						continue;
@@ -69,7 +70,8 @@ public interface ExecutionFilterUtils {
 			if (!execution.getRestrictions()
 					.isEmpty()) {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
-				for (ExecutionRestriction restriction : execution.getRestrictions()) {
+				for (ExecutionRestriction<ExecutionArchiveSelectorConfig> restriction : execution
+						.getRestrictions(ExecutionArchiveSelectorConfig.class)) {
 					Boolean state = map.get(restriction.getHint());
 					if (state != null && state)
 						continue;
@@ -92,7 +94,8 @@ public interface ExecutionFilterUtils {
 					.contains(execution.getId()))
 				return true;
 			// any active trigger activates the execution
-			for (ExecutionTrigger trigger : execution.getTrigger())
+			for (ExecutionTrigger<ExecutionArchiveSelectorConfig> trigger : execution
+					.getTrigger(ExecutionArchiveSelectorConfig.class))
 				if (trigger.isActive(cnf))
 					return true;
 			return false;

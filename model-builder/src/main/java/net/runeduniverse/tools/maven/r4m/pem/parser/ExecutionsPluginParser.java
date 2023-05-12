@@ -18,13 +18,13 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
@@ -62,7 +62,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		ProjectExecutionModel model = new ProjectExecutionModel(ExecutionsPluginParser.class,
 				ExecutionsPluginParser.HINT);
 
-		model.setVersion(Properties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setVersion(ModelProperties.MODEL_VERSION);
 
 		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
 			Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);

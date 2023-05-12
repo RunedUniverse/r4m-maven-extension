@@ -8,7 +8,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionWriter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerWriter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
@@ -18,6 +17,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
@@ -46,8 +46,8 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		node.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		node.setAttribute("xsi:schemaLocation",
 				"https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v"
-						+ Properties.PROJECT_EXECUTION_MODEL_VERSION.replace('.', '_') + ".xsd");
-		node.addChild("modelVersion", Properties.PROJECT_EXECUTION_MODEL_VERSION);
+						+ ModelProperties.MODEL_VERSION.replace('.', '_') + ".xsd");
+		node.addChild("modelVersion", ModelProperties.MODEL_VERSION);
 
 		PlexusConfiguration executionsNode = node.getChild("executions", true);
 		for (Execution exec : pem.getExecutions())

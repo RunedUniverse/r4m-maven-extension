@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.apache.maven.execution.MavenSession;
@@ -602,7 +601,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 
 		// reduce and order MojoExecution's
-		Map<String, List<MojoExecution>> lifecycleMappings = new TreeMap<>();
+		Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
 		for (String phase : orderedPhases)
 			lifecycleMappings.put(phase, phaseToMojoMapping.get(phase));

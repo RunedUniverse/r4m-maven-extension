@@ -4,10 +4,12 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ExecutionArchiveSlice extends Recordable {
+
 	public MavenProject getMvnProject();
 
 	public String getVersion();
@@ -25,4 +27,5 @@ public interface ExecutionArchiveSlice extends Recordable {
 	public void setParent(ExecutionArchiveSlice parent);
 
 	public void register(ProjectExecutionModel pem);
+
 }

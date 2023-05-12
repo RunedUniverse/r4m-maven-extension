@@ -5,9 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class Phase implements Recordable {
+
 	private String id;
 
 	private List<Goal> goals = new LinkedList<>();
@@ -43,4 +44,5 @@ public class Phase implements Recordable {
 
 		return tree;
 	}
+
 }

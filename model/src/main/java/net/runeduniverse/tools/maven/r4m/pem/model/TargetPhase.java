@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.Recordable;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class TargetPhase implements Recordable {
 
@@ -57,4 +57,5 @@ public class TargetPhase implements Recordable {
 
 		return tree;
 	}
+
 }

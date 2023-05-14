@@ -7,7 +7,7 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * prints the help-page
  * 
- * @author Pl4yingNight
+ * @author VenaNocta
  * @goal help
  * @requiresProject false
  */

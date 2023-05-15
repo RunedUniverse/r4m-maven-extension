@@ -60,7 +60,7 @@ public class MojoExecutionEventSpy implements EventSpy {
 		this.log.info("");
 		this.log.info(String.format("\033[1m Injected Configuration-Override into forked lifecycle\033[m",
 				Properties.PREFIX_ID));
-		this.log.info(String.format("\033[1m   provided by\033[0m %s:%s:%s", Properties.PREFIX_ID, overlay.getGroupId(),
+		this.log.info(String.format("\033[1m   provided by\033[0m %s:%s:%s", overlay.getGroupId(),
 				overlay.getArtifactId(), overlay.getVersion()));
 	}
 

@@ -28,8 +28,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginPars
 public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
-	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = 
-			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
+	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = "\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
 			+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
 			+ "This failure was cached in the local repository and resolution is not reattempted until the update interval "
 			+ "of central has elapsed or updates are forced\u001B[0m";
@@ -47,7 +46,7 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
 	@Requirement
 	private PlexusContainer container;
-	
+
 	private final Set<Plugin> unidentifiablePlugins = new LinkedHashSet<>();
 
 	private boolean coreExtension = false;
@@ -94,6 +93,10 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 
+			// collect indirectly referenced build-plugins after seeding the archive
+			for (MavenProject mvnProject : mvnSession.getAllProjects())
+				loadReferencedPlugins(mvnSession, mvnProject);
+
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
 		} finally {
@@ -122,7 +125,7 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
 			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-				if(isIdentifiable(mvnPlugin))
+				if (isIdentifiable(mvnPlugin))
 					try {
 						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
 								mvnSession.getRepositorySession(), mvnPlugin));
@@ -135,10 +138,10 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	}
 
 	private boolean isIdentifiable(Plugin mvnPlugin) {
-		if(this.unidentifiablePlugins.contains(mvnPlugin))
+		if (this.unidentifiablePlugins.contains(mvnPlugin))
 			return false;
 
-		if(mvnPlugin.getVersion() == null) {
+		if (mvnPlugin.getVersion() == null) {
 			this.unidentifiablePlugins.add(mvnPlugin);
 			return false;
 		}
@@ -147,12 +150,17 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	}
 
 	private void logUnidentifiablePlugins() {
-		if(this.unidentifiablePlugins.isEmpty())
+		if (this.unidentifiablePlugins.isEmpty())
 			return;
 
 		this.log.error(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
 		for (Plugin mvnPlugin : this.unidentifiablePlugins)
-			this.log.error(String.format(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
+			this.log.error(String.format(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
+					mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
+	}
+
+	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
+		// inject here
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {

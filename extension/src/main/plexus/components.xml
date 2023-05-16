@@ -11,5 +11,17 @@
 			<phase>pre-integration-test</phase> <phase>integration-test</phase> <phase>post-integration-test</phase> 
 			<phase>verify</phase> <phase>install</phase> <phase>deploy</phase> </phases> -->
 
+		<component>
+			<role>org.apache.maven.lifecycle.Lifecycle</role>
+			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+			<role-hint>help</role-hint>
+			<configuration>
+				<id>help</id>
+				<phases>
+					<phase>help</phase>
+				</phases>
+			</configuration>
+		</component>
+
 	</components>
 </component-set>

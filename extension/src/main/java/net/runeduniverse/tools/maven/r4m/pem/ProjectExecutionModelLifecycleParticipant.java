@@ -1,15 +1,27 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginContainer;
+import org.apache.maven.plugin.InvalidPluginDescriptorException;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
@@ -17,6 +29,11 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
+
 import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
@@ -46,6 +63,10 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
 	@Requirement
 	private PlexusContainer container;
+	@Requirement
+	private MavenPluginManager mavenPluginManager;
+	@Requirement
+	private PluginDependenciesResolver pluginDependenciesResolver;
 
 	private final Set<Plugin> unidentifiablePlugins = new LinkedHashSet<>();
 
@@ -78,10 +99,14 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 				// outdated version of the plexus-utils
 				realm = world.getRealm("plexus.core")
 						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.api.pem");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.api.pem.model");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.api");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.model");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.restrictions");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.trigger");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.restrictions");
 				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
 			}
 
@@ -95,6 +120,7 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 
 			// collect indirectly referenced build-plugins after seeding the archive
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
+				// enable dependent on property?
 				loadReferencedPlugins(mvnSession, mvnProject);
 
 		} catch (Exception e) {
@@ -160,7 +186,88 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
-		// inject here
+		PluginContainer plugins = mvnProject.getBuild();
+		List<Artifact> knownArtifacts = new LinkedList<>();
+		List<Plugin> knownPlugins = new LinkedList<>(plugins.getPlugins());
+		List<Plugin> remainingPlugins = plugins.getPlugins();
+		Map<String, Plugin> managedPlugins = mvnProject.getBuild()
+				.getPluginManagement()
+				.getPluginsAsMap();
+		while (!remainingPlugins.isEmpty()) {
+			List<Plugin> cache = new LinkedList<>();
+			for (Plugin plugin : remainingPlugins)
+				cache.addAll(discoverReferencedPlugins(mvnSession.getRepositorySession(), mvnProject, knownArtifacts,
+						knownPlugins, managedPlugins, plugin));
+			remainingPlugins = cache;
+			mvnProject.getBuild()
+					.getPlugins()
+					.addAll(cache);
+		}
+	}
+
+	private List<Plugin> discoverReferencedPlugins(final RepositorySystemSession repoSession,
+			final MavenProject mvnProject, final List<Artifact> knownArtifacts, final List<Plugin> knownPlugins,
+			final Map<String, Plugin> managedPlugins, final Plugin parentPlugin) {
+		List<Plugin> referencedPlugins = new LinkedList<>();
+		List<Artifact> artifacts = null;
+		try {
+			artifacts = resolvePluginArtifacts(parentPlugin, mvnProject.getRemotePluginRepositories(), repoSession);
+		} catch (PluginResolutionException e) {
+		}
+		if (artifacts == null)
+			return referencedPlugins;
+
+		for (Artifact artifact : artifacts) {
+			if (knownArtifacts.contains(artifact))
+				continue;
+			knownArtifacts.add(artifact);
+
+			Plugin plugin = new Plugin();
+			plugin.setGroupId(artifact.getGroupId());
+			plugin.setArtifactId(artifact.getArtifactId());
+			plugin.setVersion(artifact.getVersion());
+
+			Plugin pluginInPom = managedPlugins.get(plugin.getKey());
+			if (pluginInPom != null) {
+				if (plugin.getVersion() == null)
+					plugin.setVersion(pluginInPom.getVersion());
+				plugin.setDependencies(new ArrayList<>(pluginInPom.getDependencies()));
+			}
+
+			if (knownPlugins.contains(plugin))
+				continue;
+
+			try {
+				this.mavenPluginManager.getPluginDescriptor(plugin, mvnProject.getRemotePluginRepositories(),
+						repoSession);
+			} catch (PluginDescriptorParsingException | InvalidPluginDescriptorException
+					| PluginResolutionException e) {
+				// probably not a plugin ...
+				continue;
+			}
+
+			knownPlugins.add(plugin);
+			referencedPlugins.add(plugin);
+		}
+		return referencedPlugins;
+	}
+
+	private List<Artifact> resolvePluginArtifacts(Plugin extensionPlugin, List<RemoteRepository> repositories,
+			RepositorySystemSession session) throws PluginResolutionException {
+		DependencyNode root = pluginDependenciesResolver.resolve(extensionPlugin, null, null, repositories, session);
+		PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+		root.accept(nlg);
+
+		List<Artifact> artifacts = new ArrayList<>(nlg.getNodes()
+				.size());
+		RepositoryUtils.toArtifacts(artifacts, Collections.singleton(root), Collections.<String>emptyList(), null);
+		for (Iterator<Artifact> it = artifacts.iterator(); it.hasNext();) {
+			Artifact artifact = it.next();
+			if (artifact.getFile() == null) {
+				it.remove();
+			}
+		}
+		return Collections.unmodifiableList(artifacts);
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {
@@ -189,4 +296,5 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 		plugin.setVersion(id.substring(idx + 1));
 		return plugin;
 	}
+
 }

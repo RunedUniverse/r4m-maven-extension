@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,12 +36,13 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
-import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
+import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
@@ -56,24 +58,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			"Failed to load maven-extension ClassRealm";
 	public static final String ERR_FAILED_TO_LOAD_PEM = //
 			"Failed while loading pem.xml from project";
-	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = //
-			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
-					+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
-					+ "This failure was cached in the local repository and resolution is not reattempted until "
-					+ "the update interval of central has elapsed or updates are forced\u001B[0m";
-	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED = //
-			"Unidentifiable plugin detected » %s:%s:%s";
-	public static final String WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT = //
-			"[%s] Component<%s> could not be located in PlexusContainer!";
-	public static final String WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT = //
-			"[%s] Component<%s> could not be released from PlexusContainer!";
-	public static final String DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR = //
-			"[%s] Updating ComponentDescriptor of Component<%s> to Role: %s\tHint: %s";
 
 	public static final String PLEXUS_DEFAULT_MAVEN_HINT = "maven-default";
 
-	@Requirement
-	private Logger log;
 	@Requirement
 	private EventSpyDispatcher dispatcher;
 	@Requirement
@@ -116,7 +103,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * before they are sorted and actual build execution starts.
 	 */
 	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
-		this.dispatcher.onEvent(PatchingEvent.createBasicInfoEvent(Type.INFO_PATCHING_STARTED));
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
 
 		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
 				.getContextClassLoader();
@@ -124,9 +111,11 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 		try {
 			ClassRealm realm;
-			if (this.coreExtension)
+			if (this.coreExtension) {
+				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));
 				realm = world.getRealm("maven.ext");
-			else {
+			} else {
+				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_BUILD_REALM));
 				// we need to reinitiate the r4m-maven-extension realm because maven injects an
 				// outdated version of the plexus-utils
 				realm = world.getRealm("plexus.core")
@@ -159,19 +148,23 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 		} catch (DuplicateRealmException | NoSuchRealmException e) {
 			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM, e);
-			this.dispatcher.onEvent(PatchingEvent.createBasicErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
+			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} catch (Exception e) {
 			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_PEM, e);
-			this.dispatcher.onEvent(PatchingEvent.createBasicErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
+			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} finally {
+			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_RETURNING_TO_EXTENSION_REALM));
 			Thread.currentThread()
 					.setContextClassLoader(currentRealm);
 		}
 
-		logUnidentifiablePlugins();
-		this.dispatcher.onEvent(PatchingEvent.createBasicInfoEvent(Type.INFO_PATCHING_STOPPED));
+		if (!this.unidentifiablePlugins.isEmpty())
+			this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
+					this.unidentifiablePlugins));
+
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STOPPED));
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
@@ -214,16 +207,6 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		}
 
 		return true;
-	}
-
-	private void logUnidentifiablePlugins() {
-		if (this.unidentifiablePlugins.isEmpty())
-			return;
-
-		this.log.error(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
-		for (Plugin mvnPlugin : this.unidentifiablePlugins)
-			this.log.error(String.format(ERR_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
-					mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
@@ -315,6 +298,11 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		String defaultExecPlanCalcName = DefaultLifecycleExecutionPlanCalculator.class.getCanonicalName();
 		DefaultLifecycleExecutionPlanCalculator defaultExecPlanCalc = null;
 
+		Map<String, CharSequence> eventData = new LinkedHashMap<>();
+		eventData.put("component", defaultExecPlanCalcName);
+		eventData.put("role", LifecycleExecutionPlanCalculator.class.getCanonicalName());
+
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_LIFECYCLE_EXEC_PLAN_CALC_STARTED));
 		try {
 			for (LifecycleExecutionPlanCalculator item : this.container
 					.lookupList(LifecycleExecutionPlanCalculator.class))
@@ -323,20 +311,29 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 					break;
 				}
 		} catch (ComponentLookupException e) {
-			this.log.warn(String.format(WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
-					defaultExecPlanCalcName));
+			this.dispatcher.onEvent(MessagePatchingEvent
+					.createInfoEvent(Type.WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_LOCATE_PLEXUS_COMPONENT,
+							eventData)
+					.readonly());
 		}
 		if (defaultExecPlanCalc != null)
 			try {
 				this.container.release(defaultExecPlanCalc);
 				this.container.addComponent(defaultExecPlanCalc, DefaultLifecycleExecutionPlanCalculator.class,
 						PLEXUS_DEFAULT_MAVEN_HINT);
-				this.log.debug(String.format(DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, Properties.PREFIX_ID,
-						defaultExecPlanCalcName, defaultExecPlanCalcName, PLEXUS_DEFAULT_MAVEN_HINT));
+				eventData.put("role", defaultExecPlanCalcName);
+				eventData.put("hint", PLEXUS_DEFAULT_MAVEN_HINT);
+				this.dispatcher.onEvent(MessagePatchingEvent
+						.createInfoEvent(
+								Type.DEBUG_LIFECYCLE_EXEC_PLAN_CALC_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, eventData)
+						.readonly());
 			} catch (ComponentLifecycleException e) {
-				this.log.warn(String.format(WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
-						defaultExecPlanCalcName));
+				this.dispatcher.onEvent(MessagePatchingEvent
+						.createInfoEvent(Type.WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_RELEASE_PLEXUS_COMPONENT,
+								eventData)
+						.readonly());
 			}
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED));
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {
@@ -352,10 +349,10 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	private static Plugin fromExtRealm(ClassRealm realm) {
 		String id = realm.getId();
-		Plugin plugin = new Plugin();
-		plugin.setExtensions(true);
 		if (!id.startsWith("coreExtension>"))
 			return null;
+		Plugin plugin = new Plugin();
+		plugin.setExtensions(true);
 		id = id.substring(14);
 		int idx = id.indexOf(':');
 		plugin.setGroupId(id.substring(0, idx));

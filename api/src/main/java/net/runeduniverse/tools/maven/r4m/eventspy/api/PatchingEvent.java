@@ -3,18 +3,25 @@ package net.runeduniverse.tools.maven.r4m.eventspy.api;
 public interface PatchingEvent {
 
 	public enum Type {
-		INFO_PATCHING_STARTED, INFO_PATCHING_STOPPED, INFO_PATCHING_ABORTED,//
+		INFO_PATCHING_STARTED, INFO_PATCHING_STOPPED, INFO_PATCHING_ABORTED, //
+		INFO_ELEVATING_TO_CORE_REALM, INFO_ELEVATING_TO_BUILD_REALM, INFO_RETURNING_TO_EXTENSION_REALM, //
+		WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, //
+		INFO_LIFECYCLE_EXEC_PLAN_CALC_STARTED, INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED,
+		WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_LOCATE_PLEXUS_COMPONENT,
+		WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_RELEASE_PLEXUS_COMPONENT,
+		DEBUG_LIFECYCLE_EXEC_PLAN_CALC_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, //
+
 	}
 
 	public Type getType();
 
 	public Exception getException();
 
-	public static PatchingEvent createBasicInfoEvent(Type type) {
+	public static BasicEvent createInfoEvent(Type type) {
 		return new BasicEvent(type, null);
 	}
 
-	public static PatchingEvent createBasicErrorEvent(Type type, Exception exception) {
+	public static BasicEvent createErrorEvent(Type type, Exception exception) {
 		return new BasicEvent(type, exception);
 	}
 

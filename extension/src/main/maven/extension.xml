@@ -5,6 +5,8 @@
 		<!-- r4m-maven-extension -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
+		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos
@@ -28,6 +30,10 @@
 	<exportedArtifacts>
 		<!-- r4m-maven-extension -->
 		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-model
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-model-builder
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.tools.maven.r4m:r4m-maven-extension
 		</exportedArtifact>

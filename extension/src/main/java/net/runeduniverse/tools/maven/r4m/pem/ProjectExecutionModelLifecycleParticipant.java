@@ -100,6 +100,7 @@ public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLife
 				realm = world.getRealm("plexus.core")
 						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.api");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.eventspy.api");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.model");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser");
 				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");

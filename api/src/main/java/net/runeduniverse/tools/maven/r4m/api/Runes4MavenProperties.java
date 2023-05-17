@@ -17,7 +17,7 @@ public interface Runes4MavenProperties {
 
 	public interface LIFECYCLE {
 		public interface DEV {
-			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:dev-lifecycle";
+			public static String LIFECYCLE_PARTICIPANT_HINT = "r4m:lifecycle";
 		}
 	}
 

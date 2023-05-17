@@ -1,4 +1,4 @@
-package net.runeduniverse.tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +34,6 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
@@ -42,14 +41,17 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingP
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
-public class ProjectExecutionModelLifecycleParticipant extends AbstractMavenLifecycleParticipant {
+public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
-	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = "Failed loading maven-extension ClassRealm";
-	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = "\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
-			+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
-			+ "This failure was cached in the local repository and resolution is not reattempted until the update interval "
-			+ "of central has elapsed or updates are forced\u001B[0m";
-	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED = "Unidentifiable plugin detected » %s:%s:%s";
+	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = //
+			"Failed loading maven-extension ClassRealm";
+	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = //
+			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
+					+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
+					+ "This failure was cached in the local repository and resolution is not reattempted until "
+					+ "the update interval of central has elapsed or updates are forced\u001B[0m";
+	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED = //
+			"Unidentifiable plugin detected » %s:%s:%s";
 
 	@Requirement
 	private Logger log;

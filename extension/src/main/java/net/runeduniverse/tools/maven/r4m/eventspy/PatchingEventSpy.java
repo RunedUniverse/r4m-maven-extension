@@ -1,9 +1,12 @@
 package net.runeduniverse.tools.maven.r4m.eventspy;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.component.annotations.Component;
@@ -38,7 +41,7 @@ public class PatchingEventSpy implements EventSpy {
 
 		switch (event.getType()) {
 		case INFO_PATCHING_STARTED:
-		case INFO_PATCHING_STOPPED:
+		case INFO_PATCHING_FINISHED:
 		case INFO_PATCHING_ABORTED:
 			printBox(event);
 			break;
@@ -53,7 +56,12 @@ public class PatchingEventSpy implements EventSpy {
 		case INFO_ELEVATING_TO_BUILD_REALM:
 			printExtensionState(event);
 			break;
-
+		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED:
+		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED:
+		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED:
+		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_FINISHED:
+			handleScanningReferencedPlugins(event);
+			break;
 		default:
 			break;
 		}
@@ -69,7 +77,7 @@ public class PatchingEventSpy implements EventSpy {
 			this.log.info("\033[1mRunes4Maven Extension: patching Maven\033[m");
 			this.log.info("");
 		}
-		if (event.getType() == Type.INFO_PATCHING_STOPPED)
+		if (event.getType() == Type.INFO_PATCHING_FINISHED)
 			this.log.info("");
 		if (event.getType() == Type.INFO_PATCHING_ABORTED)
 			this.log.error("\033[1;31mpatching aborted\u001B[0m", event.getException());
@@ -132,6 +140,44 @@ public class PatchingEventSpy implements EventSpy {
 			break;
 		default:
 			break;
+		}
+	}
+
+	private static final String INFO_SCANNING_BUNDLED_PLUGINS_STARTED = //
+			"searching for embedded plugins in projects:";
+	private static final String INFO_SCANNING_BUNDLED_PLUGINS_RESULT = //
+			"  %-53s  [%3s | %2.3f s]";
+	private Map<CharSequence, StopWatch> scanRefPluginsStopWatches = new LinkedHashMap<>();
+
+	private void handleScanningReferencedPlugins(PatchingEvent event) {
+		Map<String, CharSequence> data = null;
+		if (event instanceof MessagePatchingEvent)
+			data = ((MessagePatchingEvent) event).getMessage();
+		if (data != null) {
+			if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED) {
+				StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
+				if (watch == null) {
+					watch = new StopWatch();
+					this.scanRefPluginsStopWatches.put(data.get("maven-project"), watch);
+				} else
+					watch.reset();
+				watch.start();
+				return;
+			}
+			if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_FINISHED) {
+				StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
+				if (watch == null || !watch.isStarted())
+					return;
+				watch.stop();
+				long elapsedTime = watch.getTime(TimeUnit.MILLISECONDS);
+				this.log.info(String.format(INFO_SCANNING_BUNDLED_PLUGINS_RESULT, data.get("maven-project"),
+						data.get("amount"), (double) elapsedTime / 1000));
+				return;
+			}
+		}
+		if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED) {
+			this.log.info("");
+			this.log.info(INFO_SCANNING_BUNDLED_PLUGINS_STARTED);
 		}
 	}
 

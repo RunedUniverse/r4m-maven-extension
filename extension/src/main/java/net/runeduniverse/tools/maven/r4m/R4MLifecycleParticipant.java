@@ -139,10 +139,12 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 
+			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED));
 			// collect indirectly referenced build-plugins after seeding the archive
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				// enable dependent on property?
 				loadReferencedPlugins(mvnSession, mvnProject);
+			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED));
 
 			modifyLifecycleExecutionPlanCalculator();
 
@@ -164,7 +166,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
 					this.unidentifiablePlugins));
 
-		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STOPPED));
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_FINISHED));
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
@@ -210,6 +212,13 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
+		Map<String, CharSequence> eventData = new LinkedHashMap<>();
+		eventData.put("maven-project", mvnProject.getGroupId() + ':' + mvnProject.getArtifactId());
+
+		this.dispatcher.onEvent(MessagePatchingEvent
+				.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED, eventData)
+				.readonly());
+
 		PluginContainer plugins = mvnProject.getBuild();
 		List<Artifact> knownArtifacts = new LinkedList<>();
 		List<Plugin> knownPlugins = new LinkedList<>(plugins.getPlugins());
@@ -217,16 +226,22 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		Map<String, Plugin> managedPlugins = mvnProject.getBuild()
 				.getPluginManagement()
 				.getPluginsAsMap();
+		int discoveredPluginAmount = 0;
 		while (!remainingPlugins.isEmpty()) {
 			List<Plugin> cache = new LinkedList<>();
 			for (Plugin plugin : remainingPlugins)
 				cache.addAll(discoverReferencedPlugins(mvnSession.getRepositorySession(), mvnProject, knownArtifacts,
 						knownPlugins, managedPlugins, plugin));
 			remainingPlugins = cache;
+			discoveredPluginAmount = discoveredPluginAmount + cache.size();
 			mvnProject.getBuild()
 					.getPlugins()
 					.addAll(cache);
 		}
+
+		eventData.put("amount", "" + discoveredPluginAmount);
+		this.dispatcher.onEvent(MessagePatchingEvent
+				.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_FINISHED, eventData));
 	}
 
 	private List<Plugin> discoverReferencedPlugins(final RepositorySystemSession repoSession,
@@ -312,8 +327,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				}
 		} catch (ComponentLookupException e) {
 			this.dispatcher.onEvent(MessagePatchingEvent
-					.createInfoEvent(Type.WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_LOCATE_PLEXUS_COMPONENT,
-							eventData)
+					.createInfoEvent(Type.WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_LOCATE_PLEXUS_COMPONENT, eventData)
 					.readonly());
 		}
 		if (defaultExecPlanCalc != null)
@@ -324,8 +338,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				eventData.put("role", defaultExecPlanCalcName);
 				eventData.put("hint", PLEXUS_DEFAULT_MAVEN_HINT);
 				this.dispatcher.onEvent(MessagePatchingEvent
-						.createInfoEvent(
-								Type.DEBUG_LIFECYCLE_EXEC_PLAN_CALC_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, eventData)
+						.createInfoEvent(Type.DEBUG_LIFECYCLE_EXEC_PLAN_CALC_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR,
+								eventData)
 						.readonly());
 			} catch (ComponentLifecycleException e) {
 				this.dispatcher.onEvent(MessagePatchingEvent

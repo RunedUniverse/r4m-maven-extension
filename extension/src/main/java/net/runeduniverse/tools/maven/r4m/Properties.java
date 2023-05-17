@@ -14,11 +14,6 @@ public interface Properties extends MavenProperties, Runes4MavenProperties {
 		}
 	}
 
-	public interface LIFECYCLE {
-		public interface DEV extends Runes4MavenProperties.LIFECYCLE.DEV {
-		}
-	}
-
 	public interface METAINF extends MavenProperties.METAINF {
 		public interface MAVEN extends MavenProperties.METAINF.MAVEN {
 		}

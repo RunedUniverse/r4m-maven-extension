@@ -15,6 +15,8 @@ import org.apache.maven.MavenExecutionException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
+import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -28,6 +30,8 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
+import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyNode;
@@ -40,7 +44,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigPars
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 
-@Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.EXECUTIONS_PARSER_LIFECYCLE_PARTICIPANT_HINT)
+@Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.R4M_LIFECYCLE_PARTICIPANT_HINT)
 public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = //
@@ -52,6 +56,14 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 					+ "the update interval of central has elapsed or updates are forced\u001B[0m";
 	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED = //
 			"Unidentifiable plugin detected » %s:%s:%s";
+	public static final String WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT = //
+			"[%s] Component<%s> could not be located in PlexusContainer!";
+	public static final String WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT = //
+			"[%s] Component<%s> could not be released from PlexusContainer!";
+	public static final String DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR = //
+			"[%s] Updating ComponentDescriptor of Component<%s> to Role: %s\tHint: %s";
+
+	public static final String PLEXUS_DEFAULT_MAVEN_HINT = "maven-default";
 
 	@Requirement
 	private Logger log;
@@ -74,6 +86,13 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	private boolean coreExtension = false;
 
+	/**
+	 * Invoked after MavenSession instance has been created.
+	 *
+	 * This callback is intended to allow extensions to inject execution properties,
+	 * activate profiles and perform similar tasks that affect MavenProject instance
+	 * construction.
+	 */
 	public void afterSessionStart(MavenSession mvnSession) throws MavenExecutionException {
 		this.coreExtension = true;
 
@@ -113,11 +132,10 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
 			}
 
-			Collection<Plugin> extPlugins = scanCoreExtensions(world.getRealms());
-
 			Thread.currentThread()
 					.setContextClassLoader(realm);
 
+			Collection<Plugin> extPlugins = scanCoreExtensions(world.getRealms());
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 
@@ -125,6 +143,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				// enable dependent on property?
 				loadReferencedPlugins(mvnSession, mvnProject);
+
+			modifyLifecycleExecutionPlanCalculator();
 
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
@@ -271,6 +291,34 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			}
 		}
 		return Collections.unmodifiableList(artifacts);
+	}
+
+	protected void modifyLifecycleExecutionPlanCalculator() {
+		String defaultExecPlanCalcName = DefaultLifecycleExecutionPlanCalculator.class.getCanonicalName();
+		DefaultLifecycleExecutionPlanCalculator defaultExecPlanCalc = null;
+
+		try {
+			for (LifecycleExecutionPlanCalculator item : this.container
+					.lookupList(LifecycleExecutionPlanCalculator.class))
+				if (item instanceof DefaultLifecycleExecutionPlanCalculator) {
+					defaultExecPlanCalc = (DefaultLifecycleExecutionPlanCalculator) item;
+					break;
+				}
+		} catch (ComponentLookupException e) {
+			this.log.warn(String.format(WARN_FAILED_TO_LOCATE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
+					defaultExecPlanCalcName));
+		}
+		if (defaultExecPlanCalc != null)
+			try {
+				this.container.release(defaultExecPlanCalc);
+				this.container.addComponent(defaultExecPlanCalc, DefaultLifecycleExecutionPlanCalculator.class,
+						PLEXUS_DEFAULT_MAVEN_HINT);
+				this.log.debug(String.format(DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR, Properties.PREFIX_ID,
+						defaultExecPlanCalcName, defaultExecPlanCalcName, PLEXUS_DEFAULT_MAVEN_HINT));
+			} catch (ComponentLifecycleException e) {
+				this.log.warn(String.format(WARN_FAILED_TO_RELEASE_PLEXUS_COMPONENT, Properties.PREFIX_ID,
+						defaultExecPlanCalcName));
+			}
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {

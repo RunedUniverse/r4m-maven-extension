@@ -14,6 +14,7 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -28,6 +29,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -38,6 +41,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
+import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
@@ -47,8 +52,10 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginPars
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.R4M_LIFECYCLE_PARTICIPANT_HINT)
 public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
-	public static final String ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM = //
-			"Failed loading maven-extension ClassRealm";
+	public static final String ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM = //
+			"Failed to load maven-extension ClassRealm";
+	public static final String ERR_FAILED_TO_LOAD_PEM = //
+			"Failed while loading pem.xml from project";
 	public static final String ERR_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = //
 			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved: "
 					+ "They were not found in https://repo.maven.apache.org/maven2 during a previous attempt. "
@@ -67,6 +74,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	@Requirement
 	private Logger log;
+	@Requirement
+	private EventSpyDispatcher dispatcher;
 	@Requirement
 	private ExecutionArchive archive;
 	@Requirement(role = ProjectExecutionModelConfigParser.class)
@@ -107,6 +116,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * before they are sorted and actual build execution starts.
 	 */
 	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
+		this.dispatcher.onEvent(PatchingEvent.createBasicInfoEvent(Type.INFO_PATCHING_STARTED));
+
 		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
 				.getContextClassLoader();
 		ClassWorld world = currentRealm.getWorld();
@@ -146,14 +157,21 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 			modifyLifecycleExecutionPlanCalculator();
 
+		} catch (DuplicateRealmException | NoSuchRealmException e) {
+			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM, e);
+			this.dispatcher.onEvent(PatchingEvent.createBasicErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
+			throw ex;
 		} catch (Exception e) {
-			throw new MavenExecutionException(ERR_FAILED_LOADING_MAVEN_EXTENSION_CLASSREALM, e);
+			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_PEM, e);
+			this.dispatcher.onEvent(PatchingEvent.createBasicErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
+			throw ex;
 		} finally {
 			Thread.currentThread()
 					.setContextClassLoader(currentRealm);
 		}
 
 		logUnidentifiablePlugins();
+		this.dispatcher.onEvent(PatchingEvent.createBasicInfoEvent(Type.INFO_PATCHING_STOPPED));
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,

@@ -53,6 +53,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskParser;
@@ -87,6 +88,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement
 	protected Logger log;
+
+	@Requirement
+	protected Settings settings;
 
 	@Requirement
 	private BuildPluginManager pluginManager;

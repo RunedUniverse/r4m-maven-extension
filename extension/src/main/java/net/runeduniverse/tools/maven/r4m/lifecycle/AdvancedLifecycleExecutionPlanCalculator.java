@@ -414,6 +414,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			if (alreadyForkedForks.contains(fork))
 				return;
 			alreadyForkedForks.add(fork);
+
+			// TODO disable MojoDescriptor patching via property
+			mojoExecution.setMojoDescriptor(patchMojoDescriptorForLogging(mojoDescriptor, fork));
 		}
 
 		List<MavenProject> forkedProjects = LifecycleDependencyResolver.getProjects(project, session,
@@ -441,6 +444,42 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			alreadyForkedMojos.remove(mojoDescriptor);
 		else
 			alreadyForkedForks.remove(fork);
+	}
+
+	protected MojoDescriptor patchMojoDescriptorForLogging(final MojoDescriptor mojoDescriptor, final Fork fork) {
+		MojoDescriptor patched = mojoDescriptor.clone();
+		String start = null;
+		String stop = null;
+
+		List<TargetPhase> phases = fork.getPhases();
+		if (phases != null && !phases.isEmpty()) {
+			for (TargetPhase phase : phases) {
+				if (start == null)
+					start = phase.getId();
+				stop = phase.getId();
+			}
+		} else {
+			TargetLifecycle targetLifecycle = fork.getLifecycle();
+			if (targetLifecycle != null) {
+				start = targetLifecycle.getStartPhase();
+				stop = targetLifecycle.getStopPhase();
+			}
+			boolean findStop = stop == null;
+			if (start == null || findStop)
+				for (String phase : this.lifecycles.get(targetLifecycle.getId())
+						.getPhases()) {
+					if (start == null)
+						start = phase;
+					if (findStop)
+						stop = phase;
+					else
+						continue;
+				}
+		}
+
+		patched.setExecuteLifecycle(fork.getLifecycleId());
+		patched.setExecutePhase(start == stop ? start : "(" + start + "," + stop + ")");
+		return patched;
 	}
 
 	protected List<MojoExecution> calculateForkedLifecycle(final MavenSession session, final MavenProject project,

@@ -8,14 +8,14 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 
 @Component(role = EventSpy.class, hint = MojoExecutionEventSpy.HINT)
 public class MojoExecutionEventSpy implements EventSpy {
 
-	public static final String HINT = Properties.PREFIX_ID + "-eventspy-exec-mojo";
+	public static final String HINT = R4MProperties.PREFIX_ID + "-eventspy-exec-mojo";
 
 	@Requirement
 	private Logger log;
@@ -59,7 +59,7 @@ public class MojoExecutionEventSpy implements EventSpy {
 			final PluginDescriptor overlay) {
 		this.log.info("");
 		this.log.info(String.format("\033[1m Injected Configuration-Override into forked lifecycle\033[m",
-				Properties.PREFIX_ID));
+				R4MProperties.PREFIX_ID));
 		this.log.info(String.format("\033[1m   provided by\033[0m %s:%s:%s", overlay.getGroupId(),
 				overlay.getArtifactId(), overlay.getVersion()));
 	}

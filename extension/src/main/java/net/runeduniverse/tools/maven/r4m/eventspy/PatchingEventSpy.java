@@ -13,7 +13,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
@@ -22,7 +22,7 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 @Component(role = EventSpy.class, hint = PatchingEventSpy.HINT)
 public class PatchingEventSpy implements EventSpy {
 
-	public static final String HINT = Properties.PREFIX_ID + "-eventspy-patching";
+	public static final String HINT = R4MProperties.PREFIX_ID + "-eventspy-patching";
 
 	@Requirement
 	private Logger log;

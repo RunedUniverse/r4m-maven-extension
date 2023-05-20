@@ -52,7 +52,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import net.runeduniverse.tools.maven.r4m.Properties;
+import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
@@ -263,7 +263,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		Lifecycle lifecycle = this.defaultLifeCycles.get(lifecyclePhase);
 
 		if (lifecycle == null) {
-			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE, Properties.PREFIX_ID,
+			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE, R4MProperties.PREFIX_ID,
 					lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()), lifecyclePhase);
 		}
 
@@ -554,7 +554,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
 			if (mvnLifecycle == null) {
 				this.log.warn(
-						String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, Properties.PREFIX_ID, targetLifecycle.getId()));
+						String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, R4MProperties.PREFIX_ID, targetLifecycle.getId()));
 			} else {
 				boolean includePhase = isBlank(targetLifecycle.getStartPhase());
 				for (String phaseId : mvnLifecycle.getPhases()) {
@@ -619,7 +619,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
 			if (lifecycle == null)
 				throw new LifecyclePhaseNotFoundException(
-						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, Properties.PREFIX_ID, phase), phase);
+						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, R4MProperties.PREFIX_ID, phase), phase);
 
 			AdvancedLifecycleMappingDelegate delegate;
 			if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {

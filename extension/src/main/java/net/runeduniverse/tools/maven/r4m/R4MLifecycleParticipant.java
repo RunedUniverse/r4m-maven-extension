@@ -41,6 +41,7 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
@@ -51,7 +52,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigPars
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 
-@Component(role = AbstractMavenLifecycleParticipant.class, hint = Properties.R4M_LIFECYCLE_PARTICIPANT_HINT)
+@Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
 public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM = //
@@ -63,6 +64,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	@Requirement
 	private EventSpyDispatcher dispatcher;
+	@Requirement
+	private Settings settings;
 	@Requirement
 	private ExecutionArchive archive;
 	@Requirement(role = ProjectExecutionModelConfigParser.class)
@@ -93,7 +96,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.coreExtension = true;
 
 		mvnSession.getSettings()
-				.addPluginGroup(Properties.GROUP_ID);
+				.addPluginGroup(R4MProperties.GROUP_ID);
 	}
 
 	/**

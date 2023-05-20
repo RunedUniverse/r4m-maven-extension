@@ -3,7 +3,7 @@ package net.runeduniverse.tools.maven.r4m;
 import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 
-public interface Properties extends MavenProperties, Runes4MavenProperties {
+public interface R4MProperties extends MavenProperties, Runes4MavenProperties {
 	public static String VAL_PREFIX = "${";
 	public static String VAL_POSTFIX = "}";
 

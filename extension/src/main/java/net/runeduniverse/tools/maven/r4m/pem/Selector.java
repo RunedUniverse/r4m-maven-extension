@@ -22,6 +22,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
@@ -46,6 +47,8 @@ public class Selector implements ExecutionArchiveSelector {
 
 	@Requirement
 	private Logger log;
+	@Requirement
+	private Settings settings;
 	@Requirement
 	private MavenSession mvnSession;
 	@Requirement
@@ -86,6 +89,8 @@ public class Selector implements ExecutionArchiveSelector {
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(final ExecutionArchiveSelectorConfig cnf,
 			Collection<Execution> executions) {
+		boolean warn = "warn".equals(this.settings.getMissingBuildPluginHandler()
+				.getSelected());
 		Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
 
 		for (Execution execution : executions) {
@@ -121,7 +126,7 @@ public class Selector implements ExecutionArchiveSelector {
 							goalView.setFork(goal.getFork());
 							if (acquireMojoDescriptor(cnf, goalView))
 								phaseView.addGoal(goalView);
-							else
+							else if (warn)
 								this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_GOAL, goalView.getGroupId(),
 										goalView.getArtifactId(), goalView.getGoalId()));
 						}

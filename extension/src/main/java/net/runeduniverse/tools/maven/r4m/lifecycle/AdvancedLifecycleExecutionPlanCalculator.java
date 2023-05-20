@@ -263,8 +263,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		Lifecycle lifecycle = this.defaultLifeCycles.get(lifecyclePhase);
 
 		if (lifecycle == null) {
-			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE, R4MProperties.PREFIX_ID,
-					lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()), lifecyclePhase);
+			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE,
+					R4MProperties.PREFIX_ID, lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()),
+					lifecyclePhase);
 		}
 
 		AdvancedLifecycleMappingDelegate delegate;
@@ -277,8 +278,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			}
 		}
 
-		// TODO define selectedPhaseSeqCalc via property
-		String selectedPhaseSeqCalc = "declared";
+		String selectedPhaseSeqCalc = this.settings.getPhaseSequenceCalculator()
+				.getSelected();
 		if (isFlagged)
 			if (selectedPhaseSeqCalc == DeclaredSeqCalculatorDelegate.HINT)
 				selectedPhaseSeqCalc = SequentialSeqCalculatorDelegate.HINT;
@@ -419,8 +420,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				return;
 			alreadyForkedForks.add(fork);
 
-			// TODO disable MojoDescriptor patching via property
-			mojoExecution.setMojoDescriptor(patchMojoDescriptorForLogging(mojoDescriptor, fork));
+			if (this.settings.getPatchMojoOnFork()
+					.getSelected())
+				mojoExecution.setMojoDescriptor(patchMojoDescriptorForLogging(mojoDescriptor, fork));
 		}
 
 		List<MavenProject> forkedProjects = LifecycleDependencyResolver.getProjects(project, session,
@@ -553,8 +555,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (targetLifecycle != null && phases.isEmpty()) {
 			Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
 			if (mvnLifecycle == null) {
-				this.log.warn(
-						String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, R4MProperties.PREFIX_ID, targetLifecycle.getId()));
+				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, R4MProperties.PREFIX_ID,
+						targetLifecycle.getId()));
 			} else {
 				boolean includePhase = isBlank(targetLifecycle.getStartPhase());
 				for (String phaseId : mvnLifecycle.getPhases()) {

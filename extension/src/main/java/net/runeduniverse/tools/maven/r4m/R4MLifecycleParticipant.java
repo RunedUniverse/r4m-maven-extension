@@ -9,6 +9,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -41,11 +42,13 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+import net.runeduniverse.tools.maven.r4m.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
@@ -106,6 +109,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * before they are sorted and actual build execution starts.
 	 */
 	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
+		compileSettings(mvnSession);
+
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
 
 		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
@@ -142,12 +147,16 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 
-			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED));
-			// collect indirectly referenced build-plugins after seeding the archive
-			for (MavenProject mvnProject : mvnSession.getAllProjects())
-				// enable dependent on property?
-				loadReferencedPlugins(mvnSession, mvnProject);
-			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED));
+			if ("scan".equals(this.settings.getMissingBuildPluginHandler()
+					.getSelected())) {
+				this.dispatcher
+						.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED));
+				// collect indirectly referenced build-plugins after seeding the archive
+				for (MavenProject mvnProject : mvnSession.getAllProjects())
+					loadReferencedPlugins(mvnSession, mvnProject);
+				this.dispatcher
+						.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED));
+			}
 
 			modifyLifecycleExecutionPlanCalculator();
 
@@ -170,6 +179,63 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 					this.unidentifiablePlugins));
 
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_FINISHED));
+	}
+
+	private void compileSettings(final MavenSession mvnSession) {
+		Properties prop = defaultProperties();
+		prop.putAll(mvnSession.getSystemProperties());
+		prop.putAll(mvnSession.getCurrentProject()
+				.getProperties());
+		prop.putAll(mvnSession.getUserProperties());
+
+		this.settings.setPhaseSequenceCalculator(buildTextPropertyAddPlexusHints(prop, "r4m.phase-sequence-calculator",
+				PhaseSequenceCalculatorDelegate.class));
+		this.settings.setMissingBuildPluginHandler(
+				buildTextProperty(prop, "r4m.missing-build-plugin-handler", "skip", "warn", "scan", "download"));
+		this.settings.setPatchMojoOnFork(buildBooleanProperty(prop, "r4m.patch-mojo-on-fork"));
+
+		this.settings.selectDefaults();
+	}
+
+	private Properties defaultProperties() {
+		Properties properties = new Properties();
+
+		properties.setProperty("r4m.phase-sequence-calculator.default", "declared");
+		properties.setProperty("r4m.missing-build-plugin-handler.default", "skip");
+		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
+
+		return properties;
+	}
+
+	private Property<Boolean> buildBooleanProperty(final Properties properties, final String key) {
+		AbstractProperty<Boolean> property = new AbstractProperty<>(key);
+		String defaultValue = properties.getProperty(key + ".default");
+		String selectedValue = properties.getProperty(key + ".selected");
+		property.setDefault(defaultValue == null ? null : "true".equals(defaultValue));
+		property.setSelected(selectedValue == null ? null : "true".equals(selectedValue));
+		property.add(true, false);
+		return property;
+	}
+
+	private Property<String> buildTextProperty(final Properties properties, final String key, final String... options) {
+		AbstractProperty<String> property = new AbstractProperty<>(key);
+		property.setDefault(properties.getProperty(key + ".default"));
+		property.setSelected(properties.getProperty(key + ".selected"));
+		property.add(options);
+		return property;
+	}
+
+	private Property<String> buildTextPropertyAddPlexusHints(final Properties properties, final String key,
+			final Class<?> plexusRole) {
+		AbstractProperty<String> property = new AbstractProperty<>(key);
+		property.setDefault(properties.getProperty(key + ".default"));
+		property.setSelected(properties.getProperty(key + ".selected"));
+		try {
+			property.addAll(this.container.lookupMap(plexusRole)
+					.keySet());
+		} catch (ComponentLookupException e) {
+		}
+		return property;
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,

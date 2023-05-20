@@ -1,8 +1,6 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -27,8 +25,8 @@ public class StatusMojo extends AbstractMojo {
 
 	private static final String ITEM_FORMAT = "\033[%c;%cm%s\033[m";
 
-	private static final String T_DEFAULT = "default";
-	private static final String T_SELECTED = "selected";
+	private static final String T_DEFAULT = "key.default";
+	private static final String T_SELECTED = "key.selected";
 	private static final Set<String> TEMPLATE = new LinkedHashSet<>();
 	static {
 		TEMPLATE.add(T_DEFAULT);
@@ -44,44 +42,54 @@ public class StatusMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Status\033[m");
-		getLog().info(" key = " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
-
-		Collections.addAll(new LinkedHashSet<>(), "declared", "sequential");
-
-		// r4m.phase-sequence-calculator.default
-		// r4m.phase-sequence-calculator.selected
-		logTextEntry(this.settings.getPhaseSequenceCalculator());
+		getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
+		for (Property<?> prop : this.settings.getAllProperties())
+			logTextEntry(prop);
 		getLog().info("");
 		getLog().info("");
 	}
 
-	private void logTextEntry(Property<String> entry) {
-		if (entry == null || isBlank(entry.getId()) || entry.getOptions() == null || entry.getOptions()
-				.isEmpty())
+	private void logTextEntry(Property<?> entry) {
+		if (entry == null || isBlank(entry.getId()))
 			return;
 		getLog().info("");
 		getLog().info(" " + entry.getId());
 		getLog().info("     = " + format(entry.getOptions(), entry.getDefault(), entry.getSelected()));
 	}
 
-	private static String format(Collection<String> options, String base, String selected) {
-		Set<String> values = new LinkedHashSet<>(options);
-		if (!isBlank(base))
-			values.add(base);
-		if (!isBlank(selected))
-			values.add(selected);
+	private static String format(Collection<?> options, Object defaultValue, Object selectedValue) {
+		Set<Object> values = new LinkedHashSet<>(options);
+		if (!isNull(defaultValue))
+			values.add(defaultValue);
+		if (!isNull(selectedValue))
+			values.add(selectedValue);
 
 		StringBuilder result = new StringBuilder("[");
-		for (Iterator<String> idx = values.iterator(); idx.hasNext();) {
-			String value = idx.next();
+		for (Iterator<?> idx = values.iterator(); idx.hasNext();) {
+			Object value = idx.next();
 
-			result.append(String.format(ITEM_FORMAT, value == base ? '4' : '0', value == selected ? '1' : '2', value));
+			result.append(String.format(ITEM_FORMAT, equals(value, defaultValue) ? '4' : '0',
+					equals(value, selectedValue) ? '1' : '2', value.toString()));
 
 			if (idx.hasNext())
 				result.append(", ");
 		}
 		return result.append(']')
 				.toString();
+	}
+
+	private static boolean isNull(Object o) {
+		if (o instanceof String)
+			return isBlank((String) o);
+		return o == null;
+	}
+
+	private static boolean equals(Object a, Object b) {
+		if (a == b)
+			return true;
+		if (a == null)
+			return b.equals(a);
+		return a.equals(b);
 	}
 
 }

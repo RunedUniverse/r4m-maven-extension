@@ -33,6 +33,9 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info("     condensed as much as possible and written to the 'rel-pem.xml' file");
 		getLog().info("     in the defined build directory.");
 		getLog().info("");
+		getLog().info(" r4m:status");
+		getLog().info("     Shows the status of all r4m features.");
+		getLog().info("");
 		getLog().info("");
 	}
 

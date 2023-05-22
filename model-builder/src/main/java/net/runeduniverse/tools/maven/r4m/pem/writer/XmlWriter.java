@@ -138,6 +138,10 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 				modeNodes.addChild(mode, null);
 		}
 
+		if (goal.getOptional() != null)
+			node.setAttribute("optional", goal.getOptional()
+					.toString());
+
 		if (goal.hasFork())
 			node.addChild(convert(goal.getFork()));
 

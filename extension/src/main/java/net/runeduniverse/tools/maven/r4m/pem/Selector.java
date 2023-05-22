@@ -11,13 +11,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
+import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -54,6 +58,8 @@ public class Selector implements ExecutionArchiveSelector {
 	@Requirement
 	private MavenPluginManager pluginManager;
 	@Requirement
+	private MojoDescriptorCreator mojoDescriptorCreator;
+	@Requirement
 	private ExecutionArchive archive;
 
 	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, Goal goal) {
@@ -64,20 +70,36 @@ public class Selector implements ExecutionArchiveSelector {
 		return false;
 	}
 
-	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView) {
+	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView,
+			boolean download) {
 		Plugin plugin = cnf.getActiveProject()
 				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
+		boolean loadManaged = true;
 
-		if (plugin == null)
-			return false;
+		if (plugin == null) {
+			if (goalView.isOptional())
+				return false;
+			if (download)
+				loadManaged = false;
+			else
+				return false;
+		}
 
 		MojoDescriptor descriptor = null;
 		try {
-			descriptor = pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), cnf.getActiveProject()
-					.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
+			if (loadManaged)
+				descriptor = this.pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), cnf.getActiveProject()
+						.getRemotePluginRepositories(), this.mvnSession.getRepositorySession());
+			else
+				descriptor = this.mojoDescriptorCreator.getMojoDescriptor(String.format("%s:%s:%s",
+						goalView.getGroupId(), goalView.getArtifactId(), goalView.getGoalId()), this.mvnSession,
+						cnf.getActiveProject());
 		} catch (MojoNotFoundException | PluginResolutionException | PluginDescriptorParsingException
 				| InvalidPluginDescriptorException e) {
 			this.log.debug("Failed to acquire MojoDescriptor!", e);
+			return false;
+		} catch (PluginNotFoundException | NoPluginFoundForPrefixException | PluginVersionResolutionException e) {
+			this.log.debug("Failed to acquire maven plugin!", e);
 			return false;
 		}
 		if (descriptor == null)
@@ -90,6 +112,8 @@ public class Selector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(final ExecutionArchiveSelectorConfig cnf,
 			Collection<Execution> executions) {
 		boolean warn = "warn".equals(this.settings.getMissingBuildPluginHandler()
+				.getSelected());
+		boolean download = "download".equals(this.settings.getMissingBuildPluginHandler()
 				.getSelected());
 		Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
 
@@ -123,10 +147,11 @@ public class Selector implements ExecutionArchiveSelector {
 							GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
 									goal.getGoalId());
 							goalView.addModes(goal.getModes());
+							goalView.setOptional(goal.getOptional() != null && goal.getOptional());
 							goalView.setFork(goal.getFork());
-							if (acquireMojoDescriptor(cnf, goalView))
+							if (acquireMojoDescriptor(cnf, goalView, download))
 								phaseView.addGoal(goalView);
-							else if (warn)
+							else if (!goalView.isOptional() && (warn || download))
 								this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_GOAL, goalView.getGroupId(),
 										goalView.getArtifactId(), goalView.getGoalId()));
 						}

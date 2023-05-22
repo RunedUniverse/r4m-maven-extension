@@ -204,6 +204,15 @@
 			<xs:element name="fork" type="Fork" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="optional" use="optional"
+			default="true">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="true" />
+					<xs:enumeration value="false" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="Fork">

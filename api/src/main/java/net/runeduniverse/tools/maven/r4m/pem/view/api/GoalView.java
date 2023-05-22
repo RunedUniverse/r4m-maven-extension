@@ -18,6 +18,8 @@ public interface GoalView extends Recordable {
 
 	public Set<String> getModes();
 
+	public boolean isOptional();
+
 	public boolean hasFork();
 
 	public boolean hasValidFork();
@@ -29,6 +31,8 @@ public interface GoalView extends Recordable {
 	public void addModes(String... modes);
 
 	public void addModes(Collection<String> modes);
+
+	public void setOptional(boolean optional);
 
 	public void setFork(Fork fork);
 

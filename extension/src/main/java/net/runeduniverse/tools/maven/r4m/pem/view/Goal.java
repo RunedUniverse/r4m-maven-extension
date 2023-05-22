@@ -11,10 +11,13 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
 public class Goal implements GoalView {
+
 	private String groupId;
 	private String artifactId;
 	private String goalId;
+	private boolean optional;
 	private Fork fork = null;
+
 	private final Set<String> modes = new LinkedHashSet<>();
 
 	private MojoDescriptor descriptor;
@@ -46,6 +49,11 @@ public class Goal implements GoalView {
 	}
 
 	@Override
+	public boolean isOptional() {
+		return this.optional;
+	}
+
+	@Override
 	public boolean hasFork() {
 		return this.fork != null;
 	}
@@ -74,6 +82,11 @@ public class Goal implements GoalView {
 	@Override
 	public void addModes(Collection<String> modes) {
 		this.modes.addAll(modes);
+	}
+
+	@Override
+	public void setOptional(boolean optional) {
+		this.optional = optional;
 	}
 
 	@Override
@@ -118,10 +131,12 @@ public class Goal implements GoalView {
 				.append("goalId", this.goalId);
 
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
+		tree.append("optional", Boolean.toString(this.optional));
 
 		if (this.fork != null)
 			tree.append(this.fork.toRecord());
 
 		return tree;
 	}
+
 }

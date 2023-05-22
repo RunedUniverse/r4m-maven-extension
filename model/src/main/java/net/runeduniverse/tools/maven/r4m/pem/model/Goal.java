@@ -8,10 +8,13 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class Goal implements Recordable {
+
 	private String groupId;
 	private String artifactId;
 	private String goalId;
+	private Boolean optional = null;
 	private Fork fork = null;
+
 	private final Set<String> modes = new LinkedHashSet<>();
 
 	public Goal() {
@@ -39,6 +42,10 @@ public class Goal implements Recordable {
 		return this.goalId;
 	}
 
+	public Boolean getOptional() {
+		return this.optional;
+	}
+
 	public Set<String> getModes() {
 		return this.modes;
 	}
@@ -59,6 +66,11 @@ public class Goal implements Recordable {
 
 	public Goal addModes(Collection<String> modes) {
 		this.modes.addAll(modes);
+		return this;
+	}
+
+	public Goal setOptional(Boolean optional) {
+		this.optional = optional;
 		return this;
 	}
 
@@ -125,6 +137,12 @@ public class Goal implements Recordable {
 				.size() && this.modes.containsAll(goal.getModes())))
 			return false;
 
+		if (this.optional == null) {
+			if (goal.getOptional() != null)
+				return false;
+		} else if (!this.optional.equals(goal.getOptional()))
+			return false;
+
 		if (this.fork != null)
 			return this.fork.equals(goal.getFork());
 
@@ -141,9 +159,13 @@ public class Goal implements Recordable {
 
 		tree.append("modes", '[' + String.join(", ", this.modes) + ']');
 
+		if (this.optional != null)
+			tree.append("optional", this.optional.toString());
+
 		if (this.fork != null)
 			tree.append(this.fork.toRecord());
 
 		return tree;
 	}
+
 }

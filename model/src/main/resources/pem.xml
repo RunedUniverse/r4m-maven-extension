@@ -37,7 +37,7 @@
 						</phase>
 						<phase id="test-compile">
 							<goals>
-								<goal id="compiler-summary">
+								<goal id="compiler-summary" optional="true">
 									<modes>
 										<default />
 										<dev />

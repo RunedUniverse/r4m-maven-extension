@@ -375,6 +375,13 @@ public interface ExtensionUtils {
 				.equals(goal.getGoalId()))
 			return false;
 
+		if (origGoal.getOptional() == null) {
+			if (goal.getOptional() != null)
+				return false;
+		} else if (!origGoal.getOptional()
+				.equals(goal.getOptional()))
+			return false;
+
 		if (checkModes && !(origGoal.getModes()
 				.size() == goal.getModes()
 						.size()
@@ -404,6 +411,7 @@ public interface ExtensionUtils {
 	public static Goal createEquivalent(final Goal original) {
 		Goal equivalent = new Goal(original.getGroupId(), original.getArtifactId(), original.getGoalId());
 		equivalent.addModes(original.getModes());
+		equivalent.setOptional(original.getOptional());
 		equivalent.setFork(original.getFork());
 		return equivalent;
 	}

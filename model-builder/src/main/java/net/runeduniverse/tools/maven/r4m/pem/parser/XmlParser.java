@@ -264,7 +264,10 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (isBlank(groupId) || isBlank(artifactId) || isBlank(goalId))
 			return false;
 
-		Goal goal = new Goal(groupId, artifactId, goalId);
+		String optionalValue = goalNode.getAttribute("optional");
+		Boolean optional = isBlank(optionalValue) ? null : Boolean.parseBoolean(optionalValue);
+
+		Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 
 		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
 		Set<String> modes = new LinkedHashSet<>(0);

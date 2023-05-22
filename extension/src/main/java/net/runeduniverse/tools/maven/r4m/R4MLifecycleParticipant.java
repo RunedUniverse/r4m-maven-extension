@@ -201,7 +201,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		Properties properties = new Properties();
 
 		properties.setProperty("r4m.phase-sequence-calculator.default", "declared");
-		properties.setProperty("r4m.missing-build-plugin-handler.default", "skip");
+		properties.setProperty("r4m.missing-build-plugin-handler.default", "warn");
 		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
 
 		return properties;
@@ -210,7 +210,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private Property<Boolean> buildBooleanProperty(final Properties properties, final String key) {
 		AbstractProperty<Boolean> property = new AbstractProperty<>(key);
 		String defaultValue = properties.getProperty(key + ".default");
-		String selectedValue = properties.getProperty(key + ".selected");
+		String selectedValue = properties.getProperty(key);
 		property.setDefault(defaultValue == null ? null : "true".equals(defaultValue));
 		property.setSelected(selectedValue == null ? null : "true".equals(selectedValue));
 		property.add(true, false);
@@ -220,7 +220,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private Property<String> buildTextProperty(final Properties properties, final String key, final String... options) {
 		AbstractProperty<String> property = new AbstractProperty<>(key);
 		property.setDefault(properties.getProperty(key + ".default"));
-		property.setSelected(properties.getProperty(key + ".selected"));
+		property.setSelected(properties.getProperty(key));
 		property.add(options);
 		return property;
 	}
@@ -229,7 +229,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			final Class<?> plexusRole) {
 		AbstractProperty<String> property = new AbstractProperty<>(key);
 		property.setDefault(properties.getProperty(key + ".default"));
-		property.setSelected(properties.getProperty(key + ".selected"));
+		property.setSelected(properties.getProperty(key));
 		try {
 			property.addAll(this.container.lookupMap(plexusRole)
 					.keySet());

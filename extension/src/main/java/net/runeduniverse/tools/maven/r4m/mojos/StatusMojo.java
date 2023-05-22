@@ -26,11 +26,11 @@ public class StatusMojo extends AbstractMojo {
 	private static final String ITEM_FORMAT = "\033[%c;%cm%s\033[m";
 
 	private static final String T_DEFAULT = "key.default";
-	private static final String T_SELECTED = "key.selected";
+	private static final String T_SELECTED = "key";
 	private static final Set<String> TEMPLATE = new LinkedHashSet<>();
 	static {
-		TEMPLATE.add(T_DEFAULT);
 		TEMPLATE.add(T_SELECTED);
+		TEMPLATE.add(T_DEFAULT);
 	}
 
 	/**

@@ -192,8 +192,15 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			mojoExecution.setMojoDescriptor(mojoDescriptor);
 		}
 
+		///////////////
+		System.out.println(mojoDescriptor.getId());
+		System.out.println(mojoExecution.getConfiguration());
+
 		selectExecutionConfigurator(mojoExecution).configure(project, mojoExecution,
 				MojoExecution.Source.CLI.equals(mojoExecution.getSource()));
+
+		System.out.println(mojoExecution.getConfiguration());
+		///////////////
 
 		finalizeMojoConfiguration(mojoExecution);
 

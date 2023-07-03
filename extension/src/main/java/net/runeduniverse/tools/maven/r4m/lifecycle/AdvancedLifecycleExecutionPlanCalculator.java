@@ -30,10 +30,12 @@ import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.plugin.MojoExecution.Source;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -70,8 +72,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = LifecycleExecutionPlanCalculator.class, instantiationStrategy = "singleton")
 public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
@@ -193,21 +193,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			mojoExecution.setMojoDescriptor(mojoDescriptor);
 		}
 
-		///////////////
-		String execuitionId = mojoExecution.getExecutionId();
-		// ERROR > Configuration is in PluginExecution > which doesn't get found! &&
-		// since it isn't started via CLI it doesn't get injected on configuration
-
-		System.out.println(mojoDescriptor.getId());
-		System.out.println(mojoExecution.getSource());
-
-		System.out.println(mojoExecution.getConfiguration());
-
 		selectExecutionConfigurator(mojoExecution).configure(project, mojoExecution,
 				MojoExecution.Source.CLI.equals(mojoExecution.getSource()));
-
-		System.out.println(mojoExecution.getConfiguration());
-		///////////////
 
 		finalizeMojoConfiguration(mojoExecution);
 
@@ -253,9 +240,13 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						this.selector.compileSelection(selectorConfig.selectModes(isBlank(mode) ? "default" : mode)
 								.selectActiveExecutions(taskData.getExecution())));
 
-				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
-					mojoExecutions.addAll(mojoExecutionsFromLifecycle);
-				}
+				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
+					for (MojoExecution exec : mojoExecutionsFromLifecycle) {
+						if (this.settings.getGeneratePluginExecutions()
+								.getSelected())
+							generatePluginExecutions(project, exec);
+						mojoExecutions.add(exec);
+					}
 			} else
 				throw new IllegalStateException("unexpected task " + task);
 		}
@@ -319,6 +310,99 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			}
 
 		return phaseToMojoMapping;
+	}
+
+	protected void generatePluginExecutions(final MavenProject mvnProject, final MojoExecution mojoExecution) {
+		Build build = mvnProject.getBuild();
+		String groupId = mojoExecution.getGroupId();
+		String artifactId = mojoExecution.getArtifactId();
+		String goal = mojoExecution.getGoal();
+		String executionId = mojoExecution.getExecutionId();
+
+		Plugin plugin = findPlugin(groupId, artifactId, build.getPlugins());
+		Plugin managedPlugin = findPlugin(groupId, artifactId, build.getPluginManagement()
+				.getPlugins());
+
+		Object cnfObj = null;
+		if (plugin != null)
+			cnfObj = plugin.getConfiguration();
+		if (isBlank(cnfObj) && managedPlugin != null)
+			cnfObj = managedPlugin.getConfiguration();
+		if (isBlank(cnfObj))
+			return;
+
+		PluginExecution exec = null;
+		if (plugin != null) {
+			// local plugin
+			Xpp3Dom currentConfig = null;
+			for (PluginExecution e : plugin.getExecutions())
+				if (executionId.equals(e.getId())) {
+					exec = e;
+					if (exec.getConfiguration() instanceof Xpp3Dom)
+						currentConfig = (Xpp3Dom) exec.getConfiguration();
+					break;
+				}
+			if (exec == null && managedPlugin != null)
+				for (PluginExecution e : managedPlugin.getExecutions())
+					if (executionId.equals(e.getId())) {
+						exec = e.clone();
+						exec.getGoals()
+								.clear();
+						exec.setInherited(false);
+						plugin.addExecution(exec);
+						break;
+					}
+			if (exec == null) {
+				exec = new PluginExecution();
+				exec.setId(executionId);
+				exec.setInherited(false);
+				plugin.addExecution(exec);
+			} else
+				exec.removeGoal(goal);
+			exec.addGoal(goal);
+			if (currentConfig != null && cnfObj instanceof Xpp3Dom)
+				exec.setConfiguration(Xpp3Dom.mergeXpp3Dom(currentConfig, (Xpp3Dom) cnfObj, true));
+			else
+				exec.setConfiguration(cnfObj);
+		} else if (managedPlugin != null) {
+			// managed plugin
+			plugin = managedPlugin.clone();
+			plugin.setConfiguration(null);
+			plugin.setInherited(false);
+			for (PluginExecution e : managedPlugin.getExecutions())
+				if (executionId.equals(e.getId())) {
+					exec = e.clone();
+					exec.getGoals()
+							.clear();
+				}
+			if (exec == null) {
+				exec = new PluginExecution();
+				exec.setId(executionId);
+			}
+			exec.setInherited(false);
+			exec.addGoal(goal);
+			exec.setConfiguration(cnfObj);
+			plugin.addExecution(exec);
+			build.addPlugin(plugin);
+			build.flushPluginMap();
+		}
+	}
+
+	protected boolean isBlank(final Object configuration) {
+		if (configuration == null)
+			return true;
+		if (configuration instanceof Xpp3Dom) {
+			Xpp3Dom dom = (Xpp3Dom) configuration;
+			return isBlank(dom.getValue()) && dom.getChildCount() == 0;
+		}
+		return false;
+	}
+
+	protected Plugin findPlugin(final String groupId, final String artifactId, final Collection<Plugin> plugins) {
+		for (Plugin plugin : plugins)
+			if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId()))
+				return plugin;
+		return null;
 	}
 
 	/**
@@ -546,6 +630,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		for (Entry<String, List<MojoExecution>> entry : lifecycleMappings.entrySet())
 			if (entry.getValue() != null)
 				for (MojoExecution exec : entry.getValue()) {
+					if (this.settings.getGeneratePluginExecutionsOnFork()
+							.getSelected())
+						generatePluginExecutions(project, exec);
 					// complete with default values
 					finalizeMojoConfiguration(exec);
 					calculateForks(session, project, exec, alreadyForkedForks, alreadyForkedMojos);
@@ -792,6 +879,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 							.selectModes("default")
 							.selectPackagingProcedure(project.getPackaging())
 							.selectActiveExecutions(mojoExecution.getExecutionId()));
+
+		if (this.settings.getGeneratePluginExecutionsOnFork()
+				.getSelected())
+			generatePluginExecutions(project, forkedExecution);
 
 		selectExecutionConfigurator(forkedExecution).configure(project, forkedExecution, true);
 

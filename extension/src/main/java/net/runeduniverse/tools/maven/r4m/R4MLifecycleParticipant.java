@@ -193,6 +193,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.settings.setMissingBuildPluginHandler(
 				buildTextProperty(prop, "r4m.missing-build-plugin-handler", "skip", "warn", "scan", "download"));
 		this.settings.setPatchMojoOnFork(buildBooleanProperty(prop, "r4m.patch-mojo-on-fork"));
+		this.settings.setGeneratePluginExecutions(buildBooleanProperty(prop, "r4m.generate-plugin-executions"));
+		this.settings.setGeneratePluginExecutionsOnFork(
+				buildBooleanProperty(prop, "r4m.generate-plugin-executions-on-fork"));
 
 		this.settings.selectDefaults();
 	}
@@ -203,6 +206,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		properties.setProperty("r4m.phase-sequence-calculator.default", "declared");
 		properties.setProperty("r4m.missing-build-plugin-handler.default", "warn");
 		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
+		properties.setProperty("r4m.generate-plugin-executions.default", "true");
+		properties.setProperty("r4m.generate-plugin-executions-on-fork.default", "true");
 
 		return properties;
 	}

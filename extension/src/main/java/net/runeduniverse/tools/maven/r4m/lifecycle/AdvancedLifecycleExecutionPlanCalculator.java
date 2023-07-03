@@ -33,6 +33,7 @@ import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.MojoExecution.Source;
 import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
@@ -193,7 +194,13 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 
 		///////////////
+		String execuitionId = mojoExecution.getExecutionId();
+		// ERROR > Configuration is in PluginExecution > which doesn't get found! &&
+		// since it isn't started via CLI it doesn't get injected on configuration
+
 		System.out.println(mojoDescriptor.getId());
+		System.out.println(mojoExecution.getSource());
+
 		System.out.println(mojoExecution.getConfiguration());
 
 		selectExecutionConfigurator(mojoExecution).configure(project, mojoExecution,

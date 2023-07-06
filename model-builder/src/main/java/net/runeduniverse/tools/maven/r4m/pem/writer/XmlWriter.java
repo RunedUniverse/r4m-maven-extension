@@ -1,6 +1,10 @@
 package net.runeduniverse.tools.maven.r4m.pem.writer;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 import org.codehaus.plexus.component.annotations.Component;
@@ -23,8 +27,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 @Component(role = ProjectExecutionModelWriter.class, hint = "default")
 public class XmlWriter implements ProjectExecutionModelWriter {
 
@@ -34,9 +36,21 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 	private Map<String, ExecutionTriggerWriter> triggerWriter;
 
 	@Override
-	public void writeModel(OutputStream stream, ProjectExecutionModel pem) {
-		// TODO Auto-generated method stub
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem) throws IOException {
+		stream.write(convert(pem).toString()
+				.getBytes());
+	}
 
+	@Override
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, Charset charset) throws IOException {
+		stream.write(convert(pem).toString()
+				.getBytes(charset));
+	}
+
+	@Override
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, String charsetName) throws IOException {
+		stream.write(convert(pem).toString()
+				.getBytes(charsetName));
 	}
 
 	@Override

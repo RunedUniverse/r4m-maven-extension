@@ -1,9 +1,12 @@
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
@@ -29,8 +32,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelPluginParser.class, hint = ExecutionsPluginParser.HINT)
 public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser {
@@ -159,4 +160,5 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 			return lifecycle;
 		return new Lifecycle(id);
 	}
+
 }

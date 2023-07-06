@@ -41,6 +41,7 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 	@Requirement
 	private Logger log;
 
+	@Override
 	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
 			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,

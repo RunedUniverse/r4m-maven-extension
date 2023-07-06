@@ -16,6 +16,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 
 @Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
 public class Archive implements ExecutionArchive {
+
 	private Map<MavenProject, ExecutionArchiveSlice> registry = new LinkedHashMap<>();
 
 	@Requirement
@@ -57,4 +58,5 @@ public class Archive implements ExecutionArchive {
 
 		return tree;
 	}
+
 }

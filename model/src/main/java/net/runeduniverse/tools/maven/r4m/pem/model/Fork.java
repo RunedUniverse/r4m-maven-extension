@@ -44,11 +44,7 @@ public class Fork implements Recordable {
 	}
 
 	public boolean isValid() {
-		if (this.mode != null)
-			return true;
-		if (!this.executions.isEmpty())
-			return true;
-		if (this.lifecycle != null)
+		if (this.mode != null || !this.executions.isEmpty() || this.lifecycle != null)
 			return true;
 		if (this.phases != null && !this.phases.isEmpty())
 			return true;

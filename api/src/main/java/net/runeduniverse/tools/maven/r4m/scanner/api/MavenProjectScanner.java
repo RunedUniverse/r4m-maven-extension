@@ -10,7 +10,7 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 
 /**
- * Required for scanning mavne projects for pem configurations.
+ * Required for scanning maven projects to extract pem configurations.
  */
 public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 

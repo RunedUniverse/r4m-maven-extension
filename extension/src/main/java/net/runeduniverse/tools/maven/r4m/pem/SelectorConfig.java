@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -11,8 +13,6 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
@@ -46,9 +46,9 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
 		this.dirty = true;
-		for (int i = 0; i < values.length; i++)
-			if (!isBlank(values[i]))
-				this.activeExecutions.add(values[i]);
+		for (String value : values)
+			if (!isBlank(value))
+				this.activeExecutions.add(value);
 		return this;
 	}
 
@@ -62,9 +62,9 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public ExecutionArchiveSelectorConfig selectActiveProfiles(String... values) {
 		this.dirty = true;
-		for (int i = 0; i < values.length; i++)
-			if (!isBlank(values[i]))
-				this.activeProfiles.add(values[i]);
+		for (String value : values)
+			if (!isBlank(value))
+				this.activeProfiles.add(value);
 		return this;
 	}
 
@@ -78,9 +78,9 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values) {
 		this.dirty = true;
-		for (int i = 0; i < values.length; i++)
-			if (!isBlank(values[i]))
-				this.providedProfiles.add(values[i]);
+		for (String value : values)
+			if (!isBlank(value))
+				this.providedProfiles.add(value);
 		return this;
 	}
 
@@ -94,9 +94,9 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public ExecutionArchiveSelectorConfig selectModes(String... values) {
 		this.dirty = true;
-		for (int i = 0; i < values.length; i++)
-			if (!isBlank(values[i]))
-				this.modes.add(values[i]);
+		for (String value : values)
+			if (!isBlank(value))
+				this.modes.add(value);
 		return this;
 	}
 
@@ -184,6 +184,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 		return Collections.unmodifiableSet(this.modes);
 	}
 
+	@Override
 	public SelectorConfig clone() {
 		SelectorConfig cnf = new SelectorConfig();
 		cnf.selectActiveProject(this.mvnProject);

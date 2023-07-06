@@ -1,9 +1,9 @@
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class ExecutionSource {
 

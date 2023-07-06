@@ -13,4 +13,5 @@ public interface PluginExecutionRegistry {
 	PluginExecutionRegistrySlice getSlice(String prefix);
 
 	PluginExecutionRegistrySlice getSlice(String groupId, String artifactId);
+
 }

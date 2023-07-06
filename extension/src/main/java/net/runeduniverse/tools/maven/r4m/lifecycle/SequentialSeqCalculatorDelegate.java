@@ -2,6 +2,7 @@ package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import java.util.LinkedList;
 import java.util.List;
+
 import org.apache.maven.lifecycle.Lifecycle;
 import org.codehaus.plexus.component.annotations.Component;
 

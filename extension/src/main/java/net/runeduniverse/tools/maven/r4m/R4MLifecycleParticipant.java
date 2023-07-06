@@ -43,6 +43,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 import net.runeduniverse.tools.maven.r4m.api.Property;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
@@ -89,11 +90,12 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * activate profiles and perform similar tasks that affect MavenProject instance
 	 * construction.
 	 */
+	@Override
 	public void afterSessionStart(MavenSession mvnSession) throws MavenExecutionException {
 		this.coreExtension = true;
 
 		mvnSession.getSettings()
-				.addPluginGroup(R4MProperties.GROUP_ID);
+				.addPluginGroup(Runes4MavenProperties.GROUP_ID);
 	}
 
 	/**
@@ -102,6 +104,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * This callback is intended to allow extensions to manipulate MavenProjects
 	 * before they are sorted and actual build execution starts.
 	 */
+	@Override
 	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
 		this.mavenProjectScanner = new LinkedList<>(this.mavenProjectScanner);
 		this.mavenProjectScanner.sort(null);
@@ -397,7 +400,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	}
 
 	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {
-		Collection<Plugin> extPlugins = new LinkedHashSet<Plugin>();
+		Collection<Plugin> extPlugins = new LinkedHashSet<>();
 		for (ClassRealm realm : realms) {
 			Plugin plugin = fromExtRealm(realm);
 			if (plugin == null)

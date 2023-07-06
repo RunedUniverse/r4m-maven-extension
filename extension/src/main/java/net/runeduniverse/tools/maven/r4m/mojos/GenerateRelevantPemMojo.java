@@ -1,5 +1,12 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.acquireExecutionArchive;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.mojoFailureExtensionLoading;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.reduce;
+import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.replaceWithEquivalents;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -14,8 +21,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
-
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
@@ -26,16 +31,9 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.acquireExecutionArchive;
-import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.mojoFailureExtensionLoading;
-import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.reduce;
-import static net.runeduniverse.tools.maven.r4m.mojos.api.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
-
 /**
  * generates the rel-pem.xml from all relevant executions
- * 
+ *
  * @author Pl4yingNight
  * @goal gen-rel-pem
  */
@@ -120,13 +118,11 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		PlexusConfiguration xml = this.writer.convert(model);
 		File xmlFile = new File(this.buildDir, "rel-pem.xml");
 		buildDir.mkdirs();
 
 		try (OutputStream stream = new FileOutputStream(xmlFile, false)) {
-			stream.write(xml.toString()
-					.getBytes(this.encoding));
+			this.writer.writeModel(stream, model, this.encoding);
 		} catch (IOException e) {
 			throw new MojoFailureException(String.format(ERR_MSG_FAILED_TO_WRITE_TO_FILE, xmlFile.getPath()), e);
 		}

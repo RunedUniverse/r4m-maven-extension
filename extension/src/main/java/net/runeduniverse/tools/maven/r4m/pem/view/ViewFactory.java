@@ -22,4 +22,5 @@ public class ViewFactory {
 	public static GoalView createGoal(String groupId, String artifactId, String goalId) {
 		return new Goal(groupId, artifactId, goalId);
 	}
+
 }

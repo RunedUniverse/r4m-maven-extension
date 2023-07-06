@@ -43,4 +43,5 @@ public class ProfileTriggerProvided extends ProfileTrigger {
 				return false;
 		return getProfileId().equals(trigger.getProfileId());
 	}
+
 }

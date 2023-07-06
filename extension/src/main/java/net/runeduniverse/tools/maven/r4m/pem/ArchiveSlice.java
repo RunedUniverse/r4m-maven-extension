@@ -17,6 +17,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public class ArchiveSlice implements ExecutionArchiveSlice {
+
 	private final MavenProject mvnProject;
 	private ExecutionArchiveSlice parent;
 	private String version;
@@ -129,4 +130,5 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 
 		return tree;
 	}
+
 }

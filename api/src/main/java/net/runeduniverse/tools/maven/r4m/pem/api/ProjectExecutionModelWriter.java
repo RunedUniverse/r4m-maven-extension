@@ -1,6 +1,8 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
@@ -15,7 +17,13 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 public interface ProjectExecutionModelWriter {
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem);
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem) throws IOException;
+
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final Charset charset)
+			throws IOException;
+
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final String charsetName)
+			throws IOException;
 
 	public PlexusConfiguration convert(final ProjectExecutionModel pem);
 

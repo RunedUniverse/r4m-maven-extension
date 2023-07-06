@@ -75,8 +75,8 @@ public class Goal implements GoalView {
 
 	@Override
 	public void addModes(String... modes) {
-		for (int i = 0; i < modes.length; i++)
-			this.modes.add(modes[i]);
+		for (String mode : modes)
+			this.modes.add(mode);
 	}
 
 	@Override
@@ -109,11 +109,9 @@ public class Goal implements GoalView {
 		GoalView view = (GoalView) obj;
 
 		if (!(this.groupId.equals(view.getGroupId()) && this.artifactId.equals(view.getArtifactId())
-				&& this.goalId.equals(view.getGoalId())))
-			return false;
-
-		if (!(this.modes.size() == view.getModes()
-				.size() && this.modes.containsAll(view.getModes())))
+				&& this.goalId.equals(view.getGoalId()))
+				|| !(this.modes.size() == view.getModes()
+						.size() && this.modes.containsAll(view.getModes())))
 			return false;
 
 		if (this.fork != null)

@@ -6,4 +6,5 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 public interface ExecutionFilter {
 
 	public boolean apply(Execution execution);
+
 }

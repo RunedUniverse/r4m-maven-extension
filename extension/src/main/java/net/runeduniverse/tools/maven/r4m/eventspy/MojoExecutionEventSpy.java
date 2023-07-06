@@ -9,6 +9,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 
@@ -59,7 +60,7 @@ public class MojoExecutionEventSpy implements EventSpy {
 			final PluginDescriptor overlay) {
 		this.log.info("");
 		this.log.info(String.format("\033[1m Injected Configuration-Override into forked lifecycle\033[m",
-				R4MProperties.PREFIX_ID));
+				Runes4MavenProperties.PREFIX_ID));
 		this.log.info(String.format("\033[1m   provided by\033[0m %s:%s:%s", overlay.getGroupId(),
 				overlay.getArtifactId(), overlay.getVersion()));
 	}

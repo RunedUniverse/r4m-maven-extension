@@ -7,6 +7,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface PluginExecutionRegistrySlice {
+
 	public Set<Execution> getExecutions();
 
 	public void addExecutions(Collection<Execution> values);
@@ -16,4 +17,5 @@ public interface PluginExecutionRegistrySlice {
 	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint);
 
 	public Set<ProjectExecutionModel> getModels();
+
 }

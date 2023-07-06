@@ -58,8 +58,8 @@ public class AbstractProperty<T> implements Property<T> {
 	}
 
 	public AbstractProperty<T> add(final T... options) {
-		for (int i = 0; i < options.length; i++)
-			this.options.add(options[i]);
+		for (T option : options)
+			this.options.add(option);
 		return this;
 	}
 

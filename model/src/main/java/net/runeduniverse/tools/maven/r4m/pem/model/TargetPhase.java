@@ -36,10 +36,7 @@ public class TargetPhase implements Recordable {
 			return false;
 		TargetPhase phase = (TargetPhase) obj;
 
-		if (!this.id.equals(phase.getId()))
-			return false;
-
-		if (!(this.executions.size() == phase.getExecutions()
+		if (!this.id.equals(phase.getId()) || !(this.executions.size() == phase.getExecutions()
 				.size() && this.executions.containsAll(phase.getExecutions())))
 			return false;
 

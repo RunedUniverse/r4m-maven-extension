@@ -11,8 +11,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
@@ -55,7 +55,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import net.runeduniverse.tools.maven.r4m.R4MProperties;
+import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
@@ -199,8 +199,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		finalizeMojoConfiguration(mojoExecution);
 
 		// using LinkedList for Forks since it calls equals() on contains
-		calculateForks(session, session.getCurrentProject(), mojoExecution, new LinkedList<Fork>(),
-				new LinkedHashSet<MojoDescriptor>());
+		calculateForks(session, session.getCurrentProject(), mojoExecution, new LinkedList<>(), new LinkedHashSet<>());
 	}
 
 	public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<Object> tasks)
@@ -269,7 +268,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		if (lifecycle == null) {
 			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE,
-					R4MProperties.PREFIX_ID, lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()),
+					Runes4MavenProperties.PREFIX_ID, lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()),
 					lifecyclePhase);
 		}
 
@@ -460,8 +459,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
 		// using LinkedList for Forks since it calls equals() on contains
-		calculateForks(session, session.getCurrentProject(), mojoExecution, new LinkedList<Fork>(),
-				new LinkedHashSet<MojoDescriptor>());
+		calculateForks(session, session.getCurrentProject(), mojoExecution, new LinkedList<>(), new LinkedHashSet<>());
 	}
 
 	protected void calculateForks(final MavenSession session, final MavenProject project,
@@ -512,9 +510,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			if (!alreadyForkedMojos.add(mojoDescriptor))
 				return;
 		} else {
-			if (fork == null || !fork.isValid())
-				return;
-			if (alreadyForkedForks.contains(fork))
+			if (fork == null || !fork.isValid() || alreadyForkedForks.contains(fork))
 				return;
 			alreadyForkedForks.add(fork);
 
@@ -656,7 +652,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (targetLifecycle != null && phases.isEmpty()) {
 			Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
 			if (mvnLifecycle == null) {
-				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, R4MProperties.PREFIX_ID,
+				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, Runes4MavenProperties.PREFIX_ID,
 						targetLifecycle.getId()));
 			} else {
 				boolean includePhase = isBlank(targetLifecycle.getStartPhase());
@@ -722,7 +718,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
 			if (lifecycle == null)
 				throw new LifecyclePhaseNotFoundException(
-						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, R4MProperties.PREFIX_ID, phase), phase);
+						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, Runes4MavenProperties.PREFIX_ID, phase),
+						phase);
 
 			AdvancedLifecycleMappingDelegate delegate;
 			if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {

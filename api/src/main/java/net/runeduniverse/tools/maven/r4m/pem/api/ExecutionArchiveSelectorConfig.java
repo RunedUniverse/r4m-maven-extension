@@ -16,7 +16,7 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 	 * used to select for the packaging flag in pom. Keep in mind there are multiple
 	 * packaging flags that set the type of how an artifact is packaged. So here we
 	 * define it as packaging procedure.
-	 * 
+	 *
 	 * @param value packaging procedure
 	 * @return selection
 	 */

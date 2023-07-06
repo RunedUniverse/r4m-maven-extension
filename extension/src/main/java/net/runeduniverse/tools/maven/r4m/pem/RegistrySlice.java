@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -10,8 +12,6 @@ import java.util.Set;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class RegistrySlice implements PluginExecutionRegistrySlice {
 
@@ -33,9 +33,7 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 
 	@Override
 	public void includeModel(ProjectExecutionModel model) {
-		if (model == null)
-			return;
-		if (model.getExecutions()
+		if (model == null || model.getExecutions()
 				.isEmpty())
 			return;
 
@@ -64,4 +62,5 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 			return parserHint;
 		return String.join(":", parserType.getCanonicalName(), parserHint);
 	}
+
 }

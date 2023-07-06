@@ -12,11 +12,11 @@ public interface ExecutionFilterUtils {
 	 * Creates the default {@link ExecutionFilter} for filtering out all the
 	 * relevant Executions utilizing the provided
 	 * {@link ExecutionArchiveSelectorConfig}.
-	 * 
+	 *
 	 * <p>
 	 * Relevant are all Executions that are not permanently flagged as disabled and
 	 * adhere to all restrictions.
-	 * 
+	 *
 	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
 	 *            the filter
 	 * @return an instance of {@link ExecutionFilter} for filtering Executions by
@@ -49,12 +49,12 @@ public interface ExecutionFilterUtils {
 	/**
 	 * Creates the default {@link ExecutionFilter} for filtering out all the active
 	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
-	 * 
+	 *
 	 * <p>
 	 * Active are all Executions that are not permanently flagged as disabled,
 	 * adhere to all restrictions and are triggered by either a trigger or by direct
 	 * invocation.
-	 * 
+	 *
 	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
 	 *            the filter
 	 * @return an instance of {@link ExecutionFilter} for filtering for active

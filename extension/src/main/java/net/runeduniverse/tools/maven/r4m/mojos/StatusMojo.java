@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.mojos;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -12,11 +14,9 @@ import org.apache.maven.plugin.MojoFailureException;
 import net.runeduniverse.tools.maven.r4m.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;;
-
 /**
  * prints the status-page
- * 
+ *
  * @author VenaNocta
  * @goal status
  * @requiresProject false

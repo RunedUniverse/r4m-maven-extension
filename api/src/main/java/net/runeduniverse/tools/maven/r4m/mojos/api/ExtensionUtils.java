@@ -71,11 +71,11 @@ public interface ExtensionUtils {
 	/***
 	 * Reduces the {@link Execution} collection by compiling the intersections
 	 * between the goals and summarizing the remaining.
-	 * 
+	 *
 	 * <p>
 	 * Mergeable Goals will be merged using {@link #createEquivalent(Goal)}, note
 	 * the {@link Fork} instance will not be cloned!
-	 * 
+	 *
 	 * @param executions the {@link Collection} of {@link Execution} instances to be
 	 *                   reduced
 	 * @throws NullPointerException if {@code executions} is {@code null}
@@ -101,7 +101,7 @@ public interface ExtensionUtils {
 				boolean gotReduced = false;
 
 				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-					Execution exec = (Execution) iExec.next();
+					Execution exec = iExec.next();
 
 					if (!isSimilar(origExec, exec, false))
 						continue;
@@ -140,7 +140,7 @@ public interface ExtensionUtils {
 					continue;
 
 				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-					Execution exec = (Execution) iExec.next();
+					Execution exec = iExec.next();
 
 					if (!isSimilar(remExec, exec, true))
 						continue;
@@ -159,7 +159,7 @@ public interface ExtensionUtils {
 	 * Merges a dominant {@link Execution} and a secondary {@link Execution}, both
 	 * must not be {@code null}, by creating an equivalent instance of
 	 * {@code domExec} using {@link #createEquivalent(Execution)}.
-	 * 
+	 *
 	 * <p>
 	 * By default only goals contained by both executions will be carried over to
 	 * the merged execution. This behavior may be changed by setting the
@@ -167,12 +167,12 @@ public interface ExtensionUtils {
 	 * be carried over. Please keep in mind that all moved goals will be removed
 	 * from their previous phases. Furthermore all empty phases and subsequently
 	 * empty lifecycles will be removed too.
-	 * 
+	 *
 	 * <p>
 	 * All goals contained by both executions will be merged into an equivalent
 	 * instance, created using {@link #createEquivalent(Goal)}. Additionally their
 	 * modes will also be merged.
-	 * 
+	 *
 	 * @param domExec the dominant {@link Execution}
 	 * @param secExec the secondary {@link Execution}
 	 * @param force   following flag may be set to force all goals to be merged
@@ -190,7 +190,7 @@ public interface ExtensionUtils {
 		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles()
 				.values()
 				.iterator(); iDomLifecycle.hasNext();) {
-			Lifecycle domLifecycle = (Lifecycle) iDomLifecycle.next();
+			Lifecycle domLifecycle = iDomLifecycle.next();
 			Lifecycle secLifecycle = secExec.getLifecycle(domLifecycle.getId());
 			if (secLifecycle == null)
 				if (force)
@@ -204,7 +204,7 @@ public interface ExtensionUtils {
 			for (Iterator<Phase> iDomPhase = domLifecycle.getPhases()
 					.values()
 					.iterator(); iDomPhase.hasNext();) {
-				Phase domPhase = (Phase) iDomPhase.next();
+				Phase domPhase = iDomPhase.next();
 				Phase secPhase = secLifecycle.getPhase(domPhase.getId());
 				if (secPhase == null)
 					if (force)
@@ -285,7 +285,7 @@ public interface ExtensionUtils {
 	 * Merges all {@link Goal} instances contained in the dominant and secondary
 	 * {@link Phase} into the merge {@link Phase}. Additionally their modes will be
 	 * merged.
-	 * 
+	 *
 	 * @param domPhase   the dominant {@link Phase}
 	 * @param secPhase   the secondary {@link Phase}
 	 * @param mergePhase the merge {@link Phase}
@@ -323,11 +323,9 @@ public interface ExtensionUtils {
 				return false;
 		} else if (!source.equals(exec.getSource()))
 			return false;
-		// inherited
-		if (origExec.isInherited() != exec.isInherited())
-			return false;
-		// active flags
-		if (origExec.isAlwaysActive() != exec.isAlwaysActive() || origExec.isDefaultActive() != exec.isDefaultActive()
+		// inherited & active flags
+		if ((origExec.isInherited() != exec.isInherited()) || origExec.isAlwaysActive() != exec.isAlwaysActive()
+				|| origExec.isDefaultActive() != exec.isDefaultActive()
 				|| origExec.isNeverActive() != exec.isNeverActive())
 			return false;
 		// restrictions
@@ -436,4 +434,5 @@ public interface ExtensionUtils {
 		executions.clear();
 		executions.addAll(equivalents);
 	}
+
 }

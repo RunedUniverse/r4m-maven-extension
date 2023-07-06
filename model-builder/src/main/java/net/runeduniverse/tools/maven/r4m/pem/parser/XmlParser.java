@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Collection;
@@ -19,9 +21,17 @@ import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.pem.model.*;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 @Component(role = ProjectExecutionModelParser.class, hint = "default")
 public class XmlParser implements ProjectExecutionModelParser {
@@ -393,4 +403,5 @@ public class XmlParser implements ProjectExecutionModelParser {
 		list.add(id);
 		return true;
 	}
+
 }

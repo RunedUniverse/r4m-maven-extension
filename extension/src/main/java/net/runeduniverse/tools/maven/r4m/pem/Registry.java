@@ -1,5 +1,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -8,8 +10,6 @@ import org.codehaus.plexus.component.annotations.Component;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
-
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = PluginExecutionRegistry.class, instantiationStrategy = "keep-alive")
 public class Registry implements PluginExecutionRegistry {
@@ -59,4 +59,5 @@ public class Registry implements PluginExecutionRegistry {
 	protected static String createKey(String groupId, String artifactId) {
 		return String.join(":", groupId, artifactId);
 	}
+
 }

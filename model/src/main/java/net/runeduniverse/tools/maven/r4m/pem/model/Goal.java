@@ -59,8 +59,8 @@ public class Goal implements Recordable {
 	}
 
 	public Goal addModes(String... modes) {
-		for (int i = 0; i < modes.length; i++)
-			this.modes.add(modes[i]);
+		for (String mode : modes)
+			this.modes.add(mode);
 		return this;
 	}
 

@@ -51,9 +51,7 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
 public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
@@ -71,12 +69,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private Settings settings;
 	@Requirement
 	private ExecutionArchive archive;
-	@Requirement(role = ProjectExecutionModelConfigParser.class)
-	private Map<String, ProjectExecutionModelConfigParser> pemConfigParser;
-	@Requirement(role = ProjectExecutionModelPluginParser.class)
-	private Map<String, ProjectExecutionModelPluginParser> pemPluginParser;
-	@Requirement(role = ProjectExecutionModelPackagingParser.class)
-	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
+	@Requirement(role = MavenProjectScanner.class)
+	private List<MavenProjectScanner> mavenProjectScanner;
 	@Requirement
 	private PlexusContainer container;
 	@Requirement
@@ -109,6 +103,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * before they are sorted and actual build execution starts.
 	 */
 	public void afterProjectsRead(MavenSession mvnSession) throws MavenExecutionException {
+		this.mavenProjectScanner = new LinkedList<>(this.mavenProjectScanner);
+		this.mavenProjectScanner.sort(null);
+
 		compileSettings(mvnSession);
 
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
@@ -256,33 +253,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				.getPlugins()
 				.addAll(extPlugins);
 
-		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
-			projectSlice.register(parser.parse(mvnProject));
-
-		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-				if (isIdentifiable(mvnPlugin))
-					try {
-						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-								mvnSession.getRepositorySession(), mvnPlugin));
-					} catch (PluginResolutionException e) {
-						this.unidentifiablePlugins.add(mvnPlugin);
-					}
-
-		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
-			projectSlice.register(parser.parse());
-	}
-
-	private boolean isIdentifiable(Plugin mvnPlugin) {
-		if (this.unidentifiablePlugins.contains(mvnPlugin))
-			return false;
-
-		if (mvnPlugin.getVersion() == null) {
-			this.unidentifiablePlugins.add(mvnPlugin);
-			return false;
-		}
-
-		return true;
+		for (MavenProjectScanner scanner : this.mavenProjectScanner)
+			scanner.scan(mvnSession, extPlugins, this.unidentifiablePlugins, mvnProject, projectSlice);
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
@@ -432,7 +404,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				continue;
 			extPlugins.add(plugin);
 		}
-		return extPlugins;
+		return Collections.unmodifiableCollection(extPlugins);
 	}
 
 	private static Plugin fromExtRealm(ClassRealm realm) {

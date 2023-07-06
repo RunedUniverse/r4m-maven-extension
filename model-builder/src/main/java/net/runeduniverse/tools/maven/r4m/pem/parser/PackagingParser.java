@@ -41,7 +41,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 	public ProjectExecutionModel parse() {
 		Set<Execution> effExecutions = new LinkedHashSet<>();
 
-		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : mappings.entrySet()) {
+		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : this.mappings.entrySet()) {
 			Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
 			Map<String, Execution> executions = new LinkedHashMap<>();
 			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
@@ -69,11 +69,14 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 			return;
 		for (Entry<String, LifecyclePhase> phaseMappingEntry : lifecyclePhases.entrySet()) {
 
-			String executionId = String.join("-", MavenProperties.DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX,
-					phaseMappingEntry.getKey());
-
 			for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
 					.getMojos()) {
+				Goal goal = new Goal();
+				if (!goal.parseMvnGoalKey(mojoMapping.getGoal())) {
+					// invalid goal!
+					continue;
+				}
+				String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
 				Execution execution = executions.get(executionId);
 				if (execution == null) {
 					execution = new Execution(executionId, ExecutionSource.PACKAGING);
@@ -93,7 +96,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 					lifecycle.putPhase(phase);
 				}
 
-				phase.addGoal(new Goal(mojoMapping.getGoal()).addModes("default", "dev"));
+				phase.addGoal(goal.addModes("default", "dev"));
 			}
 		}
 	}

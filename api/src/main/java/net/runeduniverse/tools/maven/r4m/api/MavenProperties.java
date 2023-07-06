@@ -4,7 +4,7 @@ public interface MavenProperties {
 
 	public static String DEFAULT_LIFECYCLE_ID = "default";
 	public static String DEFAULT_EXECUTION_ID = "default";
-	public static String DEFAULT_PACKAGING_PROCEDURE_EXECUTION_PREFIX = "default";
+	public static String DEFAULT_EXECUTION_PREFIX = "default";
 
 	public interface PROJECT {
 		public interface BUILD {

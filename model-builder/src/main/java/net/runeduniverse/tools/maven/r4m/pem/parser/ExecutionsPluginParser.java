@@ -91,14 +91,14 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 				execution.putLifecycle(lifecycle);
 			} else
 				for (String goalId : mvnExecution.getGoals()) {
-					Lifecycle lifecycle = acquireLifecycle(execution, mvnExecution.getPhase());
-					if (lifecycle == null)
-						continue;
 					MojoDescriptor mvnMojoDescriptor = mvnPluginDescriptor.getMojo(goalId);
 					if (mvnMojoDescriptor == null)
 						continue;
 					String phaseId = mvnMojoDescriptor.getPhase();
 					if (isBlank(phaseId))
+						continue;
+					Lifecycle lifecycle = acquireLifecycle(execution, phaseId);
+					if (lifecycle == null)
 						continue;
 					Phase phase = lifecycle.getPhase(phaseId);
 					if (phase == null)

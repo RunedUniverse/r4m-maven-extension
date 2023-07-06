@@ -1,1 +1,4 @@
-/target/
+.mvn/repo/
+**/target/
+**/*.log
+

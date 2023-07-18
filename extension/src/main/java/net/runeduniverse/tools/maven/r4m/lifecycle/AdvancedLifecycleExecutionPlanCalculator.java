@@ -237,6 +237,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				}
 				if (data == null)
 					throw new IllegalStateException("unexpected task " + task);
+				resolvedTasks.add(data);
 			}
 		return resolvedTasks;
 	}

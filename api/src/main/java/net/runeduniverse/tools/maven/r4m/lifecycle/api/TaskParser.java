@@ -15,10 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.lifecycle.api;
 
-import org.apache.maven.lifecycle.internal.LifecycleTask;
+public interface TaskParser {
 
-public interface LifecycleTaskParser {
-
-	public LifecycleTaskData parse(LifecycleTask task);
+	public TaskData parse(Object task);
 
 }

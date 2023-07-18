@@ -19,18 +19,24 @@ import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.codehaus.plexus.component.annotations.Component;
 
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskParser;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskParser;
 
-@Component(role = LifecycleTaskParser.class)
-public class DefaultLifecycleTaskParser implements LifecycleTaskParser {
+@Component(role = TaskParser.class, hint = DefaultLifecycleTaskParser.HINT)
+public class DefaultLifecycleTaskParser implements TaskParser {
+
+	public static final String HINT = "lifecycle";
 
 	/**
-	 * Split task of format {@code [<mode>/][+]<phase>[@<execution>]}
+	 * Split task of format
+	 * {@code [<mode>[,<mode>[,...]]/][+]<phase>[@<execution>[,<execution>[,...]]}
 	 */
 	@Override
-	public LifecycleTaskData parse(final LifecycleTask lifecycleTask) {
+	public LifecycleTaskData parse(final Object taskObject) {
+		if (!(taskObject instanceof LifecycleTask))
+			return null;
+		LifecycleTask lifecycleTask = (LifecycleTask) taskObject;
 		String task = lifecycleTask.getLifecyclePhase();
-		String mode = null;
+		String mode = "";
 
 		int splitIdx = task.indexOf('/');
 		if (0 <= splitIdx) {
@@ -38,41 +44,41 @@ public class DefaultLifecycleTaskParser implements LifecycleTaskParser {
 			task = task.substring(splitIdx + 1);
 		}
 
-		String execution = null;
+		String execution = "";
 		splitIdx = task.indexOf('@');
 		if (0 < splitIdx) {
 			execution = task.substring(splitIdx + 1);
 			task = task.substring(0, splitIdx);
 		}
 
-		return new Data(mode, task, execution);
+		return new Data(mode.split(","), execution.split(","), task);
 	}
 
 	private class Data implements LifecycleTaskData {
 
-		private final String mode;
+		private final String[] modes;
+		private final String[] executions;
 		private final String phase;
-		private final String execution;
 
-		public Data(final String mode, final String phase, final String execution) {
-			this.mode = mode;
+		public Data(final String[] modes, final String[] executions, final String phase) {
+			this.modes = modes;
+			this.executions = executions;
 			this.phase = phase;
-			this.execution = execution;
 		}
 
 		@Override
-		public String getMode() {
-			return this.mode;
+		public String[] getModes() {
+			return this.modes;
+		}
+
+		@Override
+		public String[] getExecutions() {
+			return this.executions;
 		}
 
 		@Override
 		public String getLifecyclePhase() {
 			return this.phase;
-		}
-
-		@Override
-		public String getExecution() {
-			return this.execution;
 		}
 
 	}

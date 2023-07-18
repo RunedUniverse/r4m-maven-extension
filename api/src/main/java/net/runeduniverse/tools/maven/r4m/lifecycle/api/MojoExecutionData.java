@@ -24,11 +24,11 @@ public interface MojoExecutionData {
 
 	public ExecutionArchiveSelectorConfig getExecutionArchiveSelectorConfig();
 
-	public boolean isForking();
-
 	public Fork getFork();
 
 	public PluginDescriptor getLifecycleOverlayOrigin();
+
+	public boolean isForking();
 
 	public void setLifecycleOverlayOrigin(PluginDescriptor lifecycleOverlayOrigin);
 

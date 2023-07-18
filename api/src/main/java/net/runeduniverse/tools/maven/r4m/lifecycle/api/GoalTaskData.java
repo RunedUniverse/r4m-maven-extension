@@ -15,8 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.lifecycle.api;
 
-public interface LifecycleTaskData extends TaskData {
+public interface GoalTaskData extends TaskData {
 
-	public String getLifecyclePhase();
+	public String getGoalTask();
 
 }

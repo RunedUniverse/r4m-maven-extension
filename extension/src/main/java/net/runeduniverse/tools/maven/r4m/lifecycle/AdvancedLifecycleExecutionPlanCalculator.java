@@ -73,10 +73,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.GoalTaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskParser;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskData;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
@@ -126,8 +128,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	@Requirement
 	private LifecyclePluginResolver lifecyclePluginResolver;
 
-	@Requirement
-	private LifecycleTaskParser lifecycleTaskParser;
+	@Requirement(role = TaskParser.class)
+	private Map<String, TaskParser> taskParser;
 
 	@Requirement
 	protected ExecutionArchiveSelector selector;
@@ -166,7 +168,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
 		lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
 
-		final List<MojoExecution> executions = calculateMojoExecutions(session, project, tasks);
+		final List<MojoExecution> executions = calculateMojoExecutions(session, project, resolveTasks(tasks));
 
 		if (setup) {
 			setupMojoExecutions(session, project, executions);
@@ -217,7 +219,29 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		calculateForks(session, session.getCurrentProject(), mojoExecution, new LinkedList<>(), new LinkedHashSet<>());
 	}
 
-	public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<Object> tasks)
+	protected List<TaskData> resolveTasks(final List<Object> tasks) {
+		final List<TaskData> resolvedTasks = new LinkedList<>();
+		for (Object task : tasks)
+			if (task instanceof GoalTask) {
+				resolvedTasks.add(this.taskParser.get("goal")
+						.parse(task));
+			} else if (task instanceof LifecycleTask) {
+				resolvedTasks.add(this.taskParser.get("lifecycle")
+						.parse(task));
+			} else {
+				TaskData data = null;
+				for (TaskParser parser : this.taskParser.values()) {
+					data = parser.parse(task);
+					if (data != null)
+						break;
+				}
+				if (data == null)
+					throw new IllegalStateException("unexpected task " + task);
+			}
+		return resolvedTasks;
+	}
+
+	public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<TaskData> tasks)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			PluginVersionResolutionException, LifecyclePhaseNotFoundException {
@@ -239,33 +263,31 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				selectorConfig.selectAllActiveProfiles(parent.getActiveProfiles());
 		}
 
-		for (Object task : tasks)
-			if (task instanceof GoalTask) {
-				String pluginGoal = ((GoalTask) task).toString();
+		for (TaskData task : tasks)
+			if (task instanceof GoalTaskData) {
+				GoalTaskData data = (GoalTaskData) task;
 
-				String executionId = "default-cli";
-				int executionIdx = pluginGoal.indexOf('@');
-				if (executionIdx > 0) {
-					executionId = pluginGoal.substring(executionIdx + 1);
-				}
+				MojoDescriptor mojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(data.getGoalTask(),
+						session, project);
 
-				MojoDescriptor mojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(pluginGoal, session,
-						project);
-
-				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, executionId,
+				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, data.getExecutions()[0],
 						MojoExecution.Source.CLI, selectorConfig.clone()
 								.selectModes("default")
-								.selectActiveExecutions(executionId));
+								.selectActiveExecutions(data.getPrimaryExecutionOrDefault("default-cli")));
 
 				mojoExecutions.add(mojoExecution);
-			} else if (task instanceof LifecycleTask) {
-				LifecycleTaskData taskData = this.lifecycleTaskParser.parse((LifecycleTask) task);
-				String mode = taskData.getMode();
+			} else if (task instanceof LifecycleTaskData) {
+				LifecycleTaskData taskData = (LifecycleTaskData) task;
+
+				ExecutionArchiveSelectorConfig taskSelectorConfig = selectorConfig.clone();
+				if (taskData.hasValidModes())
+					taskSelectorConfig.selectModes(taskData.getModes());
+				else
+					taskSelectorConfig.selectModes("default");
 
 				Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
-						taskData.getLifecyclePhase(), this.selector.compileSelection(selectorConfig.clone()
-								.selectModes(isBlank(mode) ? "default" : mode)
-								.selectActiveExecutions(taskData.getExecution())));
+						taskData.getLifecyclePhase(), this.selector
+								.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions())));
 
 				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
 					for (MojoExecution exec : mojoExecutionsFromLifecycle) {
@@ -274,8 +296,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 							generatePluginExecutions(project, exec);
 						mojoExecutions.add(exec);
 					}
-			} else
-				throw new IllegalStateException("unexpected task " + task);
+			}
 		return mojoExecutions;
 	}
 

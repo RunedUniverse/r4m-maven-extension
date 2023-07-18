@@ -15,8 +15,29 @@
  */
 package net.runeduniverse.tools.maven.r4m.lifecycle.api;
 
-public interface LifecycleTaskData extends TaskData {
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-	public String getLifecyclePhase();
+public interface TaskData {
+
+	public String[] getExecutions();
+
+	public String[] getModes();
+
+	public default String getPrimaryExecutionOrDefault(String other) {
+		final String[] e = getExecutions();
+		if (e == null)
+			return other;
+		for (String s : e)
+			if (!isBlank(s))
+				return s;
+		return other;
+	}
+
+	public default boolean hasValidModes() {
+		for (String mode : getModes())
+			if (!isBlank(mode))
+				return true;
+		return false;
+	}
 
 }

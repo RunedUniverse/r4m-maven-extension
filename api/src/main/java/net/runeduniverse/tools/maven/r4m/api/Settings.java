@@ -27,6 +27,8 @@ public interface Settings {
 
 	public Property<String> getMissingBuildPluginHandler();
 
+	public Property<String> getActiveProfilesInheritance();
+
 	public Property<Boolean> getPatchMojoOnFork();
 
 	public Property<Boolean> getGeneratePluginExecutions();
@@ -36,6 +38,8 @@ public interface Settings {
 	public void setPhaseSequenceCalculator(Property<String> value);
 
 	public void setMissingBuildPluginHandler(Property<String> value);
+
+	public void setActiveProfilesInheritance(Property<String> value);
 
 	public void setPatchMojoOnFork(Property<Boolean> value);
 

@@ -17,7 +17,17 @@ package net.runeduniverse.tools.maven.r4m.api;
 
 import java.util.Set;
 
-public interface Property<T> {
+public interface Property<T> extends Comparable<Property<?>> {
+
+	@Override
+	public default int compareTo(Property<?> o) {
+		if (this == o)
+			return 0;
+		if (this.getId() == null)
+			return o.getId() == null ? 0 : -1;
+		return this.getId()
+				.compareTo(o.getId());
+	}
 
 	public String getId();
 

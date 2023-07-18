@@ -20,6 +20,8 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -58,7 +60,9 @@ public class StatusMojo extends AbstractMojo {
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Status\033[m");
 		getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
-		for (Property<?> prop : this.settings.getAllProperties())
+		List<Property<?>> props = new LinkedList<Property<?>>(this.settings.getAllProperties());
+		props.sort(null);
+		for (Property<?> prop : props)
 			logTextEntry(prop);
 		getLog().info("");
 		getLog().info("");

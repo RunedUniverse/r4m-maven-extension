@@ -223,14 +223,23 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			PluginVersionResolutionException, LifecyclePhaseNotFoundException {
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-		for (Object task : tasks) {
-			ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
-					.selectActiveProject(project)
-					.selectAllActiveProfiles(session.getTopLevelProject()
-							.getActiveProfiles())
-					.selectAllActiveProfiles(project.getActiveProfiles())
-					.selectPackagingProcedure(project.getPackaging());
+		ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+				.selectActiveProject(project)
+				.selectAllActiveProfiles(project.getActiveProfiles())
+				.selectPackagingProcedure(project.getPackaging());
 
+		if ("top-level".equals(this.settings.getActiveProfilesInheritance()
+				.getSelected())) {
+			selectorConfig.selectAllActiveProfiles(session.getTopLevelProject()
+					.getActiveProfiles());
+		}
+		if ("upstream".equals(this.settings.getActiveProfilesInheritance()
+				.getSelected())) {
+			for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent())
+				selectorConfig.selectAllActiveProfiles(parent.getActiveProfiles());
+		}
+
+		for (Object task : tasks)
 			if (task instanceof GoalTask) {
 				String pluginGoal = ((GoalTask) task).toString();
 
@@ -244,7 +253,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						project);
 
 				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, executionId,
-						MojoExecution.Source.CLI, selectorConfig.selectModes("default")
+						MojoExecution.Source.CLI, selectorConfig.clone()
+								.selectModes("default")
 								.selectActiveExecutions(executionId));
 
 				mojoExecutions.add(mojoExecution);
@@ -253,8 +263,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				String mode = taskData.getMode();
 
 				Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
-						taskData.getLifecyclePhase(),
-						this.selector.compileSelection(selectorConfig.selectModes(isBlank(mode) ? "default" : mode)
+						taskData.getLifecyclePhase(), this.selector.compileSelection(selectorConfig.clone()
+								.selectModes(isBlank(mode) ? "default" : mode)
 								.selectActiveExecutions(taskData.getExecution())));
 
 				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
@@ -266,7 +276,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					}
 			} else
 				throw new IllegalStateException("unexpected task " + task);
-		}
 		return mojoExecutions;
 	}
 

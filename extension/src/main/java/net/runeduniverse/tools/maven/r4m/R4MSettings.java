@@ -31,6 +31,7 @@ public class R4MSettings implements Settings {
 
 	private Property<String> phaseSequenceCalculator = null;
 	private Property<String> missingBuildPluginHandler = null;
+	private Property<String> activeProfilesInheritance = null;
 	private Property<Boolean> patchMojoOnFork = null;
 	private Property<Boolean> generatePluginExecutions = null;
 	private Property<Boolean> generatePluginExecutionsOnFork = null;
@@ -66,6 +67,11 @@ public class R4MSettings implements Settings {
 	}
 
 	@Override
+	public Property<String> getActiveProfilesInheritance() {
+		return this.activeProfilesInheritance;
+	}
+
+	@Override
 	public Property<Boolean> getPatchMojoOnFork() {
 		return this.patchMojoOnFork;
 	}
@@ -98,6 +104,15 @@ public class R4MSettings implements Settings {
 		else
 			this.properties.add(value);
 		this.missingBuildPluginHandler = value;
+	}
+
+	@Override
+	public void setActiveProfilesInheritance(Property<String> value) {
+		if (value == null)
+			this.properties.remove(this.activeProfilesInheritance);
+		else
+			this.properties.add(value);
+		this.activeProfilesInheritance = value;
 	}
 
 	@Override

@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
@@ -45,9 +46,13 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig selectActiveProfiles(Collection<String> values);
 
+	public ExecutionArchiveSelectorConfig selectAllActiveProfiles(Collection<Profile> values);
+
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values);
 
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(Collection<String> values);
+
+	public ExecutionArchiveSelectorConfig selectAllProvidedProfiles(Collection<Profile> values);
 
 	public ExecutionArchiveSelectorConfig selectModes(String... values);
 

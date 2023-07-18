@@ -226,6 +226,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		for (Object task : tasks) {
 			ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
 					.selectActiveProject(project)
+					.selectAllActiveProfiles(project.getActiveProfiles())
 					.selectPackagingProcedure(project.getPackaging());
 
 			if (task instanceof GoalTask) {

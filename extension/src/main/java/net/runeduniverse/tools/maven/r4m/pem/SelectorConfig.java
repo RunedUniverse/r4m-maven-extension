@@ -91,6 +91,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
+	public ExecutionArchiveSelectorConfig selectAllActiveProfiles(Collection<Profile> values) {
+		this.dirty = true;
+		for (Profile profile : values)
+			this.activeProfiles.add(profile.getId());
+		return this;
+	}
+
+	@Override
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values) {
 		this.dirty = true;
 		for (String value : values)
@@ -103,6 +111,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	public ExecutionArchiveSelectorConfig selectProvidedProfiles(Collection<String> values) {
 		this.dirty = true;
 		this.providedProfiles.addAll(values);
+		return this;
+	}
+
+	@Override
+	public ExecutionArchiveSelectorConfig selectAllProvidedProfiles(Collection<Profile> values) {
+		this.dirty = true;
+		for (Profile profile : values)
+			this.providedProfiles.add(profile.getId());
 		return this;
 	}
 

@@ -388,7 +388,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-pom-signed --non-recursive'
-						withCredentials([gitUsernamePassword(credentialsId: 'RunedUniverse-Jenkins', gitToolName: 'git')]){
+						sshagent (credentials: ['RunedUniverse-Jenkins']) {
 							sh 'git push origin $(git-create-version-tag r4m-parent .)'						    
 						}
 					}

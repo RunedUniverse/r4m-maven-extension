@@ -1,8 +1,13 @@
 #!/usr/bin/bash
 
-if git diff --quiet HEAD $(git describe --tags --abbrev=0 remotes/origin/master --match $2'/v*') -- $1
+if TAG=$(git describe --tags --abbrev=0 remotes/origin/master --match $2'/v*' 2>/dev/null)
 then
-  printf 0;
+  if git diff --quiet HEAD $TAG -- $1
+  then
+    printf 0;
+  else
+    printf 1;
+  fi
 else
   printf 1;
 fi

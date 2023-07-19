@@ -388,7 +388,9 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-pom-signed --non-recursive'
-						sh 'git push origin $(git-create-version-tag r4m-parent .)'
+						withCredentials([gitUsernamePassword(credentialsId: 'RunedUniverse-Jenkins ', gitToolName: 'git')]){
+							sh 'git push origin $(git-create-version-tag r4m-parent .)'						    
+						}
 					}
 				}
 				stage('r4m-sources') {
@@ -439,9 +441,9 @@ pipeline {
 			}
 		}
 	}
-	//post {
-	//	cleanup {
-	//		cleanWs()
-	//	}
-	//}
+	post {
+		cleanup {
+			cleanWs()
+		}
+	}
 }

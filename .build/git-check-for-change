@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+if git diff --quiet HEAD $(git describe --tags --abbrev=0 remotes/origin/master --match $2'/v*') -- $1
+then
+  printf 0;
+else
+  printf 1;
+fi
+

@@ -1,0 +1,23 @@
+#!/usr/bin/bash
+
+if [[ -z "${GLOBAL_MAVEN_SETTINGS}" ]]; then
+  GLOBAL_SETTINGS_FILE=''
+else
+  GLOBAL_SETTINGS_FILE='-gs '$GLOBAL_MAVEN_SETTINGS
+fi
+
+if [[ -z "${MAVEN_SETTINGS}" ]]; then
+  SETTINGS_FILE=''
+else
+  SETTINGS_FILE='-s '$MAVEN_SETTINGS
+fi
+
+if [[ -z "${MAVEN_TOOLCHAINS}" ]]; then
+  TOOLCHAINS=''
+else
+  TOOLCHAINS='--global-toolchains '$MAVEN_TOOLCHAINS
+fi
+
+echo mvn $GLOBAL_SETTINGS_FILE $SETTINGS_FILE $TOOLCHAINS $@ 
+mvn $GLOBAL_SETTINGS_FILE $SETTINGS_FILE $TOOLCHAINS $@
+

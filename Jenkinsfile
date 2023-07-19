@@ -41,13 +41,13 @@ pipeline {
 				returnStdout: true,
 				script: '.build/git-check-for-change sources/pom.xml r4m-sources'
 			)}"""
-		CHANGES_R4M_API = """${sh(
-				returnStdout: true,
-				script: '.build/git-check-for-change rogm-api/pom.xml r4m-api'
-			)}"""
 		CHANGES_R4M_MODEL = """${sh(
 				returnStdout: true,
 				script: '.build/git-check-for-change model/pom.xml r4m-model'
+			)}"""
+		CHANGES_R4M_API = """${sh(
+				returnStdout: true,
+				script: '.build/git-check-for-change rogm-api/pom.xml r4m-api'
 			)}"""
 		CHANGES_R4M_MODEL_BUILDER = """${sh(
 				returnStdout: true,
@@ -71,8 +71,8 @@ pipeline {
 				anyOf {
 					environment name: 'CHANGES_R4M_PARENT', value: '1'
 					environment name: 'CHANGES_R4M_SOURCES', value: '1'
-					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL', value: '1'
+					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL_BUILDER', value: '1'
 					environment name: 'CHANGES_R4M_EXTENSION', value: '1'
 				}
@@ -121,24 +121,6 @@ pipeline {
 				}
 			}
 		}
-		stage('Install R4M API') {
-			when {
-				environment name: 'CHANGES_R4M_API', value: '1'
-			}
-			steps {
-				sh 'mvn-dev -P ${REPOS},toolchain-openjdk-1-8-0,install -pl api'
-			}
-			post {
-				always {
-					dir(path: 'api/target') {
-						sh 'ls -l'
-						archiveArtifacts artifacts: '*.pom', fingerprint: true
-						archiveArtifacts artifacts: '*.asc', fingerprint: true
-						sh 'cp *.pom *.asc ../../target/result/'
-					}
-				}
-			}
-		}
 		stage('Build R4M Model') {
 			when {
 				environment name: 'CHANGES_R4M_MODEL', value: '1'
@@ -153,6 +135,24 @@ pipeline {
 						archiveArtifacts artifacts: '*.pom', fingerprint: true
 						archiveArtifacts artifacts: '*.asc', fingerprint: true
 						sh 'cp *.pom *.jar *.asc ../../target/result/'
+					}
+				}
+			}
+		}
+		stage('Install R4M API') {
+			when {
+				environment name: 'CHANGES_R4M_API', value: '1'
+			}
+			steps {
+				sh 'mvn-dev -P ${REPOS},toolchain-openjdk-1-8-0,install -pl api'
+			}
+			post {
+				always {
+					dir(path: 'api/target') {
+						sh 'ls -l'
+						archiveArtifacts artifacts: '*.pom', fingerprint: true
+						archiveArtifacts artifacts: '*.asc', fingerprint: true
+						sh 'cp *.pom *.asc ../../target/result/'
 					}
 				}
 			}
@@ -199,8 +199,8 @@ pipeline {
 				anyOf {
 					environment name: 'CHANGES_R4M_PARENT', value: '1'
 					environment name: 'CHANGES_R4M_SOURCES', value: '1'
-					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL', value: '1'
+					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL_BUILDER', value: '1'
 					environment name: 'CHANGES_R4M_EXTENSION', value: '1'
 				}
@@ -215,8 +215,8 @@ pipeline {
 		//		anyOf {
 		//			environment name: 'CHANGES_R4M_PARENT', value: '1'
 		//			environment name: 'CHANGES_R4M_SOURCES', value: '1'
-		//			environment name: 'CHANGES_R4M_API', value: '1'
 		//			environment name: 'CHANGES_R4M_MODEL', value: '1'
+		//			environment name: 'CHANGES_R4M_API', value: '1'
 		//			environment name: 'CHANGES_R4M_MODEL_BUILDER', value: '1'
 		//			environment name: 'CHANGES_R4M_EXTENSION', value: '1'
 		//		}
@@ -240,8 +240,8 @@ pipeline {
 				anyOf {
 					environment name: 'CHANGES_R4M_PARENT', value: '1'
 					environment name: 'CHANGES_R4M_SOURCES', value: '1'
-					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL', value: '1'
+					environment name: 'CHANGES_R4M_API', value: '1'
 					environment name: 'CHANGES_R4M_MODEL_BUILDER', value: '1'
 					environment name: 'CHANGES_R4M_EXTENSION', value: '1'
 				}
@@ -283,20 +283,20 @@ pipeline {
 								sh 'mvn-dev -P ${REPOS},dist-repo-development,deploy -pl sources'
 							}
 						}
-						stage('r4m-api') {
-							when {
-								environment name: 'CHANGES_R4M_API', value: '1'
-							}
-							steps {
-								sh 'mvn-dev -P ${REPOS},dist-repo-development,deploy -pl api'
-							}
-						}
 						stage('r4m-model') {
 							when {
 								environment name: 'CHANGES_R4M_MODEL', value: '1'
 							}
 							steps {
 								sh 'mvn-dev -P ${REPOS},dist-repo-development,deploy -pl model'
+							}
+						}
+						stage('r4m-api') {
+							when {
+								environment name: 'CHANGES_R4M_API', value: '1'
+							}
+							steps {
+								sh 'mvn-dev -P ${REPOS},dist-repo-development,deploy -pl api'
 							}
 						}
 						stage('r4m-model-builder') {
@@ -339,20 +339,20 @@ pipeline {
 								sh 'mvn-dev -P ${REPOS},dist-repo-releases,deploy-pom-signed -pl sources'
 							}
 						}
-						stage('r4m-api') {
-							when {
-								environment name: 'CHANGES_R4M_API', value: '1'
-							}
-							steps {
-								sh 'mvn-dev -P ${REPOS},dist-repo-releases,deploy-signed -pl api'
-							}
-						}
 						stage('r4m-model') {
 							when {
 								environment name: 'CHANGES_R4M_MODEL', value: '1'
 							}
 							steps {
 								sh 'mvn-dev -P ${REPOS},dist-repo-releases,deploy-signed -pl model'
+							}
+						}
+						stage('r4m-api') {
+							when {
+								environment name: 'CHANGES_R4M_API', value: '1'
+							}
+							steps {
+								sh 'mvn-dev -P ${REPOS},dist-repo-releases,deploy-signed -pl api'
 							}
 						}
 						stage('r4m-model-builder') {
@@ -398,20 +398,20 @@ pipeline {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-pom-signed -pl sources'
 					}
 				}
-				stage('r4m-api') {
-					when {
-						environment name: 'CHANGES_R4M_API', value: '1'
-					}
-					steps {
-						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl api'
-					}
-				}
 				stage('r4m-model') {
 					when {
 						environment name: 'CHANGES_R4M_MODEL', value: '1'
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl model'
+					}
+				}
+				stage('r4m-api') {
+					when {
+						environment name: 'CHANGES_R4M_API', value: '1'
+					}
+					steps {
+						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl api'
 					}
 				}
 				stage('r4m-model-builder') {

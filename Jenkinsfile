@@ -388,6 +388,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-pom-signed --non-recursive'
+						sh 'git push origin $(git-create-version-tag r4m-parent .)'
 					}
 				}
 				stage('r4m-sources') {
@@ -396,6 +397,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-pom-signed -pl sources'
+						sh 'git push origin $(git-create-version-tag r4m-sources sources)'
 					}
 				}
 				stage('r4m-model') {
@@ -404,6 +406,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl model'
+						sh 'git push origin $(git-create-version-tag r4m-model model)'
 					}
 				}
 				stage('r4m-api') {
@@ -412,6 +415,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl api'
+						sh 'git push origin $(git-create-version-tag r4m-api api)'
 					}
 				}
 				stage('r4m-model-builder') {
@@ -420,6 +424,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl model-builder'
+						sh 'git push origin $(git-create-version-tag r4m-model-builder model-builder)'
 					}
 				}
 				stage('r4m-extension') {
@@ -428,6 +433,7 @@ pipeline {
 					}
 					steps {
 						sh 'mvn-dev -P repo-releases,dist-repo-maven-central,deploy-signed -pl extension'
+						sh 'git push origin $(git-create-version-tag r4m-extension extension)'
 					}
 				}
 			}

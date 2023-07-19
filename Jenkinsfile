@@ -35,27 +35,27 @@ pipeline {
 
 		CHANGES_R4M_PARENT = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change pom.xml r4m-parent'
+				script: '.build/git-check-version-tag r4m-parent .'
 			)}"""
 		CHANGES_R4M_SOURCES = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change sources/pom.xml r4m-sources'
+				script: '.build/git-check-version-tag r4m-sources sources'
 			)}"""
 		CHANGES_R4M_MODEL = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change model/pom.xml r4m-model'
+				script: '.build/git-check-version-tag r4m-model model'
 			)}"""
 		CHANGES_R4M_API = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change rogm-api/pom.xml r4m-api'
+				script: '.build/git-check-version-tag r4m-api api'
 			)}"""
 		CHANGES_R4M_MODEL_BUILDER = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change model-builder/pom.xml r4m-model-builder'
+				script: '.build/git-check-version-tag r4m-model-builder model-builder'
 			)}"""
 		CHANGES_R4M_EXTENSION = """${sh(
 				returnStdout: true,
-				script: '.build/git-check-for-change rogm-extension/pom.xml r4m-extension'
+				script: '.build/git-check-version-tag r4m-extension extension'
 			)}"""
 	}
 	stages {

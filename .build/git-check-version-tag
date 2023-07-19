@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+#git-check-version-tag <tag-name> <maven-module>
+#git-check-version-tag r4m-sources sources
+
+TAG=$1/v$(mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=project.version -q -DforceStdout -pl $2)
+if git describe --tags --abbrev=0 remotes/origin/master --match $TAG &>/dev/null
+then
+  printf 0;
+else
+  printf 1;
+fi
+

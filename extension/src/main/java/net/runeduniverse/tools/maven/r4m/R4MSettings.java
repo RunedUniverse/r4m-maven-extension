@@ -29,7 +29,8 @@ public class R4MSettings implements Settings {
 
 	private final HashSet<Property<?>> properties = new LinkedHashSet<>();
 
-	private Property<String> phaseSequenceCalculator = null;
+	private Property<String> lifecycleTaskRequestCalculator = null;
+	private Property<String> lifecycleTaskRequestCalculatorOnFork = null;
 	private Property<String> missingBuildPluginHandler = null;
 	private Property<String> activeProfilesInheritance = null;
 	private Property<Boolean> patchMojoOnFork = null;
@@ -57,8 +58,13 @@ public class R4MSettings implements Settings {
 	//////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public Property<String> getPhaseSequenceCalculator() {
-		return this.phaseSequenceCalculator;
+	public Property<String> getLifecycleTaskRequestCalculator() {
+		return this.lifecycleTaskRequestCalculator;
+	}
+
+	@Override
+	public Property<String> getLifecycleTaskRequestCalculatorOnFork() {
+		return this.lifecycleTaskRequestCalculatorOnFork;
 	}
 
 	@Override
@@ -89,12 +95,22 @@ public class R4MSettings implements Settings {
 	//////////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void setPhaseSequenceCalculator(Property<String> value) {
+	public void setLifecycleTaskRequestCalculator(Property<String> value) {
 		if (value == null)
-			this.properties.remove(this.phaseSequenceCalculator);
+			this.properties.remove(this.lifecycleTaskRequestCalculator);
 		else
 			this.properties.add(value);
-		this.phaseSequenceCalculator = value;
+		this.lifecycleTaskRequestCalculator = value;
+	}
+
+	@Override
+	public void setLifecycleTaskRequestCalculatorOnFork(Property<String> value) {
+		if (value == null)
+			this.properties.remove(this.lifecycleTaskRequestCalculatorOnFork);
+		else
+			this.properties.add(value);
+		this.lifecycleTaskRequestCalculatorOnFork = value;
+
 	}
 
 	@Override

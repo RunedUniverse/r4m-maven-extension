@@ -23,7 +23,9 @@ public interface Settings {
 
 	public void selectDefaults();
 
-	public Property<String> getPhaseSequenceCalculator();
+	public Property<String> getLifecycleTaskRequestCalculator();
+
+	public Property<String> getLifecycleTaskRequestCalculatorOnFork();
 
 	public Property<String> getMissingBuildPluginHandler();
 
@@ -35,7 +37,9 @@ public interface Settings {
 
 	public Property<Boolean> getGeneratePluginExecutionsOnFork();
 
-	public void setPhaseSequenceCalculator(Property<String> value);
+	public void setLifecycleTaskRequestCalculator(Property<String> value);
+
+	public void setLifecycleTaskRequestCalculatorOnFork(Property<String> value);
 
 	public void setMissingBuildPluginHandler(Property<String> value);
 

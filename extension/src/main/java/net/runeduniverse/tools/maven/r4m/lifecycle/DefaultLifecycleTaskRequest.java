@@ -13,21 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.lifecycle.api;
+package net.runeduniverse.tools.maven.r4m.lifecycle;
 
 import java.util.List;
 
 import org.apache.maven.lifecycle.Lifecycle;
 
-/**
- * Phase Sequence mapping delegate component interface. Calculates project build
- * phase sequence plan given {@link Lifecycle} and lifecycle phase.
- *
- * @since 0.0.0
- * @author VenaNocta
- */
-public interface PhaseSequenceCalculatorDelegate {
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequest;
 
-	public List<String> calculatePhaseSequence(final Lifecycle lifecycle, final String phase);
+public class DefaultLifecycleTaskRequest implements LifecycleTaskRequest {
+
+	private final Lifecycle lifecycle;
+	private final List<String> phaseSequence;
+
+	public DefaultLifecycleTaskRequest(final Lifecycle lifecycle, final List<String> phaseSequence) {
+		this.lifecycle = lifecycle;
+		this.phaseSequence = phaseSequence;
+	}
+
+	@Override
+	public Lifecycle getLifecycle() {
+		return this.lifecycle;
+	}
+
+	@Override
+	public List<String> getPhaseSequence() {
+		return this.phaseSequence;
+	}
 
 }

@@ -15,8 +15,24 @@
  */
 package net.runeduniverse.tools.maven.r4m.lifecycle.api;
 
-public interface LifecycleTaskData extends TaskData {
+import java.util.List;
 
-	public String getLifecycleTask();
+import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
+
+/**
+ * Phase Sequence mapping delegate component interface. Calculates project build
+ * {@link LifecycleTaskRequest} given the {@link LifecycleTaskData}.
+ *
+ * @since 0.0.0
+ * @author VenaNocta
+ */
+public interface LifecycleTaskRequestCalculatorDelegate {
+
+	public List<LifecycleTaskRequest> calculateTaskRequest(final LifecycleTaskData taskData)
+			throws LifecyclePhaseNotFoundException;
+
+	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
+			throws LifecyclePhaseNotFoundException;
 
 }

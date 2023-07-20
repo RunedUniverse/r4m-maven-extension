@@ -22,19 +22,24 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * prints the help-page
  *
- * @author VenaNocta
  * @goal help
  * @requiresProject false
+ * @since 1.0.0
+ * @author VenaNocta
  */
 public class HelpMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("");
-		getLog().info("Runes4Maven Help");
+		getLog().info("\033[1mRunes4Maven Help\033[m");
 		getLog().info("");
 		getLog().info(" r4m:help");
 		getLog().info("     prints this help-page");
+		getLog().info("");
+		getLog().info(" r4m:help-task");
+		getLog().info("     prints task help-page.");
+		getLog().info("     It describes how the new build argument 'lifecycle-task' works.");
 		getLog().info("");
 		getLog().info(" r4m:gen-full-pem");
 		getLog().info("     Discovers all loaded Executions which influence the current project");

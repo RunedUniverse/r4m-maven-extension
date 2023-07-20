@@ -34,9 +34,10 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
 /**
  * prints the status-page
  *
- * @author VenaNocta
  * @goal status
  * @requiresProject false
+ * @since 1.0.0
+ * @author VenaNocta
  */
 public class StatusMojo extends AbstractMojo {
 
@@ -60,7 +61,7 @@ public class StatusMojo extends AbstractMojo {
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Status\033[m");
 		getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
-		List<Property<?>> props = new LinkedList<Property<?>>(this.settings.getAllProperties());
+		List<Property<?>> props = new LinkedList<>(this.settings.getAllProperties());
 		props.sort(null);
 		for (Property<?> prop : props)
 			logTextEntry(prop);

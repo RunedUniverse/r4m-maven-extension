@@ -35,6 +35,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
@@ -45,8 +46,9 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 /**
  * generates the full pem.xml from all active maven defaults
  *
- * @author Pl4yingNight
  * @goal gen-full-pem
+ * @since 1.0.0
+ * @author VenaNocta
  */
 public class GenerateFullPemMojo extends AbstractMojo {
 

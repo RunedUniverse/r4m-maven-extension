@@ -334,11 +334,6 @@
 						<configuration>
 							<dependencyPolicies>
 								<dependencyPolicy>
-									<type>ARTIFACT_PATTERN</type>
-									<rule>APPROVE</rule>
-									<value>net.runeduniverse.lib.utils</value>
-								</dependencyPolicy>
-								<dependencyPolicy>
 									<type>LICENSE_NAME</type>
 									<rule>APPROVE</rule>
 									<value>Apache License, Version 2</value>

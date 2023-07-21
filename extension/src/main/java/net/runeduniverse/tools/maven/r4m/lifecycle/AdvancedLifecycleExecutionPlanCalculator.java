@@ -75,8 +75,9 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.GoalTaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequest;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
@@ -97,12 +98,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			"[%s] skipping unknown lifecycle » %s";
 	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK = //
 			"[%s] Unknown lifecycle phase \"%s\" detected when forking";
-	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE = //
-			"[%s] Unknown lifecycle phase \"%s\". "
-					+ "You must specify a valid lifecycle phase in the format [<mode>/][+]<phase>[@<execution>] "
-					+ "or a goal in the format <plugin-prefix>:<goal>[@<execution>] or"
-					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]. "
-					+ "Available lifecycle phases are: %s.";
 
 	@Requirement
 	protected Logger log;
@@ -134,8 +129,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	@Requirement
 	protected ExecutionArchiveSelector selector;
 
-	@Requirement(role = PhaseSequenceCalculatorDelegate.class)
-	private Map<String, PhaseSequenceCalculatorDelegate> phaseSequenceDelegates;
+	@Requirement(role = LifecycleTaskRequestCalculatorDelegate.class)
+	private Map<String, LifecycleTaskRequestCalculatorDelegate> lifecycleTaskRequestDelegates;
 
 	@Requirement(hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
 	private AdvancedLifecycleMappingDelegate standardDelegate;
@@ -264,6 +259,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				selectorConfig.selectAllActiveProfiles(parent.getActiveProfiles());
 		}
 
+		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = selectLifecycleTaskReqCalcDelegate(
+				this.settings.getLifecycleTaskRequestCalculator()
+						.getSelected());
+
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
 				GoalTaskData data = (GoalTaskData) task;
@@ -286,41 +285,32 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				else
 					taskSelectorConfig.selectModes("default");
 
-				Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
-						taskData.getLifecyclePhase(), this.selector
-								.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions())));
-
-				for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
-					for (MojoExecution exec : mojoExecutionsFromLifecycle) {
-						if (this.settings.getGeneratePluginExecutions()
-								.getSelected())
-							generatePluginExecutions(project, exec);
-						mojoExecutions.add(exec);
-					}
+				final ExecutionArchiveSelection selection = this.selector
+						.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions()));
+				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
+					Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
+							request, selection);
+					for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
+						for (MojoExecution exec : mojoExecutionsFromLifecycle) {
+							if (this.settings.getGeneratePluginExecutions()
+									.getSelected())
+								generatePluginExecutions(project, exec);
+							mojoExecutions.add(exec);
+						}
+				}
 			}
 		return mojoExecutions;
 	}
 
 	protected Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, String lifecyclePhase, final ExecutionArchiveSelection selection)
+			final MavenProject mvnProject, LifecycleTaskRequest taskRequest, final ExecutionArchiveSelection selection)
 			throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 		/*
 		 * Determine the lifecycle that corresponds to the given phase.
 		 */
 
-		boolean isFlagged = lifecyclePhase.charAt(0) == '+';
-		if (isFlagged)
-			lifecyclePhase = lifecyclePhase.substring(1);
-
-		Lifecycle lifecycle = this.defaultLifeCycles.get(lifecyclePhase);
-
-		if (lifecycle == null) {
-			throw new LifecyclePhaseNotFoundException(String.format(ERR_UNKNOWN_LIFECYCLE_PHASE,
-					Runes4MavenProperties.PREFIX_ID, lifecyclePhase, this.defaultLifeCycles.getLifecyclePhaseList()),
-					lifecyclePhase);
-		}
-
+		Lifecycle lifecycle = taskRequest.getLifecycle();
 		AdvancedLifecycleMappingDelegate delegate;
 		if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
 			delegate = standardDelegate;
@@ -331,22 +321,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			}
 		}
 
-		String selectedPhaseSeqCalc = this.settings.getPhaseSequenceCalculator()
-				.getSelected();
-		if (isFlagged)
-			if (selectedPhaseSeqCalc == DeclaredSeqCalculatorDelegate.HINT)
-				selectedPhaseSeqCalc = SequentialSeqCalculatorDelegate.HINT;
-			else
-				selectedPhaseSeqCalc = DeclaredSeqCalculatorDelegate.HINT;
-
-		PhaseSequenceCalculatorDelegate phaseSeqCalcDelegate = this.phaseSequenceDelegates.get(selectedPhaseSeqCalc);
-		if (phaseSeqCalcDelegate == null)
-			throw new LifecyclePhaseNotFoundException(
-					"[r4m] PhaseSequenceCalculatorDelegate<" + selectedPhaseSeqCalc + "> not found!", lifecyclePhase);
-
 		Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
 
-		for (String phase : phaseSeqCalcDelegate.calculatePhaseSequence(lifecycle, lifecyclePhase))
+		for (String phase : taskRequest.getPhaseSequence())
 			for (Entry<String, List<MojoExecution>> item : delegate
 					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection)
 					.entrySet()) {
@@ -523,6 +500,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (mojoDescriptor.isForking())
 			isForkingGoal = isBlank(mojoDescriptor.getExecutePhase());
 
+		final String selectedLifecycleTaskReqCalc = this.settings.getLifecycleTaskRequestCalculatorOnFork()
+				.getSelected();
+		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = selectLifecycleTaskReqCalcDelegate(
+				selectedLifecycleTaskReqCalc);
+
 		Fork fork = null;
 		ExecutionArchiveSelectorConfig selectorConfig = null;
 		if (mojoExecution instanceof MojoExecutionData) {
@@ -538,8 +520,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			if (isBlank(lifecycleId)) {
 				Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
 				List<TargetPhase> phases = new LinkedList<>();
-				for (String phase : this.phaseSequenceDelegates.get(SequentialSeqCalculatorDelegate.HINT)
-						.calculatePhaseSequence(lifecycle, phaseId))
+				for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
+						.getPhaseSequence())
 					phases.add(new TargetPhase(phase));
 				fork.setPhases(phases);
 			} else {
@@ -937,6 +919,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		calculateForks(session, project, forkedExecution, alreadyForkedForks, alreadyForkedMojos);
 
 		return Collections.singletonList(forkedExecution);
+	}
+
+	protected LifecycleTaskRequestCalculatorDelegate selectLifecycleTaskReqCalcDelegate(String hint)
+			throws LifecyclePhaseNotFoundException {
+		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = this.lifecycleTaskRequestDelegates
+				.get(hint);
+		if (lifecycleTaskReqCalcDelegate == null)
+			throw new LifecyclePhaseNotFoundException(
+					"[r4m] LifecycleTaskRequestCalculatorDelegate<" + hint + "> not found!", null);
+		return lifecycleTaskReqCalcDelegate;
 	}
 
 	protected MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {

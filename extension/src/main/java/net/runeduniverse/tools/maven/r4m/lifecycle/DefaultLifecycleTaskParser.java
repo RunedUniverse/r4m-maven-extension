@@ -27,8 +27,7 @@ public class DefaultLifecycleTaskParser implements TaskParser {
 	public static final String HINT = "lifecycle";
 
 	/**
-	 * Split task of format
-	 * {@code [<mode>[,<mode>[,...]]/][+]<phase>[@<execution>[,<execution>[,...]]}
+	 * Split task of format {@code [<modes>/]<lifecycle-task/phase>[@<executions>]}
 	 */
 	@Override
 	public LifecycleTaskData parse(final Object taskObject) {
@@ -58,12 +57,12 @@ public class DefaultLifecycleTaskParser implements TaskParser {
 
 		private final String[] modes;
 		private final String[] executions;
-		private final String phase;
+		private final String task;
 
-		public Data(final String[] modes, final String[] executions, final String phase) {
+		public Data(final String[] modes, final String[] executions, final String task) {
 			this.modes = modes;
 			this.executions = executions;
-			this.phase = phase;
+			this.task = task;
 		}
 
 		@Override
@@ -77,8 +76,8 @@ public class DefaultLifecycleTaskParser implements TaskParser {
 		}
 
 		@Override
-		public String getLifecyclePhase() {
-			return this.phase;
+		public String getLifecycleTask() {
+			return this.task;
 		}
 
 	}

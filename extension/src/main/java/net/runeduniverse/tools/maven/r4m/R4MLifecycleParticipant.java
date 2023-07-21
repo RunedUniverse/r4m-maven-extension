@@ -64,7 +64,7 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
+import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
@@ -203,12 +203,15 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				.getProperties());
 		prop.putAll(mvnSession.getUserProperties());
 
-		this.settings.setPhaseSequenceCalculator(buildTextPropertyAddPlexusHints(prop, "r4m.phase-sequence-calculator",
-				PhaseSequenceCalculatorDelegate.class));
+		this.settings.setLifecycleTaskRequestCalculator(buildTextPropertyAddPlexusHints(prop,
+				"r4m.lifecycle-task-request-calculator", LifecycleTaskRequestCalculatorDelegate.class));
+		this.settings.setLifecycleTaskRequestCalculatorOnFork(buildTextPropertyAddPlexusHints(prop,
+				"r4m.lifecycle-task-request-calculator-on-fork", LifecycleTaskRequestCalculatorDelegate.class));
 		this.settings.setMissingBuildPluginHandler(
 				buildTextProperty(prop, "r4m.missing-build-plugin-handler", "skip", "warn", "scan", "download"));
 		this.settings.setActiveProfilesInheritance(
 				buildTextProperty(prop, "r4m.active-profiles-inheritance", "upstream", "top-level", "false"));
+		this.settings.setFancyOutput(buildBooleanProperty(prop, "r4m.fancy-output"));
 		this.settings.setPatchMojoOnFork(buildBooleanProperty(prop, "r4m.patch-mojo-on-fork"));
 		this.settings.setGeneratePluginExecutions(buildBooleanProperty(prop, "r4m.generate-plugin-executions"));
 		this.settings.setGeneratePluginExecutionsOnFork(
@@ -220,9 +223,11 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private Properties defaultProperties() {
 		Properties properties = new Properties();
 
-		properties.setProperty("r4m.phase-sequence-calculator.default", "declared");
+		properties.setProperty("r4m.lifecycle-task-request-calculator.default", "declared");
+		properties.setProperty("r4m.lifecycle-task-request-calculator-on-fork.default", "sequential");
 		properties.setProperty("r4m.missing-build-plugin-handler.default", "warn");
 		properties.setProperty("r4m.active-profiles-inheritance.default", "upstream");
+		properties.setProperty("r4m.fancy-output.default", "true");
 		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions-on-fork.default", "true");

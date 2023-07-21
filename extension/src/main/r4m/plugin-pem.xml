@@ -41,6 +41,14 @@
 										<dev />
 									</modes>
 								</goal>
+								<goal id="help-tasks">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<default />
+										<dev />
+									</modes>
+								</goal>
 							</goals>
 						</phase>
 					</phases>

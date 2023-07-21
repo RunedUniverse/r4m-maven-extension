@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.lifecycle;
+package net.runeduniverse.tools.maven.r4m.lifecycle.api;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.maven.lifecycle.Lifecycle;
-import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.PhaseSequenceCalculatorDelegate;
+public interface LifecycleTaskRequest {
 
-@Component(role = PhaseSequenceCalculatorDelegate.class, hint = DeclaredSeqCalculatorDelegate.HINT)
-public class DeclaredSeqCalculatorDelegate implements PhaseSequenceCalculatorDelegate {
+	public Lifecycle getLifecycle();
 
-	public static final String HINT = "declared";
-
-	@Override
-	public List<String> calculatePhaseSequence(Lifecycle lifecycle, String phase) {
-		List<String> sequence = new LinkedList<>();
-		sequence.add(phase);
-		return sequence;
-	}
+	public List<String> getPhaseSequence();
 
 }

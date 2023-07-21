@@ -26,6 +26,8 @@
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
+	<description>Runes4Maven (r4m) Maven Extension provides an alternative way
+		for defining maven executions and adds QoL improvements</description>
 	<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 	<inceptionYear>2022</inceptionYear>
 

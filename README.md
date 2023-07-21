@@ -1,6 +1,7 @@
 # Runes4Maven (r4m) Maven Extension
 Runes4Maven (r4m) Maven Extension provides an alternative way for defining maven executions
 
+
 ## Concept
 Maven hides a bunch of very useful options under the hood. Additionally the Executions feature is very powerful but can be quite a hussle to configure correctly. Furthermore maven does not provide an option to just launch one phase which might include only goals that don't require any prerequisites.
 

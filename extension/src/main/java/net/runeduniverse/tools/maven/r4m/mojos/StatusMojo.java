@@ -42,6 +42,7 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
 public class StatusMojo extends AbstractMojo {
 
 	private static final String ITEM_FORMAT = "\033[%c;%cm%s\033[m";
+	private static final String PROPERTY_FORMAT = " %-53s = %s";
 
 	private static final String T_DEFAULT = "key.default";
 	private static final String T_SELECTED = "key";
@@ -59,22 +60,31 @@ public class StatusMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("");
+		Boolean fancy = this.settings.getFancyOutput()
+				.getSelected();
 		getLog().info("\033[1mRunes4Maven Status\033[m");
-		getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
+		if (fancy)
+			getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
 		List<Property<?>> props = new LinkedList<>(this.settings.getAllProperties());
 		props.sort(null);
 		for (Property<?> prop : props)
-			logTextEntry(prop);
+			logTextEntry(prop, fancy);
 		getLog().info("");
 		getLog().info("");
 	}
 
-	private void logTextEntry(Property<?> entry) {
+	private void logTextEntry(Property<?> entry, Boolean fancy) {
 		if (entry == null || isBlank(entry.getId()))
 			return;
 		getLog().info("");
-		getLog().info(" " + entry.getId());
-		getLog().info("     = " + format(entry.getOptions(), entry.getDefault(), entry.getSelected()));
+		if (fancy) {
+			getLog().info(" " + entry.getId());
+			getLog().info("     = " + format(entry.getOptions(), entry.getDefault(), entry.getSelected()));
+			return;
+		}
+		getLog().info(String.format(PROPERTY_FORMAT, entry.getId() + ".default", entry.getDefault()));
+		getLog().info(String.format(PROPERTY_FORMAT, entry.getId(), entry.getSelected()));
+		getLog().info("     " + format(entry.getOptions(), null, null));
 	}
 
 	private static String format(Collection<?> options, Object defaultValue, Object selectedValue) {

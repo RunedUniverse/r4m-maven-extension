@@ -23,6 +23,12 @@ public interface Settings {
 
 	public void selectDefaults();
 
+	public Property<?> getProperty(String id);
+
+	public void setProperty(Property<?> value);
+
+	public void removeProperty(String id);
+
 	public Property<String> getLifecycleTaskRequestCalculator();
 
 	public Property<String> getLifecycleTaskRequestCalculatorOnFork();
@@ -30,6 +36,8 @@ public interface Settings {
 	public Property<String> getMissingBuildPluginHandler();
 
 	public Property<String> getActiveProfilesInheritance();
+
+	public Property<Boolean> getFancyOutput();
 
 	public Property<Boolean> getPatchMojoOnFork();
 
@@ -44,6 +52,8 @@ public interface Settings {
 	public void setMissingBuildPluginHandler(Property<String> value);
 
 	public void setActiveProfilesInheritance(Property<String> value);
+
+	public void setFancyOutput(Property<Boolean> value);
 
 	public void setPatchMojoOnFork(Property<Boolean> value);
 

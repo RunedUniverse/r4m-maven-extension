@@ -22,7 +22,7 @@ import org.apache.maven.plugin.MojoFailureException;
 /**
  * prints the task help-page
  *
- * @goal help-task
+ * @goal help-tasks
  * @requiresProject false
  * @since 1.0.0
  * @author VenaNocta
@@ -32,7 +32,7 @@ public class HelpTaskMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		getLog().info("");
-		getLog().info("\033[1mRunes4Maven Goal/Lifecycle Task Help\033[m");
+		getLog().info("\033[1mRunes4Maven Goal/Lifecycle Tasks Help\033[m");
 		getLog().info("");
 		getLog().info(" Maven tasks can be either goal or lifecycle tasks.");
 		getLog().info("   Lifecycle Tasks are sometimes refered to as 'phases'.");
@@ -42,16 +42,17 @@ public class HelpTaskMojo extends AbstractMojo {
 		getLog().info("   <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]");
 		getLog().info("");
 		getLog().info(" Lifecycle Tasks:");
-		getLog().info("   [<modes>/]<lifecycle-task>[@<executions>]");
+		getLog().info("   [<modes>/]<lifecycle-tasks>[@<executions>]");
 		getLog().info("");
 		getLog().info(" <modes>");
 		getLog().info("   Modes are a comma separated list of active modes.");
 		getLog().info("   By default the modes 'default' and 'dev' are available");
 		getLog().info("   but you may define others within the pem.xml config.");
 		getLog().info("");
-		getLog().info(" <lifecycle-task>");
+		getLog().info(" <lifecycle-tasks>");
 		getLog().info("  Lifecycle Tasks are a comma separated list of active lifecycle-phases.");
-		getLog().info("  Every Lifecycle Phase may have additional modifiers before and after it:");
+		getLog().info("  Every Lifecycle Phase may have one additional modifier before and/or");
+		getLog().info("  after it:");
 		getLog().info("      ']' '[' <phase> ']' '['");
 		getLog().info("");
 		getLog().info(" Modifiers:");
@@ -72,19 +73,21 @@ public class HelpTaskMojo extends AbstractMojo {
 		getLog().info("   option 'declared'   -> '<phase>' => '[<phase>]'");
 		getLog().info("       Effectively only running the declared phase itself.");
 		getLog().info("   option 'sequential' -> '<phase>' =>  '<phase>]'");
-		getLog().info("       Effectively running all phases inside the lifecycle of the phase");
-		getLog().info("       including the phase itself. (This is the Maven Default)");
+		getLog().info("       Effectively running all phases inside the phase's lifecycle until");
+		getLog().info("       the declared phase is ran and stopps after it.");
+		getLog().info("           (This is the Maven Default)");
 		getLog().info("");
 		getLog().info("");
 		getLog().info(" Examples:");
 		getLog().info("   Install everything without running tests in dev mode:");
 		getLog().info("       dev/]test[,install]");
 		getLog().info("");
-		getLog().info("   Run all the tests without recompiling with the pipeline execution active:");
+		getLog().info("   Run all the tests without recompiling, with the pipeline execution:");
 		getLog().info("       [test]@pipeline");
 		getLog().info("");
-		getLog().info("   Package all with custom defined mode 'my-mode' and executions pipeline & test:");
-		getLog().info("       my-mode/package]@pipeline,test");
+		getLog().info("   Package the project with the custom defined modes 'my-mode' &");
+		getLog().info("   'my-test-mode' and executions pipeline & test:");
+		getLog().info("       my-mode,my-test-mode/package]@pipeline,test");
 		getLog().info("");
 		getLog().info("");
 	}

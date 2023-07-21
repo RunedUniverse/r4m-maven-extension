@@ -518,7 +518,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			String lifecycleId = mojoDescriptor.getExecuteLifecycle();
 			String phaseId = mojoDescriptor.getExecutePhase();
 			if (isBlank(lifecycleId)) {
-
 				Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
 				List<TargetPhase> phases = new LinkedList<>();
 				for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)

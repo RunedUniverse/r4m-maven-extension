@@ -35,11 +35,11 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info("\033[1mRunes4Maven Help\033[m");
 		getLog().info("");
 		getLog().info(" r4m:help");
-		getLog().info("     prints this help-page");
+		getLog().info("     Prints this help-page");
 		getLog().info("");
-		getLog().info(" r4m:help-task");
-		getLog().info("     prints task help-page.");
-		getLog().info("     It describes how the new build argument 'lifecycle-task' works.");
+		getLog().info(" r4m:help-tasks");
+		getLog().info("     Prints goal/lifecycle tasks help-page.");
+		getLog().info("     It describes how the new build argument 'lifecycle-tasks' works.");
 		getLog().info("");
 		getLog().info(" r4m:gen-full-pem");
 		getLog().info("     Discovers all loaded Executions which influence the current project");

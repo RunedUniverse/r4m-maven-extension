@@ -33,7 +33,7 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE = //
 			"[%s] Unknown lifecycle phase \"%s\". "
-					+ "You must specify a valid lifecycle task or phase in the format [<modes>/]<lifecycle-task/phase>[@<executions>] "
+					+ "You must specify a valid lifecycle task or phase in the format [<modes>/]<lifecycle-tasks>[@<executions>] "
 					+ "or a goal in the format <plugin-prefix>:<goal>[@<execution>] or"
 					+ " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>[@<execution>]. "
 					+ "Additional help to lifecycle tasks can be acquired via r4m:help-task / "

@@ -79,14 +79,14 @@ public class HelpTaskMojo extends AbstractMojo {
 		getLog().info("");
 		getLog().info("");
 		getLog().info(" Examples:");
-		getLog().info("   Install everything without running tests in dev mode:");
+		getLog().info("   Install everything without running tests in 'dev' mode:");
 		getLog().info("       dev/]test[,install]");
 		getLog().info("");
-		getLog().info("   Run all the tests without recompiling, with the pipeline execution:");
+		getLog().info("   Run all the tests without recompiling, with the 'pipeline' execution:");
 		getLog().info("       [test]@pipeline");
 		getLog().info("");
 		getLog().info("   Package the project with the custom defined modes 'my-mode' &");
-		getLog().info("   'my-test-mode' and executions pipeline & test:");
+		getLog().info("   'my-test-mode' and executions 'pipeline' & 'test':");
 		getLog().info("       my-mode,my-test-mode/package]@pipeline,test");
 		getLog().info("");
 		getLog().info("");

@@ -15,7 +15,9 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -71,8 +73,10 @@
 
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
-		<connection>scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
-		<developerConnection>scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+		<connection>
+			scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -113,6 +117,10 @@
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven</artifactId>
 		</dependency>
 
 		<!-- COMPILER -->

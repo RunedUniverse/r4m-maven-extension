@@ -63,6 +63,12 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 				task = null;
 			}
 
+			markerIdx = phase.indexOf(']');
+			if (markerIdx == phase.length() - 1) {
+				flagged = true;
+				entry.setBefore(true);
+				phase = phase.substring(0, markerIdx);
+			}
 			markerIdx = phase.indexOf('[');
 			if (markerIdx == phase.length() - 1) {
 				flagged = true;
@@ -70,11 +76,8 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 				entry.setInclude(false);
 				phase = phase.substring(0, markerIdx);
 			}
-			markerIdx = phase.indexOf(']');
-			if (markerIdx == phase.length() - 1 || !flagged) {
+			if (flagged == false)
 				entry.setBefore(true);
-				phase = phase.substring(0, markerIdx);
-			}
 			entry.setLifecycle(selectLifecycle(phase));
 			entry.setPhase(phase);
 			entries.add(entry);

@@ -38,8 +38,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>0</artifact-version>
-		<sources-version>0</sources-version>
+		<artifact-version>1</artifact-version>
+		<sources-version>1</sources-version>
 		<api-version>0</api-version>
 		<model-version>0</model-version>
 		<model-builder-version>0</model-builder-version>
@@ -118,6 +118,16 @@
 			<artifactId>plexus-utils</artifactId>
 			<scope>provided</scope>
 			<!-- maven doesn't provide it to extensions -->
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<scope>compile</scope>
+			<!-- ============================================================== -->
+			<!-- In some cases where maven is executed indirectly,              -->
+			<!-- this reference is not inherited from maven-core!               -->
+			<!-- + such an occurrence is eclipse's maven integration (m2e)      -->
+			<!-- ============================================================== -->
 		</dependency>
 
 		<!-- logging utilities-->

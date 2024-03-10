@@ -64,7 +64,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		// Apache Maven 3.8.4
 		// injects the wrong or no plexus-utils
 		// as such we forcefully load it with a different ClassRealm see
-		// net.runeduniverse.tools.maven.r4m.pem.ProjectExecutionModelLifecycleParticipant
+		// net.runeduniverse.tools.maven.r4m.R4MLifecycleParticipant
 		// and pull the class directly from parent
 		// Reader reader = new XmlStreamReader(input);
 		Class<?> xmlStreamReader = currentRealm.loadClassFromParent("org.codehaus.plexus.util.xml.XmlStreamReader");

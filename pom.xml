@@ -326,7 +326,7 @@
 		</profile>
 		<!-- LICENSES -->
 		<profile>
-			<id>license-check</id>
+			<id>validate</id>
 			<build>
 				<defaultGoal>license:check</defaultGoal>
 				<plugins>
@@ -343,32 +343,37 @@
 								<dependencyPolicy>
 									<type>LICENSE_NAME</type>
 									<rule>APPROVE</rule>
-									<value>The Apache Software License, Version
-										2.0</value>
+									<value>
+										The Apache Software License, Version 2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										http://www.apache.org/licenses/LICENSE-2.0</value>
+										http://www.apache.org/licenses/LICENSE-2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										https://www.apache.org/licenses/LICENSE-2.0</value>
+										https://www.apache.org/licenses/LICENSE-2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										http://www.apache.org/licenses/LICENSE-2.0.txt</value>
+										http://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										https://www.apache.org/licenses/LICENSE-2.0.txt</value>
+										https://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
 								</dependencyPolicy>
 							</dependencyPolicies>
 						</configuration>

@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2023 VenaNocta (venanocta@gmail.com)
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>r4m-bom-sources</artifactId>
@@ -41,9 +41,11 @@
 		<artifact-version>0</artifact-version>
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
+		<runeduniverse-utils-common-version>1.1.0</runeduniverse-utils-common-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
+		<runeduniverse-utils-maven-version>1.0.0</runeduniverse-utils-maven-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
+		<apache-commons-lang3-version>3.8.1</apache-commons-lang3-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
 	</properties>
 
@@ -75,6 +77,20 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
+		<connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension/issues</url>
+	</issueManagement>
+
 	<dependencyManagement>
 		<dependencies>
 			<!-- Maven Core -->
@@ -92,6 +108,11 @@
 				<version>${plexus-utils-version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>${apache-commons-lang3-version}</version>
+			</dependency>
+			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-common</artifactId>
 				<version>${runeduniverse-utils-common-version}</version>
@@ -100,6 +121,11 @@
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-logging</artifactId>
 				<version>${runeduniverse-utils-logging-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-maven</artifactId>
+				<version>${runeduniverse-utils-maven-version}</version>
 			</dependency>
 
 			<!-- COMPILER -->

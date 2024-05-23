@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2023 VenaNocta (venanocta@gmail.com)
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
@@ -69,9 +69,11 @@
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 		<connection>
-			scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
 		<developerConnection>
-			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -85,7 +87,7 @@
 		<root-dir>${basedir}</root-dir>
 		<!-- VERSIONS -->
 		<major-version>1</major-version>
-		<minor-version>0</minor-version>
+		<minor-version>1</minor-version>
 		<artifact-version>0</artifact-version>
 		<!-- ARTIFACT VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
@@ -100,6 +102,7 @@
 		<plugin-maven-source-version>3.2.1</plugin-maven-source-version>
 		<plugin-maven-javadoc-version>3.2.0</plugin-maven-javadoc-version>
 		<plugin-maven-install-version>3.0.0-M1</plugin-maven-install-version>
+		<plugin-revelc-formatter-version>2.23.0</plugin-revelc-formatter-version>
 		<plugin-mycila-license-version>4.2.rc1</plugin-mycila-license-version>
 		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
 		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
@@ -110,7 +113,13 @@
 		<profile>
 			<id>dev-install</id>
 			<build>
-				<defaultGoal>clean license:format install</defaultGoal>
+				<defaultGoal>clean formatter:format license:format install</defaultGoal>
+			</build>
+		</profile>
+		<profile>
+			<id>format</id>
+			<build>
+				<defaultGoal>formatter:format license:format</defaultGoal>
 			</build>
 		</profile>
 		<!-- PIPELINE -->
@@ -326,9 +335,9 @@
 		</profile>
 		<!-- LICENSES -->
 		<profile>
-			<id>license-check</id>
+			<id>validate</id>
 			<build>
-				<defaultGoal>license:check</defaultGoal>
+				<defaultGoal>license:check formatter:validate</defaultGoal>
 				<plugins>
 					<plugin>
 						<groupId>com.mycila</groupId>
@@ -343,32 +352,37 @@
 								<dependencyPolicy>
 									<type>LICENSE_NAME</type>
 									<rule>APPROVE</rule>
-									<value>The Apache Software License, Version
-										2.0</value>
+									<value>
+										The Apache Software License, Version 2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										http://www.apache.org/licenses/LICENSE-2.0</value>
+										http://www.apache.org/licenses/LICENSE-2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										https://www.apache.org/licenses/LICENSE-2.0</value>
+										https://www.apache.org/licenses/LICENSE-2.0
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										http://www.apache.org/licenses/LICENSE-2.0.txt</value>
+										http://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
 								</dependencyPolicy>
 								<dependencyPolicy>
 									<type>LICENSE_URL</type>
 									<rule>APPROVE</rule>
 									<value>
-										https://www.apache.org/licenses/LICENSE-2.0.txt</value>
+										https://www.apache.org/licenses/LICENSE-2.0.txt
+									</value>
 								</dependencyPolicy>
 							</dependencyPolicies>
 						</configuration>
@@ -401,6 +415,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -427,12 +449,26 @@
 					<version>${plugin-maven-resources-version}</version>
 				</plugin>
 				<plugin>
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>${plugin-revelc-formatter-version}</version>
+					<configuration>
+						<configFile>
+							${root-dir}/.code-formats/runed-code-format-java.xml
+						</configFile>
+						<lineEnding>LF</lineEnding>
+						<skipHtmlFormatting>true</skipHtmlFormatting>
+						<skipJsFormatting>true</skipJsFormatting>
+						<skipCssFormatting>true</skipCssFormatting>
+					</configuration>
+				</plugin>
+				<plugin>
 					<groupId>com.mycila</groupId>
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${plugin-mycila-license-version}</version>
 					<configuration>
 						<properties>
-							<year>2023</year>
+							<year>2024</year>
 							<owner>VenaNocta</owner>
 							<email>venanocta@gmail.com</email>
 						</properties>

@@ -137,7 +137,7 @@ We recommend the per project installation:
 	<extension>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-maven-extension</artifactId>
-		<version>1.0.0</version>
+		<version>1.0.1</version>
 	</extension>
 </extensions>
 ```

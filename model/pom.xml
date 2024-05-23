@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2023 VenaNocta (venanocta@gmail.com)
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>r4m-model</artifactId>
@@ -36,6 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
+		<minor-version>0</minor-version>
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 	</properties>
@@ -69,8 +72,12 @@
 
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
-		<connection>scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
-		<developerConnection>scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+		<connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>

@@ -38,7 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>1</artifact-version>
+		<artifact-version>0</artifact-version>
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
 		<runeduniverse-utils-common-version>1.1.0</runeduniverse-utils-common-version>
@@ -76,6 +76,20 @@
 			</roles>
 		</developer>
 	</developers>
+
+	<scm>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
+		<connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension/issues</url>
+	</issueManagement>
 
 	<dependencyManagement>
 		<dependencies>

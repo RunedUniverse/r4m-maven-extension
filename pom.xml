@@ -69,9 +69,11 @@
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 		<connection>
-			scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
 		<developerConnection>
-			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>

@@ -100,6 +100,7 @@
 		<plugin-maven-source-version>3.2.1</plugin-maven-source-version>
 		<plugin-maven-javadoc-version>3.2.0</plugin-maven-javadoc-version>
 		<plugin-maven-install-version>3.0.0-M1</plugin-maven-install-version>
+		<plugin-revelc-formatter-version>2.23.0</plugin-revelc-formatter-version>
 		<plugin-mycila-license-version>4.2.rc1</plugin-mycila-license-version>
 		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
 		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
@@ -110,7 +111,13 @@
 		<profile>
 			<id>dev-install</id>
 			<build>
-				<defaultGoal>clean license:format install</defaultGoal>
+				<defaultGoal>clean formatter:format license:format install</defaultGoal>
+			</build>
+		</profile>
+		<profile>
+			<id>format</id>
+			<build>
+				<defaultGoal>formatter:format license:format</defaultGoal>
 			</build>
 		</profile>
 		<!-- PIPELINE -->
@@ -328,7 +335,7 @@
 		<profile>
 			<id>validate</id>
 			<build>
-				<defaultGoal>license:check</defaultGoal>
+				<defaultGoal>license:check formatter:validate</defaultGoal>
 				<plugins>
 					<plugin>
 						<groupId>com.mycila</groupId>
@@ -406,6 +413,14 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>net.revelc.code.formatter</groupId>
+				<artifactId>formatter-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -430,6 +445,20 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-resources-plugin</artifactId>
 					<version>${plugin-maven-resources-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+					<version>${plugin-revelc-formatter-version}</version>
+					<configuration>
+						<configFile>
+							${root-dir}/.code-formats/runed-code-format-java.xml
+						</configFile>
+						<lineEnding>LF</lineEnding>
+						<skipHtmlFormatting>true</skipHtmlFormatting>
+						<skipJsFormatting>true</skipJsFormatting>
+						<skipCssFormatting>true</skipCssFormatting>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>com.mycila</groupId>

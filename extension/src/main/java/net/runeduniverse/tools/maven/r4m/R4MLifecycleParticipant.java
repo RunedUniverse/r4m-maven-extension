@@ -223,7 +223,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private Properties defaultProperties() {
 		Properties properties = new Properties();
 
-		properties.setProperty("r4m.lifecycle-task-request-calculator.default", "declared");
+		properties.setProperty("r4m.lifecycle-task-request-calculator.default", "sequential");
 		properties.setProperty("r4m.lifecycle-task-request-calculator-on-fork.default", "sequential");
 		properties.setProperty("r4m.missing-build-plugin-handler.default", "warn");
 		properties.setProperty("r4m.active-profiles-inheritance.default", "upstream");

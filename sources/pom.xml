@@ -41,7 +41,7 @@
 		<artifact-version>1</artifact-version>
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
+		<runeduniverse-utils-common-version>1.1.0</runeduniverse-utils-common-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
 		<runeduniverse-utils-maven-version>1.0.0</runeduniverse-utils-maven-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>

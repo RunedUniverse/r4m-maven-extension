@@ -42,6 +42,7 @@
 		<exportedPackage>net.runeduniverse.lib.utils.logging</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven</exportedPackage>
 	</exportedPackages>
 
 	<exportedArtifacts>
@@ -59,6 +60,8 @@
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven
 		</exportedArtifact>
 	</exportedArtifacts>
 

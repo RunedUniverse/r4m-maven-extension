@@ -188,6 +188,32 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>dev-install</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- package all resources for easier testing-->
+						<!-- -Dmaven.ext.class.path=r4m-maven-extension-1.1.0.jar -->
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<appendAssemblyId>false</appendAssemblyId>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>

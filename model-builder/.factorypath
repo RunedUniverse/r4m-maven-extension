@@ -1,6 +1,4 @@
 <factorypath>
-    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/tools/maven/r4m/r4m-api/1.1.0/r4m-api-1.1.0.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/tools/maven/r4m/r4m-model/1.0.0/r4m-model-1.0.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/maven/maven-core/3.8.4/maven-core-3.8.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/maven/maven-model/3.8.4/maven-model-3.8.4.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/maven/maven-settings/3.8.4/maven-settings-3.8.4.jar" enabled="true" runInBatchMode="false"/>
@@ -36,7 +34,9 @@
     <factorypathentry kind="VARJAR" id="M2_REPO/org/apache/commons/commons-lang3/3.8.1/commons-lang3-3.8.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/slf4j/slf4j-api/1.7.32/slf4j-api-1.7.32.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/codehaus/plexus/plexus-utils/3.3.0/plexus-utils-3.3.0.jar" enabled="true" runInBatchMode="false"/>
-    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/lib/utils/utils-common/1.0.1/utils-common-1.0.1.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/lib/utils/utils-common/1.1.0/utils-common-1.1.0.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/lib/utils/utils-logging/1.0.2/utils-logging-1.0.2.jar" enabled="true" runInBatchMode="false"/>
+    <factorypathentry kind="VARJAR" id="M2_REPO/net/runeduniverse/lib/utils/utils-maven/1.0.0/utils-maven-1.0.0.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="VARJAR" id="M2_REPO/org/codehaus/plexus/plexus-component-annotations/1.7.1/plexus-component-annotations-1.7.1.jar" enabled="true" runInBatchMode="false"/>
     <factorypathentry kind="PLUGIN" id="org.eclipse.jst.ws.annotations.core" enabled="false" runInBatchMode="false"/>
 </factorypath>

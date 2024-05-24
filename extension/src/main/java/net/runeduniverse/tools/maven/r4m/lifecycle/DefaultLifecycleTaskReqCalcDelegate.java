@@ -29,6 +29,8 @@ import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequest;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTaskRequestCalculatorDelegate {
 
 	public static final String ERR_UNKNOWN_LIFECYCLE_PHASE = //
@@ -42,55 +44,43 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 	@Requirement
 	private DefaultLifecycles defaultLifeCycles;
 
-	protected abstract List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException;
+	protected void modifyEntry(final Entry entry, final boolean plain) {
+		// modify Entry after parsing
+	}
 
-	@Override
-	public List<LifecycleTaskRequest> calculateTaskRequest(final LifecycleTaskData taskData)
-			throws LifecyclePhaseNotFoundException {
-		final List<LifecycleTaskRequest> requests = new LinkedList<>();
-		final List<Entry> entries = splitEntries(taskData.getLifecycleTask());
+	protected Entry parseEntry(String phase) {
+		final Entry entry = new Entry(false, false, true);
+		int markerIdx = -1;
+		boolean flagged = false;
 
-		// remove all redundant entries
-		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
-			Entry entry = i.next();
-			if (entry == null) {
-				i.remove();
-				continue;
-			}
-			if (!entry.getInclude() || i.previousIndex() == -1 || i.nextIndex() == entries.size())
-				continue;
-			Entry previous = entries.get(i.previousIndex());
-			Entry next = entries.get(i.nextIndex());
-			Lifecycle lifecycle = entry.getLifecycle();
-			if (!lifecycle.equals(previous.getLifecycle()) || !lifecycle.equals(next.getLifecycle())
-					|| !checkOrder(lifecycle, previous.getPhase(), entry.getPhase())
-					|| !checkOrder(lifecycle, entry.getPhase(), next.getPhase()))
-				continue;
-			if (previous.getAfter() && entry.getBefore() && entry.getAfter() && next.getBefore())
-				i.remove();
+		if (phase.indexOf('[') == 0) {
+			flagged = true;
+			entry.setAfter(true);
+			phase = phase.substring(1);
+		}
+		if (phase.indexOf(']') == 0) {
+			flagged = true;
+			entry.setBefore(true);
+			entry.setInclude(false);
+			phase = phase.substring(1);
 		}
 
-		// calculate TaskRequest's
-		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
-			Entry startEntry = i.next();
-			Entry endEntry = i.hasNext() ? i.next() : null;
-			Lifecycle lifecycle = startEntry.getLifecycle();
-			if (endEntry == null) {
-				requests.add(
-						calculateTaskRequest(startEntry.getLifecycle(), startEntry.getPhase(), startEntry.getPhase(),
-								startEntry.getBefore(), startEntry.getInclude(), false, false, startEntry.getAfter()));
-				break;
-			}
-			if (!lifecycle.equals(endEntry.getLifecycle())) {
-				i.previous();
-				continue;
-			}
-			requests.add(calculateTaskRequest(lifecycle, startEntry.getPhase(), endEntry.getPhase(),
-					startEntry.getBefore(), startEntry.getInclude(), startEntry.getAfter() || endEntry.getBefore(),
-					endEntry.getInclude(), endEntry.getAfter()));
+		markerIdx = phase.indexOf(']');
+		if (markerIdx == phase.length() - 1) {
+			flagged = true;
+			entry.setBefore(true);
+			phase = phase.substring(0, markerIdx);
 		}
-
-		return requests;
+		markerIdx = phase.indexOf('[');
+		if (markerIdx == phase.length() - 1) {
+			flagged = true;
+			entry.setAfter(true);
+			entry.setInclude(false);
+			phase = phase.substring(0, markerIdx);
+		}
+		entry.setPhase(phase);
+		modifyEntry(entry, flagged == false);
+		return entry;
 	}
 
 	protected Lifecycle selectLifecycle(final String phase) throws LifecyclePhaseNotFoundException {
@@ -100,6 +90,32 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 					Runes4MavenProperties.PREFIX_ID, phase, this.defaultLifeCycles.getLifecyclePhaseList()), phase);
 		}
 		return lifecycle;
+	}
+
+	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
+		List<Entry> entries = new LinkedList<>();
+		Entry entry = null;
+		String phase = null;
+
+		while (task != null) {
+			int splitIdx = task.indexOf(',');
+			if (0 < splitIdx) {
+				phase = task.substring(0, splitIdx);
+				task = task.substring(splitIdx + 1);
+			} else {
+				phase = task;
+				task = null;
+			}
+			entry = parseEntry(phase);
+			if (entry == null)
+				continue;
+			phase = entry.getPhase();
+			if (isBlank(phase))
+				continue;
+			entry.setLifecycle(selectLifecycle(phase));
+			entries.add(entry);
+		}
+		return entries;
 	}
 
 	protected boolean checkOrder(final Lifecycle lifecycle, final String firstPhase, final String secondPhase) {
@@ -157,6 +173,55 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 			}
 		}
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
+	}
+
+	@Override
+	public List<LifecycleTaskRequest> calculateTaskRequest(final LifecycleTaskData taskData)
+			throws LifecyclePhaseNotFoundException {
+		final List<LifecycleTaskRequest> requests = new LinkedList<>();
+		final List<Entry> entries = splitEntries(taskData.getLifecycleTask());
+
+		// remove all redundant entries
+		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+			Entry entry = i.next();
+			if (entry == null) {
+				i.remove();
+				continue;
+			}
+			if (!entry.getInclude() || i.previousIndex() == -1 || i.nextIndex() == entries.size())
+				continue;
+			Entry previous = entries.get(i.previousIndex());
+			Entry next = entries.get(i.nextIndex());
+			Lifecycle lifecycle = entry.getLifecycle();
+			if (!lifecycle.equals(previous.getLifecycle()) || !lifecycle.equals(next.getLifecycle())
+					|| !checkOrder(lifecycle, previous.getPhase(), entry.getPhase())
+					|| !checkOrder(lifecycle, entry.getPhase(), next.getPhase()))
+				continue;
+			if (previous.getAfter() && entry.getBefore() && entry.getAfter() && next.getBefore())
+				i.remove();
+		}
+
+		// calculate TaskRequest's
+		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
+			Entry startEntry = i.next();
+			Entry endEntry = i.hasNext() ? i.next() : null;
+			Lifecycle lifecycle = startEntry.getLifecycle();
+			if (endEntry == null) {
+				requests.add(
+						calculateTaskRequest(startEntry.getLifecycle(), startEntry.getPhase(), startEntry.getPhase(),
+								startEntry.getBefore(), startEntry.getInclude(), false, false, startEntry.getAfter()));
+				break;
+			}
+			if (!lifecycle.equals(endEntry.getLifecycle())) {
+				i.previous();
+				continue;
+			}
+			requests.add(calculateTaskRequest(lifecycle, startEntry.getPhase(), endEntry.getPhase(),
+					startEntry.getBefore(), startEntry.getInclude(), startEntry.getAfter() || endEntry.getBefore(),
+					endEntry.getInclude(), endEntry.getAfter()));
+		}
+
+		return requests;
 	}
 
 	protected class Entry {

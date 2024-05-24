@@ -32,57 +32,8 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 	public static final String HINT = "sequential";
 
 	@Override
-	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
-		List<Entry> entries = new LinkedList<>();
-		int markerIdx = -1;
-		Entry entry = null;
-		String phase = null;
-		boolean flagged = false;
-
-		while (task != null) {
-			flagged = false;
-			entry = new Entry(false, false, true);
-			if (task.indexOf('[') == 0) {
-				flagged = true;
-				entry.setAfter(true);
-				task = task.substring(1);
-			}
-			if (task.indexOf(']') == 0) {
-				flagged = true;
-				entry.setBefore(true);
-				entry.setInclude(false);
-				task = task.substring(1);
-			}
-
-			int splitIdx = task.indexOf(',');
-			if (0 < splitIdx) {
-				task = task.substring(splitIdx + 1);
-				phase = task.substring(0, splitIdx);
-			} else {
-				phase = task;
-				task = null;
-			}
-
-			markerIdx = phase.indexOf(']');
-			if (markerIdx == phase.length() - 1) {
-				flagged = true;
-				entry.setBefore(true);
-				phase = phase.substring(0, markerIdx);
-			}
-			markerIdx = phase.indexOf('[');
-			if (markerIdx == phase.length() - 1) {
-				flagged = true;
-				entry.setAfter(true);
-				entry.setInclude(false);
-				phase = phase.substring(0, markerIdx);
-			}
-			if (flagged == false)
-				entry.setBefore(true);
-			entry.setLifecycle(selectLifecycle(phase));
-			entry.setPhase(phase);
-			entries.add(entry);
-		}
-		return entries;
+	protected void modifyEntry(final Entry entry, final boolean plain) {
+		entry.setBefore(true);
 	}
 
 	@Override

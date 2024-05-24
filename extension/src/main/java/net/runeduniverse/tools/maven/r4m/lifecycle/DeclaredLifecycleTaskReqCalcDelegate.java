@@ -39,50 +39,9 @@ public class DeclaredLifecycleTaskReqCalcDelegate extends DefaultLifecycleTaskRe
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}
 
-	@Override
-	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
-		List<Entry> entries = new LinkedList<>();
-		int markerIdx = -1;
-		Entry entry = null;
-		String phase = null;
-
-		while (task != null) {
-			entry = new Entry(false, false, true);
-			if (task.indexOf('[') == 0) {
-				entry.setAfter(true);
-				task = task.substring(1);
-			}
-			if (task.indexOf(']') == 0) {
-				entry.setBefore(true);
-				entry.setInclude(false);
-				task = task.substring(1);
-			}
-
-			int splitIdx = task.indexOf(',');
-			if (0 < splitIdx) {
-				task = task.substring(splitIdx + 1);
-				phase = task.substring(0, splitIdx);
-			} else {
-				phase = task;
-				task = null;
-			}
-
-			markerIdx = phase.indexOf(']');
-			if (markerIdx == phase.length() - 1) {
-				entry.setBefore(true);
-				phase = phase.substring(0, markerIdx);
-			}
-			markerIdx = phase.indexOf('[');
-			if (markerIdx == phase.length() - 1) {
-				entry.setAfter(true);
-				entry.setInclude(false);
-				phase = phase.substring(0, markerIdx);
-			}
-			entry.setLifecycle(selectLifecycle(phase));
-			entry.setPhase(phase);
-			entries.add(entry);
-		}
-		return entries;
-	}
+	// Nothing to modify!
+	// @Override
+	// protected void modifyEntry(final Entry entry, final boolean plain) {
+	// }
 
 }

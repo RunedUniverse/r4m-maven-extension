@@ -17,18 +17,22 @@ package net.runeduniverse.tools.maven.r4m.eventspy;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
+import net.runeduniverse.tools.maven.r4m.api.Extension;
+import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
@@ -60,16 +64,19 @@ public class PatchingEventSpy implements EventSpy {
 		case INFO_PATCHING_ABORTED:
 			printBox(event);
 			break;
+		case INFO_ELEVATING_TO_CORE_REALM:
+		case INFO_ELEVATING_TO_BUILD_REALM:
+			printExtensionState(event);
+			break;
+		case INFO_EXTENSIONS_DETECTED:
+			printDetectedExtensions(event);
+			break;
 		case WARN_UNIDENTIFIABLE_PLUGIN_DETECTED:
 			warnUnidentifiablePlugins(event);
 			break;
 		case INFO_LIFECYCLE_EXEC_PLAN_CALC_STARTED:
 		case INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED:
 			handlePatchingLifecycleExecutionPlan(event);
-			break;
-		case INFO_ELEVATING_TO_CORE_REALM:
-		case INFO_ELEVATING_TO_BUILD_REALM:
-			printExtensionState(event);
 			break;
 		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED:
 		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED:
@@ -84,6 +91,13 @@ public class PatchingEventSpy implements EventSpy {
 
 	@Override
 	public void close() throws Exception {
+	}
+
+	protected String id(MavenProject mvnProject) {
+		if (mvnProject == null)
+			return null;
+		return String.format("%s:%s:%s:%s", mvnProject.getGroupId(), mvnProject.getArtifactId(),
+				mvnProject.getPackaging(), mvnProject.getVersion());
 	}
 
 	private void printBox(PatchingEvent event) {
@@ -107,21 +121,81 @@ public class PatchingEventSpy implements EventSpy {
 		}
 	}
 
+	private static final String INFO_EXTENSIONS_DETECTED_HEAD = //
+			"Maven Extensions:";
+	private static final String INFO_EXTENSIONS_DETECTED_EXT = //
+			"  » %s";
+	private static final String INFO_EXTENSIONS_DETECTED_STATUS = //
+			"    - %-51s [ %10s ]";
+
+	private void printDetectedExtensions(PatchingEvent patchingEvent) {
+		ExtensionPatchingEvent event = null;
+		if (patchingEvent instanceof ExtensionPatchingEvent)
+			event = (ExtensionPatchingEvent) patchingEvent;
+		if (event == null) {
+			return;
+		}
+		this.log.info(INFO_EXTENSIONS_DETECTED_HEAD);
+
+		final Collection<MavenProject> projects = event.getProjects();
+		final int size = projects.size();
+		final Map<MavenProject, Boolean> status = new LinkedHashMap<>();
+		for (Extension extension : event.getExtensions()) {
+			int check = 0;
+			this.log.info(String.format(INFO_EXTENSIONS_DETECTED_EXT, extension.getId()));
+			for (MavenProject project : projects) {
+				if (extension.isPlugin(project)) {
+					check = check + 1;
+					status.put(project, true);
+				} else {
+					check = check + 2;
+					status.put(project, false);
+				}
+			}
+			if (size != 0) {
+				if (check % size == 0) {
+					if (check / size == 1) {
+						// print ext+plugin
+						this.log.info(String.format(INFO_EXTENSIONS_DETECTED_STATUS, "< all >", "ext+plugin"));
+						continue;
+					}
+					// else: act as if size == 0
+				} else {
+					// print extension || ext+plugin
+					for (Entry<MavenProject, Boolean> entry : status.entrySet()) {
+						this.log.info(String.format(INFO_EXTENSIONS_DETECTED_STATUS, id(entry.getKey()),
+								entry.getValue() ? "ext+plugin" : "extension"));
+					}
+					continue;
+				}
+			}
+			// print extension
+			this.log.info(String.format(INFO_EXTENSIONS_DETECTED_STATUS, "<all>", "extension"));
+		}
+		this.log.info("");
+	}
+
 	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = //
 			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved:\u001B[0m";
+	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_PROJECT = //
+			"  project: %s";
 	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED = //
 			"  » %s:%s:%s";
 
 	private void warnUnidentifiablePlugins(PatchingEvent event) {
-		Collection<Plugin> unidentifiablePlugins = new LinkedList<>();
+		Map<MavenProject, Set<Plugin>> unidentifiablePluginsMap = new LinkedHashMap<>();
 		if (event instanceof MavenPluginPatchingEvent)
-			unidentifiablePlugins.addAll(((MavenPluginPatchingEvent) event).getEffectedPlugins());
-		if (unidentifiablePlugins.isEmpty())
+			unidentifiablePluginsMap.putAll(((MavenPluginPatchingEvent) event).getEffectedPluginsPerProject());
+		if (unidentifiablePluginsMap.isEmpty())
 			return;
 		this.log.warn(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
-		for (Plugin mvnPlugin : unidentifiablePlugins)
-			this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
-					mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
+		for (Entry<MavenProject, Set<Plugin>> entry : unidentifiablePluginsMap.entrySet()) {
+			final MavenProject mvnProject = entry.getKey();
+			this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_PROJECT, id(mvnProject)));
+			for (Plugin mvnPlugin : entry.getValue())
+				this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
+						mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
+		}
 		this.log.info("");
 	}
 
@@ -161,7 +235,7 @@ public class PatchingEventSpy implements EventSpy {
 	private static final String INFO_SCANNING_BUNDLED_PLUGINS_STARTED = //
 			"searching for embedded plugins in projects:";
 	private static final String INFO_SCANNING_BUNDLED_PLUGINS_RESULT = //
-			"  %-53s  [%3s | %2.3f s]";
+			"  %-54s [%3s | %2.3f s]";
 	private Map<CharSequence, StopWatch> scanRefPluginsStopWatches = new LinkedHashMap<>();
 
 	private void handleScanningReferencedPlugins(PatchingEvent event) {

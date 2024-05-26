@@ -24,6 +24,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
@@ -57,9 +58,11 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
+import net.runeduniverse.tools.maven.r4m.api.Extension;
 import net.runeduniverse.tools.maven.r4m.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
@@ -94,7 +97,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	@Requirement
 	private PluginDependenciesResolver pluginDependenciesResolver;
 
-	private final Set<Plugin> unidentifiablePlugins = new LinkedHashSet<>();
+	private final Set<Extension> extensions = new LinkedHashSet<>();
+	private final Map<MavenProject, Set<Plugin>> unidentifiablePlugins = new LinkedHashMap<>();
 
 	private boolean coreExtension = false;
 
@@ -158,7 +162,18 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			Thread.currentThread()
 					.setContextClassLoader(realm);
 
-			Collection<Plugin> extPlugins = scanCoreExtensions(world.getRealms());
+			this.extensions.addAll(scanCoreExtensions(world.getRealms()));
+			final Set<Plugin> extPlugins = new LinkedHashSet<>();
+
+			for (MavenProject mvnProject : mvnSession.getAllProjects())
+				extPlugins.addAll(discoverPlugins(mvnSession, mvnProject));
+
+			if (!this.extensions.isEmpty()) {
+				this.dispatcher.onEvent(ExtensionPatchingEvent
+						.createInfoEvent(Type.INFO_EXTENSIONS_DETECTED, mvnSession.getAllProjects(), extensions)
+						.readonly());
+			}
+
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
 
@@ -189,11 +204,21 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 					.setContextClassLoader(currentRealm);
 		}
 
-		if (!this.unidentifiablePlugins.isEmpty())
+		if (checkUnidentifiablePlugins()) {
 			this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
 					this.unidentifiablePlugins));
+		}
 
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_FINISHED));
+	}
+
+	private boolean checkUnidentifiablePlugins() {
+		for (Entry<MavenProject, Set<Plugin>> entry : this.unidentifiablePlugins.entrySet()) {
+			final Set<Plugin> set = entry.getValue();
+			if (set != null && !set.isEmpty())
+				return true;
+		}
+		return false;
 	}
 
 	private void compileSettings(final MavenSession mvnSession) {
@@ -266,6 +291,27 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		return property;
 	}
 
+	private Set<Plugin> discoverPlugins(final MavenSession mvnSession, final MavenProject mvnProject) throws Exception {
+		Set<Plugin> unidentifiablePlugins = this.unidentifiablePlugins.get(mvnProject);
+		if (unidentifiablePlugins == null) {
+			this.unidentifiablePlugins.put(mvnProject, unidentifiablePlugins = new LinkedHashSet<>());
+		}
+
+		final Set<Plugin> extPlugins = new LinkedHashSet<>();
+		for (Extension ext : this.extensions) {
+			final Plugin plugin = ext.asPlugin(mvnProject);
+			try {
+				if (ext.locatePluginDescriptor(this.mavenPluginManager, mvnSession.getRepositorySession(),
+						mvnProject)) {
+					extPlugins.add(plugin);
+				}
+			} catch (InvalidPluginDescriptorException e) {
+				unidentifiablePlugins.add(plugin);
+			}
+		}
+		return extPlugins;
+	}
+
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final MavenProject mvnProject) throws Exception {
 
@@ -275,12 +321,17 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		else
 			return;
 
+		Set<Plugin> unidentifiablePlugins = this.unidentifiablePlugins.get(mvnProject);
+		if (unidentifiablePlugins == null) {
+			this.unidentifiablePlugins.put(mvnProject, unidentifiablePlugins = new LinkedHashSet<>());
+		}
+
 		mvnProject.getBuild()
 				.getPlugins()
 				.addAll(extPlugins);
 
 		for (MavenProjectScanner scanner : this.mavenProjectScanner)
-			scanner.scan(mvnSession, extPlugins, this.unidentifiablePlugins, mvnProject, projectSlice);
+			scanner.scan(mvnSession, extPlugins, unidentifiablePlugins, mvnProject, projectSlice);
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
@@ -422,31 +473,34 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED));
 	}
 
-	private static Collection<Plugin> scanCoreExtensions(final Collection<ClassRealm> realms) {
-		Collection<Plugin> extPlugins = new LinkedHashSet<>();
+	private static Collection<Extension> scanCoreExtensions(final Collection<ClassRealm> realms) {
+		final Collection<Extension> extensions = new LinkedHashSet<>();
 		for (ClassRealm realm : realms) {
-			Plugin plugin = fromExtRealm(realm);
-			if (plugin == null)
+			Extension ext = fromExtRealm(realm);
+			if (ext == null)
 				continue;
-			extPlugins.add(plugin);
+			extensions.add(ext);
 		}
-		return Collections.unmodifiableCollection(extPlugins);
+		return Collections.unmodifiableCollection(extensions);
 	}
 
-	private static Plugin fromExtRealm(ClassRealm realm) {
+	private static Extension fromExtRealm(ClassRealm realm) {
 		String id = realm.getId();
-		if (!id.startsWith("coreExtension>"))
+		final DefaultExtension ext = new DefaultExtension();
+		ext.setClassRealm(realm);
+		if (id.startsWith("coreExtension>")) {
+			id = id.substring(14);
+		} else if (id.startsWith("extension>")) {
+			id = id.substring(10);
+		} else
 			return null;
-		Plugin plugin = new Plugin();
-		plugin.setExtensions(true);
-		id = id.substring(14);
 		int idx = id.indexOf(':');
-		plugin.setGroupId(id.substring(0, idx));
+		ext.setGroupId(id.substring(0, idx));
 		id = id.substring(idx + 1);
 		idx = id.indexOf(':');
-		plugin.setArtifactId(id.substring(0, idx));
-		plugin.setVersion(id.substring(idx + 1));
-		return plugin;
+		ext.setArtifactId(id.substring(0, idx));
+		ext.setVersion(id.substring(idx + 1));
+		return ext;
 	}
 
 }

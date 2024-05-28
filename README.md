@@ -146,6 +146,12 @@ We recommend the per project installation:
 Runes4Maven (r4m) installed as maven build extension limits its potential.
 Some features may not be available in this mode it will print a sizable warning!
 
+$$\color{orange}WARNING$$
+
+> We received reports that on some maven versions past our min. supported version of `3.3.9` an essential class does not get provided to **Build Extensions** anymore, which leads to maven crashing in it's entirety!
+> 
+> **Therefore we urge you to load r4m as a [Core Extension](#maven-core-extension)!**
+
 [Maven Guide Example for Build Extensions](https://maven.apache.org/guides/mini/guide-using-extensions.html#build-extension)
 
 

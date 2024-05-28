@@ -53,7 +53,6 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 
 	public static final String HINT = "plugin-execution";
 	public static final String ERR_MSG_PLUGIN_DESCRIPTOR = "Failed to acquire org.apache.maven.plugin.descriptor.PluginDescriptor!";
-	public static final String WARN_MSG_GAOL_FORKING_NOT_SUPPORTED = "goal forking not supported: %s:%s:%s forks %s";
 
 	@Requirement
 	protected Logger log;
@@ -140,9 +139,15 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		Fork fork = new Fork();
 
 		String executeGoal = mvnMojoDescriptor.getExecuteGoal();
-		if (!isBlank(executeGoal))
-			this.log.warn(String.format(WARN_MSG_GAOL_FORKING_NOT_SUPPORTED, mvnPlugin.getGroupId(),
-					mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal(), executeGoal));
+		if (!isBlank(executeGoal)) {
+			// TODO maybe add this as a feature?
+			/*
+			 * anyway the goal gets forked as long as no phases (or lifecycles) get defined
+			 * through {@link MojoDescriptor}, PEM or other means
+			 *
+			 * (extension version: >1.1.0)
+			 */
+		}
 
 		String executePhase = mvnMojoDescriptor.getExecutePhase();
 		if (!isBlank(executePhase)) {

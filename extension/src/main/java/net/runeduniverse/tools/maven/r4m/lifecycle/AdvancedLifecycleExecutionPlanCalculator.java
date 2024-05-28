@@ -497,46 +497,72 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
 		boolean isForkingGoal = false;
-		if (mojoDescriptor.isForking())
-			isForkingGoal = isBlank(mojoDescriptor.getExecutePhase());
+		if (mojoDescriptor.isForking()) {
+			/*
+			 * We check all options since 'phase' (& 'lifecycle') beat 'goal' forking.
+			 *
+			 * Normally checking the lifecycle is redundant but some other extension might
+			 * override {@link MojoDescriptor#isForking()}.
+			 */
+			isForkingGoal = !isBlank(mojoDescriptor.getExecuteGoal()) //
+					&& isBlank(mojoDescriptor.getExecutePhase()) //
+					&& isBlank(mojoDescriptor.getExecuteLifecycle());
+		}
 
 		final String selectedLifecycleTaskReqCalc = this.settings.getLifecycleTaskRequestCalculatorOnFork()
 				.getSelected();
 		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = selectLifecycleTaskReqCalcDelegate(
 				selectedLifecycleTaskReqCalc);
 
+		// get specific fork, or create in case mojo forks phase/s (or lifecycle)
 		Fork fork = null;
 		ExecutionArchiveSelectorConfig selectorConfig = null;
 		if (mojoExecution instanceof MojoExecutionData) {
 			MojoExecutionData data = (MojoExecutionData) mojoExecution;
 			fork = data.getFork();
 			selectorConfig = data.getExecutionArchiveSelectorConfig();
-		} else if (!isForkingGoal) {
+			// NOTE currently forked goals are not recorded in {@link Fork}
+			if (fork != null && fork.isValid()) {
+				// valid PEM forks override goal forking!
+				isForkingGoal = false;
+			}
+		} else {
 			// generate a Fork from MojoDescriptor in case some other extension injected a
 			// mojoExecution missing the MojoExecutionData interface
-			fork = new Fork();
-			String lifecycleId = mojoDescriptor.getExecuteLifecycle();
-			String phaseId = mojoDescriptor.getExecutePhase();
-			if (isBlank(lifecycleId)) {
-				Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
-				List<TargetPhase> phases = new LinkedList<>();
-				for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
-						.getPhaseSequence())
-					phases.add(new TargetPhase(phase));
-				fork.setPhases(phases);
-			} else {
-				TargetLifecycle lifecycle = new TargetLifecycle(lifecycleId);
-				if (!isBlank(phaseId))
-					lifecycle.setStopPhase(phaseId);
-				fork.setLifecycle(lifecycle);
+			if (!isForkingGoal) {
+				fork = new Fork();
+				String lifecycleId = mojoDescriptor.getExecuteLifecycle();
+				String phaseId = mojoDescriptor.getExecutePhase();
+				if (isBlank(lifecycleId)) {
+					Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
+					List<TargetPhase> phases = new LinkedList<>();
+					for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
+							.getPhaseSequence())
+						phases.add(new TargetPhase(phase));
+					fork.setPhases(phases);
+				} else {
+					/*
+					 * Forking of a lifecycle when the phaseId is null would be skipped during a
+					 * default Maven execution.
+					 *
+					 * r4m diverts here from the default execution by implicitly setting the last
+					 * phase of the lifecycle as phaseId! Since we expect the developer in question
+					 * wanted to execute the target lifecycle in its entirety!
+					 */
+					TargetLifecycle lifecycle = new TargetLifecycle(lifecycleId);
+					if (!isBlank(phaseId))
+						lifecycle.setStopPhase(phaseId);
+					fork.setLifecycle(lifecycle);
+				}
+				selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+						.selectActiveProject(project)
+						.selectPackagingProcedure(project.getPackaging())
+						.selectModes("default")
+						.selectActiveExecutions(mojoExecution.getExecutionId());
 			}
-			selectorConfig = this.selectorConfigFactory.createEmptyConfig()
-					.selectActiveProject(project)
-					.selectPackagingProcedure(project.getPackaging())
-					.selectModes("default")
-					.selectActiveExecutions(mojoExecution.getExecutionId());
 		}
 
+		// validate forking / stop recursion
 		if (isForkingGoal) {
 			if (!alreadyForkedMojos.add(mojoDescriptor))
 				return;
@@ -550,6 +576,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				mojoExecution.setMojoDescriptor(patchMojoDescriptorForLogging(mojoDescriptor, fork));
 		}
 
+		// actually process the execution forking
 		List<MavenProject> forkedProjects = LifecycleDependencyResolver.getProjects(project, session,
 				mojoDescriptor.isAggregator());
 
@@ -896,17 +923,18 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			return Collections.emptyList();
 		}
 
+		String executionId = mojoExecution.getExecutionId();
 		MojoExecutionAdapter forkedExecution;
 		if (mojoExecution instanceof MojoExecutionData)
-			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, forkedGoal,
+			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,
 					((MojoExecutionData) mojoExecution).getExecutionArchiveSelectorConfig());
 		else
-			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, forkedGoal,
+			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,
 					this.selectorConfigFactory.createEmptyConfig()
 							.selectActiveProject(project)
 							.selectModes("default")
 							.selectPackagingProcedure(project.getPackaging())
-							.selectActiveExecutions(mojoExecution.getExecutionId()));
+							.selectActiveExecutions(executionId));
 
 		if (this.settings.getGeneratePluginExecutionsOnFork()
 				.getSelected())

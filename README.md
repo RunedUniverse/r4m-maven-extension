@@ -142,7 +142,9 @@ We recommend the per project installation:
 </extensions>
 ```
 
-### Maven Build Extension
+<details>
+<summary><h3 class="heading-element">Maven Build Extension</h3></summary>
+
 Runes4Maven (r4m) installed as maven build extension limits its potential.
 Some features may not be available in this mode it will print a sizable warning!
 
@@ -154,6 +156,7 @@ $$\color{orange}WARNING$$
 
 [Maven Guide Example for Build Extensions](https://maven.apache.org/guides/mini/guide-using-extensions.html#build-extension)
 
+</details>
 
 ## Properties
 

@@ -1,3 +1,23 @@
+def installArtifact(modId) {
+	def mod = getModule(id: modId);
+	if(!mod.active()) {
+		skipStage()
+		return
+	}
+	try {
+		sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
+	} finally {
+		dir(path: "${ mod.path() }/target") {
+			sh 'ls -l'
+			if(mod.hasTag('pom')) {
+				sh "cp *.pom *.asc ${ RESULT_PATH }"
+			} else {
+				sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
+			}
+		}
+	}
+}
+
 node {
 	withModules {
 		tool(name: 'maven-latest', type: 'maven')
@@ -78,25 +98,6 @@ node {
 				dir(path: "${ mod.path() }/target") {
 					sh 'ls -l'
 					sh "cp *.pom *.asc ${ RESULT_PATH }"
-				}
-			}
-		}
-		def installArtifact(modId) {
-			def mod = getModule(id: modId);
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					if(mod.hasTag('pom')) {
-						sh "cp *.pom *.asc ${ RESULT_PATH }"
-					} else {
-						sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-					}
 				}
 			}
 		}

@@ -138,15 +138,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<profiles>
-		<profile>
-			<id>deploy</id>
-			<build>
-				<defaultGoal>
-					org.apache.maven.plugins:maven-deploy-plugin:deploy
-				</defaultGoal>
-			</build>
-		</profile>
-	</profiles>
 </project>

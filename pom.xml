@@ -185,6 +185,14 @@
 			</build>
 		</profile>
 		<profile>
+			<id>deploy-pom</id>
+			<build>
+				<defaultGoal>
+					org.apache.maven.plugins:maven-deploy-plugin:deploy
+				</defaultGoal>
+			</build>
+		</profile>
+		<profile>
 			<id>deploy-signed</id>
 			<build>
 				<defaultGoal>

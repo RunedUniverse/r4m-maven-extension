@@ -195,19 +195,19 @@ node {
 					skipStage()
 					return
 				}
-				stage('Develop'){
-					sh "mvn-dev -P ${ REPOS },dist-repo-development,deploy -pl=${ mod.relPathFrom('r4m-parent') }"
-				}
-				def signedDeployProfile = 'deploy-signed';
+				def deployProfilePrefix = 'deploy';
 				if(mod.hasTag('pom')) {
-					signedDeployProfile = 'deploy-pom-signed';
+					deployProfilePrefix = 'deploy-pom';
+				}
+				stage('Develop'){
+					sh "mvn-dev -P ${ REPOS },dist-repo-development,${ deployProfilePrefix } -pl=${ mod.relPathFrom('r4m-parent') }"
 				}
 				stage('Release') {
 					if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.GIT_BRANCH != 'master') {
 						skipStage()
 						return
 					}
-					sh "mvn-dev -P ${ REPOS },dist-repo-releases,${ signedDeployProfile } -pl=${ mod.relPathFrom('r4m-parent') }"
+					sh "mvn-dev -P ${ REPOS },dist-repo-releases,${ deployProfilePrefix }-signed -pl=${ mod.relPathFrom('r4m-parent') }"
 				}
 				stage('Stage at Maven-Central') {
 					if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.GIT_BRANCH != 'master') {
@@ -215,7 +215,7 @@ node {
 						return
 					}
 					// never add : -P ${REPOS} => this is ment to fail here
-					sh "mvn-dev -P repo-releases,dist-repo-maven-central,${ signedDeployProfile } -pl=${ mod.relPathFrom('r4m-parent') }"
+					sh "mvn-dev -P repo-releases,dist-repo-maven-central,${ deployProfilePrefix }-signed -pl=${ mod.relPathFrom('r4m-parent') }"
 					sshagent (credentials: ['RunedUniverse-Jenkins']) {
 						sh "git push origin \$(git-create-version-tag ${ mod.id() } ${ mod.relPathFrom('r4m-parent') })"
 					}

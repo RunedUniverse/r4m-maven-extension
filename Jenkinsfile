@@ -81,8 +81,8 @@ node {
 				}
 			}
 		}
-		stage('Install R4M Bill of Sources') {
-			def mod = getModule(id: 'r4m-sources');
+		def installArtifact(modId) {
+			def mod = getModule(id: modId);
 			if(!mod.active()) {
 				skipStage()
 				return
@@ -92,70 +92,29 @@ node {
 			} finally {
 				dir(path: "${ mod.path() }/target") {
 					sh 'ls -l'
-					sh "cp *.pom *.asc ${ RESULT_PATH }"
+					if(mod.hasTag('pom')) {
+						sh "cp *.pom *.asc ${ RESULT_PATH }"
+					} else {
+						sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
+					}
 				}
 			}
+		}
+		stage('Install R4M Bill of Sources') {
+			installArtifact('r4m-sources');
 		}
 
 		stage('Install R4M Model') {
-			def mod = getModule(id: 'r4m-model');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-model');
 		}
 		stage('Install R4M API') {
-			def mod = getModule(id: 'r4m-api');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-api');
 		}
 		stage('Install R4M Model Builder') {
-			def mod = getModule(id: 'r4m-model-builder');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-model-builder');
 		}
 		stage('Install R4M Extension') {
-			def mod = getModule(id: 'r4m-extension');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-extension');
 		}
 
 		stage('Test') {

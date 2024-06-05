@@ -9,10 +9,11 @@ def installArtifact(modId) {
 	} finally {
 		dir(path: "${ mod.path() }/target") {
 			sh 'ls -l'
-			if(mod.hasTag('pom')) {
-				sh "cp *.pom *.asc ${ RESULT_PATH }"
-			} else {
-				sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
+			// copy pom & signatures
+			sh "cp *.pom *.asc ${ RESULT_PATH }"
+			// copy packaging specific files
+			if(mod.hasTag('pack-jar')) {
+				sh "cp *.jar ${ RESULT_PATH }"
 			}
 		}
 	}
@@ -43,12 +44,12 @@ node {
 			sh "mkdir -p ${ RESULT_PATH }"
 			sh "mkdir -p ${ ARCHIVE_PATH }"
 			
-			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'parent', 'pom' ]
-			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'bom',    'pom' ]
-			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [  ]
-			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [  ]
-			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [  ]
-			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [  ]
+			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'pack-pom', 'parent' ]
+			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'pack-pom', 'bom'    ]
+			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar'           ]
 		}
 
 		stage('Init Modules') {
@@ -156,7 +157,7 @@ node {
 					return
 				}
 				def deployProfilePrefix = 'deploy';
-				if(mod.hasTag('pom')) {
+				if(mod.hasTag('pack-pom')) {
 					deployProfilePrefix = 'deploy-pom';
 				}
 				stage('Develop'){

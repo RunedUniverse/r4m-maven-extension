@@ -1,0 +1,143 @@
+<?xml version="1.1"?>
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-geom"
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-geom"
+	elementFormDefault="qualified">
+
+	<xs:element name="goal-execution-order-model" type="Model" />
+	<xs:complexType name="Model">
+		<xs:all>
+			<xs:element name="modelVersion" type="xs:string"
+				default="1.0.0" />
+			<xs:element name="goals">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="goal" type="Goal" minOccurs="0"
+							maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="Goal">
+		<xs:all>
+			<xs:element name="groupId" type="xs:string" minOccurs="0">
+				<!-- (opt - from plugin) -->
+			</xs:element>
+			<xs:element name="artifactId" type="xs:string"
+				minOccurs="0">
+				<!-- (opt - from plugin) -->
+			</xs:element>
+			<xs:element name="phases" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="phase" type="Phase" minOccurs="0"
+							maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="Phase">
+		<xs:all>
+			<xs:element name="before" type="RefGoalGroup"
+				minOccurs="0" />
+			<xs:element name="after" type="RefGoalGroup" minOccurs="0" />
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="RefGoalGroup">
+		<xs:sequence>
+			<xs:element name="goal" type="RefGoal" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RefGoal">
+		<xs:all>
+			<xs:element name="groupId" type="xs:string" minOccurs="0"
+				default="org.apache.maven.plugins">
+			</xs:element>
+			<xs:element name="artifactId" type="xs:string" />
+			<xs:element name="when" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="always" minOccurs="0" maxOccurs="1">
+							<xs:complexType />
+						</xs:element>
+						<xs:element name="never" minOccurs="0" maxOccurs="1">
+							<xs:complexType />
+						</xs:element>
+						<xs:group ref="CheckGroup" minOccurs="0"
+							maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="source" use="optional"
+			default="plugin">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="override" />
+					<xs:enumeration value="workflow" />
+					<xs:enumeration value="packaging" />
+					<xs:enumeration value="plugin" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="CheckBranch">
+		<xs:sequence>
+			<xs:group ref="CheckGroup" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:group name="CheckGroup">
+		<xs:choice>
+			<xs:element name="execution" type="ExecutionCheck" />
+			<xs:element name="packaging" type="PackagingCheck" />
+			<xs:element name="lifecycle" type="LifecycleCheck" />
+			<xs:element name="profile" type="ProfileCheck" />
+			<xs:element name="and" type="CheckBranch" />
+			<xs:element name="or" type="CheckBranch" />
+			<xs:element name="not">
+				<xs:complexType>
+					<xs:group ref="CheckGroup" minOccurs="0" />
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="ExecutionCheck">
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="PackagingCheck">
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="LifecycleCheck">
+		<xs:attribute name="id" type="xs:string" use="required" />
+	</xs:complexType>
+	<xs:complexType name="ProfileCheck">
+		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="state" use="optional"
+			default="active">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="active" />
+					<xs:enumeration value="inactive" />
+					<xs:enumeration value="missing" />
+					<xs:enumeration value="provided" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+</xs:schema>

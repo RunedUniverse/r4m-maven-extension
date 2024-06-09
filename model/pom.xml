@@ -38,7 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
-		<minor-version>0</minor-version>
+		<minor-version>1</minor-version>
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 	</properties>

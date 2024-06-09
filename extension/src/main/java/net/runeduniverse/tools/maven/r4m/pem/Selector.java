@@ -275,11 +275,15 @@ public class Selector implements ExecutionArchiveSelector {
 		if (execution != null)
 			return execution;
 
-		ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
+		ExecutionView workflowView = views.getOrDefault(ExecutionSource.WORKFLOW, ViewFactory.createExecution(id));
 		ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING, ViewFactory.createExecution(id));
+
+		execution = merge(cnf, packagingView, workflowView, true, false);
+
+		ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
 		ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE, ViewFactory.createExecution(id));
 
-		execution = merge(cnf, pluginView, packagingView, false, true);
+		execution = merge(cnf, pluginView, execution, false, true);
 		execution = merge(cnf, execution, overrideView, true, false);
 
 		return execution;

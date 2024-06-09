@@ -8,7 +8,7 @@
 	<xs:complexType name="Model">
 		<xs:all>
 			<xs:element name="modelVersion" type="xs:string"
-				default="1.0.0" />
+				default="1.1.0" />
 			<xs:element name="executions">
 				<xs:complexType>
 					<xs:sequence>
@@ -54,6 +54,7 @@
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="override" />
+					<xs:enumeration value="workflow" />
 					<xs:enumeration value="packaging" />
 					<xs:enumeration value="plugin" />
 				</xs:restriction>
@@ -196,6 +197,12 @@
 						<xs:choice minOccurs="1" maxOccurs="unbounded">
 							<xs:element name="default" />
 							<xs:element name="dev" />
+							<xs:element name="mode">
+								<xs:complexType>
+									<xs:attribute name="id" type="xs:string"
+										use="required" />
+								</xs:complexType>
+							</xs:element>
 							<xs:any namespace="##other" />
 						</xs:choice>
 					</xs:sequence>

@@ -297,9 +297,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
 		Set<String> modes = new LinkedHashSet<>(0);
 		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
-			String name = modeNode.getName();
-			if (!isBlank(name))
-				modes.add(name);
+			parseMode(modes, modeNode);
 		}
 		// no modes selected!
 		if (modes.isEmpty())
@@ -310,6 +308,25 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 		list.add(goal);
 
+		return true;
+	}
+
+	protected boolean parseMode(final Collection<String> modes, final PlexusConfiguration modeNode) {
+		if (modeNode == null)
+			return false;
+
+		String id = modeNode.getAttribute("id");
+		if (id == null) {
+			String name = modeNode.getName();
+			if (isBlank(name))
+				return false;
+			modes.add(name);
+			return true;
+		}
+		if (isBlank(id))
+			return false;
+
+		modes.add(id);
 		return true;
 	}
 

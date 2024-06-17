@@ -163,8 +163,11 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (!goal.getModes()
 				.isEmpty()) {
 			PlexusConfiguration modeNodes = node.getChild("modes", true);
-			for (String mode : goal.getModes())
-				modeNodes.addChild(mode, null);
+			for (String mode : goal.getModes()) {
+				if (isBlank(mode))
+					continue;
+				modeNodes.addChild(convertMode(mode));
+			}
 		}
 
 		if (goal.getOptional() != null)
@@ -174,6 +177,12 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (goal.hasFork())
 			node.addChild(convert(goal.getFork()));
 
+		return node;
+	}
+
+	protected PlexusConfiguration convertMode(final String id) {
+		PlexusConfiguration node = new XmlPlexusConfiguration("mode");
+		node.setAttribute("id", id);
 		return node;
 	}
 
@@ -189,8 +198,8 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 						.setAttribute("id", execution);
 		}
 
-		if (fork.getMode() != null)
-			node.addChild("mode", fork.getMode());
+		if (!isBlank(fork.getMode()))
+			node.addChild(convertMode(fork.getMode()));
 
 		if (fork.getPhases() != null && !fork.getPhases()
 				.isEmpty()) {

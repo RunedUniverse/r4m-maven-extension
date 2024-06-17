@@ -195,14 +195,7 @@
 				<xs:complexType>
 					<xs:sequence>
 						<xs:choice minOccurs="1" maxOccurs="unbounded">
-							<xs:element name="default" />
-							<xs:element name="dev" />
-							<xs:element name="mode">
-								<xs:complexType>
-									<xs:attribute name="id" type="xs:string"
-										use="required" />
-								</xs:complexType>
-							</xs:element>
+							<xs:element name="mode" type="Mode" />
 							<xs:any namespace="##other" />
 						</xs:choice>
 					</xs:sequence>
@@ -222,9 +215,36 @@
 		</xs:attribute>
 	</xs:complexType>
 
+	<xs:complexType name="Mode">
+		<xs:attribute name="id" use="required">
+			<xs:annotation>
+				<xs:documentation>
+					Select the id under which this goal should be
+					activated, examples are 'default' and 'dev' but you may select any
+					string without whitespace characters.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:union>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="default" />
+							<xs:enumeration value="dev" />
+						</xs:restriction>
+					</xs:simpleType>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:pattern value="\S+" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:union>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
 	<xs:complexType name="Fork">
 		<xs:all>
-			<xs:element name="mode" type="xs:string" minOccurs="0"
+			<xs:element name="mode" type="Mode" minOccurs="0"
 				maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>

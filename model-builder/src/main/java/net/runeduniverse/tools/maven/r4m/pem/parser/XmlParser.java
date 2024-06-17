@@ -294,11 +294,20 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 		Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 
-		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
-		Set<String> modes = new LinkedHashSet<>(0);
-		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
-			parseMode(modes, modeNode);
-		}
+		final Set<String> modes = new LinkedHashSet<String>(0) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean add(String e) {
+				if (isBlank(e))
+					return false;
+				return super.add(e);
+			}
+		};
+
+		parseModes(modes, goalNode.getChild("modes", false));
+
 		// no modes selected!
 		if (modes.isEmpty())
 			return false;
@@ -311,22 +320,32 @@ public class XmlParser implements ProjectExecutionModelParser {
 		return true;
 	}
 
+	protected boolean parseModes(final Collection<String> modes, final PlexusConfiguration modesNode) {
+		if (modesNode == null)
+			return false;
+		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
+			parseMode(modes, modeNode);
+		}
+		return true;
+	}
+
 	protected boolean parseMode(final Collection<String> modes, final PlexusConfiguration modeNode) {
 		if (modeNode == null)
 			return false;
 
-		String id = modeNode.getAttribute("id");
-		if (id == null) {
-			String name = modeNode.getName();
-			if (isBlank(name))
-				return false;
-			modes.add(name);
-			return true;
-		}
-		if (isBlank(id))
+		String name = modeNode.getName();
+		if (isBlank(name))
 			return false;
 
-		modes.add(id);
+		String id = modeNode.getAttribute("id");
+		if (id == null) {
+			modes.add(name.trim());
+			return true;
+		}
+		if (isBlank(id) || !name.equals("mode"))
+			return false;
+
+		modes.add(id.trim());
 		return true;
 	}
 
@@ -337,8 +356,10 @@ public class XmlParser implements ProjectExecutionModelParser {
 		Fork fork = new Fork();
 
 		final PlexusConfiguration modeNode = forkNode.getChild("mode", false);
-		if (modeNode != null)
-			fork.setMode(modeNode.getValue());
+		if (modeNode != null) {
+			String modeId = modeNode.getAttribute("id");
+			fork.setMode(isBlank(modeId) ? null : modeId.trim());
+		}
 
 		Set<String> executions = new LinkedHashSet<>(0);
 		parseTargetExecutions(executions, forkNode.getChild("executions", false));

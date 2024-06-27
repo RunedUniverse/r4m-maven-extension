@@ -48,7 +48,9 @@
 				minOccurs="0" />
 			<xs:element name="after" type="RefGoalGroup" minOccurs="0" />
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="PhaseId" use="required" />
+		<xs:attribute name="lifecycle" type="LifecycleId"
+			use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="RefGoalGroup">
@@ -60,8 +62,21 @@
 
 	<xs:complexType name="RefGoal">
 		<xs:all>
-			<xs:element name="groupId" type="xs:string" minOccurs="0"
+			<xs:element name="groupId" minOccurs="0"
 				default="org.apache.maven.plugins">
+				<xs:simpleType>
+					<xs:union>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="org.apache.maven.plugins" />
+								<xs:enumeration value="org.codehaus.mojo" />
+							</xs:restriction>
+						</xs:simpleType>
+						<xs:simpleType>
+							<xs:restriction base="xs:string" />
+						</xs:simpleType>
+					</xs:union>
+				</xs:simpleType>
 			</xs:element>
 			<xs:element name="artifactId" type="xs:string" />
 			<xs:element name="when" minOccurs="0">
@@ -120,10 +135,10 @@
 		<xs:attribute name="id" type="xs:string" use="required" />
 	</xs:complexType>
 	<xs:complexType name="PackagingCheck">
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="PackagingId" use="required" />
 	</xs:complexType>
 	<xs:complexType name="LifecycleCheck">
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="LifecycleId" use="required" />
 	</xs:complexType>
 	<xs:complexType name="ProfileCheck">
 		<xs:attribute name="id" type="xs:string" use="required" />
@@ -139,5 +154,85 @@
 			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
+
+	<xs:simpleType name="PackagingId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="pom" />
+					<xs:enumeration value="jar" />
+					<xs:enumeration value="maven-plugin" />
+					<xs:enumeration value="ejb" />
+					<xs:enumeration value="war" />
+					<xs:enumeration value="ear" />
+					<xs:enumeration value="rar" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string" />
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="LifecycleId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string" />
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="PhaseId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<!-- Clean Lifecycle -->
+					<xs:enumeration value="pre-clean" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="post-clean" />
+					<!-- Default Lifecycle -->
+					<xs:enumeration value="validate" />
+					<xs:enumeration value="initialize" />
+					<xs:enumeration value="generate-sources" />
+					<xs:enumeration value="process-sources" />
+					<xs:enumeration value="generate-resources" />
+					<xs:enumeration value="process-resources" />
+					<xs:enumeration value="compile" />
+					<xs:enumeration value="process-classes" />
+					<xs:enumeration value="generate-test-sources" />
+					<xs:enumeration value="process-test-sources" />
+					<xs:enumeration value="generate-test-resources" />
+					<xs:enumeration value="process-test-resources" />
+					<xs:enumeration value="test-compile" />
+					<xs:enumeration value="process-test-classes" />
+					<xs:enumeration value="test" />
+					<xs:enumeration value="prepare-package" />
+					<xs:enumeration value="package" />
+					<xs:enumeration value="pre-integration-test" />
+					<xs:enumeration value="integration-test" />
+					<xs:enumeration value="post-integration-test" />
+					<xs:enumeration value="verify" />
+					<xs:enumeration value="install" />
+					<xs:enumeration value="deploy" />
+					<!-- Site Lifecycle -->
+					<xs:enumeration value="pre-site" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="post-site" />
+					<xs:enumeration value="site-deploy" />
+					<!-- R4M - Help Lifecycle -->
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string" />
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
 
 </xs:schema>

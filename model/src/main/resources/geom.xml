@@ -25,7 +25,7 @@
 			</groupId>
 			<artifactId>r4m-maven-extension</artifactId>
 			<phases>
-				<phase id="package">
+				<phase id="package" lifecycle="default">
 					<before>
 						<goal id="pre-pack" source="workflow">
 							<groupId>

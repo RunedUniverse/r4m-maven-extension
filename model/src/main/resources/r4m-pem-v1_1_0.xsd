@@ -1,4 +1,21 @@
 <?xml version="1.0"?>
+<!--
+
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-pem"
@@ -7,7 +24,7 @@
 	<xs:element name="project-execution-model" type="Model" />
 	<xs:complexType name="Model">
 		<xs:all>
-			<xs:element name="modelVersion" type="xs:string"
+			<xs:element name="modelVersion" type="AnyId"
 				default="1.1.0" />
 			<xs:element name="executions">
 				<xs:complexType>
@@ -49,7 +66,7 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="ExecutionId" use="required" />
 		<xs:attribute name="source" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
@@ -65,7 +82,7 @@
 	<xs:complexType name="ExecutionRestrictions">
 		<xs:sequence>
 			<xs:choice minOccurs="0" maxOccurs="unbounded">
-				<xs:element name="packaging-procedure" type="xs:string">
+				<xs:element name="packaging-procedure" type="PackagingId">
 					<xs:annotation>
 						<xs:documentation>
 							Used to select packaging flag in POM. Keep in
@@ -156,7 +173,7 @@
 	</xs:complexType>
 
 	<xs:complexType name="Profile">
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="AnyId" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="Lifecycle">
@@ -170,7 +187,7 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="LifecycleId" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="Phase">
@@ -184,13 +201,13 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="PhaseId" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="Goal">
 		<xs:all>
-			<xs:element name="groupId" type="xs:string" />
-			<xs:element name="artifactId" type="xs:string" />
+			<xs:element name="groupId" type="ArtifactGroupId" />
+			<xs:element name="artifactId" type="AnyId" />
 			<xs:element name="modes">
 				<xs:complexType>
 					<xs:sequence>
@@ -203,7 +220,7 @@
 			</xs:element>
 			<xs:element name="fork" type="Fork" minOccurs="0" />
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="AnyId" use="required" />
 		<xs:attribute name="optional" use="optional"
 			default="true">
 			<xs:simpleType>
@@ -216,7 +233,7 @@
 	</xs:complexType>
 
 	<xs:complexType name="Mode">
-		<xs:attribute name="id" use="required">
+		<xs:attribute name="id" type="ModeId" use="required">
 			<xs:annotation>
 				<xs:documentation>
 					Select the id under which this goal should be
@@ -224,21 +241,6 @@
 					string without whitespace characters.
 				</xs:documentation>
 			</xs:annotation>
-			<xs:simpleType>
-				<xs:union>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:enumeration value="default" />
-							<xs:enumeration value="dev" />
-						</xs:restriction>
-					</xs:simpleType>
-					<xs:simpleType>
-						<xs:restriction base="xs:string">
-							<xs:pattern value="\S+" />
-						</xs:restriction>
-					</xs:simpleType>
-				</xs:union>
-			</xs:simpleType>
 		</xs:attribute>
 	</xs:complexType>
 
@@ -292,8 +294,7 @@
 
 	<xs:complexType name="TragetLifecycle">
 		<xs:all>
-			<xs:element name="startPhase" type="xs:string"
-				minOccurs="0">
+			<xs:element name="startPhase" type="PhaseId" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						Start-Phase at which to start executing.
@@ -301,8 +302,7 @@
 					</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="stopPhase" type="xs:string"
-				minOccurs="0">
+			<xs:element name="stopPhase" type="PhaseId" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						Stop-Phase at which to stop executing.
@@ -311,7 +311,7 @@
 				</xs:annotation>
 			</xs:element>
 		</xs:all>
-		<xs:attribute name="id" type="xs:string" use="required" />
+		<xs:attribute name="id" type="LifecycleId" use="required" />
 	</xs:complexType>
 
 	<xs:complexType name="TragetPhases">
@@ -331,8 +331,7 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:all>
-					<xs:attribute name="id" type="xs:string"
-						use="required" />
+					<xs:attribute name="id" type="PhaseId" use="required" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
@@ -356,8 +355,7 @@
 							</xs:annotation>
 						</xs:element>
 					</xs:all>
-					<xs:attribute name="id" type="xs:string"
-						use="required" />
+					<xs:attribute name="id" type="PhaseId" use="required" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
@@ -368,11 +366,146 @@
 			<xs:element name="execution" minOccurs="0"
 				maxOccurs="unbounded">
 				<xs:complexType>
-					<xs:attribute name="id" type="xs:string"
+					<xs:attribute name="id" type="ExecutionId"
 						use="required" />
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
 	</xs:complexType>
+
+	<xs:simpleType name="AnyId">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\S+" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PackagingId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="pom" />
+					<xs:enumeration value="jar" />
+					<xs:enumeration value="maven-plugin" />
+					<xs:enumeration value="ejb" />
+					<xs:enumeration value="war" />
+					<xs:enumeration value="ear" />
+					<xs:enumeration value="rar" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ExecutionId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="LifecycleId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="PhaseId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<!-- Clean Lifecycle -->
+					<xs:enumeration value="pre-clean" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="post-clean" />
+					<!-- Default Lifecycle -->
+					<xs:enumeration value="validate" />
+					<xs:enumeration value="initialize" />
+					<xs:enumeration value="generate-sources" />
+					<xs:enumeration value="process-sources" />
+					<xs:enumeration value="generate-resources" />
+					<xs:enumeration value="process-resources" />
+					<xs:enumeration value="compile" />
+					<xs:enumeration value="process-classes" />
+					<xs:enumeration value="generate-test-sources" />
+					<xs:enumeration value="process-test-sources" />
+					<xs:enumeration value="generate-test-resources" />
+					<xs:enumeration value="process-test-resources" />
+					<xs:enumeration value="test-compile" />
+					<xs:enumeration value="process-test-classes" />
+					<xs:enumeration value="test" />
+					<xs:enumeration value="prepare-package" />
+					<xs:enumeration value="package" />
+					<xs:enumeration value="pre-integration-test" />
+					<xs:enumeration value="integration-test" />
+					<xs:enumeration value="post-integration-test" />
+					<xs:enumeration value="verify" />
+					<xs:enumeration value="install" />
+					<xs:enumeration value="deploy" />
+					<!-- Site Lifecycle -->
+					<xs:enumeration value="pre-site" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="post-site" />
+					<xs:enumeration value="site-deploy" />
+					<!-- R4M - Help Lifecycle -->
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ModeId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="dev" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ArtifactGroupId">
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.apache.maven.plugins" />
+					<xs:enumeration value="org.codehaus.mojo" />
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\S+" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
 
 </xs:schema>

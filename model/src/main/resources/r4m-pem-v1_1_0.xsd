@@ -375,11 +375,11 @@
 
 	<xs:simpleType name="AnyId">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="\S+" />
+			<xs:pattern value="\s*\S+\s*" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="PackagingId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="pom" />
@@ -391,29 +391,19 @@
 					<xs:enumeration value="rar" />
 				</xs:restriction>
 			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="ExecutionId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="default" />
 				</xs:restriction>
 			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="LifecycleId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="default" />
@@ -422,15 +412,10 @@
 					<xs:enumeration value="help" />
 				</xs:restriction>
 			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="PhaseId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<!-- Clean Lifecycle -->
@@ -470,39 +455,24 @@
 					<xs:enumeration value="help" />
 				</xs:restriction>
 			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="ModeId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="default" />
 					<xs:enumeration value="dev" />
 				</xs:restriction>
 			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
-				</xs:restriction>
-			</xs:simpleType>
 		</xs:union>
 	</xs:simpleType>
 	<xs:simpleType name="ArtifactGroupId">
-		<xs:union>
+		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="org.apache.maven.plugins" />
 					<xs:enumeration value="org.codehaus.mojo" />
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="\S+" />
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:union>

@@ -15,7 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class WhenCheck extends OrCheck {
 	protected boolean never = false;
 
 	public WhenCheck() {
-		super(new LinkedHashSet<>());
+		super();
 	}
 
 	@Override

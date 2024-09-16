@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.LinkedHashSet;
-
 public class GoalInfoCheck extends AndCheck {
 
 	protected final GroupIdCheck group = new GroupIdCheck();
@@ -24,7 +22,6 @@ public class GoalInfoCheck extends AndCheck {
 	protected final GoalCheck goal = new GoalCheck();
 
 	public GoalInfoCheck() {
-		super(new LinkedHashSet<>());
 		this.conditions.add(this.group);
 		this.conditions.add(this.artifact);
 		this.conditions.add(this.goal);

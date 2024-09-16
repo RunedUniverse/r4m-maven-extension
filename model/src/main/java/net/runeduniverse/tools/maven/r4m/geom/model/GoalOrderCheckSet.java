@@ -15,15 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.LinkedHashSet;
-
 import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
 public class GoalOrderCheckSet extends OrCheck {
 
 	public GoalOrderCheckSet() {
-		super(new LinkedHashSet<>());
+		super();
 	}
 
 	/**

@@ -15,8 +15,32 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class NotCheck extends NotCondition<Object> {
+public class LifecycleIdCheck extends ACheck {
 
+	protected String lifecycleId = null;
+
+	public String getPhaseId() {
+		return this.lifecycleId;
+	}
+
+	public void setPhaseId(String lifecycleId) {
+		this.lifecycleId = lifecycleId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.lifecycleId != null;
+	}
+
+	@Override
+	protected DataCheck<EntityData> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(RuntimeData data) {
+		return this.lifecycleId.equals(data.getLifecycleId());
+	}
 }

@@ -15,8 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class NotCheck extends NotCondition<Object> {
+public class ProfileProvidedCheck extends AProfileCheck {
 
+	@Override
+	protected boolean eval(RuntimeData data) {
+		return data.getProvidedProfileIds()
+				.contains(this.profileId);
+	}
 }

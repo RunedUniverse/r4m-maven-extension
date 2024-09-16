@@ -15,8 +15,30 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class NotCheck extends NotCondition<Object> {
+public abstract class AProfileCheck extends ACheck {
 
+	protected String profileId = null;
+
+	public String getProfileId() {
+		return this.profileId;
+	}
+
+	public void setProfileId(String executionId) {
+		this.profileId = executionId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.profileId != null;
+	}
+
+	@Override
+	protected DataCheck<EntityData> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected abstract boolean eval(RuntimeData data);
 }

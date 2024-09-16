@@ -15,19 +15,33 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.Collection;
-
-import net.runeduniverse.lib.utils.conditions.AndCondition;
-import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class AndCheck extends AndCondition<EntityData> {
+public class ExecutionIdCheck extends ACheck {
 
-	public AndCheck() {
-		super();
+	protected String executionId = null;
+
+	public String getExecutionId() {
+		return this.executionId;
 	}
 
-	public AndCheck(final Collection<Condition<EntityData>> conditions) {
-		super(conditions);
+	public void setExecutionId(String executionId) {
+		this.executionId = executionId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.executionId != null;
+	}
+
+	@Override
+	protected DataCheck<EntityData> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(RuntimeData data) {
+		return data.getActiveExecutionIds()
+				.contains(this.executionId);
 	}
 }

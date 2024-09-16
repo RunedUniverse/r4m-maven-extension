@@ -15,8 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public interface Check extends Recordable {
+public class ProfileInactiveCheck extends AProfileCheck {
 
+	@Override
+	protected boolean eval(RuntimeData data) {
+		return data.getInactiveProfileIds()
+				.contains(this.profileId);
+	}
 }

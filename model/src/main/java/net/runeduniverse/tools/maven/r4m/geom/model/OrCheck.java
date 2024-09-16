@@ -16,40 +16,18 @@
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
 import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.conditions.OrCondition;
+import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
-public class OrCheck implements Check {
-
-	protected Set<Check> checks = new LinkedHashSet<>();
+public class OrCheck extends OrCondition<EntityData> {
 
 	public OrCheck() {
+		super();
 	}
 
-	public Set<Check> getChecks() {
-		return this.checks;
+	public OrCheck(final Collection<Condition<EntityData>> conditions) {
+		super(conditions);
 	}
-
-	public void addCheck(Check check) {
-		this.checks.add(check);
-	}
-
-	public void addChecks(Collection<Check> checks) {
-		this.checks.addAll(checks);
-	}
-
-	@Override
-	public CompoundTree toRecord() {
-		return toRecord(new CompoundTree("or"));
-	}
-
-	protected CompoundTree toRecord(CompoundTree tree) {
-		for (Check check : this.checks) {
-			tree.append(check.toRecord());
-		}
-		return tree;
-	}
-
 }

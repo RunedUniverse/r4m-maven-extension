@@ -26,58 +26,50 @@
 	<modelVersion>1.0.0</modelVersion>
 	<goals>
 		<goal id="x">
-			<phases>
-				<phase id="package">
-					<after>
-						<goal id="x" source="plugin">
-							<artifactId>yy</artifactId>
-						</goal>
-					</after>
-				</phase>
-			</phases>
+			<dependents>
+				<goal id="x" source="plugin">
+					<artifactId>yy</artifactId>
+				</goal>
+			</dependents>
 		</goal>
 		<goal id="pack">
 			<groupId>
 				net.runeduniverse.tools.maven.r4m
 			</groupId>
 			<artifactId>r4m-maven-extension</artifactId>
-			<phases>
-				<phase id="package" lifecycle="default">
-					<before>
-						<goal id="pre-pack" source="workflow">
-							<groupId>
-								<!-- (opt - maven groupId) -->
-								net.runeduniverse.tools.maven.r4m
-							</groupId>
-							<artifactId>r4m-maven-extension</artifactId>
-							<when>
-								<!-- (opt - always) -->
-								<!-- conditions following each other inside the <when> block form 
-									an OR condition -->
-								<always />
-								<and>
-									<execution id="pipeline" />
-									<packaging id="jar" />
-									<lifecycle id="clean" />
-									<profile id="dev-install" state="inactive" />
-									<not>
-										<profile id="build" state="provided" />
-									</not>
-								</and>
-							</when>
-						</goal>
-					</before>
-					<after>
-						<goal id="wrap-pack">
-							<groupId>
-								<!-- (opt - maven groupId) -->
-								net.runeduniverse.tools.maven.r4m
-							</groupId>
-							<artifactId>r4m-maven-extension</artifactId>
-						</goal>
-					</after>
-				</phase>
-			</phases>
+			<dependencies>
+				<goal id="pre-pack" source="workflow">
+					<groupId>
+						<!-- (opt - maven groupId) -->
+						net.runeduniverse.tools.maven.r4m
+					</groupId>
+					<artifactId>r4m-maven-extension</artifactId>
+					<when>
+						<!-- (opt - always) -->
+						<!-- conditions following each other inside the <when> block form an 
+							OR condition -->
+						<always />
+						<and>
+							<execution id="pipeline" />
+							<packaging id="jar" />
+							<lifecycle id="clean" />
+							<profile id="dev-install" state="inactive" />
+							<not>
+								<profile id="build" state="provided" />
+							</not>
+						</and>
+					</when>
+				</goal>
+			</dependencies>
+			<dependents>
+				<goal id="wrap-pack">
+					<groupId>
+						<!-- (opt - maven groupId) -->
+						net.runeduniverse.tools.maven.r4m
+					</groupId>
+					<artifactId>r4m-maven-extension</artifactId>
+				</goal>
+			</dependents>
 		</goal>
 
 	</goals>

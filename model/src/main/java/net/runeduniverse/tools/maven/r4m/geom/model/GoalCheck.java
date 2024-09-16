@@ -15,64 +15,43 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
 
-public class WhenCheck extends OrCheck {
+public class GoalCheck extends ACheck {
 
-	protected boolean always = false;
-	protected boolean never = false;
+	protected String goal = null;
 
-	public WhenCheck() {
-		super(new LinkedHashSet<>());
+	public String getGoal() {
+		return this.goal;
 	}
 
-	@Override
-	public String getType() {
-		return "when";
-	}
-
-	public boolean getAlwaysActive() {
-		return this.always;
-	}
-
-	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
+	public void setGoal(String goalId) {
+		this.goal = goalId;
 	}
 
 	@Override
 	public boolean isValid() {
-		if (this.always || this.never)
-			return true;
-		return super.isValid();
+		return this.goal != null;
 	}
 
 	@Override
-	public boolean evaluate(EntityData entity) {
-		if (this.always)
-			return true;
-		if (this.never)
-			return false;
-		return super.evaluate(entity);
+	protected DataCheck<EntityData> check() {
+		return and(nonNull(), goal(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(GoalData data) {
+		return this.goal.equals(data.getGoalId());
 	}
 
 	@Override
 	public List<ConditionInfo> getInfo() {
 		final List<ConditionInfo> lst = new LinkedList<>();
-		lst.add(new DefaultConditionInfo("always", Boolean.toString(this.always)));
-		lst.add(new DefaultConditionInfo("never", Boolean.toString(this.never)));
+		lst.add(new DefaultConditionInfo("goalId", this.goal));
 		return lst;
 	}
 }

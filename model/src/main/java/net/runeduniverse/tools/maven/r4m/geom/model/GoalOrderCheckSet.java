@@ -15,8 +15,26 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import java.util.LinkedHashSet;
 
-public class NotCheck extends NotCondition<Object> {
+import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
+public class GoalOrderCheckSet extends OrCheck {
+
+	public GoalOrderCheckSet() {
+		super(new LinkedHashSet<>());
+	}
+
+	/**
+	 * @throws ClassCastException if the added value is not an instance of
+	 *                            GoalOrderCheck
+	 */
+	@Override
+	public boolean add(Condition<EntityData> condition) {
+		if (condition instanceof GoalOrderCheck)
+			return super.add(condition);
+		throw new ClassCastException(
+				"The added object is not an instance of " + GoalOrderCheck.class.getCanonicalName());
+	}
 }

@@ -92,6 +92,10 @@
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-conditions</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
 		</dependency>
 	</dependencies>

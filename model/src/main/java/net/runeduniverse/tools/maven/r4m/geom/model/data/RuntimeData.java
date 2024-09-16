@@ -13,10 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.geom.model;
+package net.runeduniverse.tools.maven.r4m.geom.model.data;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import java.util.Set;
 
-public class NotCheck extends NotCondition<Object> {
+public interface RuntimeData {
 
+	public String getLifecycleId();
+
+	public String getPhaseId();
+
+	public Set<String> getModes();
+
+	public Set<String> getActiveProfileIds();
+
+	public Set<String> getInactiveProfileIds();
+
+	public Set<String> getMissingProfileIds();
+
+	public Set<String> getProvidedProfileIds();
+
+	public Set<String> getActiveExecutionIds();
 }

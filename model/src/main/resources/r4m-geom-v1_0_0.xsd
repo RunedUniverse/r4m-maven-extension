@@ -47,27 +47,12 @@
 			<xs:element name="artifactId" type="AnyId" minOccurs="0">
 				<!-- (opt - from plugin) -->
 			</xs:element>
-			<xs:element name="phases" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="phase" type="Phase" minOccurs="0"
-							maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="dependencies" type="RefGoalGroup"
+				minOccurs="0" />
+			<xs:element name="dependents" type="RefGoalGroup"
+				minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="AnyId" use="required" />
-	</xs:complexType>
-
-	<xs:complexType name="Phase">
-		<xs:all>
-			<xs:element name="before" type="RefGoalGroup"
-				minOccurs="0" />
-			<xs:element name="after" type="RefGoalGroup" minOccurs="0" />
-		</xs:all>
-		<xs:attribute name="id" type="PhaseId" use="required" />
-		<xs:attribute name="lifecycle" type="LifecycleId"
-			use="optional" />
 	</xs:complexType>
 
 	<xs:complexType name="RefGoalGroup">
@@ -123,6 +108,7 @@
 			<xs:element name="execution" type="ExecutionCheck" />
 			<xs:element name="packaging" type="PackagingCheck" />
 			<xs:element name="lifecycle" type="LifecycleCheck" />
+			<xs:element name="phase" type="PhaseCheck" />
 			<xs:element name="profile" type="ProfileCheck" />
 			<xs:element name="and" type="CheckBranch" />
 			<xs:element name="or" type="CheckBranch" />
@@ -142,6 +128,9 @@
 	</xs:complexType>
 	<xs:complexType name="LifecycleCheck">
 		<xs:attribute name="id" type="LifecycleId" use="required" />
+	</xs:complexType>
+	<xs:complexType name="PhaseCheck">
+		<xs:attribute name="id" type="PhaseId" use="required" />
 	</xs:complexType>
 	<xs:complexType name="ProfileCheck">
 		<xs:attribute name="id" type="AnyId" use="required" />

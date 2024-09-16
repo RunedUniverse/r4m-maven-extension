@@ -16,64 +16,90 @@
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
+import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
+import net.runeduniverse.lib.utils.conditions.tools.Entry;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
 public class GoalSelector implements Recordable {
 
-	private final Set<PhaseSelector> phases = new LinkedHashSet<>();
-
-	private String groupId = null;
-	private String artifactId = null;
-	private String goalId = null;
+	protected final GoalInfoCheck goalInfo = new GoalInfoCheck();
+	protected final GoalOrderCheckSet dependencies = new GoalOrderCheckSet();
+	protected final GoalOrderCheckSet dependents = new GoalOrderCheckSet();
+	protected final Entry<EntityData> entry = new Entry<EntityData>(this.goalInfo, this.dependencies, this.dependents);
 
 	public GoalSelector() {
 	}
 
 	public GoalSelector(String groupId, String artifactId, String goalId) {
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.goalId = goalId;
+		this.goalInfo.setGroupId(groupId);
+		this.goalInfo.setArtifactId(artifactId);
+		this.goalInfo.setGoalId(goalId);
+	}
+
+	public Entry<EntityData> asEntry() {
+		return entry;
 	}
 
 	public String getGroupId() {
-		return this.groupId;
+		return this.goalInfo.getGroupId();
+	}
+
+	public void setGroupId(String groupId) {
+		this.goalInfo.setGroupId(groupId);
 	}
 
 	public String getArtifactId() {
-		return this.artifactId;
+		return this.goalInfo.getArtifactId();
+	}
+
+	public void setArtifactId(String artifactId) {
+		this.goalInfo.setArtifactId(artifactId);
 	}
 
 	public String getGoalId() {
-		return this.goalId;
+		return this.goalInfo.getGoalId();
 	}
 
-	public Set<PhaseSelector> getPhaseSelector() {
-		return Collections.unmodifiableSet(this.phases);
+	public void setGoalId(String goalId) {
+		this.goalInfo.setGoalId(goalId);
 	}
 
-	public void addPhaseSelector(PhaseSelector selector) {
-		this.phases.add(selector);
+	public GoalOrderCheckSet getDependencies() {
+		return this.dependencies;
 	}
 
-	public void addPhaseSelector(Collection<PhaseSelector> selector) {
-		this.phases.addAll(selector);
+	public GoalOrderCheckSet getDependents() {
+		return this.dependents;
+	}
+
+	public void addDependency(GoalOrderCheck info) {
+		this.dependencies.add(info);
+	}
+
+	public void addDependent(GoalOrderCheck info) {
+		this.dependents.add(info);
+	}
+
+	public void addDependencies(Collection<GoalOrderCheck> infos) {
+		for (GoalOrderCheck info : infos)
+			this.dependencies.add(info);
+	}
+
+	public void addDependents(Collection<GoalOrderCheck> infos) {
+		for (GoalOrderCheck info : infos)
+			this.dependents.add(info);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("GoalSelector");
+		final ConditionIndexer indexer = new ConditionIndexer();
+		final CompoundTree tree = new CompoundTree("GoalSelector");
 
-		tree.append("groupId", this.groupId);
-		tree.append("artifactId", this.artifactId);
-		tree.append("goalId", this.goalId);
-
-		for (Recordable selector : this.phases)
-			tree.append(selector.toRecord());
+		indexer.toRecord(this.goalInfo);
+		indexer.toRecord(this.dependencies);
+		indexer.toRecord(this.dependents);
 
 		return tree;
 	}

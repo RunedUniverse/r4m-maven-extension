@@ -15,14 +15,19 @@
  */
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
-import java.util.LinkedHashSet;
+import java.util.Collection;
 
 import net.runeduniverse.lib.utils.conditions.OrCondition;
+import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
 public class OrCheck extends OrCondition<EntityData> {
 
 	public OrCheck() {
-		super(new LinkedHashSet<>());
+		super();
+	}
+
+	public OrCheck(final Collection<Condition<EntityData>> conditions) {
+		super(conditions);
 	}
 }

@@ -72,5 +72,115 @@
 			</dependents>
 		</goal>
 
+		<!-- example : formatting -->
+
+		<goal id="format">
+			<groupId>net.revelc.code.formatter</groupId>
+			<artifactId>formatter-maven-plugin</artifactId>
+			<dependents>
+				<goal id="format" source="plugin">
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<goal id="format">
+			<groupId>com.mycila</groupId>
+			<artifactId>license-maven-plugin</artifactId>
+			<dependencies>
+				<goal id="format" source="plugin">
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+				</goal>
+			</dependencies>
+		</goal>
+
+		<!-- example : compile -->
+
+		<goal id="compile">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<dependents>
+				<goal id="testCompile" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<!-- example : packaging -->
+
+		<goal id="test-jar">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<dependencies>
+				<goal id="jar" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+				</goal>
+			</dependencies>
+		</goal>
+
+		<goal id="test-jar-no-fork">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<dependencies>
+				<goal id="jar-no-fork" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+				</goal>
+			</dependencies>
+		</goal>
+
+		<goal id="test-jar">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-javadoc-plugin</artifactId>
+			<dependencies>
+				<goal id="jar" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+				</goal>
+			</dependencies>
+		</goal>
+
+		<!-- example : artifact attachment -->
+
+		<goal id="attach-artifact">
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>build-helper-maven-plugin</artifactId>
+			<dependents>
+				<goal id="install" source="workflow">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</goal>
+				<goal id="deploy" source="workflow">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<goal id="sign">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-gpg-plugin</artifactId>
+			<dependencies>
+				<goal id="attach-artifact" source="workflow">
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+				</goal>
+			</dependencies>
+			<dependents>
+				<goal id="install" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</goal>
+				<goal id="deploy" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
 	</goals>
 </goal-execution-order-model>

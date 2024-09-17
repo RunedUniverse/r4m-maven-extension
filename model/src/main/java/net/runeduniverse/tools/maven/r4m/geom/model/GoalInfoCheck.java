@@ -63,6 +63,6 @@ public class GoalInfoCheck extends AndCheck {
 
 	@Override
 	public boolean isValid() {
-		return this.group.isValid() && this.artifact.isValid() && this.goal.isValid() && super.isValid();
+		return this.group.isValid() && this.artifact.isValid() && this.goal.isValid();
 	}
 }

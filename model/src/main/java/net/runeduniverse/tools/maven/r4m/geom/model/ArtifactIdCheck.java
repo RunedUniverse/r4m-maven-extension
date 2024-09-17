@@ -22,7 +22,7 @@ import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
 
-public class ArtifactIdCheck extends ACheck {
+public class ArtifactIdCheck extends DefaultCheck {
 
 	protected String artifactId = null;
 

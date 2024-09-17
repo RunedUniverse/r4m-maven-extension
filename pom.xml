@@ -112,6 +112,14 @@
 	<profiles>
 		<profile>
 			<id>dev-install</id>
+			<repositories>
+				<!-- dev-repo contains: development builds -->
+				<repository>
+					<id>runeduniverse-development</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-development/</url>
+				</repository>
+			</repositories>
 			<build>
 				<defaultGoal>clean formatter:format license:format install</defaultGoal>
 			</build>

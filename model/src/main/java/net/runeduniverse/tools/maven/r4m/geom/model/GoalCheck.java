@@ -22,7 +22,7 @@ import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
 
-public class GoalCheck extends ACheck {
+public class GoalCheck extends DefaultCheck {
 
 	protected String goal = null;
 

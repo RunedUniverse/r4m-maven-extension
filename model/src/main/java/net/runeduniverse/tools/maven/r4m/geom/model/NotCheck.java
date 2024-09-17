@@ -16,7 +16,8 @@
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
 import net.runeduniverse.lib.utils.conditions.NotCondition;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 
-public class NotCheck extends NotCondition<Object> {
+public class NotCheck extends NotCondition<EntityData> {
 
 }

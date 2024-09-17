@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.geom.model;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
 
 import net.runeduniverse.lib.utils.conditions.AndCondition;
 import net.runeduniverse.lib.utils.conditions.api.Condition;
@@ -24,7 +25,7 @@ import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 public class AndCheck extends AndCondition<EntityData> {
 
 	public AndCheck() {
-		super();
+		super(new LinkedHashSet<>());
 	}
 
 	public AndCheck(final Collection<Condition<EntityData>> conditions) {

@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.geom.model;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class LifecycleIdCheck extends ACheck {
+public class LifecycleIdCheck extends DefaultCheck {
 
 	protected String lifecycleId = null;
 

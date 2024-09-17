@@ -21,7 +21,7 @@ import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.ProjectData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public abstract class ACheck implements Condition<EntityData> {
+public abstract class DefaultCheck implements Condition<EntityData> {
 
 	@Override
 	public boolean evaluate(EntityData entity) {

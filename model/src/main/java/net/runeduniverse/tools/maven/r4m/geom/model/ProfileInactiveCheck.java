@@ -17,7 +17,7 @@ package net.runeduniverse.tools.maven.r4m.geom.model;
 
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class ProfileInactiveCheck extends AProfileCheck {
+public class ProfileInactiveCheck extends DefaultProfileCheck {
 
 	@Override
 	protected boolean eval(RuntimeData data) {

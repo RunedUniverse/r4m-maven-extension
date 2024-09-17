@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.geom.model;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class ExecutionIdCheck extends ACheck {
+public class ExecutionIdCheck extends DefaultCheck {
 
 	protected String executionId = null;
 

@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.geom.model;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public class PhaseIdCheck extends ACheck {
+public class PhaseIdCheck extends DefaultCheck {
 
 	protected String phaseId = null;
 

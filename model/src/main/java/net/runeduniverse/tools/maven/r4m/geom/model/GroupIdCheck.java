@@ -22,7 +22,7 @@ import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
 
-public class GroupIdCheck extends ACheck {
+public class GroupIdCheck extends DefaultCheck {
 
 	protected String groupId = null;
 

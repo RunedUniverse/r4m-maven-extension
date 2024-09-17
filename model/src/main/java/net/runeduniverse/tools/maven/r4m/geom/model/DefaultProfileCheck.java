@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.geom.model;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
 import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 
-public abstract class AProfileCheck extends ACheck {
+public abstract class DefaultProfileCheck extends DefaultCheck {
 
 	protected String profileId = null;
 

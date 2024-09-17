@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.model;
+package net.runeduniverse.tools.maven.r4m.geom.model;
 
 public interface ModelProperties {
 
-	public static String MODEL_VERSION = "1.1.0";
+	public static String MODEL_VERSION = "1.0.0";
 
 }

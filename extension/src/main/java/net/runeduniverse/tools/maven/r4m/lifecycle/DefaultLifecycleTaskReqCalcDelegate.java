@@ -44,9 +44,8 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 	@Requirement
 	private DefaultLifecycles defaultLifeCycles;
 
-	protected void modifyEntry(final Entry entry, final boolean plain) {
-		// modify Entry after parsing
-	}
+	// modify Entry after parsing
+	protected abstract void modifyEntry(final Entry entry, final boolean plain);
 
 	protected Entry parseEntry(String phase) {
 		final Entry entry = new Entry(false, false, true);
@@ -291,7 +290,5 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 		public void setInclude(boolean include) {
 			this.include = include;
 		}
-
 	}
-
 }

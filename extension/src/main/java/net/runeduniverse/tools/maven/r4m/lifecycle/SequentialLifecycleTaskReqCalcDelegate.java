@@ -33,13 +33,14 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 
 	@Override
 	protected void modifyEntry(final Entry entry, final boolean plain) {
-		entry.setBefore(true);
+		if (plain)
+			entry.setBefore(true);
 	}
 
 	@Override
 	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
 			throws LifecyclePhaseNotFoundException {
-		List<String> sequence = new LinkedList<>();
+		final List<String> sequence = new LinkedList<>();
 		for (String phase : lifecycle.getPhases()) {
 			sequence.add(phase);
 			if (phase.equals(phaseId))
@@ -47,5 +48,4 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 		}
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}
-
 }

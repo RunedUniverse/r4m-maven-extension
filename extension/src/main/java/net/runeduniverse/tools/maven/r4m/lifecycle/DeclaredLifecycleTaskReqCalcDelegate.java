@@ -39,9 +39,8 @@ public class DeclaredLifecycleTaskReqCalcDelegate extends DefaultLifecycleTaskRe
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}
 
-	// Nothing to modify!
-	// @Override
-	// protected void modifyEntry(final Entry entry, final boolean plain) {
-	// }
-
+	@Override
+	protected void modifyEntry(final Entry entry, final boolean plain) {
+		// Nothing to modify!
+	}
 }

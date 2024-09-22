@@ -243,7 +243,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			PluginVersionResolutionException, LifecyclePhaseNotFoundException {
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-		ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+		final ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
 				.selectActiveProject(project)
 				.selectAllActiveProfiles(project.getActiveProfiles())
 				.selectPackagingProcedure(project.getPackaging());
@@ -265,21 +265,21 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
-				GoalTaskData data = (GoalTaskData) task;
+				final GoalTaskData data = (GoalTaskData) task;
 
-				MojoDescriptor mojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(data.getGoalTask(),
+				final MojoDescriptor mojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(data.getGoalTask(),
 						session, project);
 
-				MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor, data.getExecutions()[0],
-						MojoExecution.Source.CLI, selectorConfig.clone()
+				final MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor,
+						data.getExecutions()[0], MojoExecution.Source.CLI, selectorConfig.clone()
 								.selectModes("default")
 								.selectActiveExecutions(data.getPrimaryExecutionOrDefault("default-cli")));
 
 				mojoExecutions.add(mojoExecution);
 			} else if (task instanceof LifecycleTaskData) {
-				LifecycleTaskData taskData = (LifecycleTaskData) task;
+				final LifecycleTaskData taskData = (LifecycleTaskData) task;
 
-				ExecutionArchiveSelectorConfig taskSelectorConfig = selectorConfig.clone();
+				final ExecutionArchiveSelectorConfig taskSelectorConfig = selectorConfig.clone();
 				if (taskData.hasValidModes())
 					taskSelectorConfig.selectModes(taskData.getModes());
 				else
@@ -288,8 +288,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				final ExecutionArchiveSelection selection = this.selector
 						.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions()));
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
-					Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session, project,
-							request, selection);
+					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
+							project, request, selection);
 					for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
 						for (MojoExecution exec : mojoExecutionsFromLifecycle) {
 							if (this.settings.getGeneratePluginExecutions()
@@ -334,14 +334,14 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected void generatePluginExecutions(final MavenProject mvnProject, final MojoExecution mojoExecution) {
-		Build build = mvnProject.getBuild();
-		String groupId = mojoExecution.getGroupId();
-		String artifactId = mojoExecution.getArtifactId();
-		String goal = mojoExecution.getGoal();
-		String executionId = mojoExecution.getExecutionId();
+		final Build build = mvnProject.getBuild();
+		final String groupId = mojoExecution.getGroupId();
+		final String artifactId = mojoExecution.getArtifactId();
+		final String goal = mojoExecution.getGoal();
+		final String executionId = mojoExecution.getExecutionId();
 
 		Plugin plugin = findPlugin(groupId, artifactId, build.getPlugins());
-		Plugin managedPlugin = findPlugin(groupId, artifactId, build.getPluginManagement()
+		final Plugin managedPlugin = findPlugin(groupId, artifactId, build.getPluginManagement()
 				.getPlugins());
 
 		Object cnfObj = null;
@@ -413,7 +413,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		if (configuration == null)
 			return true;
 		if (configuration instanceof Xpp3Dom) {
-			Xpp3Dom dom = (Xpp3Dom) configuration;
+			final Xpp3Dom dom = (Xpp3Dom) configuration;
 			return isBlank(dom.getValue()) && dom.getChildCount() == 0;
 		}
 		return false;
@@ -436,16 +436,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	 *                      finalized, must not be {@code null}.
 	 */
 	protected void finalizeMojoConfiguration(final MojoExecution mojoExecution) {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
 		Xpp3Dom executionConfiguration = mojoExecution.getConfiguration();
 		if (executionConfiguration == null) {
 			executionConfiguration = new Xpp3Dom("configuration");
 		}
 
-		Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
+		final Xpp3Dom defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
 
-		Xpp3Dom finalConfiguration = new Xpp3Dom("configuration");
+		final Xpp3Dom finalConfiguration = new Xpp3Dom("configuration");
 
 		if (mojoDescriptor.getParameters() != null) {
 			for (Parameter parameter : mojoDescriptor.getParameters()) {
@@ -455,7 +455,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
 				}
 
-				Xpp3Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
+				final Xpp3Dom parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
 				parameterConfiguration = Xpp3Dom.mergeXpp3Dom(parameterConfiguration, parameterDefaults, Boolean.TRUE);
 
@@ -490,7 +490,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
 		boolean isForkingGoal = false;
 		if (mojoDescriptor.isForking()) {
@@ -514,7 +514,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		Fork fork = null;
 		ExecutionArchiveSelectorConfig selectorConfig = null;
 		if (mojoExecution instanceof MojoExecutionData) {
-			MojoExecutionData data = (MojoExecutionData) mojoExecution;
+			final MojoExecutionData data = (MojoExecutionData) mojoExecution;
 			fork = data.getFork();
 			selectorConfig = data.getExecutionArchiveSelectorConfig();
 			// NOTE currently forked goals are not recorded in {@link Fork}
@@ -527,11 +527,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			// mojoExecution missing the MojoExecutionData interface
 			if (!isForkingGoal) {
 				fork = new Fork();
-				String lifecycleId = mojoDescriptor.getExecuteLifecycle();
-				String phaseId = mojoDescriptor.getExecutePhase();
+				final String lifecycleId = mojoDescriptor.getExecuteLifecycle();
+				final String phaseId = mojoDescriptor.getExecutePhase();
 				if (isBlank(lifecycleId)) {
-					Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
-					List<TargetPhase> phases = new LinkedList<>();
+					final Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
+					final List<TargetPhase> phases = new LinkedList<>();
 					for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
 							.getPhaseSequence())
 						phases.add(new TargetPhase(phase));
@@ -545,7 +545,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					 * phase of the lifecycle as phaseId! Since we expect the developer in question
 					 * wanted to execute the target lifecycle in its entirety!
 					 */
-					TargetLifecycle lifecycle = new TargetLifecycle(lifecycleId);
+					final TargetLifecycle lifecycle = new TargetLifecycle(lifecycleId);
 					if (!isBlank(phaseId))
 						lifecycle.setStopPhase(phaseId);
 					fork.setLifecycle(lifecycle);
@@ -573,7 +573,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 
 		// actually process the execution forking
-		List<MavenProject> forkedProjects = LifecycleDependencyResolver.getProjects(project, session,
+		final List<MavenProject> forkedProjects = LifecycleDependencyResolver.getProjects(project, session,
 				mojoDescriptor.isAggregator());
 
 		for (MavenProject forkedProject : forkedProjects) {
@@ -581,7 +581,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				this.lifecyclePluginResolver.resolveMissingPluginVersions(forkedProject, session);
 			}
 
-			List<MojoExecution> forkedExecutions;
+			final List<MojoExecution> forkedExecutions;
 
 			if (isForkingGoal) {
 				forkedExecutions = calculateForkedGoal(session, forkedProject, mojoExecution, alreadyForkedForks,
@@ -605,7 +605,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		String start = null;
 		String stop = null;
 
-		List<TargetPhase> phases = fork.getPhases();
+		final List<TargetPhase> phases = fork.getPhases();
 		if (phases != null && !phases.isEmpty()) {
 			for (TargetPhase phase : phases) {
 				if (start == null)
@@ -642,7 +642,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-		ExecutionArchiveSelectorConfig cnf = this.selectorConfigFactory.createEmptyConfig();
+		final ExecutionArchiveSelectorConfig cnf = this.selectorConfigFactory.createEmptyConfig();
 
 		// select mvnProject
 		cnf.selectActiveProject(project);
@@ -676,7 +676,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		// (defined by the plugin that forks & defines configs for lifecycle/phase)
 		injectLifecycleOverlay(lifecycleMappings, session, project, mojoExecution, fork.getLifecycleId());
 
-		List<MojoExecution> mappings = new LinkedList<>();
+		final List<MojoExecution> mappings = new LinkedList<>();
 		for (Entry<String, List<MojoExecution>> entry : lifecycleMappings.entrySet())
 			if (entry.getValue() != null)
 				for (MojoExecution exec : entry.getValue()) {
@@ -695,16 +695,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		final Map<String, Set<String>> definedExecutionsPerPhase = new LinkedHashMap<>();
 		final Map<String, Set<String>> excludedExecutionsPerPhase = new LinkedHashMap<>(0);
 		// seed executing phases which might be defined
-		List<String> phases = new LinkedList<>();
+		final List<String> phases = new LinkedList<>();
 		if (fork.getPhases() != null)
 			for (TargetPhase phase : fork.getPhases()) {
 				phases.add(phase.getId());
 				definedExecutionsPerPhase.put(phase.getId(), phase.getExecutions());
 			}
 		// seed phases if not set & existent from lifecycle
-		TargetLifecycle targetLifecycle = fork.getLifecycle();
+		final TargetLifecycle targetLifecycle = fork.getLifecycle();
 		if (targetLifecycle != null && phases.isEmpty()) {
-			Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
+			final Lifecycle mvnLifecycle = this.lifecycles.get(targetLifecycle.getId());
 			if (mvnLifecycle == null) {
 				this.log.warn(String.format(WARN_SKIPPING_UNKNOWN_LIFECYCLE, Runes4MavenProperties.PREFIX_ID,
 						targetLifecycle.getId()));
@@ -729,22 +729,22 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		selection.modify(views -> {
 			for (ExecutionView exec : views) {
-				String executionId = exec.getId();
+				final String executionId = exec.getId();
 				for (LifecycleView lifecycle : exec.getLifecycles()
 						.values())
 					for (Iterator<PhaseView> iPhase = lifecycle.getPhases()
 							.values()
 							.iterator(); iPhase.hasNext();) {
-						String phaseId = iPhase.next()
+						final String phaseId = iPhase.next()
 								.getId();
-						Set<String> requiredExecutions = definedExecutionsPerPhase.get(phaseId);
+						final Set<String> requiredExecutions = definedExecutionsPerPhase.get(phaseId);
 						// if executions are explicitly defined, only run those
 						if (requiredExecutions == null
 								|| !requiredExecutions.isEmpty() && !requiredExecutions.contains(executionId)) {
 							iPhase.remove();
 							continue;
 						}
-						Set<String> excludedExecutions = excludedExecutionsPerPhase.get(phaseId);
+						final Set<String> excludedExecutions = excludedExecutionsPerPhase.get(phaseId);
 						if (excludedExecutions != null) {
 							if (excludedExecutions.isEmpty())
 								iPhase.remove();
@@ -763,7 +763,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			MojoNotFoundException, InvalidPluginDescriptorException, LifecyclePhaseNotFoundException {
 
 		final ExecutionArchiveSelection selection = this.selector.compileSelection(cnf);
-		List<String> orderedPhases = calculateExecutingPhasesByFork(selection, fork);
+		final List<String> orderedPhases = calculateExecutingPhasesByFork(selection, fork);
 
 		// Initialize mapping from lifecycle phase to bound mojos.
 		final Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
@@ -795,15 +795,15 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			String forkedLifecycleId) throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			PluginVersionResolutionException {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
-		PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+		final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		final PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
 		if (isBlank(forkedLifecycleId))
 			forkedLifecycleId = mojoDescriptor.getExecuteLifecycle();
 		if (isBlank(forkedLifecycleId))
 			return;
 
-		org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
+		final org.apache.maven.plugin.lifecycle.Lifecycle lifecycleOverlay;
 
 		try {
 			lifecycleOverlay = pluginDescriptor.getLifecycleMapping(forkedLifecycleId);
@@ -825,7 +825,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 			final Map<MojoDescriptor, Map<String, Object>> mappedConfigurations = new LinkedHashMap<>();
 			for (Execution execution : phase.getExecutions()) {
-				Object executionConfiguration = execution.getConfiguration();
+				final Object executionConfiguration = execution.getConfiguration();
 
 				for (String goal : execution.getGoals()) {
 					String executionId = null;
@@ -833,7 +833,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					if (0 < splitIdx)
 						executionId = goal.substring(splitIdx + 1);
 
-					MojoDescriptor forkedMojoDescriptor;
+					final MojoDescriptor forkedMojoDescriptor;
 					if (goal.indexOf(':') < 0) {
 						forkedMojoDescriptor = pluginDescriptor.getMojo(goal);
 						if (forkedMojoDescriptor == null)
@@ -851,8 +851,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			}
 
 			for (MojoExecution mojoExec : forkedExecutions) {
-				MojoDescriptor mojoDesc = mojoExec.getMojoDescriptor();
-				Map<String, Object> configurations = mappedConfigurations.get(mojoDesc);
+				final MojoDescriptor mojoDesc = mojoExec.getMojoDescriptor();
+				final Map<String, Object> configurations = mappedConfigurations.get(mojoDesc);
 				if (configurations == null)
 					continue;
 				Object configuration = configurations.get(mojoExec.getExecutionId());
@@ -864,7 +864,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				selectExecutionConfigurator(mojoExec).configure(project, mojoExec, true);
 			}
 
-			Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
+			final Xpp3Dom phaseConfiguration = (Xpp3Dom) phase.getConfiguration();
 			if (phaseConfiguration != null)
 				for (MojoExecution forkedExecution : forkedExecutions) {
 					Xpp3Dom forkedConfiguration = forkedExecution.getConfiguration();
@@ -888,13 +888,13 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+		final MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
-		PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+		final PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
 
-		String forkedGoal = mojoDescriptor.getExecuteGoal();
+		final String forkedGoal = mojoDescriptor.getExecuteGoal();
 
-		MojoDescriptor forkedMojoDescriptor = pluginDescriptor.getMojo(forkedGoal);
+		final MojoDescriptor forkedMojoDescriptor = pluginDescriptor.getMojo(forkedGoal);
 		if (forkedMojoDescriptor == null) {
 			throw new MojoNotFoundException(forkedGoal, pluginDescriptor);
 		}
@@ -903,7 +903,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			return Collections.emptyList();
 		}
 
-		String executionId = mojoExecution.getExecutionId();
+		final String executionId = mojoExecution.getExecutionId();
 		MojoExecutionAdapter forkedExecution;
 		if (mojoExecution instanceof MojoExecutionData)
 			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,

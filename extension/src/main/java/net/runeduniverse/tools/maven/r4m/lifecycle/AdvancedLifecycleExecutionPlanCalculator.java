@@ -161,7 +161,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			boolean setup) throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
 			NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
-		lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
+		this.lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
 
 		final List<MojoExecution> executions = calculateMojoExecutions(session, project, resolveTasks(tasks));
 
@@ -171,7 +171,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		final List<ExecutionPlanItem> planItem = ExecutionPlanItem.createExecutionPlanItems(project, executions);
 
-		return new MavenExecutionPlan(planItem, defaultLifeCycles);
+		return new MavenExecutionPlan(planItem, this.defaultLifeCycles);
 	}
 
 	@Override
@@ -199,7 +199,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
 
 		if (mojoDescriptor == null) {
-			mojoDescriptor = pluginManager.getMojoDescriptor(mojoExecution.getPlugin(), mojoExecution.getGoal(),
+			mojoDescriptor = this.pluginManager.getMojoDescriptor(mojoExecution.getPlugin(), mojoExecution.getGoal(),
 					project.getRemotePluginRepositories(), session.getRepositorySession());
 
 			mojoExecution.setMojoDescriptor(mojoDescriptor);
@@ -310,31 +310,27 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		 * Determine the lifecycle that corresponds to the given phase.
 		 */
 
-		Lifecycle lifecycle = taskRequest.getLifecycle();
-		AdvancedLifecycleMappingDelegate delegate;
-		if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
-			delegate = standardDelegate;
-		} else {
-			delegate = lifecycleMappingDelegates.get(lifecycle.getId());
-			if (delegate == null) {
-				delegate = standardDelegate;
-			}
-		}
+		final Lifecycle lifecycle = taskRequest.getLifecycle();
+		final AdvancedLifecycleMappingDelegate delegate = selectAdvancedLifecycleMappingDelegate(lifecycle);
 
-		Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
+		final Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
 
 		for (String phase : taskRequest.getPhaseSequence())
-			for (Entry<String, List<MojoExecution>> item : delegate
-					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection)
-					.entrySet()) {
-				List<MojoExecution> col = phaseToMojoMapping.get(item.getKey());
-				if (col == null)
-					phaseToMojoMapping.put(item.getKey(), item.getValue());
-				else
-					col.addAll(item.getValue());
-			}
+			addPhaseToMojoMappings(phaseToMojoMapping,
+					delegate.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection));
 
 		return phaseToMojoMapping;
+	}
+
+	protected void addPhaseToMojoMappings(final Map<String, List<MojoExecution>> base,
+			final Map<String, List<MojoExecution>> addition) {
+		for (Entry<String, List<MojoExecution>> item : addition.entrySet()) {
+			final List<MojoExecution> col = base.get(item.getKey());
+			if (col == null)
+				base.put(item.getKey(), item.getValue());
+			else
+				col.addAll(item.getValue());
+		}
 	}
 
 	protected void generatePluginExecutions(final MavenProject mvnProject, final MojoExecution mojoExecution) {
@@ -582,7 +578,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		for (MavenProject forkedProject : forkedProjects) {
 			if (forkedProject != project) {
-				lifecyclePluginResolver.resolveMissingPluginVersions(forkedProject, session);
+				this.lifecyclePluginResolver.resolveMissingPluginVersions(forkedProject, session);
 			}
 
 			List<MojoExecution> forkedExecutions;
@@ -660,7 +656,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		// select executions
 		cnf.selectActiveExecutions(fork.getExecutions());
 
-		Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork, cnf);
+		final Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork, cnf);
 
 		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
 			for (MojoExecution forkedExecution : forkedExecutions) {
@@ -770,7 +766,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		List<String> orderedPhases = calculateExecutingPhasesByFork(selection, fork);
 
 		// Initialize mapping from lifecycle phase to bound mojos.
-		Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
+		final Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
 		for (String phase : orderedPhases) {
 
 			Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
@@ -779,30 +775,14 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, Runes4MavenProperties.PREFIX_ID, phase),
 						phase);
 
-			AdvancedLifecycleMappingDelegate delegate;
-			if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
-				delegate = standardDelegate;
-			} else {
-				delegate = lifecycleMappingDelegates.get(lifecycle.getId());
-				if (delegate == null) {
-					delegate = standardDelegate;
-				}
-			}
+			final AdvancedLifecycleMappingDelegate delegate = selectAdvancedLifecycleMappingDelegate(lifecycle);
 
-			for (Entry<String, List<MojoExecution>> item : delegate
-					.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection)
-					.entrySet()) {
-				List<MojoExecution> col = phaseToMojoMapping.get(item.getKey());
-				if (col == null)
-					phaseToMojoMapping.put(item.getKey(), item.getValue());
-				else
-					col.addAll(item.getValue());
-			}
-
+			addPhaseToMojoMappings(phaseToMojoMapping,
+					delegate.calculateLifecycleMappings(mvnSession, mvnProject, lifecycle, phase, selection));
 		}
 
 		// reduce and order MojoExecution's
-		Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
+		final Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
 		for (String phase : orderedPhases)
 			lifecycleMappings.put(phase, phaseToMojoMapping.get(phase));
@@ -838,12 +818,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			((MojoExecutionData) mojoExecution).setLifecycleOverlayOrigin(pluginDescriptor);
 
 		for (Phase phase : lifecycleOverlay.getPhases()) {
-			List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
+			final List<MojoExecution> forkedExecutions = lifecycleMappings.get(phase.getId());
 
 			if (forkedExecutions == null)
 				continue;
 
-			Map<MojoDescriptor, Map<String, Object>> mappedConfigurations = new LinkedHashMap<>();
+			final Map<MojoDescriptor, Map<String, Object>> mappedConfigurations = new LinkedHashMap<>();
 			for (Execution execution : phase.getExecutions()) {
 				Object executionConfiguration = execution.getConfiguration();
 
@@ -959,6 +939,19 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return lifecycleTaskReqCalcDelegate;
 	}
 
+	protected AdvancedLifecycleMappingDelegate selectAdvancedLifecycleMappingDelegate(final Lifecycle lifecycle) {
+		AdvancedLifecycleMappingDelegate delegate;
+		if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
+			delegate = this.standardDelegate;
+		} else {
+			delegate = this.lifecycleMappingDelegates.get(lifecycle.getId());
+			if (delegate == null) {
+				delegate = this.standardDelegate;
+			}
+		}
+		return delegate;
+	}
+
 	protected MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
 		String configuratorId = mojoExecution.getMojoDescriptor()
 				.getComponentConfigurator();
@@ -966,7 +959,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			configuratorId = "default";
 		}
 
-		MojoExecutionConfigurator mojoExecutionConfigurator = mojoExecutionConfigurators.get(configuratorId);
+		MojoExecutionConfigurator mojoExecutionConfigurator = this.mojoExecutionConfigurators.get(configuratorId);
 
 		if (mojoExecutionConfigurator == null) {
 			//
@@ -974,7 +967,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			// mojo execution configurator
 			// so fall back to the default mojo execution configurator.
 			//
-			mojoExecutionConfigurator = mojoExecutionConfigurators.get("default");
+			mojoExecutionConfigurator = this.mojoExecutionConfigurators.get("default");
 		}
 		return mojoExecutionConfigurator;
 	}

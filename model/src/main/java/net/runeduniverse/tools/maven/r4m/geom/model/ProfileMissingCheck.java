@@ -21,7 +21,7 @@ public class ProfileMissingCheck extends DefaultProfileCheck {
 
 	@Override
 	protected boolean eval(RuntimeData data) {
-		return data.getMissingProfileIds()
+		return !data.getProvidedProfileIds()
 				.contains(this.profileId);
 	}
 }

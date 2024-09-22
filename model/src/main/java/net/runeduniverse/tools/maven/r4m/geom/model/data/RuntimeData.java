@@ -29,8 +29,6 @@ public interface RuntimeData {
 
 	public Set<String> getInactiveProfileIds();
 
-	public Set<String> getMissingProfileIds();
-
 	public Set<String> getProvidedProfileIds();
 
 	public Set<String> getActiveExecutionIds();

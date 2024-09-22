@@ -17,9 +17,9 @@ package net.runeduniverse.tools.maven.r4m.geom.model.data;
 
 public interface ProjectData {
 
-	public String getPackaging();
-
 	public String getGroupId();
 
 	public String getArtifactId();
+
+	public String getPackaging();
 }

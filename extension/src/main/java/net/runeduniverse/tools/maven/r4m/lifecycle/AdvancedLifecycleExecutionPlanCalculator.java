@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -72,6 +73,12 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.geom.DefaultGeomArchive;
+import net.runeduniverse.tools.maven.r4m.geom.data.DefaultGeomDataFactory;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.GoalData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.ProjectData;
+import net.runeduniverse.tools.maven.r4m.geom.model.data.RuntimeData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.AdvancedLifecycleMappingDelegate;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.GoalTaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskData;
@@ -137,6 +144,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement(role = AdvancedLifecycleMappingDelegate.class)
 	private Map<String, AdvancedLifecycleMappingDelegate> lifecycleMappingDelegates;
+
+	@Requirement
+	private DefaultGeomDataFactory geomDataFactory;
+
+	@Requirement
+	private DefaultGeomArchive geomArchive;
 
 	@Requirement(role = MojoExecutionConfigurator.class)
 	private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
@@ -290,6 +303,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
 					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
 							project, request, selection);
+					sortMojosByProxy(selectorConfig, phaseToMojoMapping);
 					for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
 						for (MojoExecution exec : mojoExecutionsFromLifecycle) {
 							if (this.settings.getGeneratePluginExecutions()
@@ -330,6 +344,32 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				base.put(item.getKey(), item.getValue());
 			else
 				col.addAll(item.getValue());
+		}
+	}
+
+	protected void sortMojosByProxy(final ExecutionArchiveSelectorConfig selectorConfig,
+			final Map<String, List<MojoExecution>> phaseToMojoMapping) {
+		final ProjectData projectData = this.geomDataFactory.createProjectData(selectorConfig.getActiveProject());
+		final Comparator<EntityData> comparator = this.geomArchive.getComparator();
+
+		for (Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
+			final List<MojoExecution> executions = entry.getValue();
+			final Map<EntityData, MojoExecution> proxyMap = new LinkedHashMap<>();
+			final RuntimeData runtimeData = this.geomDataFactory.createRuntimeData(selectorConfig, entry.getKey());
+
+			for (MojoExecution mojoExec : executions) {
+				final GoalData goalData = this.geomDataFactory.createGoalData(mojoExec);
+				proxyMap.put(this.geomDataFactory.createEntityData(projectData, runtimeData, goalData), mojoExec);
+			}
+
+			final List<EntityData> entityList = new LinkedList<>();
+			entityList.addAll(proxyMap.keySet());
+			entityList.sort(comparator);
+
+			executions.clear();
+			for (EntityData entity : entityList) {
+				executions.add(proxyMap.get(entity));
+			}
 		}
 	}
 
@@ -658,10 +698,12 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 		final Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork, cnf);
 
+		sortMojosByProxy(cnf, lifecycleMappings);
+
 		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
 			for (MojoExecution forkedExecution : forkedExecutions) {
 				if (forkedExecution.getMojoDescriptor() == null) {
-					MojoDescriptor forkedMojoDescriptor = this.pluginManager.getMojoDescriptor(
+					final MojoDescriptor forkedMojoDescriptor = this.pluginManager.getMojoDescriptor(
 							forkedExecution.getPlugin(), forkedExecution.getGoal(),
 							project.getRemotePluginRepositories(), session.getRepositorySession());
 
@@ -769,7 +811,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		final Map<String, List<MojoExecution>> phaseToMojoMapping = new LinkedHashMap<>();
 		for (String phase : orderedPhases) {
 
-			Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
+			final Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
 			if (lifecycle == null)
 				throw new LifecyclePhaseNotFoundException(
 						String.format(ERR_UNKNOWN_LIFECYCLE_PHASE_ON_FORK, Runes4MavenProperties.PREFIX_ID, phase),

@@ -147,16 +147,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				// outdated version of the plexus-utils
 				realm = world.getRealm("plexus.core")
 						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.api");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.eventspy.api");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.model");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.restrictions");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.trigger");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.restrictions");
-				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m");
+				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils");
 			}
 
 			Thread.currentThread()

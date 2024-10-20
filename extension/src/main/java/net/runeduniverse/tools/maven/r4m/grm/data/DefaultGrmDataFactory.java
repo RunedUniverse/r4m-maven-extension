@@ -30,7 +30,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.data.RuntimeData;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 @Component(role = GoalRequirementDataFactory.class)
-public class DefaultGrmDataFactory implements GoalRequirementDataFactory{
+public class DefaultGrmDataFactory implements GoalRequirementDataFactory {
 
 	@Requirement
 	protected DefaultLifecycles defaultLifeCycles;

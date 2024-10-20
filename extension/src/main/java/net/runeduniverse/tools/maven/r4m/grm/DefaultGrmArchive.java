@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.grm.model.data.EntityData;
 
 @Component(role = GoalRequirementArchive.class, instantiationStrategy = "keep-alive")
-public class DefaultGrmArchive implements GoalRequirementArchive{
+public class DefaultGrmArchive implements GoalRequirementArchive {
 
 	public Comparator<EntityData> getComparator() {
 		// TODO implement

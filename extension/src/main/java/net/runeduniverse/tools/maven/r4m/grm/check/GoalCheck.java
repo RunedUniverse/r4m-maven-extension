@@ -13,40 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultEntityData implements EntityView {
+public class GoalCheck extends DefaultCheck {
 
-	protected ProjectView project = null;
-	protected RuntimeView runtime = null;
-	protected GoalView goal = null;
+	protected String goal = null;
 
-	protected DefaultEntityData() {
-	}
-
-	public DefaultEntityData(final ProjectView projectData, final RuntimeView runtimeData, final GoalView goalData) {
-		this.project = projectData;
-		this.runtime = runtimeData;
-		this.goal = goalData;
-	}
-
-	@Override
-	public ProjectView getProject() {
-		return this.project;
-	}
-
-	@Override
-	public RuntimeView getRuntime() {
-		return this.runtime;
-	}
-
-	@Override
-	public GoalView getGoal() {
+	public String getGoal() {
 		return this.goal;
+	}
+
+	public void setGoal(String goalId) {
+		this.goal = goalId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.goal != null;
+	}
+
+	@Override
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), goal(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(GoalView data) {
+		return this.goal.equals(data.getGoalId());
+	}
+
+	@Override
+	public List<ConditionInfo> getInfo() {
+		final List<ConditionInfo> lst = new LinkedList<>();
+		lst.add(new DefaultConditionInfo("goalId", this.goal));
+		return lst;
 	}
 }

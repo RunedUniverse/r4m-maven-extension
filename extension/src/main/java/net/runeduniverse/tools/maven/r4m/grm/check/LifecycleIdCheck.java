@@ -13,14 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
-
-import java.util.Comparator;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public interface GoalRequirementArchive {
+public class LifecycleIdCheck extends DefaultCheck {
 
-	public Comparator<EntityView> getComparator();
+	protected String lifecycleId = null;
 
+	public String getPhaseId() {
+		return this.lifecycleId;
+	}
+
+	public void setPhaseId(String lifecycleId) {
+		this.lifecycleId = lifecycleId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.lifecycleId != null;
+	}
+
+	@Override
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(RuntimeView data) {
+		return this.lifecycleId.equals(data.getLifecycleId());
+	}
 }

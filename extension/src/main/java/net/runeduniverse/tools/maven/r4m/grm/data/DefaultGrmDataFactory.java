@@ -23,10 +23,10 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementDataFactory;
-import net.runeduniverse.tools.maven.r4m.grm.model.data.EntityData;
-import net.runeduniverse.tools.maven.r4m.grm.model.data.GoalData;
-import net.runeduniverse.tools.maven.r4m.grm.model.data.ProjectData;
-import net.runeduniverse.tools.maven.r4m.grm.model.data.RuntimeData;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 @Component(role = GoalRequirementDataFactory.class)
@@ -35,23 +35,23 @@ public class DefaultGrmDataFactory implements GoalRequirementDataFactory {
 	@Requirement
 	protected DefaultLifecycles defaultLifeCycles;
 
-	public ProjectData createProjectData(final MavenProject mvnProject) {
+	public ProjectView createProjectData(final MavenProject mvnProject) {
 		return new DefaultProjectData(mvnProject.getGroupId(), mvnProject.getArtifactId(), mvnProject.getPackaging());
 	}
 
-	public RuntimeData createRuntimeData(final ExecutionArchiveSelectorConfig cnf, final String phase) {
+	public RuntimeView createRuntimeData(final ExecutionArchiveSelectorConfig cnf, final String phase) {
 		final Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
 		return new DefaultRuntimeData(lifecycle == null ? null : lifecycle.getId(), phase, cnf.getModes(),
 				cnf.getActiveProfiles(), cnf.getInactiveProfiles(), cnf.getProvidedProfiles(),
 				cnf.getActiveExecutions());
 	}
 
-	public GoalData createGoalData(final MojoExecution mojoExecution) {
+	public GoalView createGoalData(final MojoExecution mojoExecution) {
 		return new DefaultGoalData(mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getGoal());
 	}
 
-	public EntityData createEntityData(final ProjectData projectData, final RuntimeData runtimeData,
-			final GoalData goalData) {
+	public EntityView createEntityData(final ProjectView projectData, final RuntimeView runtimeData,
+			final GoalView goalData) {
 		return new DefaultEntityData(projectData, runtimeData, goalData);
 	}
 }

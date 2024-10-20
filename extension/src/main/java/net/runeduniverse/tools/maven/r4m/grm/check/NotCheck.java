@@ -13,14 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import java.util.Comparator;
-
+import net.runeduniverse.lib.utils.conditions.NotCondition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
-public interface GoalRequirementArchive {
-
-	public Comparator<EntityView> getComparator();
+public class NotCheck extends NotCondition<EntityView> {
 
 }

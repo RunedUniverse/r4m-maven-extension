@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
+package net.runeduniverse.tools.maven.r4m.grm.view.api;
 
-import java.util.Comparator;
+import java.util.Set;
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+public interface RuntimeView {
 
-public interface GoalRequirementArchive {
+	public String getLifecycleId();
 
-	public Comparator<EntityView> getComparator();
+	public String getPhaseId();
 
+	public Set<String> getModes();
+
+	public Set<String> getActiveProfileIds();
+
+	public Set<String> getInactiveProfileIds();
+
+	public Set<String> getProvidedProfileIds();
+
+	public Set<String> getActiveExecutionIds();
 }

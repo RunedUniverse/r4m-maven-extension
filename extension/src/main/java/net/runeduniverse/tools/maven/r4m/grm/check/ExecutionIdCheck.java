@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
-
-import java.util.Comparator;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public interface GoalRequirementArchive {
+public class ExecutionIdCheck extends DefaultCheck {
 
-	public Comparator<EntityView> getComparator();
+	protected String executionId = null;
 
+	public String getExecutionId() {
+		return this.executionId;
+	}
+
+	public void setExecutionId(String executionId) {
+		this.executionId = executionId;
+	}
+
+	@Override
+	public boolean isValid() {
+		return this.executionId != null;
+	}
+
+	@Override
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(RuntimeView data) {
+		return data.getActiveExecutionIds()
+				.contains(this.executionId);
+	}
 }

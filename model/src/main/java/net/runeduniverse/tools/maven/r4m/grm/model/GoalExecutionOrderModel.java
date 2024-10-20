@@ -25,7 +25,7 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class GoalExecutionOrderModel implements Recordable {
 
-	private final Set<GoalSelector> goals = new LinkedHashSet<>(0);
+	private final Set<Recordable> goals = new LinkedHashSet<>(0);
 
 	private String version = null;
 	private Class<?> parserType = null;
@@ -57,7 +57,7 @@ public class GoalExecutionOrderModel implements Recordable {
 		return this.effective;
 	}
 
-	public Set<GoalSelector> getGoalSelector() {
+	public Set<Recordable> getGoalSelector() {
 		return Collections.unmodifiableSet(this.goals);
 	}
 
@@ -74,11 +74,11 @@ public class GoalExecutionOrderModel implements Recordable {
 		this.effective = value;
 	}
 
-	public void addGoalSelector(GoalSelector selector) {
+	public void addGoalSelector(Recordable selector) {
 		this.goals.add(selector);
 	}
 
-	public void addGoalSelector(Collection<GoalSelector> selector) {
+	public void addGoalSelector(Collection<Recordable> selector) {
 		this.goals.addAll(selector);
 	}
 

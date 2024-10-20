@@ -13,40 +13,45 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultEntityData implements EntityView {
+public class GroupIdCheck extends DefaultCheck {
 
-	protected ProjectView project = null;
-	protected RuntimeView runtime = null;
-	protected GoalView goal = null;
+	protected String groupId = null;
 
-	protected DefaultEntityData() {
+	public String getGroupId() {
+		return this.groupId;
 	}
 
-	public DefaultEntityData(final ProjectView projectData, final RuntimeView runtimeData, final GoalView goalData) {
-		this.project = projectData;
-		this.runtime = runtimeData;
-		this.goal = goalData;
+	public void setGroupId(String groupId) {
+		this.groupId = groupId;
 	}
 
 	@Override
-	public ProjectView getProject() {
-		return this.project;
+	public boolean isValid() {
+		return this.groupId != null;
 	}
 
 	@Override
-	public RuntimeView getRuntime() {
-		return this.runtime;
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), goal(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(GoalView data) {
+		return this.groupId.equals(data.getGroupId());
 	}
 
 	@Override
-	public GoalView getGoal() {
-		return this.goal;
+	public List<ConditionInfo> getInfo() {
+		final List<ConditionInfo> lst = new LinkedList<>();
+		lst.add(new DefaultConditionInfo("groupId", this.groupId));
+		return lst;
 	}
 }

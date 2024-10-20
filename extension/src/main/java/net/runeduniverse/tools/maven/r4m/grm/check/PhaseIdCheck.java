@@ -13,37 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultGoalData implements GoalView {
+public class PhaseIdCheck extends DefaultCheck {
 
-	protected String groupId;
-	protected String artifactId;
-	protected String goalId;
+	protected String phaseId = null;
 
-	protected DefaultGoalData() {
+	public String getPhaseId() {
+		return this.phaseId;
 	}
 
-	public DefaultGoalData(final String groupId, final String artifactId, final String goalId) {
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.goalId = goalId;
-	}
-
-	@Override
-	public String getGroupId() {
-		return this.groupId;
+	public void setPhaseId(String phaseId) {
+		this.phaseId = phaseId;
 	}
 
 	@Override
-	public String getArtifactId() {
-		return this.artifactId;
+	public boolean isValid() {
+		return this.phaseId != null;
 	}
 
 	@Override
-	public String getGoalId() {
-		return this.goalId;
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
+	}
+
+	protected boolean eval(RuntimeView data) {
+		return this.phaseId.equals(data.getPhaseId());
 	}
 }

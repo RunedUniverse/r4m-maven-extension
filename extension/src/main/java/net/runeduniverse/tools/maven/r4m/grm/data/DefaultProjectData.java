@@ -15,9 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.data;
 
-import net.runeduniverse.tools.maven.r4m.grm.model.data.ProjectData;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 
-public class DefaultProjectData implements ProjectData {
+public class DefaultProjectData implements ProjectView {
 
 	protected String groupId;
 	protected String artifactId;

@@ -23,15 +23,15 @@ import net.runeduniverse.lib.utils.conditions.tools.ConditionComparator;
 import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
 import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
-import net.runeduniverse.tools.maven.r4m.grm.model.data.EntityData;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 @Component(role = GoalRequirementArchive.class, instantiationStrategy = "keep-alive")
 public class DefaultGrmArchive implements GoalRequirementArchive {
 
-	public Comparator<EntityData> getComparator() {
+	public Comparator<EntityView> getComparator() {
 		// TODO implement
-		final EntrySet<EntityData> set = new EntrySet<>();
+		final EntrySet<EntityView> set = new EntrySet<>();
 		set.compile(new ConditionIndexer());
-		return new ConditionComparator<EntityData>(set);
+		return new ConditionComparator<EntityView>(set);
 	}
 }

@@ -13,14 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import java.util.Comparator;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 
+import net.runeduniverse.lib.utils.conditions.AndCondition;
+import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
-public interface GoalRequirementArchive {
+public class AndCheck extends AndCondition<EntityView> {
 
-	public Comparator<EntityView> getComparator();
+	public AndCheck() {
+		super(new LinkedHashSet<>());
+	}
 
+	public AndCheck(final Collection<Condition<EntityView>> conditions) {
+		super(conditions);
+	}
 }

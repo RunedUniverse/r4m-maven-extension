@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
+package net.runeduniverse.tools.maven.r4m.grm.view.api;
 
-import java.util.Comparator;
+public interface ProjectView {
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+	public String getGroupId();
 
-public interface GoalRequirementArchive {
+	public String getArtifactId();
 
-	public Comparator<EntityView> getComparator();
-
+	public String getPackaging();
 }

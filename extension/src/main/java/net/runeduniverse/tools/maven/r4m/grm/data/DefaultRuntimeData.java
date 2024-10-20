@@ -18,9 +18,9 @@ package net.runeduniverse.tools.maven.r4m.grm.data;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.tools.maven.r4m.grm.model.data.RuntimeData;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultRuntimeData implements RuntimeData {
+public class DefaultRuntimeData implements RuntimeView {
 
 	protected final Set<String> modes = new LinkedHashSet<>();
 	protected final Set<String> activeProfileIds = new LinkedHashSet<>();

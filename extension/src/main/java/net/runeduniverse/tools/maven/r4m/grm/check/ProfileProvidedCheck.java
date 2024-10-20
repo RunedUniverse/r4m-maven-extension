@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.api;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import java.util.Comparator;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+public class ProfileProvidedCheck extends DefaultProfileCheck {
 
-public interface GoalRequirementArchive {
-
-	public Comparator<EntityView> getComparator();
-
+	@Override
+	protected boolean eval(RuntimeView data) {
+		return data.getProvidedProfileIds()
+				.contains(this.profileId);
+	}
 }

@@ -13,37 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultGoalData implements GoalView {
+public abstract class DefaultProfileCheck extends DefaultCheck {
 
-	protected String groupId;
-	protected String artifactId;
-	protected String goalId;
+	protected String profileId = null;
 
-	protected DefaultGoalData() {
+	public String getProfileId() {
+		return this.profileId;
 	}
 
-	public DefaultGoalData(final String groupId, final String artifactId, final String goalId) {
-		this.groupId = groupId;
-		this.artifactId = artifactId;
-		this.goalId = goalId;
-	}
-
-	@Override
-	public String getGroupId() {
-		return this.groupId;
+	public void setProfileId(String executionId) {
+		this.profileId = executionId;
 	}
 
 	@Override
-	public String getArtifactId() {
-		return this.artifactId;
+	public boolean isValid() {
+		return this.profileId != null;
 	}
 
 	@Override
-	public String getGoalId() {
-		return this.goalId;
+	protected DataCheck<EntityView> check() {
+		return and(nonNull(), runtime(and(nonNull(), this::eval)));
 	}
+
+	protected abstract boolean eval(RuntimeView data);
 }

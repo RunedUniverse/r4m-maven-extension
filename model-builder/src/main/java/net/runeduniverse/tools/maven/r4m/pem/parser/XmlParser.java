@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.apache.commons.io.input.XmlStreamReader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -58,19 +58,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 	@Override
 	public void parseModel(ProjectExecutionModel pem, InputStream input) throws Exception {
-		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-
-		// Apache Maven 3.8.4
-		// injects the wrong or no plexus-utils
-		// as such we forcefully load it with a different ClassRealm see
-		// net.runeduniverse.tools.maven.r4m.R4MLifecycleParticipant
-		// and pull the class directly from parent
-		// Reader reader = new XmlStreamReader(input);
-		Class<?> xmlStreamReader = currentRealm.loadClassFromParent("org.codehaus.plexus.util.xml.XmlStreamReader");
-		Reader reader = (Reader) xmlStreamReader.getConstructor(InputStream.class)
-				.newInstance(input);
-
+		final Reader reader = new XmlStreamReader(input);
 		PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));

@@ -47,6 +47,7 @@
 			<xs:element name="artifactId" type="AnyId" minOccurs="0">
 				<!-- (opt - from plugin) -->
 			</xs:element>
+			<xs:element name="when" type="WhenCheck" minOccurs="0" />
 			<xs:element name="dependencies" type="RefGoalGroup"
 				minOccurs="0" />
 			<xs:element name="dependents" type="RefGoalGroup"
@@ -67,20 +68,7 @@
 			<xs:element name="groupId" type="ArtifactGroupId"
 				minOccurs="0" default="org.apache.maven.plugins" />
 			<xs:element name="artifactId" type="AnyId" />
-			<xs:element name="when" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="always" minOccurs="0" maxOccurs="1">
-							<xs:complexType />
-						</xs:element>
-						<xs:element name="never" minOccurs="0" maxOccurs="1">
-							<xs:complexType />
-						</xs:element>
-						<xs:group ref="CheckGroup" minOccurs="0"
-							maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="when" type="WhenCheck" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="AnyId" use="required" />
 		<xs:attribute name="source" use="optional"
@@ -119,6 +107,19 @@
 			</xs:element>
 		</xs:choice>
 	</xs:group>
+
+	<xs:complexType name="WhenCheck">
+		<xs:sequence>
+			<xs:element name="always" minOccurs="0" maxOccurs="1">
+				<xs:complexType />
+			</xs:element>
+			<xs:element name="never" minOccurs="0" maxOccurs="1">
+				<xs:complexType />
+			</xs:element>
+			<xs:group ref="CheckGroup" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
 
 	<xs:complexType name="ExecutionCheck">
 		<xs:attribute name="id" type="ExecutionId" use="required" />

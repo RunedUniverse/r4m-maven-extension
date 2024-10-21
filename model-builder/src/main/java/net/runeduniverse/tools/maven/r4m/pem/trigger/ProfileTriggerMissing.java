@@ -52,10 +52,9 @@ public class ProfileTriggerMissing extends ProfileTrigger {
 			return true;
 		if (!(obj instanceof ProfileTriggerMissing))
 			return false;
-		ProfileTriggerMissing trigger = (ProfileTriggerMissing) obj;
+		final ProfileTriggerMissing trigger = (ProfileTriggerMissing) obj;
 		if (getProfileId() == null)
-			if (trigger.getProfileId() != null)
-				return false;
+			return trigger.getProfileId() == null;
 		return getProfileId().equals(trigger.getProfileId());
 	}
 

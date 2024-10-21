@@ -47,6 +47,8 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
 		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
 			projectSlice.register(parser.parse(mvnProject));
+
+		// TODO call grm parser!
 	}
 
 }

@@ -93,7 +93,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			if (pluginFile.isFile()) {
 				try (JarFile pluginJar = new JarFile(pluginFile, false)) {
 					ZipEntry executionDescriptorEntry = pluginJar
-							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
+							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
 
 					if (executionDescriptorEntry != null) {
 						try (InputStream is = pluginJar.getInputStream(executionDescriptorEntry)) {
@@ -102,7 +102,8 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 					}
 				}
 			} else {
-				File executionXml = new File(pluginFile, Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
+				File executionXml = new File(pluginFile,
+						Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
 
 				if (executionXml.isFile()) {
 					try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {

@@ -25,20 +25,17 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class GoalRequirementModel implements Recordable {
 
-	private final Set<GoalContainer> goals = new LinkedHashSet<>(0);
+	protected final Set<GoalContainer> goals = new LinkedHashSet<>(0);
 
-	private String version = null;
-	private Class<?> parserType = null;
-	private String parserHint = null;
-	private boolean effective = false;
+	protected String version = null;
+	protected Class<?> parserType = null;
+	protected String parserHint = null;
+	protected boolean effective = false;
+	protected String defaultGroupId = null;
+	protected String defaultArtifactId = null;
+	protected ExecutionSource defaultSource = ExecutionSource.PLUGIN;
 
 	public GoalRequirementModel() {
-		this.parserHint = null;
-	}
-
-	public GoalRequirementModel(final Class<?> parserType, final String parserHint) {
-		this.parserType = parserType;
-		this.parserHint = parserHint;
 	}
 
 	public String getVersion() {
@@ -57,7 +54,19 @@ public class GoalRequirementModel implements Recordable {
 		return this.effective;
 	}
 
-	public Set<GoalContainer> getGoalSelector() {
+	public String getDefaultGroupId() {
+		return this.defaultGroupId;
+	}
+
+	public String getDefaultArtifactId() {
+		return this.defaultArtifactId;
+	}
+
+	public ExecutionSource getDefaultSource() {
+		return this.defaultSource;
+	}
+
+	public Set<GoalContainer> getGoalContainer() {
 		return Collections.unmodifiableSet(this.goals);
 	}
 
@@ -72,6 +81,18 @@ public class GoalRequirementModel implements Recordable {
 
 	public void setEffective(boolean value) {
 		this.effective = value;
+	}
+
+	public void setDefaultGroupId(final String defaultGroupId) {
+		this.defaultGroupId = defaultGroupId;
+	}
+
+	public void setDefaultArtifactId(final String defaultArtifactId) {
+		this.defaultArtifactId = defaultArtifactId;
+	}
+
+	public void setDefaultSource(final ExecutionSource defaultSource) {
+		this.defaultSource = defaultSource;
 	}
 
 	public void addGoalContainer(GoalContainer container) {

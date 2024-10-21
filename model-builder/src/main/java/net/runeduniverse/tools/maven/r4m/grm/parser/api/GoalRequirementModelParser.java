@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder;
+package net.runeduniverse.tools.maven.r4m.grm.parser.api;
 
-import org.codehaus.plexus.component.annotations.Component;
+import java.io.InputStream;
 
-import net.runeduniverse.tools.maven.r4m.grm.builder.api.GoalRequirementModelBuilder;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
-@Component(role = GoalRequirementModelBuilder.class, hint = "default")
-public class DefaultGoalRequirementModelBuilder implements GoalRequirementModelBuilder {
+public interface GoalRequirementModelParser {
+
+	public void parseModel(final GoalRequirementModel grm, final InputStream input) throws Exception;
 
 }

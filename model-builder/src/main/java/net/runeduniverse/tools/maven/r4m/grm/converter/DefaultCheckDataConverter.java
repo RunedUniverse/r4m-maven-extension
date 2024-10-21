@@ -25,7 +25,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.AbstractCheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
@@ -38,13 +38,14 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
-@Component(role = AbstractCheckDataFactory.class, hint = "default")
-public class DefaultAbstractCheckDataFactory implements AbstractCheckDataFactory {
+@Component(role = CheckDataConverter.class, hint = "default")
+public class DefaultCheckDataConverter implements CheckDataConverter {
 
 	@Requirement(role = CheckDataFactory.class)
 	protected Map<String, CheckDataFactory> factories;
 
-	public GoalContainer createContainer(final PlexusConfiguration cnf, final String defaultGroupId,
+	@Override
+	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId, final ExecutionSource defaultSource) {
 		final PlexusConfiguration preqCnf = cnf.getChild("prerequisites", true);
 		final PlexusConfiguration depCnf = cnf.getChild("dependents", true);
@@ -56,16 +57,19 @@ public class DefaultAbstractCheckDataFactory implements AbstractCheckDataFactory
 		final GoalContainer containerData = new GoalContainer(match, new OrDataGroup(), new OrDataGroup());
 
 		for (PlexusConfiguration entry : preqCnf.getChildren()) {
-			containerData.addPrerequisiteEntry(collectRequirementData(entry, defaultSource));
+			containerData.addPrerequisiteEntry(
+					collectRequirementData(entry, defaultGroupId, defaultArtifactId, defaultSource));
 		}
 		for (PlexusConfiguration entry : depCnf.getChildren()) {
-			containerData.addDependentEntry(collectRequirementData(entry, defaultSource));
+			containerData
+					.addDependentEntry(collectRequirementData(entry, defaultGroupId, defaultArtifactId, defaultSource));
 		}
 
 		return containerData;
 	}
 
-	public DataEntry createEntry(final PlexusConfiguration cnf) {
+	@Override
+	public DataEntry convertEntry(final PlexusConfiguration cnf) {
 		if (cnf == null)
 			return null;
 		final CheckDataFactory factory = this.factories.get(cnf.getName());
@@ -103,7 +107,7 @@ public class DefaultAbstractCheckDataFactory implements AbstractCheckDataFactory
 		for (PlexusConfiguration child : cnf.getChildren()) {
 			if (child == groupIdCnf || child == artifactIdCnf)
 				continue;
-			final DataEntry entry = createEntry(child);
+			final DataEntry entry = convertEntry(child);
 			if (entry == null)
 				continue;
 			group.addEntry(entry);
@@ -112,20 +116,21 @@ public class DefaultAbstractCheckDataFactory implements AbstractCheckDataFactory
 		return group;
 	}
 
-	protected DataGroup collectRequirementData(PlexusConfiguration cnf, final ExecutionSource defaultSource) {
+	protected DataGroup collectRequirementData(PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId, final ExecutionSource defaultSource) {
 		final MergeDataGroup group = new MergeDataGroup();
 		final PlexusConfiguration groupIdCnf = cnf.getChild("groupId", true);
 		final PlexusConfiguration artifactIdCnf = cnf.getChild("artifactId", true);
 
 		group.setSource(ExecutionSource.create(cnf.getAttribute("source", defaultSource.key())));
 		group.addEntry(new GoalIdData().setGoalId(cnf.getAttribute("id")));
-		group.addEntry(new GroupIdData().setGroupId(groupIdCnf.getValue("org.apache.maven.plugins")));
-		group.addEntry(new ArtifactIdData().setArtifactId(artifactIdCnf.getValue()));
+		group.addEntry(new GroupIdData().setGroupId(groupIdCnf.getValue(defaultGroupId)));
+		group.addEntry(new ArtifactIdData().setArtifactId(artifactIdCnf.getValue(defaultArtifactId)));
 
 		for (PlexusConfiguration child : cnf.getChildren()) {
 			if (child == groupIdCnf || child == artifactIdCnf)
 				continue;
-			final DataEntry entry = createEntry(child);
+			final DataEntry entry = convertEntry(child);
 			if (entry == null)
 				continue;
 			group.addEntry(entry);

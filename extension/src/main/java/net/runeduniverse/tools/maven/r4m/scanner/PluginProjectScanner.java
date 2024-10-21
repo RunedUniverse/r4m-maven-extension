@@ -44,7 +44,7 @@ public class PluginProjectScanner implements MavenProjectScanner {
 	}
 
 	private boolean isIdentifiable(final Set<Plugin> unidentifiablePlugins, Plugin mvnPlugin) {
-		if (unidentifiablePlugins.contains(mvnPlugin))
+		if (mvnPlugin == null || unidentifiablePlugins.contains(mvnPlugin))
 			return false;
 
 		if (mvnPlugin.getVersion() == null) {
@@ -58,15 +58,18 @@ public class PluginProjectScanner implements MavenProjectScanner {
 	@Override
 	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
 			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
-		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-				if (isIdentifiable(unidentifiablePlugins, mvnPlugin))
-					try {
+		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
+			if (isIdentifiable(unidentifiablePlugins, mvnPlugin))
+				try {
+					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
 						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
 								mvnSession.getRepositorySession(), mvnPlugin));
-					} catch (PluginResolutionException e) {
-						unidentifiablePlugins.add(mvnPlugin);
-					}
+
+					// TODO call grm parser!
+				} catch (PluginResolutionException e) {
+					unidentifiablePlugins.add(mvnPlugin);
+				}
+		}
 	}
 
 }

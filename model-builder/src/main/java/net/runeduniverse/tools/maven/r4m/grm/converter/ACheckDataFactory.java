@@ -19,18 +19,18 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.lib.utils.common.StringUtils;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.AbstractCheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 
 public abstract class ACheckDataFactory implements CheckDataFactory {
 
-	@Requirement(role = AbstractCheckDataFactory.class)
-	protected AbstractCheckDataFactory factory;
+	@Requirement(role = CheckDataConverter.class)
+	protected CheckDataConverter factory;
 
 	protected DataEntry convertEntry(final PlexusConfiguration cnf) {
-		return this.factory.createEntry(cnf);
+		return this.factory.convertEntry(cnf);
 	}
 
 	protected boolean addConvertedEntry(final DataGroup group, final PlexusConfiguration cnf) {

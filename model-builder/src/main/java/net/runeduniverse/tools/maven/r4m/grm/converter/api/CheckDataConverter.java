@@ -13,8 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder.api;
+package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 
-public interface GoalRequirementModelBuilder {
+import org.codehaus.plexus.configuration.PlexusConfiguration;
+
+import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
+
+public interface CheckDataConverter {
+
+	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId, final ExecutionSource defaultSource);
+
+	public DataEntry convertEntry(final PlexusConfiguration cnf);
 
 }

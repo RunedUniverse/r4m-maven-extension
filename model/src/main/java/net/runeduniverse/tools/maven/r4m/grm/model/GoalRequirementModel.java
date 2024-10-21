@@ -23,20 +23,20 @@ import java.util.Set;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class GoalExecutionOrderModel implements Recordable {
+public class GoalRequirementModel implements Recordable {
 
-	private final Set<Recordable> goals = new LinkedHashSet<>(0);
+	private final Set<GoalContainer> goals = new LinkedHashSet<>(0);
 
 	private String version = null;
 	private Class<?> parserType = null;
 	private String parserHint = null;
 	private boolean effective = false;
 
-	public GoalExecutionOrderModel() {
+	public GoalRequirementModel() {
 		this.parserHint = null;
 	}
 
-	public GoalExecutionOrderModel(final Class<?> parserType, final String parserHint) {
+	public GoalRequirementModel(final Class<?> parserType, final String parserHint) {
 		this.parserType = parserType;
 		this.parserHint = parserHint;
 	}
@@ -57,7 +57,7 @@ public class GoalExecutionOrderModel implements Recordable {
 		return this.effective;
 	}
 
-	public Set<Recordable> getGoalSelector() {
+	public Set<GoalContainer> getGoalSelector() {
 		return Collections.unmodifiableSet(this.goals);
 	}
 
@@ -74,12 +74,12 @@ public class GoalExecutionOrderModel implements Recordable {
 		this.effective = value;
 	}
 
-	public void addGoalSelector(Recordable selector) {
-		this.goals.add(selector);
+	public void addGoalContainer(GoalContainer container) {
+		this.goals.add(container);
 	}
 
-	public void addGoalSelector(Collection<Recordable> selector) {
-		this.goals.addAll(selector);
+	public void addGoalContainer(Collection<GoalContainer> container) {
+		this.goals.addAll(container);
 	}
 
 	@Override

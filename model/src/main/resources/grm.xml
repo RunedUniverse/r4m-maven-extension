@@ -37,7 +37,7 @@
 				net.runeduniverse.tools.maven.r4m
 			</groupId>
 			<artifactId>r4m-maven-extension</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="pre-pack" source="workflow">
 					<groupId>
 						<!-- (opt - maven groupId) -->
@@ -60,7 +60,7 @@
 						</and>
 					</when>
 				</goal>
-			</dependencies>
+			</prerequisites>
 			<dependents>
 				<goal id="wrap-pack">
 					<groupId>
@@ -88,12 +88,12 @@
 		<goal id="format">
 			<groupId>com.mycila</groupId>
 			<artifactId>license-maven-plugin</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="format" source="plugin">
 					<groupId>net.revelc.code.formatter</groupId>
 					<artifactId>formatter-maven-plugin</artifactId>
 				</goal>
-			</dependencies>
+			</prerequisites>
 		</goal>
 
 		<!-- example : compile -->
@@ -114,34 +114,34 @@
 		<goal id="test-jar">
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-jar-plugin</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="jar" source="plugin">
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
 				</goal>
-			</dependencies>
+			</prerequisites>
 		</goal>
 
 		<goal id="test-jar-no-fork">
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-source-plugin</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="jar-no-fork" source="plugin">
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
 				</goal>
-			</dependencies>
+			</prerequisites>
 		</goal>
 
 		<goal id="test-jar">
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-javadoc-plugin</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="jar" source="plugin">
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 				</goal>
-			</dependencies>
+			</prerequisites>
 		</goal>
 
 		<!-- example : artifact attachment -->
@@ -164,12 +164,12 @@
 		<goal id="sign">
 			<groupId>org.apache.maven.plugins</groupId>
 			<artifactId>maven-gpg-plugin</artifactId>
-			<dependencies>
+			<prerequisites>
 				<goal id="attach-artifact" source="workflow">
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
 				</goal>
-			</dependencies>
+			</prerequisites>
 			<dependents>
 				<goal id="install" source="plugin">
 					<groupId>org.apache.maven.plugins</groupId>

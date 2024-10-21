@@ -68,11 +68,12 @@ public class ExecutionSource {
 		if (isBlank(key))
 			return null;
 
+		key = key.trim()
+				.toLowerCase();
 		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
 		if (source == null)
 			return new ExecutionSource(key);
 		else
 			return source;
 	}
-
 }

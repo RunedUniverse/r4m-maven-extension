@@ -13,33 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.check;
+package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
-
-public class GoalOrderCheck extends GoalInfoCheck {
-
-	private final WhenCheck when = new WhenCheck();
+public class MergeDataGroup extends AndDataGroup {
 
 	private ExecutionSource source = null;
-
-	public GoalOrderCheck() {
-		super();
-		this.conditions.add(when);
-	}
-
-	public GoalOrderCheck(String groupId, String artifactId, String goalId) {
-		super(groupId, artifactId, goalId);
-		this.conditions.add(when);
-	}
-
-	public WhenCheck getWhen() {
-		return this.when;
-	}
 
 	public ExecutionSource getSourceId() {
 		return this.source;
@@ -47,12 +25,5 @@ public class GoalOrderCheck extends GoalInfoCheck {
 
 	public void setSource(ExecutionSource source) {
 		this.source = source;
-	}
-
-	@Override
-	public List<ConditionInfo> getInfo() {
-		final List<ConditionInfo> lst = new LinkedList<>();
-		lst.add(new DefaultConditionInfo("source", this.source.key()));
-		return lst;
 	}
 }

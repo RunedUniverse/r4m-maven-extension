@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.check;
+package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
@@ -68,11 +68,12 @@ public class ExecutionSource {
 		if (isBlank(key))
 			return null;
 
+		key = key.trim()
+				.toLowerCase();
 		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
 		if (source == null)
 			return new ExecutionSource(key);
 		else
 			return source;
 	}
-
 }

@@ -48,7 +48,7 @@
 				<!-- (opt - from plugin) -->
 			</xs:element>
 			<xs:element name="when" type="WhenCheck" minOccurs="0" />
-			<xs:element name="dependencies" type="RefGoalGroup"
+			<xs:element name="prerequisites" type="RefGoalGroup"
 				minOccurs="0" />
 			<xs:element name="dependents" type="RefGoalGroup"
 				minOccurs="0" />

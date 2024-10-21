@@ -19,6 +19,8 @@ import java.util.LinkedHashSet;
 
 public class AndDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
+	public static final String HINT = "and";
+
 	public AndDataGroup() {
 		super(LinkedHashSet<DataEntry>::new);
 	}

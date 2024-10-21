@@ -51,7 +51,7 @@
 						<always />
 						<and>
 							<execution id="pipeline" />
-							<packaging id="jar" />
+							<packaging procedure="jar" />
 							<lifecycle id="clean" />
 							<profile id="dev-install" state="inactive" />
 							<not>

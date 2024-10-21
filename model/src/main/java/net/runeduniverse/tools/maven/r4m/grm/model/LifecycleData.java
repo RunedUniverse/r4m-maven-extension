@@ -15,26 +15,18 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public class WhenDataGroup extends OrDataGroup {
+public class LifecycleData implements DataEntry {
 
-	public static final String HINT = "when";
+	public static final String HINT = "lifecycle";
 
-	protected boolean always = false;
-	protected boolean never = false;
+	protected String id = null;
 
-	public boolean getAlwaysActive() {
-		return this.always;
+	public String getId() {
+		return this.id;
 	}
 
-	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
+	public LifecycleData setId(final String id) {
+		this.id = id;
+		return this;
 	}
 }

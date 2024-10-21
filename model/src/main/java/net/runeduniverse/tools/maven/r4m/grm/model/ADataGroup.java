@@ -22,7 +22,7 @@ public class ADataGroup<T extends Collection<DataEntry>> implements DataGroup {
 
 	protected final T collection;
 
-	protected ADataGroup(Supplier<T> supplier) {
+	protected ADataGroup(final Supplier<T> supplier) {
 		this.collection = supplier.get();
 	}
 

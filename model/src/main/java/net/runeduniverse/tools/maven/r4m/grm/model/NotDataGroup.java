@@ -15,26 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public class WhenDataGroup extends OrDataGroup {
+import java.util.LinkedHashSet;
 
-	public static final String HINT = "when";
+public class NotDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
-	protected boolean always = false;
-	protected boolean never = false;
+	public static final String HINT = "not";
 
-	public boolean getAlwaysActive() {
-		return this.always;
-	}
-
-	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
+	public NotDataGroup() {
+		super(LinkedHashSet<DataEntry>::new);
 	}
 }

@@ -125,7 +125,7 @@
 		<xs:attribute name="id" type="ExecutionId" use="required" />
 	</xs:complexType>
 	<xs:complexType name="PackagingCheck">
-		<xs:attribute name="id" type="PackagingId" use="required" />
+		<xs:attribute name="procedure" type="PackagingProcedure" use="required" />
 	</xs:complexType>
 	<xs:complexType name="LifecycleCheck">
 		<xs:attribute name="id" type="LifecycleId" use="required" />
@@ -153,7 +153,7 @@
 			<xs:pattern value="\s*\S+\s*" />
 		</xs:restriction>
 	</xs:simpleType>
-	<xs:simpleType name="PackagingId">
+	<xs:simpleType name="PackagingProcedure">
 		<xs:union memberTypes="AnyId">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">

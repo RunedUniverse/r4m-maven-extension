@@ -15,26 +15,18 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public class WhenDataGroup extends OrDataGroup {
+public class PackagingData implements DataEntry {
 
-	public static final String HINT = "when";
+	public static final String HINT = "packaging";
 
-	protected boolean always = false;
-	protected boolean never = false;
+	protected String procedure = null;
 
-	public boolean getAlwaysActive() {
-		return this.always;
+	public String getProcedure() {
+		return this.procedure;
 	}
 
-	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
+	public PackagingData setProcedure(final String procedure) {
+		this.procedure = procedure;
+		return this;
 	}
 }

@@ -13,28 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.model;
+package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 
-public class WhenDataGroup extends OrDataGroup {
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-	public static final String HINT = "when";
+import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 
-	protected boolean always = false;
-	protected boolean never = false;
+public interface CheckDataFactory {
 
-	public boolean getAlwaysActive() {
-		return this.always;
-	}
+	public DataEntry createEntry(final PlexusConfiguration cnf);
 
-	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
-	}
 }

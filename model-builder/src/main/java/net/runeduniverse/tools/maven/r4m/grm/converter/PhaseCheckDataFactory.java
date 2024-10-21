@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder.api;
+package net.runeduniverse.tools.maven.r4m.grm.converter;
 
+import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
-import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
+import net.runeduniverse.tools.maven.r4m.grm.model.PhaseData;
 
-public interface AbstractCheckFactory {
+@Component(role = CheckDataFactory.class, hint = PhaseData.HINT)
+public class PhaseCheckDataFactory extends ACheckDataFactory {
 
-	public GoalContainer createContainer(final PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId, final ExecutionSource defaultExecutionSource);
+	@Override
+	public DataEntry createEntry(PlexusConfiguration cnf) {
+		if (!PhaseData.HINT.equals(cnf.getName()))
+			return null;
 
-	public DataEntry createEntry(final PlexusConfiguration cnf);
-
+		return new PhaseData().setId(getAttributeAsId(cnf, "id"));
+	}
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder;
+package net.runeduniverse.tools.maven.r4m.grm.converter;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,8 +25,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.builder.api.AbstractCheckFactory;
-import net.runeduniverse.tools.maven.r4m.grm.builder.api.CheckFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.AbstractCheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
@@ -38,11 +38,11 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
-@Component(role = AbstractCheckFactory.class, hint = "default")
-public class DefaultAbstractCheckFactory implements AbstractCheckFactory {
+@Component(role = AbstractCheckDataFactory.class, hint = "default")
+public class DefaultAbstractCheckDataFactory implements AbstractCheckDataFactory {
 
-	@Requirement(role = CheckFactory.class)
-	protected Map<String, CheckFactory> factories;
+	@Requirement(role = CheckDataFactory.class)
+	protected Map<String, CheckDataFactory> factories;
 
 	public GoalContainer createContainer(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId, final ExecutionSource defaultSource) {
@@ -66,7 +66,9 @@ public class DefaultAbstractCheckFactory implements AbstractCheckFactory {
 	}
 
 	public DataEntry createEntry(final PlexusConfiguration cnf) {
-		final CheckFactory factory = this.factories.get(cnf.getName());
+		if (cnf == null)
+			return null;
+		final CheckDataFactory factory = this.factories.get(cnf.getName());
 		if (factory == null)
 			return null;
 		return factory.createEntry(cnf);

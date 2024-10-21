@@ -15,26 +15,32 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public class WhenDataGroup extends OrDataGroup {
+public class ProfileData implements DataEntry {
 
-	public static final String HINT = "when";
+	public static final String HINT = "profile";
+	public static final String STATE_ACTIVE = "active";
+	public static final String STATE_INACTIVE = "inactive";
+	public static final String STATE_MISSING = "missing";
+	public static final String STATE_PROVIDED = "provided";
 
-	protected boolean always = false;
-	protected boolean never = false;
+	protected String id = null;
+	protected String state = null;
 
-	public boolean getAlwaysActive() {
-		return this.always;
+	public String getId() {
+		return this.id;
 	}
 
-	public boolean getNeverActive() {
-		return this.never;
+	public String getState() {
+		return this.state;
 	}
 
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
+	public ProfileData setId(final String id) {
+		this.id = id;
+		return this;
 	}
 
-	public void setNeverActive(boolean value) {
-		this.never = value;
+	public ProfileData setState(final String state) {
+		this.state = state;
+		return this;
 	}
 }

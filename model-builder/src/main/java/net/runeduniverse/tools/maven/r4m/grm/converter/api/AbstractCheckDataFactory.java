@@ -13,13 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder.api;
+package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 
-public interface CheckFactory {
+public interface AbstractCheckDataFactory {
+
+	public GoalContainer createContainer(final PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId, final ExecutionSource defaultExecutionSource);
 
 	public DataEntry createEntry(final PlexusConfiguration cnf);
 

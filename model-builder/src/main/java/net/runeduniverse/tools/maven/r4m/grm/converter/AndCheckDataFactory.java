@@ -13,38 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.builder.check;
+package net.runeduniverse.tools.maven.r4m.grm.converter;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.builder.api.AbstractCheckFactory;
-import net.runeduniverse.tools.maven.r4m.grm.builder.api.CheckFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.AbstractCheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup;
 
-@Component(role = CheckFactory.class, hint = WhenDataGroup.HINT)
-public class WhenCheckFactory implements CheckFactory {
+@Component(role = CheckDataFactory.class, hint = AndDataGroup.HINT)
+public class AndCheckDataFactory extends ACheckDataFactory {
 
-	@Requirement(role = AbstractCheckFactory.class)
-	protected AbstractCheckFactory factory;
+	@Requirement(role = AbstractCheckDataFactory.class)
+	protected AbstractCheckDataFactory factory;
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!WhenDataGroup.HINT.equals(cnf.getName()))
+		if (!AndDataGroup.HINT.equals(cnf.getName()))
 			return null;
 
-		final WhenDataGroup group = new WhenDataGroup();
+		final AndDataGroup group = new AndDataGroup();
 
-		for (PlexusConfiguration child : cnf.getChildren()) {
-			if (child == null)
-				continue;
-			final DataEntry entry = factory.createEntry(child);
-			if (entry == null)
-				continue;
-			group.addEntry(entry);
-		}
+		addConvertedEntries(group, cnf.getChildren());
 
 		return group;
 	}

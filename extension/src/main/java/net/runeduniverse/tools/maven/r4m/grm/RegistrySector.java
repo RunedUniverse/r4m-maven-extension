@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.grm;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
@@ -24,49 +24,49 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
-public class RegistrySector implements PluginExecutionRegistrySector {
+public class RegistrySector implements PluginRequirementRegistrySector {
 
 	// save more infos???
 
-	protected final Set<Execution> executions = new LinkedHashSet<>(0);
-	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>(0);
-	protected final Map<String, ProjectExecutionModel> hintedOrigins = new LinkedHashMap<>(0);
+	protected final Set<GoalContainer> containerSet = new LinkedHashSet<>(0);
+	protected final Map<GoalContainer, GoalRequirementModel> containerOrigins = new LinkedHashMap<>(0);
+	protected final Map<String, GoalRequirementModel> hintedOrigins = new LinkedHashMap<>(0);
 
 	@Override
-	public Set<Execution> getExecutions() {
-		return Collections.unmodifiableSet(this.executions);
+	public Set<GoalContainer> getGoalContainer() {
+		return Collections.unmodifiableSet(this.containerSet);
 	}
 
 	@Override
-	public void addExecutions(Collection<Execution> values) {
-		this.executions.addAll(values);
+	public void addGoalContainer(final Collection<GoalContainer> values) {
+		this.containerSet.addAll(values);
 	}
 
 	@Override
-	public void includeModel(ProjectExecutionModel model) {
-		if (model == null || model.getExecutions()
+	public void includeModel(final GoalRequirementModel model) {
+		if (model == null || model.getGoalContainer()
 				.isEmpty())
 			return;
 
 		this.hintedOrigins.put(createKey(model.getParserType(), model.getParserHint()), model);
 
-		for (Execution execution : model.getExecutions()) {
-			this.executions.add(execution);
-			this.executionOrigins.put(execution, model);
+		for (GoalContainer container : model.getGoalContainer()) {
+			this.containerSet.add(container);
+			this.containerOrigins.put(container, model);
 		}
 	}
 
 	@Override
-	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint) {
+	public GoalRequirementModel getModel(Class<?> parserType, String parserHint) {
 		return this.hintedOrigins.get(createKey(parserType, parserHint));
 	}
 
 	@Override
-	public Set<ProjectExecutionModel> getModels() {
+	public Set<GoalRequirementModel> getModels() {
 		return new LinkedHashSet<>(this.hintedOrigins.values());
 	}
 

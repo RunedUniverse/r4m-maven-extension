@@ -66,5 +66,4 @@ public class ConfigParser implements GoalRequirementModelConfigParser {
 
 		return model;
 	}
-
 }

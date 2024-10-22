@@ -35,11 +35,6 @@ public class ProjectExecutionModel implements Recordable {
 		this.parserHint = null;
 	}
 
-	public ProjectExecutionModel(final Class<?> parserType, final String parserHint) {
-		this.parserType = parserType;
-		this.parserHint = parserHint;
-	}
-
 	public String getVersion() {
 		return this.version;
 	}

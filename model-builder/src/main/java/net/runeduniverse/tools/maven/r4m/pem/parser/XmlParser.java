@@ -48,7 +48,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
-@Component(role = ProjectExecutionModelParser.class, hint = "default")
+@Component(role = ProjectExecutionModelParser.class, hint = "xml")
 public class XmlParser implements ProjectExecutionModelParser {
 
 	@Requirement(role = ExecutionRestrictionParser.class)

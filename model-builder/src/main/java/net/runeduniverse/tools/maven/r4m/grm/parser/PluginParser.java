@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.parser;
+package net.runeduniverse.tools.maven.r4m.grm.parser;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -37,30 +37,31 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistry;
+import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector;
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelParser;
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPluginParser;
 
-@Component(role = ProjectExecutionModelPluginParser.class, hint = PluginParser.HINT)
-public class PluginParser implements ProjectExecutionModelPluginParser {
+@Component(role = GoalRequirementModelPluginParser.class, hint = PluginParser.HINT)
+public class PluginParser implements GoalRequirementModelPluginParser {
 
 	public static final String HINT = "default";
 	public static final String ERR_MSG_PLUGIN_DESCRIPTOR = "Failed to acquire org.apache.maven.plugin.descriptor.PluginDescriptor!";
-	public static final String ERR_MSG_PARSE_PEM = "Failed to parse pem of %s [%s]";
+	public static final String ERR_MSG_PARSE_GRM = "Failed to parse grm of %s [%s]";
 
 	@Requirement
 	protected Logger log;
 	@Requirement
 	protected MavenPluginManager manager;
 	@Requirement
-	protected PluginExecutionRegistry registry;
+	protected PluginRequirementRegistry registry;
 	@Requirement(hint = "xml")
-	protected ProjectExecutionModelParser parser;
+	protected GoalRequirementModelParser parser;
 
 	@Override
-	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
+	public GoalRequirementModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
 			Plugin mvnPlugin) throws Exception {
 
 		PluginDescriptor mvnPluginDescriptor = null;
@@ -72,32 +73,35 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return null;
 		}
 
-		PluginExecutionRegistrySector slice = this.registry.getSector(mvnPlugin.getGroupId(),
+		PluginRequirementRegistrySector sector = this.registry.getSector(mvnPlugin.getGroupId(),
 				mvnPlugin.getArtifactId());
-		if (slice == null)
-			slice = this.registry.createSector(mvnPluginDescriptor);
+		if (sector == null)
+			sector = this.registry.createSector(mvnPluginDescriptor);
 
-		ProjectExecutionModel model = slice.getModel(PluginParser.class, PluginParser.HINT);
+		GoalRequirementModel model = sector.getModel(PluginParser.class, PluginParser.HINT);
 		if (model != null)
 			return model;
 
 		model = parseModel(mvnPluginDescriptor);
-		slice.includeModel(model);
+		sector.includeModel(model);
 		return model;
 	}
 
-	protected ProjectExecutionModel parseModel(final PluginDescriptor mvnPluginDescriptor) throws Exception {
-		final ProjectExecutionModel model = new ProjectExecutionModel();
+	protected GoalRequirementModel parseModel(final PluginDescriptor mvnPluginDescriptor) throws Exception {
+		final GoalRequirementModel model = new GoalRequirementModel();
 		final File pluginFile = mvnPluginDescriptor.getPluginArtifact()
 				.getFile();
 
 		model.setParser(PluginParser.class, PluginParser.HINT);
+		model.setDefaultGroupId(mvnPluginDescriptor.getGroupId());
+		model.setDefaultArtifactId(mvnPluginDescriptor.getArtifactId());
+		model.setDefaultSource(ExecutionSource.PLUGIN);
 
 		try {
 			if (pluginFile.isFile()) {
 				try (JarFile pluginJar = new JarFile(pluginFile, false)) {
 					final ZipEntry xmlFileEntry = pluginJar
-							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
+							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.GOAL_REQUIREMENT_MODEL_FILE);
 
 					if (xmlFileEntry != null) {
 						try (InputStream is = pluginJar.getInputStream(xmlFileEntry)) {
@@ -107,7 +111,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 				}
 			} else {
 				final File xmlFile = new File(pluginFile,
-						Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
+						Runes4MavenProperties.METAINF.RUNES4MAVEN.GOAL_REQUIREMENT_MODEL_FILE);
 
 				if (xmlFile.isFile()) {
 					try (InputStream is = new BufferedInputStream(new FileInputStream(xmlFile))) {
@@ -116,7 +120,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 				}
 			}
 		} catch (IOException | XmlPullParserException e) {
-			this.log.error(String.format(ERR_MSG_PARSE_PEM, mvnPluginDescriptor.getPlugin()
+			this.log.error(String.format(ERR_MSG_PARSE_GRM, mvnPluginDescriptor.getPlugin()
 					.getKey(), pluginFile.getAbsolutePath()));
 			throw e;
 		}

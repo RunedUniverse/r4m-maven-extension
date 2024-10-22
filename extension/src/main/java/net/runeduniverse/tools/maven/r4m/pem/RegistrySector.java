@@ -24,11 +24,11 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public class RegistrySlice implements PluginExecutionRegistrySlice {
+public class RegistrySector implements PluginExecutionRegistrySector {
 
 	// save more infos???
 
@@ -77,5 +77,4 @@ public class RegistrySlice implements PluginExecutionRegistrySlice {
 			return parserHint;
 		return String.join(":", parserType.getCanonicalName(), parserHint);
 	}
-
 }

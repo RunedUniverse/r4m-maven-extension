@@ -15,8 +15,22 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import net.runeduniverse.tools.maven.r4m.indexer.api.PluginBoundRegistry;
+import java.util.Collection;
+import java.util.Set;
 
-public interface PluginExecutionRegistry extends PluginBoundRegistry<PluginExecutionRegistrySector> {
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+public interface PluginExecutionRegistrySector {
+
+	public Set<Execution> getExecutions();
+
+	public void addExecutions(final Collection<Execution> values);
+
+	public void includeModel(final ProjectExecutionModel model);
+
+	public ProjectExecutionModel getModel(final Class<?> parserType, final String parserHint);
+
+	public Set<ProjectExecutionModel> getModels();
 
 }

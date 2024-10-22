@@ -38,7 +38,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -72,7 +72,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return null;
 		}
 
-		PluginExecutionRegistrySlice slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
+		PluginExecutionRegistrySector slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
 		if (slice == null)
 			slice = this.registry.createSlice(mvnPluginDescriptor);
 

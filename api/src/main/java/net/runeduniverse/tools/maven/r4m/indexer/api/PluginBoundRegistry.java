@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.api;
+package net.runeduniverse.tools.maven.r4m.indexer.api;
 
-import java.util.Collection;
-import java.util.Set;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+public interface PluginBoundRegistry<S> {
 
-public interface PluginExecutionRegistrySlice {
+	public S createSector(final PluginDescriptor mvnPluginDescriptor);
 
-	public Set<Execution> getExecutions();
+	public boolean hasSector(final String prefix);
 
-	public void addExecutions(Collection<Execution> values);
+	public boolean hasSector(final String groupId, final String artifactId);
 
-	public void includeModel(ProjectExecutionModel model);
+	public S getSector(final String prefix);
 
-	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint);
-
-	public Set<ProjectExecutionModel> getModels();
+	public S getSector(final String groupId, final String artifactId);
 
 }

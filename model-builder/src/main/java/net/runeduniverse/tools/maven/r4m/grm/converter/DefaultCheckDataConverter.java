@@ -18,8 +18,9 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
@@ -27,6 +28,8 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
@@ -41,12 +44,19 @@ import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 @Component(role = CheckDataConverter.class, hint = "default")
 public class DefaultCheckDataConverter implements CheckDataConverter {
 
+	public static int MAX_TYPE_SEARCH_DEPTH = 4;
+
 	@Requirement(role = CheckDataFactory.class)
 	protected Map<String, CheckDataFactory> factories;
+	@Requirement(role = CheckDataHandler.class)
+	protected Map<String, CheckDataHandler> handler;
 
 	@Override
 	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId, final ExecutionSource defaultSource) {
+		if (cnf == null)
+			return null;
+
 		final PlexusConfiguration preqCnf = cnf.getChild("prerequisites", true);
 		final PlexusConfiguration depCnf = cnf.getChild("dependents", true);
 
@@ -94,9 +104,8 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 		return copy;
 	}
 
-	protected DataGroup collectMatchData(PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId) {
-		final AndDataGroup group = new AndDataGroup();
+	protected void collectGoalData(final PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId, final DataGroup group) {
 		final PlexusConfiguration groupIdCnf = cnf.getChild("groupId", true);
 		final PlexusConfiguration artifactIdCnf = cnf.getChild("artifactId", true);
 
@@ -112,30 +121,135 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 				continue;
 			group.addEntry(entry);
 		}
+	}
 
+	protected DataGroup collectMatchData(final PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId) {
+		final AndDataGroup group = new AndDataGroup();
+		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
 		return group;
 	}
 
-	protected DataGroup collectRequirementData(PlexusConfiguration cnf, final String defaultGroupId,
+	protected DataGroup collectRequirementData(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId, final ExecutionSource defaultSource) {
 		final MergeDataGroup group = new MergeDataGroup();
-		final PlexusConfiguration groupIdCnf = cnf.getChild("groupId", true);
-		final PlexusConfiguration artifactIdCnf = cnf.getChild("artifactId", true);
-
+		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
 		group.setSource(ExecutionSource.create(cnf.getAttribute("source", defaultSource.key())));
-		group.addEntry(new GoalIdData().setGoalId(cnf.getAttribute("id")));
-		group.addEntry(new GroupIdData().setGroupId(groupIdCnf.getValue(defaultGroupId)));
-		group.addEntry(new ArtifactIdData().setArtifactId(artifactIdCnf.getValue(defaultArtifactId)));
+		return group;
+	}
 
-		for (PlexusConfiguration child : cnf.getChildren()) {
-			if (child == groupIdCnf || child == artifactIdCnf)
+	@Override
+	public PlexusConfiguration convertContainer(final ConfigurationFactory<PlexusConfiguration> factory,
+			final GoalContainer container) {
+		if (factory == null || container == null)
+			return null;
+		final PlexusConfiguration goalCnf = convertGoalData(factory, container.getMatchGroup());
+		if (goalCnf == null)
+			return null;
+
+		processRequirementData(factory, container.getPrerequisiteEntries(), goalCnf.getChild("prerequisites", true));
+		processRequirementData(factory, container.getDependentEntries(), goalCnf.getChild("dependents", true));
+
+		return goalCnf;
+	}
+
+	protected void processRequirementData(final ConfigurationFactory<PlexusConfiguration> factory,
+			final Collection<DataEntry> entries, final PlexusConfiguration targetCnf) {
+		for (DataEntry entry : entries) {
+			PlexusConfiguration cnf = null;
+			if (entry instanceof MergeDataGroup) {
+				cnf = convertGoalData(factory, (MergeDataGroup) entry);
+			}
+			if (cnf == null)
 				continue;
-			final DataEntry entry = convertEntry(child);
-			if (entry == null)
+			targetCnf.addChild(cnf);
+		}
+	}
+
+	@Override
+	public PlexusConfiguration convertEntry(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry) {
+		if (factory == null || entry == null)
+			return null;
+
+		final List<String> types = collectEntryTypes(entry.getClass());
+		PlexusConfiguration cnf = null;
+		CheckDataHandler handler = null;
+
+		for (String type : types) {
+			// find valid handler
+			handler = this.handler.get(type);
+			if (handler == null)
 				continue;
-			group.addEntry(entry);
+			// check if the handler rejects the entry
+			cnf = handler.createConfiguration(factory, entry);
+			if (cnf != null)
+				return cnf;
+		}
+		return null;
+	}
+
+	protected List<String> collectEntryTypes(Class<?> clazz) {
+		final List<String> lst = new LinkedList<>();
+		// add class
+		lst.add(clazz.getCanonicalName());
+
+		for (int i = 0; i < MAX_TYPE_SEARCH_DEPTH; i++) {
+			if (clazz == Object.class)
+				return lst;
+			// add all interfaces
+			for (Class<?> ic : clazz.getInterfaces()) {
+				lst.add(ic.getCanonicalName());
+			}
+			// add superclass
+			clazz = clazz.getSuperclass();
+			lst.add(clazz.getCanonicalName());
+		}
+		return lst;
+	}
+
+	protected PlexusConfiguration convertGoalData(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataGroup goalData) {
+		if (goalData == null)
+			return null;
+		final PlexusConfiguration goalCnf = factory.create("goal");
+
+		if (goalData instanceof MergeDataGroup) {
+			final ExecutionSource source = ((MergeDataGroup) goalData).getSourceId();
+			if (source != null) {
+				goalCnf.setAttribute("source", source.key());
+			}
 		}
 
-		return group;
+		for (DataEntry entry : goalData.getEntries()) {
+			if (entry == null)
+				continue;
+			// check for basic values
+			if (entry instanceof GoalIdData) {
+				final GoalIdData data = (GoalIdData) entry;
+				goalCnf.setAttribute("id", data.getGoalId());
+				continue;
+			}
+			if (entry instanceof GroupIdData) {
+				final GroupIdData data = (GroupIdData) entry;
+				goalCnf.addChild("groupId", data.getGroupId());
+				continue;
+			}
+			if (entry instanceof ArtifactIdData) {
+				final ArtifactIdData data = (ArtifactIdData) entry;
+				goalCnf.addChild("artifactId", data.getArtifactId());
+				continue;
+			}
+			if (entry instanceof ArtifactIdData) {
+				final ArtifactIdData data = (ArtifactIdData) entry;
+				goalCnf.addChild("artifactId", data.getArtifactId());
+				continue;
+			}
+			// check additional values > by default only "when" is expected
+			final PlexusConfiguration childCnf = convertEntry(factory, entry);
+			if (childCnf != null)
+				goalCnf.addChild(childCnf);
+		}
+		return goalCnf;
 	}
 }

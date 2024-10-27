@@ -33,7 +33,7 @@ public class GoalContainer implements Recordable {
 		this.dependentData = dependentData == null ? new DummyDataGroup() : dependentData;
 	}
 
-	public DataEntry getMatchEntry() {
+	public DataGroup getMatchGroup() {
 		return this.matchData instanceof DummyDataGroup ? null : this.matchData;
 	}
 
@@ -41,7 +41,7 @@ public class GoalContainer implements Recordable {
 		return this.matchData.getEntries();
 	}
 
-	public DataEntry getPrerequisiteEntry() {
+	public DataGroup getPrerequisiteGroup() {
 		return this.prerequisiteData instanceof DummyDataGroup ? null : this.prerequisiteData;
 	}
 
@@ -49,7 +49,7 @@ public class GoalContainer implements Recordable {
 		return this.prerequisiteData.getEntries();
 	}
 
-	public DataEntry getDependentEntry() {
+	public DataGroup getDependentGroup() {
 		return this.dependentData instanceof DummyDataGroup ? null : this.dependentData;
 	}
 

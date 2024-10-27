@@ -92,7 +92,10 @@ public class GoalRequirementModel implements Recordable {
 	}
 
 	public void setDefaultSource(final ExecutionSource defaultSource) {
-		this.defaultSource = defaultSource;
+		if (defaultSource == null)
+			this.defaultSource = ExecutionSource.PLUGIN;
+		else
+			this.defaultSource = defaultSource;
 	}
 
 	public void addGoalContainer(GoalContainer container) {

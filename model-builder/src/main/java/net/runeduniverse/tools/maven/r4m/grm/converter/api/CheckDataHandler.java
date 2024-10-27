@@ -18,19 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
-import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 
-public interface CheckDataConverter {
+public interface CheckDataHandler {
 
-	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId, final ExecutionSource defaultSource);
-
-	public DataEntry convertEntry(final PlexusConfiguration cnf);
-
-	public PlexusConfiguration convertContainer(final ConfigurationFactory<PlexusConfiguration> factory,
-			final GoalContainer container);
-
-	public PlexusConfiguration convertEntry(final ConfigurationFactory<PlexusConfiguration> factory,
+	public PlexusConfiguration createConfiguration(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry);
+
 }

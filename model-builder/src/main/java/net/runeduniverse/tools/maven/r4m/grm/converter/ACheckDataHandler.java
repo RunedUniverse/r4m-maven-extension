@@ -15,6 +15,48 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.converter;
 
-public class ACheckDataHandler {
+import org.codehaus.plexus.component.annotations.Requirement;
+import org.codehaus.plexus.configuration.PlexusConfiguration;
 
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
+
+public abstract class ACheckDataHandler implements CheckDataHandler {
+
+	@Requirement(role = CheckDataConverter.class)
+	protected CheckDataConverter converter;
+
+	@Override
+	public PlexusConfiguration createConfiguration(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry) {
+		if (factory == null || entry == null)
+			return null;
+		return toConfig(factory, entry);
+	}
+
+	protected abstract PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry);
+
+	protected PlexusConfiguration convertEntry(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry) {
+		return this.converter.convertEntry(factory, entry);
+	}
+
+	protected boolean addConvertedEntry(final PlexusConfiguration cnf,
+			final ConfigurationFactory<PlexusConfiguration> factory, final DataEntry entry) {
+		final PlexusConfiguration entryCnf = convertEntry(factory, entry);
+		if (entryCnf == null)
+			return false;
+		cnf.addChild(entryCnf);
+		return true;
+	}
+
+	protected void addConvertedEntries(final PlexusConfiguration cnf,
+			final ConfigurationFactory<PlexusConfiguration> factory, final DataGroup group) {
+		for (DataEntry entry : group.getEntries())
+			addConvertedEntry(cnf, factory, entry);
+	}
 }

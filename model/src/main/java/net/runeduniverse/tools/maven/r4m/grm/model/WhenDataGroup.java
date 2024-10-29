@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class WhenDataGroup extends OrDataGroup {
 
 	public static final String HINT = "when";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup";
 
 	protected boolean always = false;
 	protected boolean never = false;

@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 public class AndDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
 	public static final String HINT = "and";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup";
 
 	public AndDataGroup() {
 		super(LinkedHashSet<DataEntry>::new);

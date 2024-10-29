@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 public class OrDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
 	public static final String HINT = "or";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup";
 
 	public OrDataGroup() {
 		super(LinkedHashSet<DataEntry>::new);

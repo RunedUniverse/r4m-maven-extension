@@ -59,4 +59,18 @@ public abstract class ACheckDataHandler implements CheckDataHandler {
 		for (DataEntry entry : group.getEntries())
 			addConvertedEntry(cnf, factory, entry);
 	}
+
+	protected String asId(final String id) {
+		if (id == null)
+			return null;
+		return id.trim();
+	}
+
+	protected void setAttributeAsId(final PlexusConfiguration cnf, final String attributeName, final String value) {
+		cnf.setAttribute(attributeName, asId(value));
+	}
+
+	protected void setValueAsId(final PlexusConfiguration cnf, final String value) {
+		cnf.setValue(asId(value));
+	}
 }

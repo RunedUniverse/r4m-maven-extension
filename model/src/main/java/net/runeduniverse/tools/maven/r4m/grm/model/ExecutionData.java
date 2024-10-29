@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class ExecutionData implements DataEntry {
 
 	public static final String HINT = "execution";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData";
 
 	protected String id = null;
 

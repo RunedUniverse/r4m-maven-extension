@@ -18,6 +18,8 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class ProfileData implements DataEntry {
 
 	public static final String HINT = "profile";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.ProfileData";
+
 	public static final String STATE_ACTIVE = "active";
 	public static final String STATE_INACTIVE = "inactive";
 	public static final String STATE_MISSING = "missing";

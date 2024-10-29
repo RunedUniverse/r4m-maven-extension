@@ -18,7 +18,6 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.lib.utils.common.StringUtils;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;

@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class PackagingData implements DataEntry {
 
 	public static final String HINT = "packaging";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.PackagingData";
 
 	protected String procedure = null;
 

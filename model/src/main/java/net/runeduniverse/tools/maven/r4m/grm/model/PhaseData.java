@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class PhaseData implements DataEntry {
 
 	public static final String HINT = "phase";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.PhaseData";
 
 	protected String id = null;
 

@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 public class LifecycleData implements DataEntry {
 
 	public static final String HINT = "lifecycle";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData";
 
 	protected String id = null;
 

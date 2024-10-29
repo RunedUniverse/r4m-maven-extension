@@ -110,6 +110,12 @@
 			<scope>provided</scope>
 			<!-- maven doesn't provide it to extensions -->
 		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<scope>compile</scope>
+			<!-- maven doesn't provide it to extensions -->
+		</dependency>
 
 		<!-- logging utilities-->
 		<dependency>

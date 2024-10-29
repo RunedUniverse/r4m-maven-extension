@@ -47,6 +47,7 @@
 		<runeduniverse-utils-maven-version>1.0.0</runeduniverse-utils-maven-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
 		<apache-commons-lang3-version>3.8.1</apache-commons-lang3-version>
+		<apache-commons-io-version>2.6</apache-commons-io-version>
 		<!-- ARTIFACT VERSIONS - TESTING -->
 	</properties>
 
@@ -113,6 +114,12 @@
 				<artifactId>commons-lang3</artifactId>
 				<version>${apache-commons-lang3-version}</version>
 			</dependency>
+			<dependency>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${apache-commons-io-version}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-common</artifactId>

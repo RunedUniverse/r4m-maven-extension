@@ -19,10 +19,22 @@
 <extension>
 
 	<exportedPackages>
-		<!-- r4m-maven-extension -->
+		<!-- r4m-maven-extension : api -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.converter.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.parser.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.view.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.writer.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.indexer.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
@@ -32,13 +44,15 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
-		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.view.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.scanner.api
 		</exportedPackage>
+
+		<!-- r4m-maven-extension : model -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.model
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
 		</exportedPackage>
 
 		<!-- runeduniverse-utils -->

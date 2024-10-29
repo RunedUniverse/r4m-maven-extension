@@ -240,11 +240,6 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 				goalCnf.addChild("artifactId", data.getArtifactId());
 				continue;
 			}
-			if (entry instanceof ArtifactIdData) {
-				final ArtifactIdData data = (ArtifactIdData) entry;
-				goalCnf.addChild("artifactId", data.getArtifactId());
-				continue;
-			}
 			// check additional values > by default only "when" is expected
 			final PlexusConfiguration childCnf = convertEntry(factory, entry);
 			if (childCnf != null)

@@ -13,11 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.api;
+package net.runeduniverse.tools.maven.r4m.indexer.api;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
-import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundArchive;
-
-public interface ExecutionArchive extends ProjectBoundArchive<ExecutionArchiveSector>, Recordable {
+public interface ProjectBoundArchive<S extends ProjectBoundArchiveSector<S>> extends ProjectBoundRegistry<S> {
 
 }

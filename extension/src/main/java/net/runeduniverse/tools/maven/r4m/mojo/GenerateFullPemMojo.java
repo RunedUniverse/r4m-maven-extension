@@ -38,7 +38,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -88,9 +88,9 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (isBlank(this.encoding))
 			this.encoding = "UTF-8";
 
-		ExecutionArchiveSlice projectSlice = null;
+		ExecutionArchiveSector projectSlice = null;
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSlice = this.archive.getSector(this.mvnProject);
 
 		if (projectSlice == null) {
 			// try loading via build-extension classrealm
@@ -98,7 +98,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 					.getContextClassLoader());
 		}
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSlice = this.archive.getSector(this.mvnProject);
 
 		if (projectSlice == null)
 			mojoFailureExtensionLoading(getLog());
@@ -139,11 +139,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector slice) {
 		return collectExecutions(executions, slice, false);
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector slice,
 			final boolean onlyInherited) {
 		if (slice == null)
 			return 0;

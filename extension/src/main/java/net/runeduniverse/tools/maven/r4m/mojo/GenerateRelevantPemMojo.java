@@ -41,7 +41,7 @@ import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -96,9 +96,9 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		if (isBlank(this.encoding))
 			this.encoding = "UTF-8";
 
-		ExecutionArchiveSlice projectSlice = null;
+		ExecutionArchiveSector projectSlice = null;
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSlice = this.archive.getSector(this.mvnProject);
 
 		if (projectSlice == null) {
 			// try loading via build-extension classrealm
@@ -106,7 +106,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 					.getContextClassLoader());
 		}
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSlice = this.archive.getSector(this.mvnProject);
 
 		if (projectSlice == null)
 			mojoFailureExtensionLoading(getLog());
@@ -152,14 +152,14 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector slice,
 			final ExecutionArchiveSelectorConfig cnf) {
 		Data data = new Data();
 		collectExecutions(executions, slice, defaultRelevanceFilter(cnf), false, data);
 		return data.getDepth();
 	}
 
-	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector slice,
 			final ExecutionFilter filter, final boolean onlyInherited, final Data data) {
 		if (slice == null)
 			return;

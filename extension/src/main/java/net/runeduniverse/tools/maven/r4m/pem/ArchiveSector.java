@@ -25,39 +25,29 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public class ArchiveSlice implements ExecutionArchiveSlice {
+public class ArchiveSector extends AProjectBoundArchiveSector<ExecutionArchiveSector>
+		implements ExecutionArchiveSector {
 
-	private final MavenProject mvnProject;
-	private ExecutionArchiveSlice parent;
 	private String version;
 	private final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
 	private final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
-	public ArchiveSlice(MavenProject mvnProject, String version, ArchiveSlice parent) {
-		this.mvnProject = mvnProject;
+	public ArchiveSector(MavenProject mvnProject, String version, ArchiveSector parent) {
+		super(mvnProject);
 		this.version = version;
 		this.parent = parent;
 	}
 
 	@Override
-	public MavenProject getMvnProject() {
-		return this.mvnProject;
-	}
-
-	@Override
 	public String getVersion() {
 		return this.version;
-	}
-
-	@Override
-	public ExecutionArchiveSlice getParent() {
-		return this.parent;
 	}
 
 	@Override
@@ -97,11 +87,6 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 						executions.add(execution);
 				}
 		return executions;
-	}
-
-	@Override
-	public void setParent(ExecutionArchiveSlice parent) {
-		this.parent = parent;
 	}
 
 	@Override
@@ -145,5 +130,4 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 
 		return tree;
 	}
-
 }

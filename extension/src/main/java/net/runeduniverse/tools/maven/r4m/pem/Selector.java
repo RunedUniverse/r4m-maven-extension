@@ -46,7 +46,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
@@ -221,7 +221,7 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
-			final ExecutionArchiveSlice slice) {
+			final ExecutionArchiveSector slice) {
 		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
 		getExecutions(cnf, defaultActiveFilter(cnf), views, slice, false);
 		return views;
@@ -229,17 +229,17 @@ public class Selector implements ExecutionArchiveSelector {
 
 	@SuppressWarnings("deprecation")
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final ExecutionFilter filter,
-			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSlice slice,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
 			final boolean onlyInherited) {
-		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter, onlyInherited);
+		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
-			if (slice.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, slice.getParent(), true);
+			if (sector.getParent() != null)
+				effExecDetected = getExecutions(cnf, filter, baseViews, sector.getParent(), true);
 
 			if (!effExecDetected)
-				applicableExecutions = slice.getExecutions(filter, onlyInherited);
+				applicableExecutions = sector.getExecutions(filter, onlyInherited);
 		} else
 			effExecDetected = true;
 
@@ -295,7 +295,7 @@ public class Selector implements ExecutionArchiveSelector {
 		if (selectorConfig.getActiveProject() == null)
 			return new Selection(selectorConfig.clone(), views);
 
-		ExecutionArchiveSlice slice = this.archive.getSlice(selectorConfig.getActiveProject());
+		ExecutionArchiveSector slice = this.archive.getSector(selectorConfig.getActiveProject());
 		if (slice == null)
 			return new Selection(selectorConfig.clone(), views);
 

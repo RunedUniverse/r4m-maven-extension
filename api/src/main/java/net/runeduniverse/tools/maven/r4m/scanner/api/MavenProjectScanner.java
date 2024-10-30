@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 
 /**
  * Required for scanning maven projects to extract pem configurations.
@@ -42,6 +42,6 @@ public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 
 	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final Set<Plugin> unidentifiablePlugins, final MavenProject mvnProject,
-			final ExecutionArchiveSlice projectSlice) throws Exception;
+			final ExecutionArchiveSector projectSlice) throws Exception;
 
 }

@@ -26,6 +26,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
@@ -37,6 +38,8 @@ public class PluginProjectScanner implements MavenProjectScanner {
 
 	@Requirement(role = ProjectExecutionModelPluginParser.class)
 	private Map<String, ProjectExecutionModelPluginParser> pemPluginParser;
+	@Requirement(role = GoalRequirementModelPluginParser.class)
+	private Map<String, GoalRequirementModelPluginParser> grmPluginParser;
 
 	@Override
 	public int getPriority() {
@@ -61,15 +64,18 @@ public class PluginProjectScanner implements MavenProjectScanner {
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			if (isIdentifiable(unidentifiablePlugins, mvnPlugin))
 				try {
-					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
+					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values()) {
 						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
 								mvnSession.getRepositorySession(), mvnPlugin));
-
-					// TODO call grm parser!
+					}
+					for (GoalRequirementModelPluginParser parser : this.grmPluginParser.values()) {
+						parser.parse(mvnProject.getRemotePluginRepositories(), mvnSession.getRepositorySession(),
+								mvnPlugin);
+						// TODO save grm model!
+					}
 				} catch (PluginResolutionException e) {
 					unidentifiablePlugins.add(mvnPlugin);
 				}
 		}
 	}
-
 }

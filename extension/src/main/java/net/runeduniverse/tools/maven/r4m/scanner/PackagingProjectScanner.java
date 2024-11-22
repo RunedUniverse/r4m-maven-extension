@@ -48,5 +48,4 @@ public class PackagingProjectScanner implements MavenProjectScanner {
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 			projectSlice.register(parser.parse());
 	}
-
 }

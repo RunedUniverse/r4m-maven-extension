@@ -25,6 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
@@ -36,6 +37,8 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 
 	@Requirement(role = ProjectExecutionModelConfigParser.class)
 	private Map<String, ProjectExecutionModelConfigParser> pemConfigParser;
+	@Requirement(role = GoalRequirementModelConfigParser.class)
+	private Map<String, GoalRequirementModelConfigParser> grmConfigParser;
 
 	@Override
 	public int getPriority() {
@@ -45,10 +48,12 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 	@Override
 	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
 			MavenProject mvnProject, ExecutionArchiveSector projectSlice) throws Exception {
-		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
+		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
 			projectSlice.register(parser.parse(mvnProject));
-
-		// TODO call grm parser!
+		}
+		for (GoalRequirementModelConfigParser parser : this.grmConfigParser.values()) {
+			parser.parse(mvnProject);
+			// TODO save grm data!
+		}
 	}
-
 }

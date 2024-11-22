@@ -229,17 +229,17 @@ public class Selector implements ExecutionArchiveSelector {
 
 	@SuppressWarnings("deprecation")
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final ExecutionFilter filter,
-			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector slice,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
 			final boolean onlyInherited) {
-		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter, onlyInherited);
+		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
-			if (slice.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, slice.getParent(), true);
+			if (sector.getParent() != null)
+				effExecDetected = getExecutions(cnf, filter, baseViews, sector.getParent(), true);
 
 			if (!effExecDetected)
-				applicableExecutions = slice.getExecutions(filter, onlyInherited);
+				applicableExecutions = sector.getExecutions(filter, onlyInherited);
 		} else
 			effExecDetected = true;
 

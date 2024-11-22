@@ -16,8 +16,8 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
-import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundArchive;
+import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundRegistry;
 
-public interface ExecutionArchive extends ProjectBoundArchive<ExecutionArchiveSector>, Recordable {
+public interface ExecutionArchive extends ProjectBoundRegistry<ExecutionArchiveSector>, Recordable {
 
 }

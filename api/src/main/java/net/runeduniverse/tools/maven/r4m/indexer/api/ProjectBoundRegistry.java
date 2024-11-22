@@ -17,9 +17,11 @@ package net.runeduniverse.tools.maven.r4m.indexer.api;
 
 import org.apache.maven.project.MavenProject;
 
-public interface ProjectBoundArchive<S> {
+public interface ProjectBoundRegistry<S> {
 
 	public S createSector(final MavenProject mvnProject);
+
+	public boolean hasSector(final MavenProject mvnProject);
 
 	public S getSector(final MavenProject mvnProject);
 

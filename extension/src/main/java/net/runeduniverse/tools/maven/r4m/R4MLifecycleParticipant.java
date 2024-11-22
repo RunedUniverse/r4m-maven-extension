@@ -67,6 +67,7 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
@@ -87,7 +88,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	@Requirement
 	private Settings settings;
 	@Requirement
-	private ExecutionArchive archive;
+	private ExecutionArchive pemArchive;
+	@Requirement
+	private GoalRequirementArchive grmArchive;
 	@Requirement(role = MavenProjectScanner.class)
 	private List<MavenProjectScanner> mavenProjectScanner;
 	@Requirement
@@ -306,12 +309,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final MavenProject mvnProject) throws Exception {
-
-		ExecutionArchiveSector projectSlice = this.archive.getSector(mvnProject);
-		if (projectSlice == null)
-			projectSlice = this.archive.createSector(mvnProject);
-		else
-			return;
+		this.pemArchive.createSector(mvnProject);
+		this.grmArchive.createSector(mvnProject);
 
 		Set<Plugin> unidentifiablePlugins = this.unidentifiablePlugins.get(mvnProject);
 		if (unidentifiablePlugins == null) {
@@ -323,7 +322,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				.addAll(extPlugins);
 
 		for (MavenProjectScanner scanner : this.mavenProjectScanner)
-			scanner.scan(mvnSession, extPlugins, unidentifiablePlugins, mvnProject, projectSlice);
+			scanner.scan(mvnSession, extPlugins, unidentifiablePlugins, mvnProject);
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {

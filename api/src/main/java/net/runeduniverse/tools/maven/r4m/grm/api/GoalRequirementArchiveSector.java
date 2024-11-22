@@ -15,14 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.api;
 
-import java.util.Comparator;
-
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
-import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundRegistry;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundEntry;
 
-public interface GoalRequirementArchive extends ProjectBoundRegistry<GoalRequirementArchiveSector>, Recordable {
+public interface GoalRequirementArchiveSector extends ProjectBoundEntry<GoalRequirementArchiveSector>, Recordable {
 
-	public Comparator<EntityView> getComparator();
+	// public GoalRequirementModel getModel(Object sourcedModelEntry);
+
+	public void register(GoalRequirementModel grm);
 
 }

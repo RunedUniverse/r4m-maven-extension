@@ -128,5 +128,4 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 	protected String _getRecordTitle() {
 		return "ArchiveSector";
 	}
-
 }

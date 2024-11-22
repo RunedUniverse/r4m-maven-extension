@@ -17,21 +17,35 @@ package net.runeduniverse.tools.maven.r4m.grm;
 
 import java.util.Comparator;
 
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
 import net.runeduniverse.lib.utils.conditions.tools.ConditionComparator;
 import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
 import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundArchive;
 
 @Component(role = GoalRequirementArchive.class, instantiationStrategy = "keep-alive")
-public class DefaultGrmArchive implements GoalRequirementArchive {
+public class DefaultGrmArchive extends AProjectBoundArchive<GoalRequirementArchiveSector>
+		implements GoalRequirementArchive {
 
 	public Comparator<EntityView> getComparator() {
 		// TODO implement
 		final EntrySet<EntityView> set = new EntrySet<>();
 		set.compile(new ConditionIndexer());
 		return new ConditionComparator<EntityView>(set);
+	}
+
+	@Override
+	protected GoalRequirementArchiveSector _newSector(MavenProject mvnProject) {
+		return new ArchiveSector(mvnProject, null);
+	}
+
+	@Override
+	protected String _getRecordTitle() {
+		return "GoalRequirementArchive";
 	}
 }

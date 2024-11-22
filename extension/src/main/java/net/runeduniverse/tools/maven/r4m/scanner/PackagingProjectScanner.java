@@ -25,7 +25,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
@@ -44,7 +44,7 @@ public class PackagingProjectScanner implements MavenProjectScanner {
 
 	@Override
 	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
-			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
+			MavenProject mvnProject, ExecutionArchiveSector projectSlice) throws Exception {
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
 			projectSlice.register(parser.parse());
 	}

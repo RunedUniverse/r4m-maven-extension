@@ -69,7 +69,7 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
@@ -307,9 +307,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final MavenProject mvnProject) throws Exception {
 
-		ExecutionArchiveSlice projectSlice = this.archive.getSlice(mvnProject);
+		ExecutionArchiveSector projectSlice = this.archive.getSector(mvnProject);
 		if (projectSlice == null)
-			projectSlice = this.archive.createSlice(mvnProject);
+			projectSlice = this.archive.createSector(mvnProject);
 		else
 			return;
 

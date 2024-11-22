@@ -41,7 +41,7 @@ import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -96,19 +96,19 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		if (isBlank(this.encoding))
 			this.encoding = "UTF-8";
 
-		ExecutionArchiveSlice projectSlice = null;
+		ExecutionArchiveSector projectSector = null;
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSector = this.archive.getSector(this.mvnProject);
 
-		if (projectSlice == null) {
+		if (projectSector == null) {
 			// try loading via build-extension classrealm
 			this.archive = acquireExecutionArchive(mvnSession, (ClassRealm) Thread.currentThread()
 					.getContextClassLoader());
 		}
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSector = this.archive.getSector(this.mvnProject);
 
-		if (projectSlice == null)
+		if (projectSector == null)
 			mojoFailureExtensionLoading(getLog());
 
 		final ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
@@ -117,13 +117,13 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		cnf.compile(this.mvnSession);
 
 		Set<Execution> executions = new LinkedHashSet<>();
-		int sliceCnt = collectExecutions(executions, projectSlice, cnf);
+		int sectorCnt = collectExecutions(executions, projectSector, cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
 		getLog().info("");
 		getLog().info("Discovered & Relevant");
-		getLog().info(String.format("    project depth:      %s", sliceCnt));
+		getLog().info(String.format("    project depth:      %s", sectorCnt));
 		getLog().info(String.format("    executions:         %s", executions.size()));
 		getLog().info("    ------------------------");
 
@@ -152,27 +152,27 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final ExecutionArchiveSelectorConfig cnf) {
 		Data data = new Data();
-		collectExecutions(executions, slice, defaultRelevanceFilter(cnf), false, data);
+		collectExecutions(executions, sector, defaultRelevanceFilter(cnf), false, data);
 		return data.getDepth();
 	}
 
-	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final ExecutionFilter filter, final boolean onlyInherited, final Data data) {
-		if (slice == null)
+		if (sector == null)
 			return;
 
 		data.incrementDepth();
-		Set<Execution> applicableExecutions = slice.getEffectiveExecutions(filter, onlyInherited);
+		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
 
 		if (applicableExecutions.isEmpty()) {
-			if (slice.getParent() != null)
-				collectExecutions(executions, slice.getParent(), filter, true, data);
+			if (sector.getParent() != null)
+				collectExecutions(executions, sector.getParent(), filter, true, data);
 
 			if (!data.isEffExecDetected())
-				applicableExecutions = slice.getExecutions(filter, onlyInherited);
+				applicableExecutions = sector.getExecutions(filter, onlyInherited);
 		} else
 			data.setEffExecDetected(true);
 

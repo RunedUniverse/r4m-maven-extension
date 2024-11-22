@@ -38,7 +38,8 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -88,29 +89,29 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (isBlank(this.encoding))
 			this.encoding = "UTF-8";
 
-		ExecutionArchiveSlice projectSlice = null;
+		ExecutionArchiveSector projectSector = null;
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSector = this.archive.getSector(this.mvnProject);
 
-		if (projectSlice == null) {
+		if (projectSector == null) {
 			// try loading via build-extension classrealm
 			this.archive = acquireExecutionArchive(mvnSession, (ClassRealm) Thread.currentThread()
 					.getContextClassLoader());
 		}
 		if (this.archive != null)
-			projectSlice = this.archive.getSlice(this.mvnProject);
+			projectSector = this.archive.getSector(this.mvnProject);
 
-		if (projectSlice == null)
+		if (projectSector == null)
 			mojoFailureExtensionLoading(getLog());
 
 		Set<Execution> executions = new LinkedHashSet<>();
-		int sliceCnt = collectExecutions(executions, projectSlice);
+		int sectorCnt = collectExecutions(executions, projectSector);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
 		getLog().info("");
 		getLog().info("Discovered");
-		getLog().info(String.format("    project depth:      %s", sliceCnt));
+		getLog().info(String.format("    project depth:      %s", sectorCnt));
 		getLog().info(String.format("    executions:         %s", executions.size()));
 		getLog().info("    ------------------------");
 
@@ -139,16 +140,16 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice) {
-		return collectExecutions(executions, slice, false);
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector) {
+		return collectExecutions(executions, sector, false);
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSlice slice,
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final boolean onlyInherited) {
-		if (slice == null)
+		if (sector == null)
 			return 0;
-		executions.addAll(slice.getExecutions(e -> true, onlyInherited));
-		return collectExecutions(executions, slice.getParent(), true) + 1;
+		executions.addAll(sector.getExecutions(e -> true, onlyInherited));
+		return collectExecutions(executions, sector.getParent(), true) + 1;
 	}
 
 }

@@ -27,7 +27,7 @@ public class Registry extends APluginBoundRegistry<PluginRequirementRegistrySect
 		implements PluginRequirementRegistry {
 
 	@Override
-	protected PluginRequirementRegistrySector newSector(final PluginDescriptor mvnPluginDescriptor) {
+	protected PluginRequirementRegistrySector _newSector(final PluginDescriptor mvnPluginDescriptor) {
 		return new RegistrySector();
 	}
 }

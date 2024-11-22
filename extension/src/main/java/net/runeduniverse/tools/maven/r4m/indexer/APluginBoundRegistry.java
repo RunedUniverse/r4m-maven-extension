@@ -30,14 +30,14 @@ public abstract class APluginBoundRegistry<S> implements PluginBoundRegistry<S> 
 	protected final Map<String, PluginDescriptor> prefixedDescriptor = new LinkedHashMap<>();
 	protected final Map<String, PluginDescriptor> keyedDescriptor = new LinkedHashMap<>();
 
-	protected abstract S newSector(PluginDescriptor mvnPluginDescriptor);
+	protected abstract S _newSector(PluginDescriptor mvnPluginDescriptor);
 
 	@Override
 	public S createSector(PluginDescriptor mvnPluginDescriptor) {
 		final String prefix = mvnPluginDescriptor.getGoalPrefix();
-		final String key = createKey(mvnPluginDescriptor.getGroupId(), mvnPluginDescriptor.getArtifactId());
+		final String key = _createKey(mvnPluginDescriptor.getGroupId(), mvnPluginDescriptor.getArtifactId());
 
-		final S sector = newSector(mvnPluginDescriptor);
+		final S sector = _newSector(mvnPluginDescriptor);
 		if (!isBlank(prefix)) {
 			this.prefixedDescriptor.put(prefix, mvnPluginDescriptor);
 			this.prefixedSectors.put(prefix, sector);
@@ -56,7 +56,7 @@ public abstract class APluginBoundRegistry<S> implements PluginBoundRegistry<S> 
 
 	@Override
 	public boolean hasSector(String groupId, String artifactId) {
-		return this.prefixedSectors.containsKey(createKey(groupId, artifactId));
+		return this.prefixedSectors.containsKey(_createKey(groupId, artifactId));
 	}
 
 	@Override
@@ -66,10 +66,10 @@ public abstract class APluginBoundRegistry<S> implements PluginBoundRegistry<S> 
 
 	@Override
 	public S getSector(String groupId, String artifactId) {
-		return this.keyedSectors.get(createKey(groupId, artifactId));
+		return this.keyedSectors.get(_createKey(groupId, artifactId));
 	}
 
-	protected static String createKey(String groupId, String artifactId) {
+	protected static String _createKey(String groupId, String artifactId) {
 		return String.join(":", groupId, artifactId);
 	}
 }

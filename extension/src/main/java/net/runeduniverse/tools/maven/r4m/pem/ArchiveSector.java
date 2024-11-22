@@ -25,29 +25,23 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public class ArchiveSlice implements ExecutionArchiveSlice {
+public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> implements ExecutionArchiveSector {
 
-	private final MavenProject mvnProject;
-	private ExecutionArchiveSlice parent;
-	private String version;
-	private final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
-	private final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
+	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
+	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
-	public ArchiveSlice(MavenProject mvnProject, String version, ArchiveSlice parent) {
-		this.mvnProject = mvnProject;
+	protected String version;
+
+	public ArchiveSector(final MavenProject mvnProject, final String version, final ArchiveSector parent) {
+		super(mvnProject, parent);
 		this.version = version;
-		this.parent = parent;
-	}
-
-	@Override
-	public MavenProject getMvnProject() {
-		return this.mvnProject;
 	}
 
 	@Override
@@ -56,12 +50,7 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 	}
 
 	@Override
-	public ExecutionArchiveSlice getParent() {
-		return this.parent;
-	}
-
-	@Override
-	public ProjectExecutionModel getModel(Execution execution) {
+	public ProjectExecutionModel getModel(final Execution execution) {
 		return this.executionOrigins.get(execution);
 	}
 
@@ -100,12 +89,7 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 	}
 
 	@Override
-	public void setParent(ExecutionArchiveSlice parent) {
-		this.parent = parent;
-	}
-
-	@Override
-	public void register(ProjectExecutionModel pem) {
+	public void register(final ProjectExecutionModel pem) {
 		if (pem == null)
 			return;
 
@@ -128,15 +112,9 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("ArchiveSlice");
+		final CompoundTree tree = super.toRecord();
 
 		tree.append("version", this.version);
-
-		tree.append("project id", this.mvnProject.getId());
-
-		if (this.parent != null)
-			tree.append("parent project id", this.parent.getMvnProject()
-					.getId());
 
 		for (Map<ExecutionSource, Set<Execution>> valuesBySource : this.executions.values())
 			for (Set<Execution> executions : valuesBySource.values())
@@ -144,6 +122,11 @@ public class ArchiveSlice implements ExecutionArchiveSlice {
 					tree.append(execution.toRecord());
 
 		return tree;
+	}
+
+	@Override
+	protected String _getRecordTitle() {
+		return "ArchiveSector";
 	}
 
 }

@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 public class Registry extends APluginBoundRegistry<PluginExecutionRegistrySector> implements PluginExecutionRegistry {
 
 	@Override
-	protected PluginExecutionRegistrySector newSector(final PluginDescriptor mvnPluginDescriptor) {
+	protected PluginExecutionRegistrySector _newSector(final PluginDescriptor mvnPluginDescriptor) {
 		return new RegistrySector();
 	}
 }

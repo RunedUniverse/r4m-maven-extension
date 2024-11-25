@@ -23,6 +23,10 @@ public class NotDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup";
 
 	public NotDataGroup() {
-		super(LinkedHashSet<DataEntry>::new);
+		this(HINT);
+	}
+
+	protected NotDataGroup(final String type) {
+		super(type, LinkedHashSet<DataEntry>::new);
 	}
 }

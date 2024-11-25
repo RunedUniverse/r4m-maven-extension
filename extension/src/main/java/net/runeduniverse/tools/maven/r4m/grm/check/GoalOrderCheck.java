@@ -19,13 +19,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 
 public class GoalOrderCheck extends GoalInfoCheck {
 
 	private final WhenCheck when = new WhenCheck();
 
-	private ExecutionSource source = null;
+	private GoalRequirementSource source = null;
 
 	public GoalOrderCheck() {
 		super();
@@ -41,11 +41,11 @@ public class GoalOrderCheck extends GoalInfoCheck {
 		return this.when;
 	}
 
-	public ExecutionSource getSourceId() {
+	public GoalRequirementSource getSourceId() {
 		return this.source;
 	}
 
-	public void setSource(ExecutionSource source) {
+	public void setSource(GoalRequirementSource source) {
 		this.source = source;
 	}
 

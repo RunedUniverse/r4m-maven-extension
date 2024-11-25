@@ -27,7 +27,7 @@ import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelParser;
 
@@ -58,7 +58,7 @@ public class XmlParser implements GoalRequirementModelParser {
 	}
 
 	protected boolean parseGoals(final GoalRequirementModel model, final PlexusConfiguration nodeList,
-			final String defaultGroupId, final String defaultArtifactId, final ExecutionSource defaultSource) {
+			final String defaultGroupId, final String defaultArtifactId, final GoalRequirementSource defaultSource) {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 

@@ -70,7 +70,7 @@ public class ExecutionSource {
 
 		key = key.trim()
 				.toLowerCase();
-		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
+		final ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
 		if (source == null)
 			return new ExecutionSource(key);
 		else

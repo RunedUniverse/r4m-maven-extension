@@ -28,23 +28,23 @@ import java.util.Map;
  * 3. $pem = $pem merges with PLUGIN by replacing all goals which are also defined in PLUGIN
  * 4. $pem = OVERRIDE merges with $pem by replacing all lifecycles which are also defined in $pem
  */
-public class ExecutionSource {
+public class GoalRequirementSource {
 
 	@Deprecated
-	public static final Map<String, ExecutionSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
+	public static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
 
-	public static final ExecutionSource OVERRIDE = new ExecutionSource("override");
-	public static final ExecutionSource WORKFLOW = new ExecutionSource("workflow");
-	public static final ExecutionSource PACKAGING = new ExecutionSource("packaging");
-	public static final ExecutionSource PLUGIN = new ExecutionSource("plugin");
+	public static final GoalRequirementSource OVERRIDE = new GoalRequirementSource("override");
+	public static final GoalRequirementSource WORKFLOW = new GoalRequirementSource("workflow");
+	public static final GoalRequirementSource PACKAGING = new GoalRequirementSource("packaging");
+	public static final GoalRequirementSource PLUGIN = new GoalRequirementSource("plugin");
 	@Deprecated
-	public static final ExecutionSource EFFECTIVE = new ExecutionSource("effective");
+	public static final GoalRequirementSource EFFECTIVE = new GoalRequirementSource("effective");
 
 	private final String key;
 
-	protected ExecutionSource(String key) {
+	protected GoalRequirementSource(String key) {
 		this.key = key;
-		ExecutionSource.KNOWN_SOURCES.put(key, this);
+		GoalRequirementSource.KNOWN_SOURCES.put(key, this);
 	}
 
 	public String key() {
@@ -53,10 +53,10 @@ public class ExecutionSource {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof ExecutionSource))
+		if (!(obj instanceof GoalRequirementSource))
 			return false;
 
-		return this.key.equals(((ExecutionSource) obj).key());
+		return this.key.equals(((GoalRequirementSource) obj).key());
 	}
 
 	@Override
@@ -64,15 +64,15 @@ public class ExecutionSource {
 		return this.key;
 	}
 
-	public static ExecutionSource create(String key) {
+	public static GoalRequirementSource create(String key) {
 		if (isBlank(key))
 			return null;
 
 		key = key.trim()
 				.toLowerCase();
-		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
+		final GoalRequirementSource source = GoalRequirementSource.KNOWN_SOURCES.get(key);
 		if (source == null)
-			return new ExecutionSource(key);
+			return new GoalRequirementSource(key);
 		else
 			return source;
 	}

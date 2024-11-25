@@ -23,6 +23,10 @@ public class AndDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup";
 
 	public AndDataGroup() {
-		super(LinkedHashSet<DataEntry>::new);
+		this(HINT);
+	}
+
+	protected AndDataGroup(final String type) {
+		super(type, LinkedHashSet<DataEntry>::new);
 	}
 }

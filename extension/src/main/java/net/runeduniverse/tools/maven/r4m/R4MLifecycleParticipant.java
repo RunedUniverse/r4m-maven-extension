@@ -70,7 +70,6 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
@@ -423,7 +422,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		return Collections.unmodifiableList(artifacts);
 	}
 
-	protected void modifyLifecycleExecutionPlanCalculator() {
+	private void modifyLifecycleExecutionPlanCalculator() {
 		String defaultExecPlanCalcName = DefaultLifecycleExecutionPlanCalculator.class.getCanonicalName();
 		DefaultLifecycleExecutionPlanCalculator defaultExecPlanCalc = null;
 

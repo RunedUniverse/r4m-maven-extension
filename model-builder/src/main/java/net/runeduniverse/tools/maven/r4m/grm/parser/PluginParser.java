@@ -39,7 +39,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistry;
 import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelParser;
 import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPluginParser;
@@ -95,7 +95,7 @@ public class PluginParser implements GoalRequirementModelPluginParser {
 		model.setParser(PluginParser.class, PluginParser.HINT);
 		model.setDefaultGroupId(mvnPluginDescriptor.getGroupId());
 		model.setDefaultArtifactId(mvnPluginDescriptor.getArtifactId());
-		model.setDefaultSource(ExecutionSource.PLUGIN);
+		model.setDefaultSource(GoalRequirementSource.PLUGIN);
 
 		try {
 			if (pluginFile.isFile()) {

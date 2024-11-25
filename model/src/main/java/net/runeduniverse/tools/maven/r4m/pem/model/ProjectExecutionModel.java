@@ -47,6 +47,7 @@ public class ProjectExecutionModel implements Recordable {
 		return this.parserHint;
 	}
 
+	// set when pem.xml is found in the project folder
 	public boolean isEffective() {
 		return this.effective;
 	}

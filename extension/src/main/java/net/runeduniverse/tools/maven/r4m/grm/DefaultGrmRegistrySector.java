@@ -28,7 +28,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
-public class RegistrySector implements PluginRequirementRegistrySector {
+public class DefaultGrmRegistrySector implements PluginRequirementRegistrySector {
 
 	// save more infos???
 

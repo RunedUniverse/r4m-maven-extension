@@ -23,11 +23,11 @@ import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector
 import net.runeduniverse.tools.maven.r4m.indexer.APluginBoundRegistry;
 
 @Component(role = PluginRequirementRegistry.class, instantiationStrategy = "keep-alive")
-public class Registry extends APluginBoundRegistry<PluginRequirementRegistrySector>
+public class DefaultGrmRegistry extends APluginBoundRegistry<PluginRequirementRegistrySector>
 		implements PluginRequirementRegistry {
 
 	@Override
 	protected PluginRequirementRegistrySector _newSector(final PluginDescriptor mvnPluginDescriptor) {
-		return new RegistrySector();
+		return new DefaultGrmRegistrySector();
 	}
 }

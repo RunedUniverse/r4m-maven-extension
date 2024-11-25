@@ -16,8 +16,6 @@
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import java.util.Collection;
-import java.util.Collections;
-
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
@@ -28,13 +26,13 @@ public class GoalContainer implements Recordable {
 	protected final DataGroup dependentData;
 
 	public GoalContainer(final DataGroup matchData, final DataGroup prerequisiteData, final DataGroup dependentData) {
-		this.matchData = matchData == null ? new DummyDataGroup() : matchData;
-		this.prerequisiteData = prerequisiteData == null ? new DummyDataGroup() : prerequisiteData;
-		this.dependentData = dependentData == null ? new DummyDataGroup() : dependentData;
+		this.matchData = matchData;
+		this.prerequisiteData = prerequisiteData;
+		this.dependentData = dependentData;
 	}
 
 	public DataGroup getMatchGroup() {
-		return this.matchData instanceof DummyDataGroup ? null : this.matchData;
+		return this.matchData;
 	}
 
 	public Collection<DataEntry> getMatchEntries() {
@@ -42,7 +40,7 @@ public class GoalContainer implements Recordable {
 	}
 
 	public DataGroup getPrerequisiteGroup() {
-		return this.prerequisiteData instanceof DummyDataGroup ? null : this.prerequisiteData;
+		return this.prerequisiteData;
 	}
 
 	public Collection<DataEntry> getPrerequisiteEntries() {
@@ -50,7 +48,7 @@ public class GoalContainer implements Recordable {
 	}
 
 	public DataGroup getDependentGroup() {
-		return this.dependentData instanceof DummyDataGroup ? null : this.dependentData;
+		return this.dependentData;
 	}
 
 	public Collection<DataEntry> getDependentEntries() {
@@ -71,20 +69,16 @@ public class GoalContainer implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	protected class DummyDataGroup implements DataGroup {
-
-		@Override
-		public Collection<DataEntry> getEntries() {
-			return Collections.emptySet();
-		}
-
-		@Override
-		public boolean addEntry(DataEntry entry) {
-			return false;
-		}
+		final CompoundTree tree = new CompoundTree("GoalContainer");
+		CompoundTree subtree = ModelUtils.toRecord(this.matchData);
+		if (subtree != null)
+			tree.append(subtree);
+		subtree = ModelUtils.toRecord(this.prerequisiteData);
+		if (subtree != null)
+			tree.append(subtree);
+		subtree = ModelUtils.toRecord(this.dependentData);
+		if (subtree != null)
+			tree.append(subtree);
+		return tree;
 	}
 }

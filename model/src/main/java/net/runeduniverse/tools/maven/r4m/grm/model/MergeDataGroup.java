@@ -17,13 +17,17 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 
 public class MergeDataGroup extends AndDataGroup {
 
-	private ExecutionSource source = null;
+	private GoalRequirementSource source = null;
 
-	public ExecutionSource getSourceId() {
+	public MergeDataGroup(final String type) {
+		super(type);
+	}
+
+	public GoalRequirementSource getSource() {
 		return this.source;
 	}
 
-	public void setSource(ExecutionSource source) {
+	public void setSource(GoalRequirementSource source) {
 		this.source = source;
 	}
 }

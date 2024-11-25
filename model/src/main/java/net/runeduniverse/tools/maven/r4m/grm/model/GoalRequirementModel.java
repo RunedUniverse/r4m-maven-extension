@@ -33,7 +33,7 @@ public class GoalRequirementModel implements Recordable {
 	protected boolean effective = false;
 	protected String defaultGroupId = null;
 	protected String defaultArtifactId = null;
-	protected ExecutionSource defaultSource = ExecutionSource.PLUGIN;
+	protected GoalRequirementSource defaultSource = GoalRequirementSource.PLUGIN;
 
 	public GoalRequirementModel() {
 	}
@@ -50,6 +50,7 @@ public class GoalRequirementModel implements Recordable {
 		return this.parserHint;
 	}
 
+	// set when pem.xml is found in the project folder
 	public boolean isEffective() {
 		return this.effective;
 	}
@@ -62,7 +63,7 @@ public class GoalRequirementModel implements Recordable {
 		return this.defaultArtifactId;
 	}
 
-	public ExecutionSource getDefaultSource() {
+	public GoalRequirementSource getDefaultSource() {
 		return this.defaultSource;
 	}
 
@@ -91,9 +92,9 @@ public class GoalRequirementModel implements Recordable {
 		this.defaultArtifactId = defaultArtifactId;
 	}
 
-	public void setDefaultSource(final ExecutionSource defaultSource) {
+	public void setDefaultSource(final GoalRequirementSource defaultSource) {
 		if (defaultSource == null)
-			this.defaultSource = ExecutionSource.PLUGIN;
+			this.defaultSource = GoalRequirementSource.PLUGIN;
 		else
 			this.defaultSource = defaultSource;
 	}

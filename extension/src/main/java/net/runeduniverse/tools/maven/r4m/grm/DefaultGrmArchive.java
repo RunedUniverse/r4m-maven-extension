@@ -41,7 +41,7 @@ public class DefaultGrmArchive extends AProjectBoundArchive<GoalRequirementArchi
 
 	@Override
 	protected GoalRequirementArchiveSector _newSector(MavenProject mvnProject) {
-		return new ArchiveSector(mvnProject, null);
+		return new DefaultGrmArchiveSector(mvnProject, null);
 	}
 
 	@Override

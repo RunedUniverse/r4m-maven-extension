@@ -34,7 +34,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
@@ -43,6 +43,9 @@ import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
 @Component(role = CheckDataConverter.class, hint = "default")
 public class DefaultCheckDataConverter implements CheckDataConverter {
+
+	public static final String CNF_MATCH_BEFORE_TAG = "prerequisites";
+	public static final String CNF_MATCH_AFTER_TAG = "dependents";
 
 	public static int MAX_TYPE_SEARCH_DEPTH = 4;
 
@@ -53,26 +56,26 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 
 	@Override
 	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId, final ExecutionSource defaultSource) {
+			final String defaultArtifactId, final GoalRequirementSource defaultSource) {
 		if (cnf == null)
 			return null;
 
-		final PlexusConfiguration preqCnf = cnf.getChild("prerequisites", true);
-		final PlexusConfiguration depCnf = cnf.getChild("dependents", true);
+		final PlexusConfiguration preqCnf = cnf.getChild(CNF_MATCH_BEFORE_TAG, true);
+		final PlexusConfiguration depCnf = cnf.getChild(CNF_MATCH_AFTER_TAG, true);
 
 		final DataGroup match = collectMatchData(copy(cnf, Collections.emptyList(), Arrays.asList( //
-				"prerequisites", "dependents" //
+				CNF_MATCH_BEFORE_TAG, CNF_MATCH_AFTER_TAG //
 		)), defaultGroupId, defaultArtifactId);
 
 		final GoalContainer containerData = new GoalContainer(match, new OrDataGroup(), new OrDataGroup());
 
 		for (PlexusConfiguration entry : preqCnf.getChildren()) {
-			containerData.addPrerequisiteEntry(
-					collectRequirementData(entry, defaultGroupId, defaultArtifactId, defaultSource));
+			containerData.addPrerequisiteEntry(collectRequirementData(CNF_MATCH_BEFORE_TAG, entry, defaultGroupId,
+					defaultArtifactId, defaultSource));
 		}
 		for (PlexusConfiguration entry : depCnf.getChildren()) {
-			containerData
-					.addDependentEntry(collectRequirementData(entry, defaultGroupId, defaultArtifactId, defaultSource));
+			containerData.addDependentEntry(collectRequirementData(CNF_MATCH_AFTER_TAG, entry, defaultGroupId,
+					defaultArtifactId, defaultSource));
 		}
 
 		return containerData;
@@ -125,16 +128,21 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 
 	protected DataGroup collectMatchData(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId) {
-		final AndDataGroup group = new AndDataGroup();
+		final AndDataGroup group = new AndDataGroup() {
+			@Override
+			public String type() {
+				return "match";
+			}
+		};
 		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
 		return group;
 	}
 
-	protected DataGroup collectRequirementData(final PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId, final ExecutionSource defaultSource) {
-		final MergeDataGroup group = new MergeDataGroup();
+	protected DataGroup collectRequirementData(final String type, final PlexusConfiguration cnf,
+			final String defaultGroupId, final String defaultArtifactId, final GoalRequirementSource defaultSource) {
+		final MergeDataGroup group = new MergeDataGroup(type);
 		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
-		group.setSource(ExecutionSource.create(cnf.getAttribute("source", defaultSource.key())));
+		group.setSource(GoalRequirementSource.create(cnf.getAttribute("source", defaultSource.key())));
 		return group;
 	}
 
@@ -215,7 +223,7 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 		final PlexusConfiguration goalCnf = factory.create("goal");
 
 		if (goalData instanceof MergeDataGroup) {
-			final ExecutionSource source = ((MergeDataGroup) goalData).getSourceId();
+			final GoalRequirementSource source = ((MergeDataGroup) goalData).getSource();
 			if (source != null) {
 				goalCnf.setAttribute("source", source.key());
 			}

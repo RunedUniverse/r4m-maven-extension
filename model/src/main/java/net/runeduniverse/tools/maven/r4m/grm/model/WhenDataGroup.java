@@ -15,13 +15,20 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public class WhenDataGroup extends OrDataGroup {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public class WhenDataGroup extends OrDataGroup implements Recordable {
 
 	public static final String HINT = "when";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup";
 
 	protected boolean always = false;
 	protected boolean never = false;
+
+	public WhenDataGroup() {
+		super(HINT);
+	}
 
 	public boolean getAlwaysActive() {
 		return this.always;
@@ -37,5 +44,16 @@ public class WhenDataGroup extends OrDataGroup {
 
 	public void setNeverActive(boolean value) {
 		this.never = value;
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		final CompoundTree tree = ModelUtils.createEntryTree(this);
+
+		tree.append("always", Boolean.toString(this.always));
+		tree.append("never", Boolean.toString(this.never));
+
+		ModelUtils.appendEntries(tree, getEntries());
+		return tree;
 	}
 }

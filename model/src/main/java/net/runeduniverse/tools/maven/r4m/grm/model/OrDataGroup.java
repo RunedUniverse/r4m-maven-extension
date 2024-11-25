@@ -23,6 +23,10 @@ public class OrDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup";
 
 	public OrDataGroup() {
-		super(LinkedHashSet<DataEntry>::new);
+		this(HINT);
+	}
+
+	protected OrDataGroup(final String type) {
+		super(type, LinkedHashSet<DataEntry>::new);
 	}
 }

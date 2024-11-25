@@ -18,11 +18,17 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public class ADataGroup<T extends Collection<DataEntry>> implements DataGroup {
+public abstract class ADataGroup<T extends Collection<DataEntry>> implements DataGroup {
 
+	protected final String type;
 	protected final T collection;
 
 	protected ADataGroup(final Supplier<T> supplier) {
+		this(null, supplier);
+	}
+
+	protected ADataGroup(final String type, final Supplier<T> supplier) {
+		this.type = type;
 		this.collection = supplier.get();
 	}
 
@@ -34,5 +40,12 @@ public class ADataGroup<T extends Collection<DataEntry>> implements DataGroup {
 	@Override
 	public boolean addEntry(final DataEntry entry) {
 		return this.collection.add(entry);
+	}
+
+	@Override
+	public String type() {
+		if (this.type == null)
+			return DataGroup.super.type();
+		return this.type;
 	}
 }

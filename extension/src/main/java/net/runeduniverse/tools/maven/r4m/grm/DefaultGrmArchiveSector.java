@@ -18,7 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
@@ -33,6 +36,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils;
 import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
 
 public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementArchiveSector>
@@ -46,10 +50,10 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		super(mvnProject, parent);
 	}
 
-	// TODO implement getModel()
-	// @Override
-	// public GoalRequirementModel getModel(Object sourcedModelEntry) {
-	// }
+	@Override
+	public GoalRequirementModel getModel(MergeDataGroup mergeGroup) {
+		return this.origins.get(mergeGroup);
+	}
 
 	@Override
 	public void register(final GoalRequirementModel grm) {
@@ -88,16 +92,62 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = super.toRecord();
+		final List<String> keys = new LinkedList<>();
+		keys.addAll(this.matchBefore.keySet());
+		keys.addAll(this.matchAfter.keySet());
+		keys.sort(null);
 
-		// TODO log entries
-		/*
-		 * for (Map<ExecutionSource, Set<Execution>> valuesBySource :
-		 * this.executions.values()) for (Set<Execution> executions :
-		 * valuesBySource.values()) for (Execution execution : executions)
-		 * tree.append(execution.toRecord());
-		 */
+		CompoundTree keyTree = null;
+		CompoundTree subTree = null;
+		for (String key : keys) {
+			tree.append(keyTree = new CompoundTree(key));
+			keyTree.append(subTree = new CompoundTree("matchBefore"));
+			appendEntries(subTree, this.matchBefore.get(key));
+			keyTree.append(subTree = new CompoundTree("matchAfter"));
+			appendEntries(subTree, this.matchAfter.get(key));
+		}
 
 		return tree;
+	}
+
+	protected void appendEntries(final CompoundTree tree,
+			final Map<GoalRequirementSource, Set<MergeDataGroup>> entries) {
+		if (tree == null || entries == null)
+			return;
+
+		final Map<GoalRequirementSource, CompoundTree> userMap = new LinkedHashMap<>();
+		final Map<GoalRequirementSource, CompoundTree> projectMap = new LinkedHashMap<>();
+
+		for (Entry<GoalRequirementSource, Set<MergeDataGroup>> entry : entries.entrySet()) {
+			final GoalRequirementSource source = entry.getKey();
+			final Set<MergeDataGroup> set = entry.getValue();
+			if (set == null)
+				continue;
+
+			for (MergeDataGroup mergeGroup : set) {
+				final GoalRequirementModel model = getModel(mergeGroup);
+				final Map<GoalRequirementSource, CompoundTree> map = model.isEffective() ? userMap : projectMap;
+
+				CompoundTree sourceTree = map.get(source);
+				if (sourceTree == null)
+					map.put(source,
+							sourceTree = new CompoundTree("source", source == null ? "< null >" : source.key()));
+
+				sourceTree.append(ModelUtils.toRecord(mergeGroup));
+			}
+		}
+
+		CompoundTree subTree = new CompoundTree("origin", "user-defined");
+		for (CompoundTree treeEntry : userMap.values()) {
+			subTree.append(treeEntry);
+		}
+		tree.append(subTree);
+
+		subTree = new CompoundTree("origin", "project-defined");
+		for (CompoundTree treeEntry : projectMap.values()) {
+			subTree.append(treeEntry);
+		}
+		tree.append(subTree);
 	}
 
 	@Override

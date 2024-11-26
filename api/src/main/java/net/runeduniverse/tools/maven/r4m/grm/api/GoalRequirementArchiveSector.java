@@ -17,11 +17,12 @@ package net.runeduniverse.tools.maven.r4m.grm.api;
 
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundEntry;
 
 public interface GoalRequirementArchiveSector extends ProjectBoundEntry<GoalRequirementArchiveSector>, Recordable {
 
-	// public GoalRequirementModel getModel(Object sourcedModelEntry);
+	public GoalRequirementModel getModel(MergeDataGroup mergeGroup);
 
 	public void register(GoalRequirementModel grm);
 

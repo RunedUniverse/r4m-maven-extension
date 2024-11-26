@@ -45,6 +45,13 @@ public class DefaultGrmArchive extends AProjectBoundArchive<GoalRequirementArchi
 	}
 
 	@Override
+	protected void _updateSector(GoalRequirementArchiveSector parent, GoalRequirementArchiveSector child) {
+		if (child == null)
+			return;
+		child.setParent(parent);
+	}
+
+	@Override
 	protected String _getRecordTitle() {
 		return "GoalRequirementArchive";
 	}

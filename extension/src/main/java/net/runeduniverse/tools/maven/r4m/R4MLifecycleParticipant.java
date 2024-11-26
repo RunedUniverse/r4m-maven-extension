@@ -77,8 +77,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM = //
 			"Failed to load maven-extension ClassRealm";
-	public static final String ERR_FAILED_TO_LOAD_PEM = //
-			"Failed while loading pem.xml from project";
+	public static final String ERR_FAILED_TO_LOAD_MODELS = //
+			"Failed while loading pem.xml & grm.xml from project";
 
 	public static final String PLEXUS_DEFAULT_MAVEN_HINT = "maven-default";
 
@@ -189,7 +189,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} catch (Exception e) {
-			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_PEM, e);
+			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
 			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} finally {

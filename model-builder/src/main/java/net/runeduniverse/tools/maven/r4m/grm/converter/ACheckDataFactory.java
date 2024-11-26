@@ -26,10 +26,10 @@ import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 public abstract class ACheckDataFactory implements CheckDataFactory {
 
 	@Requirement(role = CheckDataConverter.class)
-	protected CheckDataConverter factory;
+	protected CheckDataConverter converter;
 
 	protected DataEntry convertEntry(final PlexusConfiguration cnf) {
-		return this.factory.convertEntry(cnf);
+		return this.converter.convertEntry(cnf);
 	}
 
 	protected boolean addConvertedEntry(final DataGroup group, final PlexusConfiguration cnf) {

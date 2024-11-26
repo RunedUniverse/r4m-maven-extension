@@ -16,19 +16,14 @@
 package net.runeduniverse.tools.maven.r4m.grm.converter;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup;
 
 @Component(role = CheckDataFactory.class, hint = NotDataGroup.HINT)
 public class NotCheckDataFactory extends ACheckDataFactory {
-
-	@Requirement(role = CheckDataConverter.class)
-	protected CheckDataConverter factory;
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {

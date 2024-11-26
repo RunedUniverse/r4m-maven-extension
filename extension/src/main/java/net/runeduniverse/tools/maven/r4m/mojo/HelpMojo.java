@@ -56,7 +56,10 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info(" r4m:status");
 		getLog().info("     Shows the status of all r4m features.");
 		getLog().info("");
+		getLog().info(" r4m:help-debug");
+		getLog().info("     Prints the debug help-page.");
+		getLog().info("     It lists debug goals which can help trace unexpected problems.");
+		getLog().info("");
 		getLog().info("");
 	}
-
 }

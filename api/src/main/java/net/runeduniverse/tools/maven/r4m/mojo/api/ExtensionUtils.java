@@ -31,6 +31,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
@@ -62,7 +63,7 @@ public interface ExtensionUtils {
 
 	@SuppressWarnings("deprecation")
 	public static ExecutionArchive acquireExecutionArchive(final MavenSession mvnSession, final ClassRealm realm) {
-		ClassRealm extRealm = realm.getWorld()
+		final ClassRealm extRealm = realm.getWorld()
 				.getClassRealm(Runes4MavenProperties.BUILD_EXTENSION_REALM_ID);
 		if (extRealm == null)
 			return null;
@@ -74,6 +75,30 @@ public interface ExtensionUtils {
 
 			archive = mvnSession.getContainer()
 					.lookup(ExecutionArchive.class);
+
+			Thread.currentThread()
+					.setContextClassLoader(realm);
+		} catch (ComponentLookupException e) {
+			archive = null;
+		}
+		return archive;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static GoalRequirementArchive acquireGoalRequirementArchive(final MavenSession mvnSession,
+			final ClassRealm realm) {
+		final ClassRealm extRealm = realm.getWorld()
+				.getClassRealm(Runes4MavenProperties.BUILD_EXTENSION_REALM_ID);
+		if (extRealm == null)
+			return null;
+
+		GoalRequirementArchive archive;
+		try {
+			Thread.currentThread()
+					.setContextClassLoader(extRealm);
+
+			archive = mvnSession.getContainer()
+					.lookup(GoalRequirementArchive.class);
 
 			Thread.currentThread()
 					.setContextClassLoader(realm);

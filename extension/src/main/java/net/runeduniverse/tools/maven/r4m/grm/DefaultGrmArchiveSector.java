@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.grm;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -30,6 +31,7 @@ import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
@@ -43,6 +45,7 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		implements GoalRequirementArchiveSector {
 
 	protected final Map<MergeDataGroup, GoalRequirementModel> origins = new LinkedHashMap<>();
+	protected final Map<String, DataGroup> goalKeyData = new LinkedHashMap<>();
 	protected final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchBefore = new LinkedHashMap<>();
 	protected final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchAfter = new LinkedHashMap<>();
 
@@ -51,8 +54,49 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 	}
 
 	@Override
-	public GoalRequirementModel getModel(MergeDataGroup mergeGroup) {
+	public GoalRequirementModel getModel(final MergeDataGroup mergeGroup) {
 		return this.origins.get(mergeGroup);
+	}
+
+	public Map<String, DataGroup> getItemMatches() {
+		return Collections.unmodifiableMap(this.goalKeyData);
+	}
+
+	public Map<String, Set<MergeDataGroup>> getBeforeMatches() {
+		return collectEntries(this.matchBefore, false);
+	}
+
+	public Map<String, Set<MergeDataGroup>> getEffectiveBeforeMatches() {
+		return collectEntries(this.matchBefore, true);
+	}
+
+	public Map<String, Set<MergeDataGroup>> getAfterMatches() {
+		return collectEntries(this.matchAfter, false);
+	}
+
+	public Map<String, Set<MergeDataGroup>> getEffectiveAfterMatches() {
+		return collectEntries(this.matchAfter, true);
+	}
+
+	protected Map<String, Set<MergeDataGroup>> collectEntries(
+			final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchMap, final boolean onlyEffective) {
+		final Map<String, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		for (Entry<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> entry : matchMap.entrySet()) {
+			final Set<MergeDataGroup> set = new LinkedHashSet<>();
+			for (Entry<GoalRequirementSource, Set<MergeDataGroup>> sourceEntry : entry.getValue()
+					.entrySet()) {
+				for (MergeDataGroup data : sourceEntry.getValue()) {
+					// check for user-defined flag
+					if (onlyEffective && !this.origins.get(data)
+							.isEffective())
+						continue;
+					// collect data
+					set.add(data);
+				}
+			}
+			map.put(entry.getKey(), set);
+		}
+		return map;
 	}
 
 	@Override
@@ -61,7 +105,10 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 			return;
 
 		for (GoalContainer container : grm.getGoalContainer()) {
-			final String key = createKey(container.getMatchEntries());
+			final DataGroup keyData = container.getMatchGroup();
+			final String key = createKey(keyData.getEntries());
+
+			this.goalKeyData.putIfAbsent(key, keyData);
 			indexEntries(matchBefore, key, grm, container.getPrerequisiteEntries());
 			indexEntries(matchAfter, key, grm, container.getDependentEntries());
 		}
@@ -87,6 +134,23 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 
 			set.add(data);
 		}
+	}
+
+	protected String createKey(final Collection<DataEntry> entries) {
+		String groupId = null;
+		String artifactId = null;
+		String goalId = null;
+		for (DataEntry entry : entries) {
+			if (entry == null)
+				continue;
+			if (entry instanceof GroupIdData)
+				groupId = ((GroupIdData) entry).getGroupId();
+			else if (entry instanceof ArtifactIdData)
+				artifactId = ((ArtifactIdData) entry).getArtifactId();
+			else if (entry instanceof GoalIdData)
+				goalId = ((GoalIdData) entry).getGoalId();
+		}
+		return String.join(":", groupId, artifactId, goalId);
 	}
 
 	@Override
@@ -152,23 +216,6 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 
 	@Override
 	protected String _getRecordTitle() {
-		return "ArchiveSector";
-	}
-
-	protected String createKey(final Collection<DataEntry> entries) {
-		String groupId = null;
-		String artifactId = null;
-		String goalId = null;
-		for (DataEntry entry : entries) {
-			if (entry == null)
-				continue;
-			if (entry instanceof GroupIdData)
-				groupId = ((GroupIdData) entry).getGroupId();
-			else if (entry instanceof ArtifactIdData)
-				artifactId = ((ArtifactIdData) entry).getArtifactId();
-			else if (entry instanceof GoalIdData)
-				goalId = ((GoalIdData) entry).getGoalId();
-		}
-		return String.join(":", groupId, artifactId, goalId);
+		return "GRM ArchiveSector";
 	}
 }

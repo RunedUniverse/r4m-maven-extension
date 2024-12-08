@@ -61,30 +61,32 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 
 	@Override
 	public Set<Execution> getExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
-		Set<Execution> executions = new LinkedHashSet<>();
-		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
-			for (Set<Execution> execCol : entry.values())
-				for (Execution execution : execCol) {
-					if (onlyInherited && !execution.isInherited())
-						continue;
-					if (filter.apply(execution))
-						executions.add(execution);
-				}
-		return executions;
+		return collectEntries(filter, onlyInherited, false);
 	}
 
 	@Override
 	public Set<Execution> getEffectiveExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
-		Set<Execution> executions = new LinkedHashSet<>();
-		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values())
+		return collectEntries(filter, onlyInherited, true);
+	}
+
+	protected Set<Execution> collectEntries(final ExecutionFilter filter, final boolean onlyInherited,
+			final boolean onlyEffective) {
+		final Set<Execution> executions = new LinkedHashSet<>();
+		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
 			for (Set<Execution> execCol : entry.values())
 				for (Execution execution : execCol) {
+					// check for inherited flag
 					if (onlyInherited && !execution.isInherited())
 						continue;
-					if (this.executionOrigins.get(execution)
-							.isEffective() && filter.apply(execution))
+					// check for user-defined flag
+					if (onlyEffective && !this.executionOrigins.get(execution)
+							.isEffective())
+						continue;
+					// apply filter & collect data
+					if (filter.apply(execution))
 						executions.add(execution);
 				}
+		}
 		return executions;
 	}
 
@@ -126,6 +128,6 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 
 	@Override
 	protected String _getRecordTitle() {
-		return "ArchiveSector";
+		return "PEM ArchiveSector";
 	}
 }

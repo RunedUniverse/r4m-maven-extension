@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
@@ -23,6 +24,7 @@ import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
 import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
@@ -39,11 +41,20 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	private GoalRequirementArchive archive;
 
 	@Override
-	public GoalRequirementArchiveSelection compileSelection(final GoalRequirementArchiveSelectorConfig cnf) {
+	public GoalRequirementArchiveSelection compileSelection(final GoalRequirementArchiveSelectorConfig selectorConfig) {
+		final MavenProject mvnProject = selectorConfig.getActiveProject();
 		final EntrySet<EntityView> set = new EntrySet<>();
+		if (mvnProject == null)
+			return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
+
+		final GoalRequirementArchiveSector sector = this.archive.getSector(mvnProject);
+		if (sector == null)
+			return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
+
+		// TODO collect data & compile conditions
 
 		set.compile(new ConditionIndexer());
 
-		return new DefaultGrmArchiveSelection(cnf, set);
+		return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
 	}
 }

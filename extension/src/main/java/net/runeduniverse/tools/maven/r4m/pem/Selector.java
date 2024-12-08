@@ -295,12 +295,13 @@ public class Selector implements ExecutionArchiveSelector {
 		if (selectorConfig.getActiveProject() == null)
 			return new Selection(selectorConfig.clone(), views);
 
-		ExecutionArchiveSector slice = this.archive.getSector(selectorConfig.getActiveProject());
-		if (slice == null)
+		ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
+		if (sector == null)
 			return new Selection(selectorConfig.clone(), views);
 
 		selectorConfig.compile(this.mvnSession);
-		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, slice).entrySet())
+		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, sector)
+				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
 		return new Selection(selectorConfig.clone(), views);
 	}

@@ -15,9 +15,18 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.api;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
-import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundRegistry;
+import org.apache.maven.project.MavenProject;
 
-public interface GoalRequirementArchive extends ProjectBoundRegistry<GoalRequirementArchiveSector>, Recordable {
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public interface GoalRequirementArchiveSelectorConfig extends Recordable, Cloneable {
+
+	public GoalRequirementArchiveSelectorConfig selectActiveProject(MavenProject value);
+
+	public GoalRequirementArchiveSelectorConfig clearActiveProject();
+
+	public MavenProject getActiveProject();
+
+	public GoalRequirementArchiveSelectorConfig clone();
 
 }

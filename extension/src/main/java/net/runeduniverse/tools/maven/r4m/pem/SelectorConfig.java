@@ -217,7 +217,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	@Override
 	public SelectorConfig clone() {
-		SelectorConfig cnf = new SelectorConfig();
+		final SelectorConfig cnf = new SelectorConfig();
 		cnf.selectActiveProject(this.mvnProject);
 		cnf.selectPackagingProcedure(this.packagingProcedure);
 		cnf.selectActiveProfiles(Collections.unmodifiableSet(this.activeProfiles));
@@ -256,7 +256,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Selector Config");
+		final CompoundTree tree = new CompoundTree("PEM Selector Config");
 
 		if (this.dirty)
 			tree.append("[WARNING]", "The SelectorConfig was not compiled prior to recording!");

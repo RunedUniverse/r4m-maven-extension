@@ -73,10 +73,11 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
-import net.runeduniverse.tools.maven.r4m.grm.DefaultGrmArchive;
-import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementDataFactory;
-import net.runeduniverse.tools.maven.r4m.grm.data.DefaultGrmDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
@@ -115,46 +116,49 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	protected Settings settings;
 
 	@Requirement
-	private BuildPluginManager pluginManager;
+	protected BuildPluginManager pluginManager;
 
 	@Requirement
-	private MojoDescriptorCreator mojoDescriptorCreator;
+	protected MojoDescriptorCreator mojoDescriptorCreator;
 
 	@Requirement
-	private ExecutionArchiveSelectorConfigFactory selectorConfigFactory;
+	protected ExecutionArchiveSelectorConfigFactory pemSelectorConfigFactory;
 
 	@Requirement
-	private DefaultLifecycles defaultLifeCycles;
+	protected GoalRequirementArchiveSelectorConfigFactory grmSelectorConfigFactory;
+
+	@Requirement
+	protected DefaultLifecycles defaultLifeCycles;
 
 	@Requirement(role = Lifecycle.class)
 	protected Map<String, Lifecycle> lifecycles;
 
 	@Requirement
-	private LifecyclePluginResolver lifecyclePluginResolver;
+	protected LifecyclePluginResolver lifecyclePluginResolver;
 
 	@Requirement(role = TaskParser.class)
-	private Map<String, TaskParser> taskParser;
+	protected Map<String, TaskParser> taskParser;
 
 	@Requirement
-	protected ExecutionArchiveSelector selector;
+	protected ExecutionArchiveSelector pemSelector;
+
+	@Requirement
+	protected GoalRequirementArchiveSelector grmSelector;
 
 	@Requirement(role = LifecycleTaskRequestCalculatorDelegate.class)
-	private Map<String, LifecycleTaskRequestCalculatorDelegate> lifecycleTaskRequestDelegates;
+	protected Map<String, LifecycleTaskRequestCalculatorDelegate> lifecycleTaskRequestDelegates;
 
 	@Requirement(hint = DefaultAdvancedLifecycleMappingDelegate.HINT)
-	private AdvancedLifecycleMappingDelegate standardDelegate;
+	protected AdvancedLifecycleMappingDelegate standardDelegate;
 
 	@Requirement(role = AdvancedLifecycleMappingDelegate.class)
-	private Map<String, AdvancedLifecycleMappingDelegate> lifecycleMappingDelegates;
+	protected Map<String, AdvancedLifecycleMappingDelegate> lifecycleMappingDelegates;
 
 	@Requirement
-	private GoalRequirementDataFactory grmDataFactory;
-
-	@Requirement
-	private GoalRequirementArchive grmArchive;
+	protected GoalRequirementDataFactory grmDataFactory;
 
 	@Requirement(role = MojoExecutionConfigurator.class)
-	private Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
+	protected Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
 	public AdvancedLifecycleExecutionPlanCalculator() {
 	}
@@ -258,21 +262,24 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			PluginVersionResolutionException, LifecyclePhaseNotFoundException {
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
-		final ExecutionArchiveSelectorConfig selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+		final ExecutionArchiveSelectorConfig pemSelectorConfig = this.pemSelectorConfigFactory.createEmptyConfig()
 				.selectActiveProject(project)
 				.selectAllActiveProfiles(project.getActiveProfiles())
 				.selectPackagingProcedure(project.getPackaging());
 
 		if ("top-level".equals(this.settings.getActiveProfilesInheritance()
 				.getSelected())) {
-			selectorConfig.selectAllActiveProfiles(session.getTopLevelProject()
+			pemSelectorConfig.selectAllActiveProfiles(session.getTopLevelProject()
 					.getActiveProfiles());
 		}
 		if ("upstream".equals(this.settings.getActiveProfilesInheritance()
 				.getSelected())) {
 			for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent())
-				selectorConfig.selectAllActiveProfiles(parent.getActiveProfiles());
+				pemSelectorConfig.selectAllActiveProfiles(parent.getActiveProfiles());
 		}
+
+		final GoalRequirementArchiveSelectorConfig grmSelectorConfig = this.grmSelectorConfigFactory.createEmptyConfig()
+				.selectActiveProject(project);
 
 		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = selectLifecycleTaskReqCalcDelegate(
 				this.settings.getLifecycleTaskRequestCalculator()
@@ -286,7 +293,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						session, project);
 
 				final MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(mojoDescriptor,
-						data.getExecutions()[0], MojoExecution.Source.CLI, selectorConfig.clone()
+						data.getExecutions()[0], MojoExecution.Source.CLI, pemSelectorConfig.clone()
 								.selectModes("default")
 								.selectActiveExecutions(data.getPrimaryExecutionOrDefault("default-cli")));
 
@@ -294,18 +301,18 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			} else if (task instanceof LifecycleTaskData) {
 				final LifecycleTaskData taskData = (LifecycleTaskData) task;
 
-				final ExecutionArchiveSelectorConfig taskSelectorConfig = selectorConfig.clone();
+				final ExecutionArchiveSelectorConfig taskSelectorConfig = pemSelectorConfig.clone();
 				if (taskData.hasValidModes())
 					taskSelectorConfig.selectModes(taskData.getModes());
 				else
 					taskSelectorConfig.selectModes("default");
 
-				final ExecutionArchiveSelection selection = this.selector
+				final ExecutionArchiveSelection selection = this.pemSelector
 						.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions()));
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
 					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
 							project, request, selection);
-					sortMojosByProxy(selectorConfig, phaseToMojoMapping);
+					sortMojosByProxy(pemSelectorConfig, grmSelectorConfig, phaseToMojoMapping);
 					for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values())
 						for (MojoExecution exec : mojoExecutionsFromLifecycle) {
 							if (this.settings.getGeneratePluginExecutions()
@@ -349,15 +356,18 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 	}
 
-	protected void sortMojosByProxy(final ExecutionArchiveSelectorConfig selectorConfig,
+	protected void sortMojosByProxy(final ExecutionArchiveSelectorConfig pemSelectorConfig,
+			final GoalRequirementArchiveSelectorConfig grmSelectorConfig,
 			final Map<String, List<MojoExecution>> phaseToMojoMapping) {
-		final ProjectView projectData = this.grmDataFactory.createProjectData(selectorConfig.getActiveProject());
-		final Comparator<EntityView> comparator = this.grmArchive.getComparator();
+		final ProjectView projectData = this.grmDataFactory.createProjectData(grmSelectorConfig.getActiveProject());
+
+		final GoalRequirementArchiveSelection selection = this.grmSelector.compileSelection(grmSelectorConfig);
+		final Comparator<EntityView> comparator = selection.getComparator();
 
 		for (Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
 			final List<MojoExecution> executions = entry.getValue();
 			final Map<EntityView, MojoExecution> proxyMap = new LinkedHashMap<>();
-			final RuntimeView runtimeData = this.grmDataFactory.createRuntimeData(selectorConfig, entry.getKey());
+			final RuntimeView runtimeData = this.grmDataFactory.createRuntimeData(pemSelectorConfig, entry.getKey());
 
 			for (MojoExecution mojoExec : executions) {
 				final GoalView goalData = this.grmDataFactory.createGoalData(mojoExec);
@@ -592,7 +602,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						lifecycle.setStopPhase(phaseId);
 					fork.setLifecycle(lifecycle);
 				}
-				selectorConfig = this.selectorConfigFactory.createEmptyConfig()
+				selectorConfig = this.pemSelectorConfigFactory.createEmptyConfig()
 						.selectActiveProject(project)
 						.selectPackagingProcedure(project.getPackaging())
 						.selectModes("default")
@@ -684,23 +694,26 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-		final ExecutionArchiveSelectorConfig cnf = this.selectorConfigFactory.createEmptyConfig();
+		final ExecutionArchiveSelectorConfig pemCnf = this.pemSelectorConfigFactory.createEmptyConfig();
+		final GoalRequirementArchiveSelectorConfig grmCnf = this.grmSelectorConfigFactory.createEmptyConfig();
 
 		// select mvnProject
-		cnf.selectActiveProject(project);
+		pemCnf.selectActiveProject(project);
+		grmCnf.selectActiveProject(project);
 		// select packaging-procedure
-		cnf.selectPackagingProcedure(baseSelectorConfig.getPackagingProcedure());
+		pemCnf.selectPackagingProcedure(baseSelectorConfig.getPackagingProcedure());
 		// select modes
 		if (isBlank(fork.getMode()))
-			cnf.selectModes(baseSelectorConfig.getModes());
+			pemCnf.selectModes(baseSelectorConfig.getModes());
 		else
-			cnf.selectModes(fork.getMode());
+			pemCnf.selectModes(fork.getMode());
 		// select executions
-		cnf.selectActiveExecutions(fork.getExecutions());
+		pemCnf.selectActiveExecutions(fork.getExecutions());
 
-		final Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork, cnf);
+		final Map<String, List<MojoExecution>> lifecycleMappings = calculateForkMappings(session, project, fork,
+				pemCnf);
 
-		sortMojosByProxy(cnf, lifecycleMappings);
+		sortMojosByProxy(pemCnf, grmCnf, lifecycleMappings);
 
 		for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
 			for (MojoExecution forkedExecution : forkedExecutions) {
@@ -806,7 +819,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException, LifecyclePhaseNotFoundException {
 
-		final ExecutionArchiveSelection selection = this.selector.compileSelection(cnf);
+		final ExecutionArchiveSelection selection = this.pemSelector.compileSelection(cnf);
 		final List<String> orderedPhases = calculateExecutingPhasesByFork(selection, fork);
 
 		// Initialize mapping from lifecycle phase to bound mojos.
@@ -954,7 +967,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					((MojoExecutionData) mojoExecution).getExecutionArchiveSelectorConfig());
 		else
 			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,
-					this.selectorConfigFactory.createEmptyConfig()
+					this.pemSelectorConfigFactory.createEmptyConfig()
 							.selectActiveProject(project)
 							.selectModes("default")
 							.selectPackagingProcedure(project.getPackaging())
@@ -1015,5 +1028,4 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 		return mojoExecutionConfigurator;
 	}
-
 }

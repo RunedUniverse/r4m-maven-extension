@@ -69,4 +69,25 @@ public final class ModelUtils {
 			tree.append(dataTree);
 		}
 	}
+
+	public static int hash(final String s) {
+		if (s == null)
+			return 0;
+		return s.hashCode();
+	}
+
+	public static int hash(final GoalRequirementSource s) {
+		if (s == null)
+			return 0;
+		return s.key()
+				.hashCode();
+	}
+
+	public static boolean strEquals(final String a, final String b) {
+		if (a == b)
+			return true;
+		if (a == null || b == null)
+			return false;
+		return a.equals(b);
+	}
 }

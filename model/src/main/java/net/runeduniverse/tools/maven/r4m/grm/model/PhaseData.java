@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+
 public class PhaseData implements DataEntry {
 
 	public static final String HINT = "phase";
@@ -34,5 +37,18 @@ public class PhaseData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new PhaseData().setId(this.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof PhaseData))
+			return false;
+		final PhaseData other = (PhaseData) obj;
+		return strEquals(getId(), other.getId());
 	}
 }

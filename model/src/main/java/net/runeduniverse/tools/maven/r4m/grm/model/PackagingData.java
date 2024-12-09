@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+
 public class PackagingData implements DataEntry {
 
 	public static final String HINT = "packaging";
@@ -34,5 +37,18 @@ public class PackagingData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new PackagingData().setProcedure(this.procedure);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getProcedure());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof PackagingData))
+			return false;
+		final PackagingData other = (PackagingData) obj;
+		return strEquals(getProcedure(), other.getProcedure());
 	}
 }

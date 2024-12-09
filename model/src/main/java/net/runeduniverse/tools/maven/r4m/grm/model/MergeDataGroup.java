@@ -15,6 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+
 public class MergeDataGroup extends AndDataGroup {
 
 	private GoalRequirementSource source = null;
@@ -41,5 +43,18 @@ public class MergeDataGroup extends AndDataGroup {
 		final MergeDataGroup group = new MergeDataGroup(type());
 		_copyDataTo(group);
 		return _copyEntriesTo(group);
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode() ^ hash(getSource());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!super.equals(obj) || !(obj instanceof MergeDataGroup))
+			return false;
+		final MergeDataGroup data = (MergeDataGroup) obj;
+		return getSource() == data.getSource();
 	}
 }

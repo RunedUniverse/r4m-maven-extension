@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+
 public class ProfileData implements DataEntry {
 
 	public static final String HINT = "profile";
@@ -50,5 +53,18 @@ public class ProfileData implements DataEntry {
 	public DataEntry copy() {
 		return new ProfileData().setId(this.id)
 				.setState(this.state);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId()) ^ hash(getState());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof ProfileData))
+			return false;
+		final ProfileData other = (ProfileData) obj;
+		return strEquals(getId(), other.getId()) && strEquals(getState(), other.getState());
 	}
 }

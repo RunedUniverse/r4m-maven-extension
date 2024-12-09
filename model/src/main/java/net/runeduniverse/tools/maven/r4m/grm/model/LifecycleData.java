@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+
 public class LifecycleData implements DataEntry {
 
 	public static final String HINT = "lifecycle";
@@ -34,5 +37,18 @@ public class LifecycleData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new LifecycleData().setId(this.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof LifecycleData))
+			return false;
+		final LifecycleData other = (LifecycleData) obj;
+		return strEquals(getId(), other.getId());
 	}
 }

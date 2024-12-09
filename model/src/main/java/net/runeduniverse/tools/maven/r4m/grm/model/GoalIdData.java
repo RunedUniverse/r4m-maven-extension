@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+
 public class GoalIdData implements DataEntry {
 
 	protected String id = null;
@@ -31,5 +34,18 @@ public class GoalIdData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new GoalIdData().setGoalId(this.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getGoalId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof GoalIdData))
+			return false;
+		final GoalIdData other = (GoalIdData) obj;
+		return strEquals(getGoalId(), other.getGoalId());
 	}
 }

@@ -73,4 +73,17 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 		ModelUtils.appendEntries(tree, getEntries());
 		return tree;
 	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode() ^ Boolean.hashCode(getAlwaysActive()) ^ Boolean.hashCode(getNeverActive());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (!super.equals(obj) || !(obj instanceof WhenDataGroup))
+			return false;
+		final WhenDataGroup data = (WhenDataGroup) obj;
+		return getAlwaysActive() == data.getAlwaysActive() && getNeverActive() == data.getNeverActive();
+	}
 }

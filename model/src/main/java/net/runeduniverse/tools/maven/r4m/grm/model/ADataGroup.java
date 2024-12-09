@@ -15,12 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+
 import java.util.Collection;
 import java.util.function.Supplier;
 
 public abstract class ADataGroup<C extends Collection<DataEntry>> implements DataGroup {
 
-	protected final String type;
+	private final String type;
 	protected final C collection;
 
 	protected ADataGroup(final Supplier<C> supplier) {
@@ -57,5 +59,22 @@ public abstract class ADataGroup<C extends Collection<DataEntry>> implements Dat
 		for (DataEntry d : this.collection)
 			group.addEntry(d.copy());
 		return group;
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof ADataGroup))
+			return false;
+		final ADataGroup<?> other = (ADataGroup<?>) obj;
+		final Collection<DataEntry> colA = getEntries();
+		final Collection<DataEntry> colB = other.getEntries();
+		if (colA.size() != colB.size())
+			return false;
+		return colB.containsAll(colA);
 	}
 }

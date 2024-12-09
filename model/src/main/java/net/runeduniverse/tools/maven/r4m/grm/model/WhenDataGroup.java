@@ -30,6 +30,10 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 		super(HINT);
 	}
 
+	protected WhenDataGroup(final String type) {
+		super(type);
+	}
+
 	public boolean getAlwaysActive() {
 		return this.always;
 	}
@@ -54,7 +58,7 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 
 	@Override
 	public DataGroup copy() {
-		final WhenDataGroup group = new WhenDataGroup();
+		final WhenDataGroup group = new WhenDataGroup(type());
 		_copyDataTo(group);
 		return _copyEntriesTo(group);
 	}

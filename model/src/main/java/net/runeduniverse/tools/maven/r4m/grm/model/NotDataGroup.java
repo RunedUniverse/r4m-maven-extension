@@ -32,6 +32,6 @@ public class NotDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
 	@Override
 	public DataGroup copy() {
-		return _copy(NotDataGroup::new);
+		return _copy(new NotDataGroup(type()));
 	}
 }

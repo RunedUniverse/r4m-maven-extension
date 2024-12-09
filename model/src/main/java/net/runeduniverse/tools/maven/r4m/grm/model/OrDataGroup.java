@@ -32,6 +32,6 @@ public class OrDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
 	@Override
 	public DataGroup copy() {
-		return _copy(OrDataGroup::new);
+		return _copy(new OrDataGroup(type()));
 	}
 }

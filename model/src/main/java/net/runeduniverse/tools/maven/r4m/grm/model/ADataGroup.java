@@ -49,8 +49,8 @@ public abstract class ADataGroup<C extends Collection<DataEntry>> implements Dat
 		return this.type;
 	}
 
-	protected <T extends ADataGroup<C>> T _copy(final Supplier<T> supplier) {
-		return _copyEntriesTo(supplier.get());
+	protected <T extends ADataGroup<C>> T _copy(final T group) {
+		return _copyEntriesTo(group);
 	}
 
 	protected <T extends ADataGroup<C>> T _copyEntriesTo(final T group) {

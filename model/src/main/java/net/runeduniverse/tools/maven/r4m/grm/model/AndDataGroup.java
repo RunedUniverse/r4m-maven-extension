@@ -32,6 +32,6 @@ public class AndDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 
 	@Override
 	public DataGroup copy() {
-		return _copy(AndDataGroup::new);
+		return _copy(new AndDataGroup(type()));
 	}
 }

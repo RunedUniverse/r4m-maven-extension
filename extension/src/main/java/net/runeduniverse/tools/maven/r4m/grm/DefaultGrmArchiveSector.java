@@ -16,7 +16,6 @@
 package net.runeduniverse.tools.maven.r4m.grm;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -29,14 +28,11 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
-import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
-import net.runeduniverse.tools.maven.r4m.grm.model.GoalIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
-import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils;
 import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
@@ -45,9 +41,8 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		implements GoalRequirementArchiveSector {
 
 	protected final Map<MergeDataGroup, GoalRequirementModel> origins = new LinkedHashMap<>();
-	protected final Map<String, DataGroup> goalKeyData = new LinkedHashMap<>();
-	protected final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchBefore = new LinkedHashMap<>();
-	protected final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchAfter = new LinkedHashMap<>();
+	protected final Map<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchBefore = new LinkedHashMap<>();
+	protected final Map<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchAfter = new LinkedHashMap<>();
 
 	public DefaultGrmArchiveSector(final MavenProject mvnProject, final DefaultGrmArchiveSector parent) {
 		super(mvnProject, parent);
@@ -58,30 +53,31 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		return this.origins.get(mergeGroup);
 	}
 
-	public Map<String, DataGroup> getItemMatches() {
-		return Collections.unmodifiableMap(this.goalKeyData);
-	}
-
-	public Map<String, Set<MergeDataGroup>> getBeforeMatches() {
+	@Override
+	public Map<DataGroup, Set<MergeDataGroup>> getBeforeMatches() {
 		return collectEntries(this.matchBefore, false);
 	}
 
-	public Map<String, Set<MergeDataGroup>> getEffectiveBeforeMatches() {
+	@Override
+	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveBeforeMatches() {
 		return collectEntries(this.matchBefore, true);
 	}
 
-	public Map<String, Set<MergeDataGroup>> getAfterMatches() {
+	@Override
+	public Map<DataGroup, Set<MergeDataGroup>> getAfterMatches() {
 		return collectEntries(this.matchAfter, false);
 	}
 
-	public Map<String, Set<MergeDataGroup>> getEffectiveAfterMatches() {
+	@Override
+	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveAfterMatches() {
 		return collectEntries(this.matchAfter, true);
 	}
 
-	protected Map<String, Set<MergeDataGroup>> collectEntries(
-			final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchMap, final boolean onlyEffective) {
-		final Map<String, Set<MergeDataGroup>> map = new LinkedHashMap<>();
-		for (Entry<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> entry : matchMap.entrySet()) {
+	protected Map<DataGroup, Set<MergeDataGroup>> collectEntries(
+			final Map<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchMap,
+			final boolean onlyEffective) {
+		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		for (Entry<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> entry : matchMap.entrySet()) {
 			final Set<MergeDataGroup> set = new LinkedHashSet<>();
 			for (Entry<GoalRequirementSource, Set<MergeDataGroup>> sourceEntry : entry.getValue()
 					.entrySet()) {
@@ -94,7 +90,8 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 					set.add(data);
 				}
 			}
-			map.put(entry.getKey(), set);
+			if (!set.isEmpty())
+				map.put(entry.getKey(), set);
 		}
 		return map;
 	}
@@ -106,16 +103,14 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 
 		for (GoalContainer container : grm.getGoalContainer()) {
 			final DataGroup keyData = container.getMatchGroup();
-			final String key = createKey(keyData.getEntries());
 
-			this.goalKeyData.putIfAbsent(key, keyData);
-			indexEntries(matchBefore, key, grm, container.getPrerequisiteEntries());
-			indexEntries(matchAfter, key, grm, container.getDependentEntries());
+			indexEntries(matchBefore, keyData, grm, container.getPrerequisiteEntries());
+			indexEntries(matchAfter, keyData, grm, container.getDependentEntries());
 		}
 	}
 
-	protected void indexEntries(final Map<String, Map<GoalRequirementSource, Set<MergeDataGroup>>> map,
-			final String key, final GoalRequirementModel grm, final Collection<DataEntry> entries) {
+	protected void indexEntries(final Map<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> map,
+			final DataGroup key, final GoalRequirementModel grm, final Collection<DataEntry> entries) {
 		for (DataEntry entry : entries) {
 			if (!(entry instanceof MergeDataGroup))
 				continue;
@@ -136,38 +131,24 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		}
 	}
 
-	protected String createKey(final Collection<DataEntry> entries) {
-		String groupId = null;
-		String artifactId = null;
-		String goalId = null;
-		for (DataEntry entry : entries) {
-			if (entry == null)
-				continue;
-			if (entry instanceof GroupIdData)
-				groupId = ((GroupIdData) entry).getGroupId();
-			else if (entry instanceof ArtifactIdData)
-				artifactId = ((ArtifactIdData) entry).getArtifactId();
-			else if (entry instanceof GoalIdData)
-				goalId = ((GoalIdData) entry).getGoalId();
-		}
-		return String.join(":", groupId, artifactId, goalId);
-	}
-
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = super.toRecord();
-		final List<String> keys = new LinkedList<>();
+		final List<DataGroup> keys = new LinkedList<>();
 		keys.addAll(this.matchBefore.keySet());
 		keys.addAll(this.matchAfter.keySet());
 		keys.sort(null);
 
 		CompoundTree keyTree = null;
 		CompoundTree subTree = null;
-		for (String key : keys) {
-			tree.append(keyTree = new CompoundTree(key));
-			keyTree.append(subTree = new CompoundTree("matchBefore"));
+		for (DataGroup key : keys) {
+			tree.append(keyTree = new CompoundTree("--- Goal Matches ---"));
+			keyTree.append(subTree = new CompoundTree("» item"));
+			subTree.append(ModelUtils.toRecord(key));
 			appendEntries(subTree, this.matchBefore.get(key));
-			keyTree.append(subTree = new CompoundTree("matchAfter"));
+			keyTree.append(subTree = new CompoundTree("» before"));
+			appendEntries(subTree, this.matchBefore.get(key));
+			keyTree.append(subTree = new CompoundTree("» after"));
 			appendEntries(subTree, this.matchAfter.get(key));
 		}
 

@@ -15,6 +15,12 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -28,6 +34,8 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 @Component(role = GoalRequirementArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
@@ -39,6 +47,29 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	private Settings settings;
 	@Requirement
 	private GoalRequirementArchive archive;
+
+	// if grm is user-defined than it is inherited
+	// as long as no user-defined grm was found,
+	// any other grm is loaded from the plugins in the active project!
+	protected Map<DataGroup, Set<MergeDataGroup>> collectMatches(final GoalRequirementArchiveSector sector,
+			final MatchGetter getter, final EffectiveMatchGetter effGetter) {
+		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		mergeIntoMap(map, getter.get(sector));
+
+		Map<DataGroup, Set<MergeDataGroup>> userDefined = effGetter.get(sector);
+		// skip as the values are already included!
+		if (!userDefined.isEmpty())
+			return map;
+
+		for (GoalRequirementArchiveSector parent = sector.getParent(); userDefined.isEmpty()
+				&& parent != null; parent = parent.getParent()) {
+			userDefined = effGetter.get(parent);
+		}
+		if (!userDefined.isEmpty()) {
+			mergeIntoMap(map, userDefined);
+		}
+		return map;
+	}
 
 	@Override
 	public GoalRequirementArchiveSelection compileSelection(final GoalRequirementArchiveSelectorConfig selectorConfig) {
@@ -56,5 +87,32 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		set.compile(new ConditionIndexer());
 
 		return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
+	}
+
+	protected static void mergeIntoMap(final Map<DataGroup, Set<MergeDataGroup>> base,
+			final Map<DataGroup, Set<MergeDataGroup>> add) {
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : add.entrySet()) {
+			final Set<MergeDataGroup> src = entry.getValue();
+			if (src == null || src.isEmpty())
+				continue;
+			Set<MergeDataGroup> set = base.get(entry.getKey());
+			if (set == null)
+				base.put(entry.getKey(), set = new LinkedHashSet<>());
+			set.addAll(src);
+		}
+	}
+
+	@FunctionalInterface
+	protected interface MatchGetter {
+
+		public Map<DataGroup, Set<MergeDataGroup>> get(final GoalRequirementArchiveSector sector);
+
+	}
+
+	@FunctionalInterface
+	protected interface EffectiveMatchGetter {
+
+		public Map<DataGroup, Set<MergeDataGroup>> get(final GoalRequirementArchiveSector sector);
+
 	}
 }

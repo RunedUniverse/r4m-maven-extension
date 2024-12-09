@@ -15,7 +15,11 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.api;
 
+import java.util.Map;
+import java.util.Set;
+
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundEntry;
@@ -23,6 +27,14 @@ import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundEntry;
 public interface GoalRequirementArchiveSector extends ProjectBoundEntry<GoalRequirementArchiveSector>, Recordable {
 
 	public GoalRequirementModel getModel(MergeDataGroup mergeGroup);
+
+	public Map<DataGroup, Set<MergeDataGroup>> getBeforeMatches();
+
+	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveBeforeMatches();
+
+	public Map<DataGroup, Set<MergeDataGroup>> getAfterMatches();
+
+	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveAfterMatches();
 
 	public void register(GoalRequirementModel grm);
 

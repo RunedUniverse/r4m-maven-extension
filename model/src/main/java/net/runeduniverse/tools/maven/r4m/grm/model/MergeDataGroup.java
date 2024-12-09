@@ -30,4 +30,16 @@ public class MergeDataGroup extends AndDataGroup {
 	public void setSource(GoalRequirementSource source) {
 		this.source = source;
 	}
+
+	protected <T extends MergeDataGroup> T _copyDataTo(final T group) {
+		group.setSource(this.source);
+		return group;
+	}
+
+	@Override
+	public DataGroup copy() {
+		final MergeDataGroup group = new MergeDataGroup(this.type);
+		_copyDataTo(group);
+		return _copyEntriesTo(group);
+	}
 }

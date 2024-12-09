@@ -23,4 +23,6 @@ public interface DataGroup extends DataEntry {
 
 	public boolean addEntry(DataEntry entry);
 
+	public DataGroup copy();
+
 }

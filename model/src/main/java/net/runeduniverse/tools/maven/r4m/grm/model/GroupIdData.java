@@ -27,4 +27,9 @@ public class GroupIdData implements DataEntry {
 		this.id = groupId;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new GroupIdData().setGroupId(this.id);
+	}
 }

@@ -45,4 +45,10 @@ public class ProfileData implements DataEntry {
 		this.state = state;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new ProfileData().setId(this.id)
+				.setState(this.state);
+	}
 }

@@ -29,4 +29,9 @@ public class NotDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	protected NotDataGroup(final String type) {
 		super(type, LinkedHashSet<DataEntry>::new);
 	}
+
+	@Override
+	public DataGroup copy() {
+		return _copy(NotDataGroup::new);
+	}
 }

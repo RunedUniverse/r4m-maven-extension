@@ -18,16 +18,16 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import java.util.Collection;
 import java.util.function.Supplier;
 
-public abstract class ADataGroup<T extends Collection<DataEntry>> implements DataGroup {
+public abstract class ADataGroup<C extends Collection<DataEntry>> implements DataGroup {
 
 	protected final String type;
-	protected final T collection;
+	protected final C collection;
 
-	protected ADataGroup(final Supplier<T> supplier) {
+	protected ADataGroup(final Supplier<C> supplier) {
 		this(null, supplier);
 	}
 
-	protected ADataGroup(final String type, final Supplier<T> supplier) {
+	protected ADataGroup(final String type, final Supplier<C> supplier) {
 		this.type = type;
 		this.collection = supplier.get();
 	}
@@ -47,5 +47,15 @@ public abstract class ADataGroup<T extends Collection<DataEntry>> implements Dat
 		if (this.type == null)
 			return DataGroup.super.type();
 		return this.type;
+	}
+
+	protected <T extends ADataGroup<C>> T _copy(final Supplier<T> supplier) {
+		return _copyEntriesTo(supplier.get());
+	}
+
+	protected <T extends ADataGroup<C>> T _copyEntriesTo(final T group) {
+		for (DataEntry d : this.collection)
+			group.addEntry(d.copy());
+		return group;
 	}
 }

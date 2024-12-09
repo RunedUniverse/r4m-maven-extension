@@ -30,4 +30,9 @@ public class ExecutionData implements DataEntry {
 		this.id = id;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new ExecutionData().setId(this.id);
+	}
 }

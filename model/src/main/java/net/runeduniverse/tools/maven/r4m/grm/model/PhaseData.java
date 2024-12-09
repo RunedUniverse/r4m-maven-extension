@@ -30,4 +30,9 @@ public class PhaseData implements DataEntry {
 		this.id = id;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new PhaseData().setId(this.id);
+	}
 }

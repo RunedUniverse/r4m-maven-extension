@@ -27,4 +27,9 @@ public class GoalIdData implements DataEntry {
 		this.id = goalId;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new GoalIdData().setGoalId(this.id);
+	}
 }

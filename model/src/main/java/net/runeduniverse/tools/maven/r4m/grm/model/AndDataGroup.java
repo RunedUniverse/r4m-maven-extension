@@ -29,4 +29,9 @@ public class AndDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	protected AndDataGroup(final String type) {
 		super(type, LinkedHashSet<DataEntry>::new);
 	}
+
+	@Override
+	public DataGroup copy() {
+		return _copy(AndDataGroup::new);
+	}
 }

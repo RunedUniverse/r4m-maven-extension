@@ -17,8 +17,9 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 
 public interface DataEntry {
 
+	public DataEntry copy();
+
 	public default String type() {
 		return getClass().getSimpleName();
 	}
-
 }

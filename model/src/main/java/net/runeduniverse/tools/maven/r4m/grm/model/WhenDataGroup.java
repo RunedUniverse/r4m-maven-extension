@@ -46,6 +46,19 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 		this.never = value;
 	}
 
+	protected <T extends WhenDataGroup> T _copyDataTo(final T group) {
+		group.setAlwaysActive(this.always);
+		group.setNeverActive(this.never);
+		return group;
+	}
+
+	@Override
+	public DataGroup copy() {
+		final WhenDataGroup group = new WhenDataGroup();
+		_copyDataTo(group);
+		return _copyEntriesTo(group);
+	}
+
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = ModelUtils.createEntryTree(this);

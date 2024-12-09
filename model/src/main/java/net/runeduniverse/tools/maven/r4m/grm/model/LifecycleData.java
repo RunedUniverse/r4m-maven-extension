@@ -30,4 +30,9 @@ public class LifecycleData implements DataEntry {
 		this.id = id;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new LifecycleData().setId(this.id);
+	}
 }

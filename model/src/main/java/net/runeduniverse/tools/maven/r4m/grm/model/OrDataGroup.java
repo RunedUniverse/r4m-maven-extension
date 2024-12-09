@@ -29,4 +29,9 @@ public class OrDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
 	protected OrDataGroup(final String type) {
 		super(type, LinkedHashSet<DataEntry>::new);
 	}
+
+	@Override
+	public DataGroup copy() {
+		return _copy(OrDataGroup::new);
+	}
 }

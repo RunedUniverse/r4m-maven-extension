@@ -27,4 +27,9 @@ public class ArtifactIdData implements DataEntry {
 		this.id = artifactId;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new ArtifactIdData().setArtifactId(this.id);
+	}
 }

@@ -30,4 +30,9 @@ public class PackagingData implements DataEntry {
 		this.procedure = procedure;
 		return this;
 	}
+
+	@Override
+	public DataEntry copy() {
+		return new PackagingData().setProcedure(this.procedure);
+	}
 }

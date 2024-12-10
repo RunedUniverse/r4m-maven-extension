@@ -39,7 +39,7 @@ public class MergeDataGroup extends AndDataGroup {
 	}
 
 	@Override
-	public DataGroup copy() {
+	public MergeDataGroup copy() {
 		final MergeDataGroup group = new MergeDataGroup(type());
 		_copyDataTo(group);
 		return _copyEntriesTo(group);

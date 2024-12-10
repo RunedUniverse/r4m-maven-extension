@@ -54,7 +54,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	protected Map<DataGroup, Set<MergeDataGroup>> collectMatches(final GoalRequirementArchiveSector sector,
 			final MatchGetter getter, final EffectiveMatchGetter effGetter) {
 		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
-		mergeIntoMap(map, getter.get(sector));
+		copyToMap(map, getter.get(sector));
 
 		Map<DataGroup, Set<MergeDataGroup>> userDefined = effGetter.get(sector);
 		// skip as the values are already included!
@@ -66,9 +66,21 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			userDefined = effGetter.get(parent);
 		}
 		if (!userDefined.isEmpty()) {
-			mergeIntoMap(map, userDefined);
+			copyToMap(map, userDefined);
 		}
 		return map;
+	}
+
+	protected void getChecks(final GoalRequirementArchiveSector sector, final EntrySet<EntityView> set) {
+		// TODO collect data & compile conditions
+
+		final Map<DataGroup, Set<MergeDataGroup>> before = collectMatches(sector, //
+				GoalRequirementArchiveSector::getBeforeMatches, //
+				GoalRequirementArchiveSector::getEffectiveBeforeMatches);
+		final Map<DataGroup, Set<MergeDataGroup>> after = collectMatches(sector, //
+				GoalRequirementArchiveSector::getAfterMatches, //
+				GoalRequirementArchiveSector::getEffectiveAfterMatches);
+
 	}
 
 	@Override
@@ -82,14 +94,13 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		if (sector == null)
 			return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
 
-		// TODO collect data & compile conditions
-
+		getChecks(sector, set);
 		set.compile(new ConditionIndexer());
 
 		return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
 	}
 
-	protected static void mergeIntoMap(final Map<DataGroup, Set<MergeDataGroup>> base,
+	protected static void copyToMap(final Map<DataGroup, Set<MergeDataGroup>> base,
 			final Map<DataGroup, Set<MergeDataGroup>> add) {
 		for (Entry<DataGroup, Set<MergeDataGroup>> entry : add.entrySet()) {
 			final Set<MergeDataGroup> src = entry.getValue();
@@ -97,8 +108,10 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 				continue;
 			Set<MergeDataGroup> set = base.get(entry.getKey());
 			if (set == null)
-				base.put(entry.getKey(), set = new LinkedHashSet<>());
-			set.addAll(src);
+				base.put(entry.getKey()
+						.copy(), set = new LinkedHashSet<>());
+			for (MergeDataGroup data : src)
+				set.add(data.copy());
 		}
 	}
 

@@ -18,7 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 
-public class ArtifactIdData implements DataEntry {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public class ArtifactIdData implements DataEntry, Recordable {
 
 	protected String id = null;
 
@@ -34,6 +37,13 @@ public class ArtifactIdData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new ArtifactIdData().setArtifactId(this.id);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		final CompoundTree tree = ModelUtils.createEntryTree(this);
+		tree.append("id", getArtifactId());
+		return tree;
 	}
 
 	@Override

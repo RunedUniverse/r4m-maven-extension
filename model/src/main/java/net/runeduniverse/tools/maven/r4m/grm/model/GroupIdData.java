@@ -18,7 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 
-public class GroupIdData implements DataEntry {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public class GroupIdData implements DataEntry, Recordable {
 
 	protected String id = null;
 
@@ -34,6 +37,13 @@ public class GroupIdData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new GroupIdData().setGroupId(this.id);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		final CompoundTree tree = ModelUtils.createEntryTree(this);
+		tree.append("id", getGroupId());
+		return tree;
 	}
 
 	@Override

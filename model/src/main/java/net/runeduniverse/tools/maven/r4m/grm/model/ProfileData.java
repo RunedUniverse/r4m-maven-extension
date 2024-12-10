@@ -18,7 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 
-public class ProfileData implements DataEntry {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public class ProfileData implements DataEntry, Recordable {
 
 	public static final String HINT = "profile";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.ProfileData";
@@ -53,6 +56,14 @@ public class ProfileData implements DataEntry {
 	public DataEntry copy() {
 		return new ProfileData().setId(this.id)
 				.setState(this.state);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		final CompoundTree tree = ModelUtils.createEntryTree(this);
+		tree.append("id", getId());
+		tree.append("state", getState());
+		return tree;
 	}
 
 	@Override

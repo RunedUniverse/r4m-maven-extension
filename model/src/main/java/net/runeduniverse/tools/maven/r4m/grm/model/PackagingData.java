@@ -18,7 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 
-public class PackagingData implements DataEntry {
+import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+public class PackagingData implements DataEntry, Recordable {
 
 	public static final String HINT = "packaging";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.PackagingData";
@@ -37,6 +40,13 @@ public class PackagingData implements DataEntry {
 	@Override
 	public DataEntry copy() {
 		return new PackagingData().setProcedure(this.procedure);
+	}
+
+	@Override
+	public CompoundTree toRecord() {
+		final CompoundTree tree = ModelUtils.createEntryTree(this);
+		tree.append("procedure", getProcedure());
+		return tree;
 	}
 
 	@Override

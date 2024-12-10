@@ -21,41 +21,67 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class ArtifactIdData implements DataEntry, Recordable {
+public class GoalData implements DataEntry, Recordable {
 
+	protected String groupId = null;
 	protected String id = null;
+	protected String goalId = null;
+
+	public String getGroupId() {
+		return this.groupId;
+	}
 
 	public String getArtifactId() {
 		return this.id;
 	}
 
-	public ArtifactIdData setArtifactId(String artifactId) {
+	public String getGoalId() {
+		return this.goalId;
+	}
+
+	public GoalData setGroupId(String groupId) {
+		this.groupId = groupId;
+		return this;
+	}
+
+	public GoalData setArtifactId(String artifactId) {
 		this.id = artifactId;
+		return this;
+	}
+
+	public GoalData setGoalId(String goalId) {
+		this.goalId = goalId;
 		return this;
 	}
 
 	@Override
 	public DataEntry copy() {
-		return new ArtifactIdData().setArtifactId(this.id);
+		return new GoalData().setGroupId(getGroupId())
+				.setArtifactId(getArtifactId())
+				.setGoalId(getGoalId());
 	}
 
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = ModelUtils.createEntryTree(this);
-		tree.append("id", getArtifactId());
+		tree.append("groupId", getGroupId());
+		tree.append("artifactId", getArtifactId());
+		tree.append("goalId", getGoalId());
 		return tree;
 	}
 
 	@Override
 	public int hashCode() {
-		return hash(type()) ^ hash(getArtifactId());
+		return hash(type()) ^ hash(getGroupId()) ^ hash(getArtifactId()) ^ hash(getGoalId());
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
-		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof ArtifactIdData))
+		if (obj == null || hashCode() != obj.hashCode() || !(obj instanceof GoalData))
 			return false;
-		final ArtifactIdData other = (ArtifactIdData) obj;
-		return strEquals(getArtifactId(), other.getArtifactId());
+		final GoalData other = (GoalData) obj;
+		return strEquals(getGroupId(), other.getGroupId()) && //
+				strEquals(getArtifactId(), other.getArtifactId()) && //
+				strEquals(getGoalId(), other.getGoalId());
 	}
 }

@@ -31,13 +31,11 @@ import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
-import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
-import net.runeduniverse.tools.maven.r4m.grm.model.GoalIdData;
-import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
@@ -112,9 +110,10 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 		final PlexusConfiguration groupIdCnf = cnf.getChild("groupId", true);
 		final PlexusConfiguration artifactIdCnf = cnf.getChild("artifactId", true);
 
-		group.addEntry(new GoalIdData().setGoalId(cnf.getAttribute("id")));
-		group.addEntry(new GroupIdData().setGroupId(groupIdCnf.getValue(defaultGroupId)));
-		group.addEntry(new ArtifactIdData().setArtifactId(artifactIdCnf.getValue(defaultArtifactId)));
+		group.addEntry(new GoalData() //
+				.setGroupId(groupIdCnf.getValue(defaultGroupId))
+				.setArtifactId(artifactIdCnf.getValue(defaultArtifactId))
+				.setGoalId(cnf.getAttribute("id")));
 
 		for (PlexusConfiguration child : cnf.getChildren()) {
 			if (child == groupIdCnf || child == artifactIdCnf)
@@ -233,20 +232,12 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 			if (entry == null)
 				continue;
 			// check for basic values
-			if (entry instanceof GoalIdData) {
-				final GoalIdData data = (GoalIdData) entry;
-				goalCnf.setAttribute("id", data.getGoalId());
-				continue;
-			}
-			if (entry instanceof GroupIdData) {
-				final GroupIdData data = (GroupIdData) entry;
+			if (entry instanceof GoalData) {
+				final GoalData data = (GoalData) entry;
 				goalCnf.addChild("groupId", data.getGroupId());
-				continue;
-			}
-			if (entry instanceof ArtifactIdData) {
-				final ArtifactIdData data = (ArtifactIdData) entry;
 				goalCnf.addChild("artifactId", data.getArtifactId());
-				continue;
+				goalCnf.setAttribute("id", data.getGoalId());
+				break;
 			}
 			// check additional values > by default only "when" is expected
 			final PlexusConfiguration childCnf = convertEntry(factory, entry);

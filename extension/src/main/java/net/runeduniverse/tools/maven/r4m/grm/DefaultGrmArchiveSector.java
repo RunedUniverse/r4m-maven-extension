@@ -28,14 +28,12 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
-import net.runeduniverse.tools.maven.r4m.grm.model.ArtifactIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
-import net.runeduniverse.tools.maven.r4m.grm.model.GoalIdData;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
-import net.runeduniverse.tools.maven.r4m.grm.model.GroupIdData;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils;
 import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
@@ -140,7 +138,7 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		final List<DataGroup> keys = new LinkedList<>();
 		keys.addAll(this.matchBefore.keySet());
 		keys.addAll(this.matchAfter.keySet());
-		keys.sort(this::compareGoalDataGroups);
+		keys.sort(this::compareGoalDataByArtifactKey);
 
 		CompoundTree keyTree = null;
 		CompoundTree subTree = null;
@@ -158,7 +156,7 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		return tree;
 	}
 
-	protected int compareGoalDataGroups(final DataGroup d0, final DataGroup d1) {
+	protected int compareGoalDataByArtifactKey(final DataGroup d0, final DataGroup d1) {
 		final String s0 = createKey(d0);
 		final String s1 = createKey(d1);
 		if (s0 == null) {
@@ -181,15 +179,16 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		for (DataEntry entry : data.getEntries()) {
 			if (entry == null)
 				continue;
-			if (entry instanceof GroupIdData)
-				groupId = ((GroupIdData) entry).getGroupId();
-			else if (entry instanceof ArtifactIdData)
-				artifactId = ((ArtifactIdData) entry).getArtifactId();
-			else if (entry instanceof GoalIdData)
-				goalId = ((GoalIdData) entry).getGoalId();
+			if (entry instanceof GoalData) {
+				final GoalData gData = (GoalData) entry;
+				groupId = gData.getGroupId();
+				artifactId = gData.getArtifactId();
+				goalId = gData.getGoalId();
+				break;
+			}
 		}
 		if (groupId == null || artifactId == null || goalId == null)
-			return data.type();
+			return null;
 		return String.join(":", groupId, artifactId, goalId);
 	}
 

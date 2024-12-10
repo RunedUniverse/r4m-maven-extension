@@ -135,18 +135,18 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = super.toRecord();
-		final List<DataGroup> keys = new LinkedList<>();
+		final Set<DataGroup> keys = new LinkedHashSet<>();
 		keys.addAll(this.matchBefore.keySet());
 		keys.addAll(this.matchAfter.keySet());
-		keys.sort(this::compareGoalDataByArtifactKey);
+		final List<DataGroup> keyList = new LinkedList<>(keys);
+		keyList.sort(this::compareGoalDataByArtifactKey);
 
 		CompoundTree keyTree = null;
 		CompoundTree subTree = null;
-		for (DataGroup key : keys) {
+		for (DataGroup key : keyList) {
 			tree.append(keyTree = new CompoundTree("--- Goal Matches ---"));
 			keyTree.append(subTree = new CompoundTree("» item"));
 			subTree.append(ModelUtils.toRecord(key));
-			appendEntries(subTree, this.matchBefore.get(key));
 			keyTree.append(subTree = new CompoundTree("» before"));
 			appendEntries(subTree, this.matchBefore.get(key));
 			keyTree.append(subTree = new CompoundTree("» after"));

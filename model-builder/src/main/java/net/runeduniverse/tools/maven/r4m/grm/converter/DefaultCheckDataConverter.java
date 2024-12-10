@@ -154,8 +154,10 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 		if (goalCnf == null)
 			return null;
 
-		processRequirementData(factory, container.getPrerequisiteEntries(), goalCnf.getChild("prerequisites", true));
-		processRequirementData(factory, container.getDependentEntries(), goalCnf.getChild("dependents", true));
+		processRequirementData(factory, container.getPrerequisiteEntries(), //
+				goalCnf.getChild(CNF_MATCH_BEFORE_TAG, true));
+		processRequirementData(factory, container.getDependentEntries(), //
+				goalCnf.getChild(CNF_MATCH_AFTER_TAG, true));
 
 		return goalCnf;
 	}

@@ -35,6 +35,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
@@ -71,6 +72,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return map;
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void getChecks(final GoalRequirementArchiveSector sector, final EntrySet<EntityView> set) {
 		// TODO collect data & compile conditions
 
@@ -81,6 +83,37 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 				GoalRequirementArchiveSector::getAfterMatches, //
 				GoalRequirementArchiveSector::getEffectiveAfterMatches);
 
+		{
+			// check for effective
+			final Map<DataGroup, Set<MergeDataGroup>> effBefore = //
+					filterBySource(before, GoalRequirementSource.EFFECTIVE);
+			final Map<DataGroup, Set<MergeDataGroup>> effAfter = //
+					filterBySource(after, GoalRequirementSource.EFFECTIVE);
+			if (!effBefore.isEmpty() || !effAfter.isEmpty()) {
+				// done => effective sources override everything!
+				// TODO implement conversion
+				return;
+			}
+		}
+
+	}
+
+	protected Map<DataGroup, Set<MergeDataGroup>> filterBySource(final Map<DataGroup, Set<MergeDataGroup>> input,
+			final GoalRequirementSource source) {
+		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		if (source == null)
+			return map;
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : input.entrySet()) {
+			final Set<MergeDataGroup> set = new LinkedHashSet<>();
+			for (MergeDataGroup group : entry.getValue()) {
+				if (source.equals(group.getSource()))
+					set.add(group);
+			}
+			if (set.isEmpty())
+				continue;
+			map.put(entry.getKey(), set);
+		}
+		return map;
 	}
 
 	@Override

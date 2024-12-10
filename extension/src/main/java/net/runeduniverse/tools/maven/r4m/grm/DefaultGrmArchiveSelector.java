@@ -72,6 +72,10 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return map;
 	}
 
+	protected void merge(Map<DataGroup, Set<MergeDataGroup>> base, Map<DataGroup, Set<MergeDataGroup>> dom) {
+
+	}
+
 	@SuppressWarnings("deprecation")
 	protected void getChecks(final GoalRequirementArchiveSector sector, final EntrySet<EntityView> set) {
 		// TODO collect data & compile conditions
@@ -83,37 +87,21 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 				GoalRequirementArchiveSector::getAfterMatches, //
 				GoalRequirementArchiveSector::getEffectiveAfterMatches);
 
-		{
-			// check for effective
-			final Map<DataGroup, Set<MergeDataGroup>> effBefore = //
-					filterBySource(before, GoalRequirementSource.EFFECTIVE);
-			final Map<DataGroup, Set<MergeDataGroup>> effAfter = //
-					filterBySource(after, GoalRequirementSource.EFFECTIVE);
-			if (!effBefore.isEmpty() || !effAfter.isEmpty()) {
-				// done => effective sources override everything!
-				// TODO implement conversion
-				return;
-			}
+		Map<DataGroup, Set<MergeDataGroup>> domBefore;
+		Map<DataGroup, Set<MergeDataGroup>> domAfter;
+
+		// check for effective
+		domBefore = filterBySource(before, GoalRequirementSource.EFFECTIVE);
+		domAfter = filterBySource(after, GoalRequirementSource.EFFECTIVE);
+		if (!domBefore.isEmpty() || !domAfter.isEmpty()) {
+			// done => effective sources override everything!
+			// TODO implement conversion
+			return;
 		}
 
-	}
+		Map<DataGroup, Set<MergeDataGroup>> baseBefore = filterBySource(before, GoalRequirementSource.PACKAGING);
+		Map<DataGroup, Set<MergeDataGroup>> baseAfter = filterBySource(after, GoalRequirementSource.PACKAGING);
 
-	protected Map<DataGroup, Set<MergeDataGroup>> filterBySource(final Map<DataGroup, Set<MergeDataGroup>> input,
-			final GoalRequirementSource source) {
-		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
-		if (source == null)
-			return map;
-		for (Entry<DataGroup, Set<MergeDataGroup>> entry : input.entrySet()) {
-			final Set<MergeDataGroup> set = new LinkedHashSet<>();
-			for (MergeDataGroup group : entry.getValue()) {
-				if (source.equals(group.getSource()))
-					set.add(group);
-			}
-			if (set.isEmpty())
-				continue;
-			map.put(entry.getKey(), set);
-		}
-		return map;
 	}
 
 	@Override
@@ -146,6 +134,24 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			for (MergeDataGroup data : src)
 				set.add(data.copy());
 		}
+	}
+
+	protected static Map<DataGroup, Set<MergeDataGroup>> filterBySource(final Map<DataGroup, Set<MergeDataGroup>> input,
+			final GoalRequirementSource source) {
+		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		if (source == null)
+			return map;
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : input.entrySet()) {
+			final Set<MergeDataGroup> set = new LinkedHashSet<>();
+			for (MergeDataGroup group : entry.getValue()) {
+				if (source.equals(group.getSource()))
+					set.add(group);
+			}
+			if (set.isEmpty())
+				continue;
+			map.put(entry.getKey(), set);
+		}
+		return map;
 	}
 
 	@FunctionalInterface

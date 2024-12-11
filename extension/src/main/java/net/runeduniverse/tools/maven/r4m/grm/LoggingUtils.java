@@ -49,23 +49,25 @@ public class LoggingUtils {
 
 		final CompoundTree tree = new CompoundTree(entry.getClass()
 				.getCanonicalName());
+		final ConditionIndexer indexer = new ConditionIndexer();
+		tree.append("valid", Boolean.toString(entry.validate(indexer)));
 
-		CompoundTree subTree = new CompoundTree("match before");
-		Condition<?> con = entry.getMatchBefore();
+		CompoundTree subTree = new CompoundTree("match entity");
+		Condition<?> con = entry.getMatchItem();
 		if (con != null) {
-			subTree.append(new ConditionIndexer().detectCircle(con));
+			subTree.append(indexer.toRecord(con));
+			tree.append(subTree);
+		}
+		subTree = new CompoundTree("match before");
+		con = entry.getMatchBefore();
+		if (con != null) {
+			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
 		subTree = new CompoundTree("match after");
 		con = entry.getMatchAfter();
 		if (con != null) {
-			subTree.append(new ConditionIndexer().detectCircle(con));
-			tree.append(subTree);
-		}
-		subTree = new CompoundTree("match entity");
-		con = entry.getMatchItem();
-		if (con != null) {
-			subTree.append(new ConditionIndexer().detectCircle(con));
+			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
 

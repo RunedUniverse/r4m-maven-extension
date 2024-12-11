@@ -83,7 +83,7 @@ node {
 					skipStage()
 					return
 				}
-				sh "mvn-dev -P ${ REPOS },validate,license-apache2-approve -pl=${ module.relPathFrom('r4m-parent') }"
+				sh "mvn-dev -P ${ REPOS },validate -pl=${ module.relPathFrom('r4m-parent') }"
 			}
 		}
 

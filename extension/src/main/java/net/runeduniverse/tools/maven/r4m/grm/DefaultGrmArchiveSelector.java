@@ -34,7 +34,9 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
@@ -99,9 +101,42 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			return;
 		}
 
+		final Map<GoalData, Set<DataGroup>> keyIndex = new LinkedHashMap<>();
+
 		Map<DataGroup, Set<MergeDataGroup>> baseBefore = filterBySource(before, GoalRequirementSource.PACKAGING);
 		Map<DataGroup, Set<MergeDataGroup>> baseAfter = filterBySource(after, GoalRequirementSource.PACKAGING);
 
+		indexGoalRefs(keyIndex, baseBefore);
+		indexGoalRefs(keyIndex, baseAfter);
+
+		domBefore = filterBySource(before, GoalRequirementSource.WORKFLOW);
+		domAfter = filterBySource(after, GoalRequirementSource.WORKFLOW);
+
+	}
+
+	protected void indexGoalRefs(final Map<GoalData, Set<DataGroup>> index,
+			final Map<DataGroup, Set<MergeDataGroup>> map) {
+
+		for (DataGroup group : map.keySet()) {
+			indexGoalRef(index, group);
+		}
+
+		for (Set<MergeDataGroup> valueSet : map.values()) {
+			if (valueSet == null || valueSet.isEmpty())
+				continue;
+			for (MergeDataGroup group : valueSet)
+				indexGoalRef(index, group);
+		}
+	}
+
+	protected void indexGoalRef(final Map<GoalData, Set<DataGroup>> index, final DataGroup group) {
+		final GoalData key = findGoalData(group);
+		if (key == null)
+			return;
+		Set<DataGroup> set = index.get(key);
+		if (set == null)
+			index.put(key, set = new LinkedHashSet<>());
+		set.add(group);
 	}
 
 	@Override
@@ -152,6 +187,14 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			map.put(entry.getKey(), set);
 		}
 		return map;
+	}
+
+	protected static GoalData findGoalData(final DataGroup group) {
+		for (DataEntry entry : group.getEntries()) {
+			if (entry instanceof GoalData)
+				return (GoalData) entry;
+		}
+		return null;
 	}
 
 	@FunctionalInterface

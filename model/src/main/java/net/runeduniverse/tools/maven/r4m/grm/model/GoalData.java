@@ -26,6 +26,7 @@ public class GoalData implements DataEntry, Recordable {
 	protected String groupId = null;
 	protected String id = null;
 	protected String goalId = null;
+	protected Integer hash = null;
 
 	public String getGroupId() {
 		return this.groupId;
@@ -70,9 +71,14 @@ public class GoalData implements DataEntry, Recordable {
 		return tree;
 	}
 
-	@Override
-	public int hashCode() {
+	protected int _hashCode() {
 		return hash(type()) ^ hash(getGroupId()) ^ hash(getArtifactId()) ^ hash(getGoalId());
+	}
+
+	public int hashCode() {
+		if (this.hash == null)
+			this.hash = _hashCode();
+		return this.hash;
 	}
 
 	@Override

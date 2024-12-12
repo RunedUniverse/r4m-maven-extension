@@ -52,7 +52,7 @@ public class MergeDataGroup extends AndDataGroup {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!super.equals(obj) || !(obj instanceof MergeDataGroup))
+		if (!(obj instanceof MergeDataGroup) || !super.equals(obj))
 			return false;
 		final MergeDataGroup data = (MergeDataGroup) obj;
 		return getSource() == data.getSource();

@@ -20,6 +20,7 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 public class MergeDataGroup extends AndDataGroup {
 
 	private GoalRequirementSource source = null;
+	private GoalRequirementCombineMethod combineMethod = null;
 
 	public MergeDataGroup(final String type) {
 		super(type);
@@ -29,12 +30,21 @@ public class MergeDataGroup extends AndDataGroup {
 		return this.source;
 	}
 
-	public void setSource(GoalRequirementSource source) {
+	public GoalRequirementCombineMethod getCombineMethod() {
+		return this.combineMethod;
+	}
+
+	public void setSource(final GoalRequirementSource source) {
 		this.source = source;
+	}
+
+	public void setCombineMethod(final GoalRequirementCombineMethod method) {
+		this.combineMethod = method;
 	}
 
 	protected <T extends MergeDataGroup> T _copyDataTo(final T group) {
 		group.setSource(this.source);
+		group.setCombineMethod(this.combineMethod);
 		return group;
 	}
 
@@ -47,7 +57,7 @@ public class MergeDataGroup extends AndDataGroup {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ hash(getSource());
+		return super.hashCode() ^ hash(getSource()) ^ hash(getCombineMethod());
 	}
 
 	@Override
@@ -55,6 +65,6 @@ public class MergeDataGroup extends AndDataGroup {
 		if (!(obj instanceof MergeDataGroup) || !super.equals(obj))
 			return false;
 		final MergeDataGroup data = (MergeDataGroup) obj;
-		return getSource() == data.getSource();
+		return getSource() == data.getSource() && getCombineMethod() == data.getCombineMethod();
 	}
 }

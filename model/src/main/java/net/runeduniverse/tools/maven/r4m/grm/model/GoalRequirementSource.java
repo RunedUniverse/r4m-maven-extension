@@ -15,10 +15,10 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 /*
  * merge-procedure of sources
@@ -33,17 +33,25 @@ public class GoalRequirementSource {
 	@Deprecated
 	public static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
 
-	public static final GoalRequirementSource OVERRIDE = new GoalRequirementSource("override");
-	public static final GoalRequirementSource WORKFLOW = new GoalRequirementSource("workflow");
-	public static final GoalRequirementSource PACKAGING = new GoalRequirementSource("packaging");
-	public static final GoalRequirementSource PLUGIN = new GoalRequirementSource("plugin");
+	public static final GoalRequirementSource OVERRIDE = //
+			new GoalRequirementSource("override", null);
+	public static final GoalRequirementSource WORKFLOW = //
+			new GoalRequirementSource("workflow", GoalRequirementCombineMethod.REPLACE);
+	public static final GoalRequirementSource PACKAGING = //
+			new GoalRequirementSource("packaging", null);
+	public static final GoalRequirementSource PLUGIN = //
+			new GoalRequirementSource("plugin", GoalRequirementCombineMethod.APPEND);
 	@Deprecated
-	public static final GoalRequirementSource EFFECTIVE = new GoalRequirementSource("effective");
+	public static final GoalRequirementSource EFFECTIVE = //
+			new GoalRequirementSource("effective", null);
 
 	private final String key;
 
-	protected GoalRequirementSource(String key) {
+	private final GoalRequirementCombineMethod defaultCombineMethod;
+
+	protected GoalRequirementSource(final String key, final GoalRequirementCombineMethod defaultCombineMethod) {
 		this.key = key;
+		this.defaultCombineMethod = defaultCombineMethod;
 		GoalRequirementSource.KNOWN_SOURCES.put(key, this);
 	}
 
@@ -51,12 +59,13 @@ public class GoalRequirementSource {
 		return this.key;
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof GoalRequirementSource))
-			return false;
+	public GoalRequirementCombineMethod defaultCombineMethod() {
+		return this.defaultCombineMethod;
+	}
 
-		return this.key.equals(((GoalRequirementSource) obj).key());
+	@Override
+	public boolean equals(final Object obj) {
+		return this == obj;
 	}
 
 	@Override
@@ -64,7 +73,7 @@ public class GoalRequirementSource {
 		return this.key;
 	}
 
-	public static GoalRequirementSource create(String key) {
+	public static GoalRequirementSource create(String key, final GoalRequirementCombineMethod defaultCombineMethod) {
 		if (isBlank(key))
 			return null;
 
@@ -72,8 +81,25 @@ public class GoalRequirementSource {
 				.toLowerCase();
 		final GoalRequirementSource source = GoalRequirementSource.KNOWN_SOURCES.get(key);
 		if (source == null)
-			return new GoalRequirementSource(key);
+			return new GoalRequirementSource(key, defaultCombineMethod);
 		else
 			return source;
+	}
+
+	public static GoalRequirementSource get(final String key) {
+		return GoalRequirementSource.KNOWN_SOURCES.get(key);
+	}
+
+	public static GoalRequirementCombineMethod getValue(final GoalRequirementSource source,
+			final GoalRequirementCombineMethod method) {
+		if (source == null)
+			return null;
+		final GoalRequirementCombineMethod m = source.defaultCombineMethod();
+		// check if the default value is null, then this source is not supported
+		if (m == null)
+			return null;
+		if (method == GoalRequirementCombineMethod.DEFAULT)
+			return m;
+		return method;
 	}
 }

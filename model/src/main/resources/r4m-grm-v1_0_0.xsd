@@ -82,6 +82,23 @@
 				</xs:restriction>
 			</xs:simpleType>
 		</xs:attribute>
+		<xs:attribute name="method.combine" use="optional"
+			default="default">
+			<xs:annotation>
+				<xs:documentation>
+					This option only effects specified sources,
+					furthermore the 'default' definitions are as follows:
+					»source="workflow"« = "replace", »source="plugin"« = "append"
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="replace" />
+					<xs:enumeration value="append" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="CheckBranch">
@@ -125,7 +142,8 @@
 		<xs:attribute name="id" type="ExecutionId" use="required" />
 	</xs:complexType>
 	<xs:complexType name="PackagingCheck">
-		<xs:attribute name="procedure" type="PackagingProcedure" use="required" />
+		<xs:attribute name="procedure" type="PackagingProcedure"
+			use="required" />
 	</xs:complexType>
 	<xs:complexType name="LifecycleCheck">
 		<xs:attribute name="id" type="LifecycleId" use="required" />

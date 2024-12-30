@@ -36,6 +36,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
@@ -141,7 +142,9 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 			final String defaultGroupId, final String defaultArtifactId, final GoalRequirementSource defaultSource) {
 		final MergeDataGroup group = new MergeDataGroup(type);
 		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
-		group.setSource(GoalRequirementSource.create(cnf.getAttribute("source", defaultSource.key())));
+		group.setSource(GoalRequirementSource.get(cnf.getAttribute("source", defaultSource.key())));
+		group.setCombineMethod(GoalRequirementCombineMethod
+				.get(cnf.getAttribute("method.combine", GoalRequirementCombineMethod.DEFAULT.key())));
 		return group;
 	}
 

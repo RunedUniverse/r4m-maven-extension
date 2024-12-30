@@ -83,6 +83,13 @@ public final class ModelUtils {
 				.hashCode();
 	}
 
+	public static int hash(final GoalRequirementCombineMethod m) {
+		if (m == null)
+			return 0;
+		return m.key()
+				.hashCode();
+	}
+
 	public static boolean strEquals(final String a, final String b) {
 		if (a == b)
 			return true;

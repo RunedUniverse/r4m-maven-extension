@@ -113,11 +113,10 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 						final GoalData baseGoal = findGoalData(base);
 						final boolean required = base.isRequired();
 
-						for (MergeDataGroup g : remove)
-							if (baseGoal.equals(findGoalData(g)) && required == g.isRequired()) {
+						for (MergeDataGroup g : remove) {
+							if (baseGoal.equals(findGoalData(g)) && required == g.isRequired())
 								i.remove();
-								break;
-							}
+						}
 					}
 				baseSet.addAll(append);
 			}

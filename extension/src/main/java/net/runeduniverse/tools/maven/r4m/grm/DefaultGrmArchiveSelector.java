@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -25,7 +26,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
-
 import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
 import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
@@ -37,6 +37,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorC
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
@@ -74,8 +75,64 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return map;
 	}
 
-	protected void merge(Map<DataGroup, Set<MergeDataGroup>> base, Map<DataGroup, Set<MergeDataGroup>> dom) {
+	protected void merge(final Map<GoalData, Set<DataGroup>> keyIndex,
+			final Map<DataGroup, Set<MergeDataGroup>> baseMap, final Map<DataGroup, Set<MergeDataGroup>> domMap,
+			final GoalRequirementCombineMethod forceMethod) {
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : domMap.entrySet()) {
+			// evaluate combination method
+			final Set<MergeDataGroup> remove = new LinkedHashSet<>();
+			final Set<MergeDataGroup> append = new LinkedHashSet<>();
 
+			for (MergeDataGroup value : entry.getValue()) {
+				final GoalRequirementCombineMethod method = forceMethod == null ? getCombineMethod(value) : forceMethod;
+				if (method == null)
+					continue;
+				if (GoalRequirementCombineMethod.REMOVE.equals(method)) {
+					remove.add(value);
+				} else if (GoalRequirementCombineMethod.REPLACE.equals(method)) {
+					remove.add(value);
+					append.add(value);
+				} else if (GoalRequirementCombineMethod.APPEND.equals(method)) {
+					append.add(value);
+				}
+			}
+			// get all keys of the same goal
+			final Set<DataGroup> keys = keyIndex.getOrDefault(findGoalData(entry.getKey()), new LinkedHashSet<>());
+
+			keys.retainAll(baseMap.keySet());
+			if (keys.isEmpty())
+				keys.add(entry.getKey());
+
+			// apply method
+			for (DataGroup keyData : keys) {
+				final Set<MergeDataGroup> baseSet = baseMap.computeIfAbsent(keyData, k -> new LinkedHashSet<>());
+
+				if (!baseSet.isEmpty() && !remove.isEmpty())
+					for (Iterator<MergeDataGroup> i = baseSet.iterator(); i.hasNext();) {
+						final MergeDataGroup base = i.next();
+						final GoalData baseGoal = findGoalData(base);
+						final boolean required = base.isRequired();
+
+						for (MergeDataGroup g : remove)
+							if (baseGoal.equals(findGoalData(g)) && required == g.isRequired()) {
+								i.remove();
+								break;
+							}
+					}
+				baseSet.addAll(append);
+			}
+		}
+	}
+
+	protected GoalRequirementCombineMethod getCombineMethod(final MergeDataGroup data) {
+		if (data == null)
+			return null;
+		GoalRequirementCombineMethod method = data.getCombineMethod();
+		if (GoalRequirementCombineMethod.DEFAULT.equals(method)) {
+			return data.getSource()
+					.defaultCombineMethod();
+		}
+		return method;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -103,15 +160,43 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 
 		final Map<GoalData, Set<DataGroup>> keyIndex = new LinkedHashMap<>();
 
+		// get PACKAGING entries as base
 		Map<DataGroup, Set<MergeDataGroup>> baseBefore = filterBySource(before, GoalRequirementSource.PACKAGING);
 		Map<DataGroup, Set<MergeDataGroup>> baseAfter = filterBySource(after, GoalRequirementSource.PACKAGING);
-
+		// index base goals
 		indexGoalRefs(keyIndex, baseBefore);
 		indexGoalRefs(keyIndex, baseAfter);
-
+		// get WORKFLOW entries as dominant
 		domBefore = filterBySource(before, GoalRequirementSource.WORKFLOW);
 		domAfter = filterBySource(after, GoalRequirementSource.WORKFLOW);
+		// merge GRM = WORKFLOW -> PACKAGING
+		merge(keyIndex, baseBefore, domBefore, null);
+		merge(keyIndex, baseAfter, domAfter, null);
+		// mark entries base entries as dominant
+		domBefore = baseBefore;
+		domAfter = baseAfter;
+		// get PLUGIN entries as base
+		baseBefore = filterBySource(before, GoalRequirementSource.PLUGIN);
+		baseAfter = filterBySource(after, GoalRequirementSource.PLUGIN);
+		// clear index & index new batch of entries
+		keyIndex.clear();
+		indexGoalRefs(keyIndex, baseBefore);
+		indexGoalRefs(keyIndex, baseAfter);
+		// merge GRM = GRM -> PLUGIN
+		merge(keyIndex, baseBefore, domBefore, GoalRequirementCombineMethod.REPLACE);
+		merge(keyIndex, baseAfter, domAfter, GoalRequirementCombineMethod.REPLACE);
+		// index dominant batch of entries
+		indexGoalRefs(keyIndex, domBefore);
+		indexGoalRefs(keyIndex, domAfter);
+		// get OVERRIDE entries as dominant
+		domBefore = filterBySource(before, GoalRequirementSource.OVERRIDE);
+		domAfter = filterBySource(after, GoalRequirementSource.OVERRIDE);
+		// merge GRM = OVERRIDE -> GRM
+		merge(keyIndex, baseBefore, domBefore, null);
+		merge(keyIndex, baseAfter, domAfter, null);
 
+		// done => effective sources override everything!
+		// TODO implement conversion
 	}
 
 	protected void indexGoalRefs(final Map<GoalData, Set<DataGroup>> index,
@@ -133,9 +218,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		final GoalData key = findGoalData(group);
 		if (key == null)
 			return;
-		Set<DataGroup> set = index.get(key);
-		if (set == null)
-			index.put(key, set = new LinkedHashSet<>());
+		final Set<DataGroup> set = index.computeIfAbsent(key, k -> new LinkedHashSet<>());
 		set.add(group);
 	}
 
@@ -162,10 +245,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			final Set<MergeDataGroup> src = entry.getValue();
 			if (src == null || src.isEmpty())
 				continue;
-			Set<MergeDataGroup> set = base.get(entry.getKey());
-			if (set == null)
-				base.put(entry.getKey()
-						.copy(), set = new LinkedHashSet<>());
+			final Set<MergeDataGroup> set = base.computeIfAbsent(entry.getKey()
+					.copy(), k -> new LinkedHashSet<>());
 			for (MergeDataGroup data : src)
 				set.add(data.copy());
 		}

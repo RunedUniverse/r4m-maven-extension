@@ -25,7 +25,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
  *
  * 1. EFFECTIVE beats all other definitions if it exists!
  * 2. $grm = WORKFLOW merges with PACKAGING by replacing (configurable!) all goals (prereq/dependencies) which are also defined in PACKAGING
- * 3. $grm = $grm merges with PLUGIN by replacing all goals which are also defined in PLUGIN, except for all goals marked a required
+ * 3. $grm = $grm merges with PLUGIN by replacing all goals which are also defined in PLUGIN, required flag must match for replace and remove!
  * 4. $grm = OVERRIDE merges with $grm by replacing (configurable!) all goals which are also defined in $grm
  */
 public class GoalRequirementSource {

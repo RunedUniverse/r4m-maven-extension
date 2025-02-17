@@ -23,6 +23,10 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class GoalData implements DataEntry, Recordable {
 
+	public static final String ERR_MSG_LOCKED_OBJECT = "Object is unmodifyable as it was already locked!";
+
+	private boolean locked = false;
+
 	protected String groupId = null;
 	protected String id = null;
 	protected String goalId = null;
@@ -41,18 +45,32 @@ public class GoalData implements DataEntry, Recordable {
 	}
 
 	public GoalData setGroupId(String groupId) {
+		if (this.locked)
+			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.groupId = groupId;
 		return this;
 	}
 
 	public GoalData setArtifactId(String artifactId) {
+		if (this.locked)
+			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.id = artifactId;
 		return this;
 	}
 
 	public GoalData setGoalId(String goalId) {
+		if (this.locked)
+			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.goalId = goalId;
 		return this;
+	}
+
+	public boolean isLocked() {
+		return this.locked;
+	}
+
+	protected void lock() {
+		this.locked = true;
 	}
 
 	@Override
@@ -75,7 +93,9 @@ public class GoalData implements DataEntry, Recordable {
 		return hash(type()) ^ hash(getGroupId()) ^ hash(getArtifactId()) ^ hash(getGoalId());
 	}
 
+	@Override
 	public int hashCode() {
+		lock();
 		if (this.hash == null)
 			this.hash = _hashCode();
 		return this.hash;

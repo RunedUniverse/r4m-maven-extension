@@ -70,6 +70,12 @@ public final class ModelUtils {
 		}
 	}
 
+	public static int hash(final Boolean b) {
+		if (b == null)
+			return 0;
+		return b.hashCode();
+	}
+
 	public static int hash(final String s) {
 		if (s == null)
 			return 0;

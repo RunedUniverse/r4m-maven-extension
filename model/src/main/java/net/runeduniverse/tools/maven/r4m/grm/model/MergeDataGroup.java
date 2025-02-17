@@ -54,6 +54,7 @@ public class MergeDataGroup extends AndDataGroup {
 	protected <T extends MergeDataGroup> T _copyDataTo(final T group) {
 		group.setSource(this.source);
 		group.setCombineMethod(this.combineMethod);
+		group.setRequired(this.required);
 		return group;
 	}
 
@@ -66,7 +67,7 @@ public class MergeDataGroup extends AndDataGroup {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ hash(getSource()) ^ hash(getCombineMethod());
+		return super.hashCode() ^ hash(getSource()) ^ hash(getCombineMethod()) ^ hash(isRequired());
 	}
 
 	@Override
@@ -74,6 +75,7 @@ public class MergeDataGroup extends AndDataGroup {
 		if (!(obj instanceof MergeDataGroup) || !super.equals(obj))
 			return false;
 		final MergeDataGroup data = (MergeDataGroup) obj;
-		return getSource() == data.getSource() && getCombineMethod() == data.getCombineMethod();
+		return getSource() == data.getSource() && getCombineMethod() == data.getCombineMethod()
+				&& isRequired() == data.isRequired();
 	}
 }

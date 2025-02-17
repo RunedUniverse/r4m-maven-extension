@@ -99,11 +99,11 @@ public class GoalRequirementModel implements Recordable {
 			this.defaultSource = defaultSource;
 	}
 
-	public void addGoalContainer(GoalContainer container) {
+	public void addGoalContainer(final GoalContainer container) {
 		this.goals.add(container);
 	}
 
-	public void addGoalContainer(Collection<GoalContainer> container) {
+	public void addGoalContainer(final Collection<GoalContainer> container) {
 		this.goals.addAll(container);
 	}
 

@@ -21,6 +21,7 @@ public class MergeDataGroup extends AndDataGroup {
 
 	private GoalRequirementSource source = null;
 	private GoalRequirementCombineMethod combineMethod = null;
+	private boolean required = false;
 
 	public MergeDataGroup(final String type) {
 		super(type);
@@ -34,12 +35,20 @@ public class MergeDataGroup extends AndDataGroup {
 		return this.combineMethod;
 	}
 
+	public boolean isRequired() {
+		return required;
+	}
+
 	public void setSource(final GoalRequirementSource source) {
 		this.source = source;
 	}
 
 	public void setCombineMethod(final GoalRequirementCombineMethod method) {
 		this.combineMethod = method;
+	}
+
+	public void setRequired(final boolean required) {
+		this.required = required;
 	}
 
 	protected <T extends MergeDataGroup> T _copyDataTo(final T group) {

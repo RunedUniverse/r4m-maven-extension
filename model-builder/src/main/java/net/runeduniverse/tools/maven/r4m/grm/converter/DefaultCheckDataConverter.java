@@ -145,6 +145,7 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 		group.setSource(GoalRequirementSource.get(cnf.getAttribute("source", defaultSource.key())));
 		group.setCombineMethod(GoalRequirementCombineMethod
 				.get(cnf.getAttribute("method.combine", GoalRequirementCombineMethod.DEFAULT.key())));
+		group.setRequired(Boolean.parseBoolean(cnf.getAttribute("required", "false")));
 		return group;
 	}
 

@@ -24,23 +24,23 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
  * merge-procedure of sources
  *
  * 1. EFFECTIVE beats all other definitions if it exists!
- * 2. $pem = WORKFLOW merges with PACKAGING by replacing all lifecycles which are also defined in PACKAGING
- * 3. $pem = $pem merges with PLUGIN by replacing all goals which are also defined in PLUGIN
- * 4. $pem = OVERRIDE merges with $pem by replacing all lifecycles which are also defined in $pem
+ * 2. $grm = WORKFLOW merges with PACKAGING by replacing (configurable!) all goals (prereq/dependencies) which are also defined in PACKAGING
+ * 3. $grm = $grm merges with PLUGIN by replacing all goals which are also defined in PLUGIN, except for all goals marked a required
+ * 4. $grm = OVERRIDE merges with $grm by replacing (configurable!) all goals which are also defined in $grm
  */
 public class GoalRequirementSource {
 
 	@Deprecated
-	public static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
+	private static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
 
 	public static final GoalRequirementSource OVERRIDE = //
-			new GoalRequirementSource("override", null);
+			new GoalRequirementSource("override", GoalRequirementCombineMethod.REPLACE);
 	public static final GoalRequirementSource WORKFLOW = //
 			new GoalRequirementSource("workflow", GoalRequirementCombineMethod.REPLACE);
 	public static final GoalRequirementSource PACKAGING = //
 			new GoalRequirementSource("packaging", null);
 	public static final GoalRequirementSource PLUGIN = //
-			new GoalRequirementSource("plugin", GoalRequirementCombineMethod.APPEND);
+			new GoalRequirementSource("plugin", null);
 	@Deprecated
 	public static final GoalRequirementSource EFFECTIVE = //
 			new GoalRequirementSource("effective", null);

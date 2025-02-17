@@ -23,11 +23,12 @@ import java.util.Map;
 public class GoalRequirementCombineMethod {
 
 	@Deprecated
-	public static final Map<String, GoalRequirementCombineMethod> KNOWN_VALUES = new LinkedHashMap<>(3);
+	private static final Map<String, GoalRequirementCombineMethod> KNOWN_VALUES = new LinkedHashMap<>(4);
 
 	public static final GoalRequirementCombineMethod DEFAULT = new GoalRequirementCombineMethod("default");
 	public static final GoalRequirementCombineMethod REPLACE = new GoalRequirementCombineMethod("replace");
 	public static final GoalRequirementCombineMethod APPEND = new GoalRequirementCombineMethod("append");
+	public static final GoalRequirementCombineMethod REMOVE = new GoalRequirementCombineMethod("remove");
 
 	private final String key;
 

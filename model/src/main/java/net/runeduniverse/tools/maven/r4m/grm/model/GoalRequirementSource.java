@@ -17,6 +17,8 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
@@ -32,27 +34,34 @@ public class GoalRequirementSource {
 
 	@Deprecated
 	private static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
+	@Deprecated
+	private static final NavigableSet<Integer> KNOWN_PRIORITIES = new TreeSet<>();
 
 	public static final GoalRequirementSource OVERRIDE = //
-			new GoalRequirementSource("override", GoalRequirementCombineMethod.REPLACE);
+			new GoalRequirementSource("override", GoalRequirementCombineMethod.REPLACE, 3);
 	public static final GoalRequirementSource WORKFLOW = //
-			new GoalRequirementSource("workflow", GoalRequirementCombineMethod.REPLACE);
+			new GoalRequirementSource("workflow", GoalRequirementCombineMethod.REPLACE, 2);
 	public static final GoalRequirementSource PACKAGING = //
-			new GoalRequirementSource("packaging", null);
+			new GoalRequirementSource("packaging", null, 1);
 	public static final GoalRequirementSource PLUGIN = //
-			new GoalRequirementSource("plugin", null);
+			new GoalRequirementSource("plugin", null, 0);
 	@Deprecated
 	public static final GoalRequirementSource EFFECTIVE = //
-			new GoalRequirementSource("effective", null);
+			new GoalRequirementSource("effective", null, Integer.MAX_VALUE);
 
 	private final String key;
 
 	private final GoalRequirementCombineMethod defaultCombineMethod;
 
-	protected GoalRequirementSource(final String key, final GoalRequirementCombineMethod defaultCombineMethod) {
+	private final int priority;
+
+	protected GoalRequirementSource(final String key, final GoalRequirementCombineMethod defaultCombineMethod,
+			final int priority) {
 		this.key = key;
 		this.defaultCombineMethod = defaultCombineMethod;
+		this.priority = priority;
 		GoalRequirementSource.KNOWN_SOURCES.put(key, this);
+		GoalRequirementSource.KNOWN_PRIORITIES.add(this.priority);
 	}
 
 	public String key() {
@@ -73,7 +82,8 @@ public class GoalRequirementSource {
 		return this.key;
 	}
 
-	public static GoalRequirementSource create(String key, final GoalRequirementCombineMethod defaultCombineMethod) {
+	public static GoalRequirementSource create(String key, final GoalRequirementCombineMethod defaultCombineMethod,
+			final int priority) {
 		if (isBlank(key))
 			return null;
 
@@ -81,7 +91,7 @@ public class GoalRequirementSource {
 				.toLowerCase();
 		final GoalRequirementSource source = GoalRequirementSource.KNOWN_SOURCES.get(key);
 		if (source == null)
-			return new GoalRequirementSource(key, defaultCombineMethod);
+			return new GoalRequirementSource(key, defaultCombineMethod, priority);
 		else
 			return source;
 	}
@@ -101,5 +111,11 @@ public class GoalRequirementSource {
 		if (method == GoalRequirementCombineMethod.DEFAULT)
 			return m;
 		return method;
+	}
+
+	public static int getPriority(final GoalRequirementSource source, final boolean required) {
+		if (required)
+			return GoalRequirementSource.KNOWN_PRIORITIES.last() + source.priority;
+		return source.priority;
 	}
 }

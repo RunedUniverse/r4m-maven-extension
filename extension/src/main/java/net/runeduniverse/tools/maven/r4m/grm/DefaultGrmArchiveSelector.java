@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
@@ -34,12 +35,14 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.grm.converter.DefaultCheckDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 @Component(role = GoalRequirementArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
@@ -111,14 +114,80 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 					for (Iterator<MergeDataGroup> i = baseSet.iterator(); i.hasNext();) {
 						final MergeDataGroup base = i.next();
 						final GoalData baseGoal = findGoalData(base);
-						final boolean required = base.isRequired();
+						final boolean required = base.getRequired();
 
 						for (MergeDataGroup g : remove) {
-							if (baseGoal.equals(findGoalData(g)) && required == g.isRequired())
+							if (baseGoal.equals(findGoalData(g)) && required == g.getRequired())
 								i.remove();
 						}
 					}
 				baseSet.addAll(append);
+			}
+		}
+	}
+
+	protected void reduce(final Map<DataGroup, Set<MergeDataGroup>> map,
+			final Supplier<MergeDataGroup> reductionSupplier) {
+		for (Iterator<Entry<DataGroup, Set<MergeDataGroup>>> i = map.entrySet()
+				.iterator(); i.hasNext();) {
+			final Entry<DataGroup, Set<MergeDataGroup>> entry = i.next();
+			final Set<MergeDataGroup> set = entry.getValue();
+			// empty sets are removed
+			if (set == null || set.isEmpty()) {
+				i.remove();
+				continue;
+			}
+			// reduce per SOURCE = we still need it as priority later during evaluation to
+			// resolve circular requirements!
+			for (Entry<GoalRequirementSource, Set<MergeDataGroup>> srcEntry : categorizeBySource(set).entrySet()) {
+				// reduce per targeted goal
+				final Map<GoalData, Set<MergeDataGroup>> index = new LinkedHashMap<>();
+				for (MergeDataGroup g : srcEntry.getValue()) {
+					indexGoalRef(index, g);
+				}
+				for (Entry<GoalData, Set<MergeDataGroup>> e : index.entrySet()) {
+					final Map<Boolean, WhenDataGroup> requiredMap = new LinkedHashMap<>();
+					// reduce every entry
+					for (MergeDataGroup g : e.getValue()) {
+						// remove entry that gets reduced
+						set.remove(g);
+						// start reduction
+						final WhenDataGroup when = findWhenDataGroup(g);
+						final WhenDataGroup reducedWhen = requiredMap.computeIfAbsent(g.getRequired(),
+								k -> new WhenDataGroup());
+
+						if (when == null) {
+							reducedWhen.setAlwaysActive(true);
+							continue;
+						}
+
+						if (when.getAlwaysActive())
+							reducedWhen.setAlwaysActive(true);
+						if (when.getNeverActive())
+							reducedWhen.setNeverActive(true);
+						reducedWhen.getEntries()
+								.addAll(when.getEntries());
+					}
+					// finalize reduction & add summarized entry to set
+					for (Boolean b : new Boolean[] { Boolean.TRUE, Boolean.FALSE }) {
+						final WhenDataGroup when = requiredMap.get(b);
+						if (when == null)
+							continue;
+						final MergeDataGroup reduction = reductionSupplier.get();
+						set.add(reduction);
+						reduction.setSource(srcEntry.getKey());
+						reduction.setRequired(b);
+						reduction.addEntry(e.getKey()
+								.copy());
+						reduction.addEntry(when);
+
+						if (when.getAlwaysActive() || when.getNeverActive()) {
+							// this automatically invalidates all other conditions!
+							when.getEntries()
+									.clear();
+						}
+					}
+				}
 			}
 		}
 	}
@@ -152,6 +221,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		domBefore = filterBySource(before, GoalRequirementSource.EFFECTIVE);
 		domAfter = filterBySource(after, GoalRequirementSource.EFFECTIVE);
 		if (!domBefore.isEmpty() || !domAfter.isEmpty()) {
+			reduce(domBefore, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_BEFORE_TAG));
+			reduce(domAfter, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_AFTER_TAG));
 			// done => effective sources override everything!
 			// TODO implement conversion
 			return;
@@ -194,6 +265,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		merge(keyIndex, baseBefore, domBefore, null);
 		merge(keyIndex, baseAfter, domAfter, null);
 
+		reduce(baseBefore, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_BEFORE_TAG));
+		reduce(baseAfter, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_AFTER_TAG));
 		// done => effective sources override everything!
 		// TODO implement conversion
 	}
@@ -213,11 +286,11 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		}
 	}
 
-	protected void indexGoalRef(final Map<GoalData, Set<DataGroup>> index, final DataGroup group) {
+	protected <T extends DataGroup> void indexGoalRef(final Map<GoalData, Set<T>> index, final T group) {
 		final GoalData key = findGoalData(group);
 		if (key == null)
 			return;
-		final Set<DataGroup> set = index.computeIfAbsent(key, k -> new LinkedHashSet<>());
+		final Set<T> set = index.computeIfAbsent(key, k -> new LinkedHashSet<>());
 		set.add(group);
 	}
 
@@ -238,6 +311,16 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
 	}
 
+	protected static Supplier<MergeDataGroup> reductionSupplierOfType(final String type) {
+		return new Supplier<MergeDataGroup>() {
+
+			@Override
+			public MergeDataGroup get() {
+				return new MergeDataGroup(type);
+			}
+		};
+	}
+
 	protected static void copyToMap(final Map<DataGroup, Set<MergeDataGroup>> base,
 			final Map<DataGroup, Set<MergeDataGroup>> add) {
 		for (Entry<DataGroup, Set<MergeDataGroup>> entry : add.entrySet()) {
@@ -254,7 +337,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	protected static Map<DataGroup, Set<MergeDataGroup>> filterBySource(final Map<DataGroup, Set<MergeDataGroup>> input,
 			final GoalRequirementSource source) {
 		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
-		if (source == null)
+		if (input == null || source == null)
 			return map;
 		for (Entry<DataGroup, Set<MergeDataGroup>> entry : input.entrySet()) {
 			final Set<MergeDataGroup> set = new LinkedHashSet<>();
@@ -269,10 +352,32 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return map;
 	}
 
+	protected static Map<GoalRequirementSource, Set<MergeDataGroup>> categorizeBySource(
+			final Set<MergeDataGroup> input) {
+		final Map<GoalRequirementSource, Set<MergeDataGroup>> map = new LinkedHashMap<>();
+		if (input == null)
+			return map;
+		for (MergeDataGroup group : input) {
+			if (group == null)
+				continue;
+			final Set<MergeDataGroup> set = map.computeIfAbsent(group.getSource(), k -> new LinkedHashSet<>());
+			set.add(group);
+		}
+		return map;
+	}
+
 	protected static GoalData findGoalData(final DataGroup group) {
 		for (DataEntry entry : group.getEntries()) {
 			if (entry instanceof GoalData)
 				return (GoalData) entry;
+		}
+		return null;
+	}
+
+	protected static WhenDataGroup findWhenDataGroup(final DataGroup group) {
+		for (DataEntry entry : group.getEntries()) {
+			if (entry instanceof WhenDataGroup)
+				return (WhenDataGroup) entry;
 		}
 		return null;
 	}

@@ -35,7 +35,7 @@ public class MergeDataGroup extends AndDataGroup {
 		return this.combineMethod;
 	}
 
-	public boolean isRequired() {
+	public boolean getRequired() {
 		return required;
 	}
 
@@ -67,7 +67,7 @@ public class MergeDataGroup extends AndDataGroup {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ hash(getSource()) ^ hash(getCombineMethod()) ^ hash(isRequired());
+		return super.hashCode() ^ hash(getSource()) ^ hash(getCombineMethod()) ^ hash(getRequired());
 	}
 
 	@Override
@@ -76,6 +76,6 @@ public class MergeDataGroup extends AndDataGroup {
 			return false;
 		final MergeDataGroup data = (MergeDataGroup) obj;
 		return getSource() == data.getSource() && getCombineMethod() == data.getCombineMethod()
-				&& isRequired() == data.isRequired();
+				&& getRequired() == data.getRequired();
 	}
 }

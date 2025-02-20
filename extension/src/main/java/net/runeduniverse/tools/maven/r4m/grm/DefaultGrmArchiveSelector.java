@@ -27,6 +27,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
+
+import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
 import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
@@ -35,6 +37,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.grm.check.converter.api.CheckConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.DefaultDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
@@ -54,12 +57,14 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	private Settings settings;
 	@Requirement
 	private GoalRequirementArchive archive;
+	@Requirement
+	private CheckConverter converter;
 
 	// if grm is user-defined than it is inherited
 	// as long as no user-defined grm was found,
 	// any other grm is loaded from the plugins in the active project!
 	protected Map<DataGroup, Set<MergeDataGroup>> collectMatches(final GoalRequirementArchiveSector sector,
-			final MatchGetter getter, final EffectiveMatchGetter effGetter) {
+			final MatchGetter getter, final MatchGetter effGetter) {
 		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
 		copyToMap(map, getter.get(sector));
 
@@ -205,8 +210,6 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 
 	@SuppressWarnings("deprecation")
 	protected void getChecks(final GoalRequirementArchiveSector sector, final EntrySet<EntityView> set) {
-		// TODO collect data & compile conditions
-
 		final Map<DataGroup, Set<MergeDataGroup>> before = collectMatches(sector, //
 				GoalRequirementArchiveSector::getBeforeMatches, //
 				GoalRequirementArchiveSector::getEffectiveBeforeMatches);
@@ -224,7 +227,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			reduce(domBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
 			reduce(domAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
 			// done => effective sources override everything!
-			// TODO implement conversion
+			convertToEntrySet(domBefore, domAfter, set);
 			return;
 		}
 
@@ -268,7 +271,24 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		reduce(baseBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
 		reduce(baseAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
 		// done => effective sources override everything!
-		// TODO implement conversion
+		convertToEntrySet(baseBefore, baseAfter, set);
+	}
+
+	protected void convertToEntrySet(final Map<DataGroup, Set<MergeDataGroup>> before,
+			final Map<DataGroup, Set<MergeDataGroup>> after, final EntrySet<EntityView> set) {
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : before.entrySet()) {
+			final Condition<EntityView> match = this.converter.convertEntry(entry.getKey());
+			for (MergeDataGroup group : entry.getValue()) {
+				set.add(match, this.converter.convertEntry(group), null);
+			}
+		}
+		for (Entry<DataGroup, Set<MergeDataGroup>> entry : after.entrySet()) {
+			final Condition<EntityView> match = this.converter.convertEntry(entry.getKey());
+			for (MergeDataGroup group : entry.getValue()) {
+				set.add(match, null, this.converter.convertEntry(group));
+			}
+		}
+
 	}
 
 	protected void indexGoalRefs(final Map<GoalData, Set<DataGroup>> index,
@@ -384,13 +404,6 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 
 	@FunctionalInterface
 	protected interface MatchGetter {
-
-		public Map<DataGroup, Set<MergeDataGroup>> get(final GoalRequirementArchiveSector sector);
-
-	}
-
-	@FunctionalInterface
-	protected interface EffectiveMatchGetter {
 
 		public Map<DataGroup, Set<MergeDataGroup>> get(final GoalRequirementArchiveSector sector);
 

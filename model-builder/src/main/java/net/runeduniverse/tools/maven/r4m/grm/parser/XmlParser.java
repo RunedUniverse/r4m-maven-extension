@@ -26,7 +26,7 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelParser;
@@ -35,7 +35,7 @@ import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPars
 public class XmlParser implements GoalRequirementModelParser {
 
 	@Requirement
-	protected CheckDataConverter converter;
+	protected DataConverter converter;
 
 	@Override
 	public void parseModel(final GoalRequirementModel grm, final InputStream input) throws Exception {

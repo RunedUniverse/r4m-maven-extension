@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.converter;
+package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
 
-@Component(role = CheckDataFactory.class, hint = ExecutionData.HINT)
-public class ExecutionCheckDataFactory extends ACheckDataFactory {
+public interface DataFactory {
 
-	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!ExecutionData.HINT.equals(cnf.getName()))
-			return null;
+	public DataEntry createEntry(final PlexusConfiguration cnf);
 
-		return new ExecutionData().setId(getAttributeAsId(cnf, "id"));
-	}
 }

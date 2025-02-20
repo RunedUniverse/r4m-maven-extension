@@ -18,12 +18,12 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
-@Component(role = CheckDataFactory.class, hint = OrDataGroup.HINT)
-public class OrCheckDataFactory extends ACheckDataFactory {
+@Component(role = DataFactory.class, hint = OrDataGroup.HINT)
+public class OrDataFactory extends ADataFactory {
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {

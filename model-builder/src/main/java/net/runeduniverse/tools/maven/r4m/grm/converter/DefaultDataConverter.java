@@ -26,9 +26,9 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
@@ -40,18 +40,18 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
-@Component(role = CheckDataConverter.class, hint = "default")
-public class DefaultCheckDataConverter implements CheckDataConverter {
+@Component(role = DataConverter.class, hint = "default")
+public class DefaultDataConverter implements DataConverter {
 
 	public static final String CNF_MATCH_BEFORE_TAG = "prerequisites";
 	public static final String CNF_MATCH_AFTER_TAG = "dependents";
 
 	public static int MAX_TYPE_SEARCH_DEPTH = 4;
 
-	@Requirement(role = CheckDataFactory.class)
-	protected Map<String, CheckDataFactory> factories;
-	@Requirement(role = CheckDataHandler.class)
-	protected Map<String, CheckDataHandler> handler;
+	@Requirement(role = DataFactory.class)
+	protected Map<String, DataFactory> factories;
+	@Requirement(role = DataHandler.class)
+	protected Map<String, DataHandler> handler;
 
 	@Override
 	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
@@ -84,7 +84,7 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 	public DataEntry convertEntry(final PlexusConfiguration cnf) {
 		if (cnf == null)
 			return null;
-		final CheckDataFactory factory = this.factories.get(cnf.getName());
+		final DataFactory factory = this.factories.get(cnf.getName());
 		if (factory == null)
 			return null;
 		return factory.createEntry(cnf);
@@ -187,7 +187,7 @@ public class DefaultCheckDataConverter implements CheckDataConverter {
 
 		final List<String> types = collectEntryTypes(entry.getClass());
 		PlexusConfiguration cnf = null;
-		CheckDataHandler handler = null;
+		DataHandler handler = null;
 
 		for (String type : types) {
 			// find valid handler

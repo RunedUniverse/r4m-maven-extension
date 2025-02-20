@@ -18,24 +18,24 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.PhaseData;
+import net.runeduniverse.tools.maven.r4m.grm.model.PackagingData;
 
-@Component(role = CheckDataHandler.class, hint = PhaseData.CANONICAL_NAME)
-public class PhaseCheckDataHandler extends ACheckDataHandler {
+@Component(role = DataHandler.class, hint = PackagingData.CANONICAL_NAME)
+public class PackagingDataHandler extends ADataHandler {
 
 	@Override
 	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry) {
-		if (!(entry instanceof PhaseData))
+		if (!(entry instanceof PackagingData))
 			return null;
 
-		final PhaseData data = (PhaseData) entry;
-		final PlexusConfiguration cnf = factory.create(PhaseData.HINT);
+		final PackagingData data = (PackagingData) entry;
+		final PlexusConfiguration cnf = factory.create(PackagingData.HINT);
 
-		setAttributeAsId(cnf, "id", data.getId());
+		setAttributeAsId(cnf, "procedure", data.getProcedure());
 
 		return cnf;
 	}

@@ -18,18 +18,18 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.PhaseData;
+import net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData;
 
-@Component(role = CheckDataFactory.class, hint = PhaseData.HINT)
-public class PhaseCheckDataFactory extends ACheckDataFactory {
+@Component(role = DataFactory.class, hint = LifecycleData.HINT)
+public class LifecycleDataFactory extends ADataFactory {
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!PhaseData.HINT.equals(cnf.getName()))
+		if (!LifecycleData.HINT.equals(cnf.getName()))
 			return null;
 
-		return new PhaseData().setId(getAttributeAsId(cnf, "id"));
+		return new LifecycleData().setId(getAttributeAsId(cnf, "id"));
 	}
 }

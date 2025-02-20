@@ -18,29 +18,24 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
 
-@Component(role = CheckDataHandler.class, hint = WhenDataGroup.CANONICAL_NAME)
-public class WhenCheckDataHandler extends ACheckDataHandler {
+@Component(role = DataHandler.class, hint = ExecutionData.CANONICAL_NAME)
+public class ExecutionDataHandler extends ADataHandler {
 
 	@Override
 	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry) {
-		if (!(entry instanceof WhenDataGroup))
+		if (!(entry instanceof ExecutionData))
 			return null;
 
-		final PlexusConfiguration cnf = factory.create(WhenDataGroup.HINT);
-		final WhenDataGroup group = (WhenDataGroup) entry;
+		final ExecutionData data = (ExecutionData) entry;
+		final PlexusConfiguration cnf = factory.create(ExecutionData.HINT);
 
-		if (group.getAlwaysActive())
-			cnf.addChild("always", null);
-		if (group.getNeverActive())
-			cnf.addChild("never", null);
-
-		addConvertedEntries(cnf, factory, group);
+		setAttributeAsId(cnf, "id", data.getId());
 
 		return cnf;
 	}

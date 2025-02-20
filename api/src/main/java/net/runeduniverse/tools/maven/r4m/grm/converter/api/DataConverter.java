@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.converter;
+package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 
-import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
-import net.runeduniverse.tools.maven.r4m.grm.model.PackagingData;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 
-@Component(role = CheckDataFactory.class, hint = PackagingData.HINT)
-public class PackagingCheckDataFactory extends ACheckDataFactory {
+public interface DataConverter {
 
-	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!ExecutionData.HINT.equals(cnf.getName()))
-			return null;
+	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
+			final String defaultArtifactId, final GoalRequirementSource defaultSource);
 
-		return new PackagingData().setProcedure(getAttributeAsId(cnf, "procedure"));
-	}
+	public DataEntry convertEntry(final PlexusConfiguration cnf);
+
+	public PlexusConfiguration convertContainer(final ConfigurationFactory<PlexusConfiguration> factory,
+			final GoalContainer container);
+
+	public PlexusConfiguration convertEntry(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry);
 }

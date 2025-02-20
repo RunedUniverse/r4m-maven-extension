@@ -18,28 +18,24 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.lib.utils.common.StringUtils;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
+import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ProfileData;
 
-@Component(role = CheckDataHandler.class, hint = ProfileData.CANONICAL_NAME)
-public class ProfileCheckDataHandler extends ACheckDataHandler {
+@Component(role = DataHandler.class, hint = AndDataGroup.CANONICAL_NAME)
+public class AndDataHandler extends ADataHandler {
 
 	@Override
 	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry) {
-		if (!(entry instanceof ProfileData))
+		if (!(entry instanceof AndDataGroup))
 			return null;
 
-		final ProfileData data = (ProfileData) entry;
-		final PlexusConfiguration cnf = factory.create(ProfileData.HINT);
+		final PlexusConfiguration cnf = factory.create(AndDataGroup.HINT);
+		final AndDataGroup group = (AndDataGroup) entry;
 
-		setAttributeAsId(cnf, "id", data.getId());
-		final String state = data.getState();
-		if (!StringUtils.isBlank(state))
-			setAttributeAsId(cnf, "state", state);
+		addConvertedEntries(cnf, factory, group);
 
 		return cnf;
 	}

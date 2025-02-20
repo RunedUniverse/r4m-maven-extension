@@ -18,24 +18,24 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData;
 
-@Component(role = CheckDataHandler.class, hint = NotDataGroup.CANONICAL_NAME)
-public class NotCheckDataHandler extends ACheckDataHandler {
+@Component(role = DataHandler.class, hint = LifecycleData.CANONICAL_NAME)
+public class LifecycleDataHandler extends ADataHandler {
 
 	@Override
 	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry) {
-		if (!(entry instanceof NotDataGroup))
+		if (!(entry instanceof LifecycleData))
 			return null;
 
-		final PlexusConfiguration cnf = factory.create(NotDataGroup.HINT);
-		final NotDataGroup group = (NotDataGroup) entry;
+		final LifecycleData data = (LifecycleData) entry;
+		final PlexusConfiguration cnf = factory.create(LifecycleData.HINT);
 
-		addConvertedEntries(cnf, factory, group);
+		setAttributeAsId(cnf, "id", data.getId());
 
 		return cnf;
 	}

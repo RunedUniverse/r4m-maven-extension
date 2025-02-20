@@ -35,7 +35,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.grm.converter.DefaultCheckDataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.DefaultDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
@@ -221,8 +221,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		domBefore = filterBySource(before, GoalRequirementSource.EFFECTIVE);
 		domAfter = filterBySource(after, GoalRequirementSource.EFFECTIVE);
 		if (!domBefore.isEmpty() || !domAfter.isEmpty()) {
-			reduce(domBefore, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_BEFORE_TAG));
-			reduce(domAfter, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_AFTER_TAG));
+			reduce(domBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
+			reduce(domAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
 			// done => effective sources override everything!
 			// TODO implement conversion
 			return;
@@ -265,8 +265,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		merge(keyIndex, baseBefore, domBefore, null);
 		merge(keyIndex, baseAfter, domAfter, null);
 
-		reduce(baseBefore, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_BEFORE_TAG));
-		reduce(baseAfter, reductionSupplierOfType(DefaultCheckDataConverter.CNF_MATCH_AFTER_TAG));
+		reduce(baseBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
+		reduce(baseAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
 		// done => effective sources override everything!
 		// TODO implement conversion
 	}

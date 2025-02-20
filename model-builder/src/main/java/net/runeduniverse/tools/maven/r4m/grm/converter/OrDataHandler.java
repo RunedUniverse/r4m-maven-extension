@@ -18,19 +18,25 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.ProfileData;
+import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
 
-@Component(role = CheckDataFactory.class, hint = ProfileData.HINT)
-public class ProfileCheckDataFactory extends ACheckDataFactory {
+@Component(role = DataHandler.class, hint = OrDataGroup.CANONICAL_NAME)
+public class OrDataHandler extends ADataHandler {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!ProfileData.HINT.equals(cnf.getName()))
+	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
+			final DataEntry entry) {
+		if (!(entry instanceof OrDataGroup))
 			return null;
 
-		return new ProfileData().setId(getAttributeAsId(cnf, "id"))
-				.setState(getValueAsId(cnf, ProfileData.STATE_ACTIVE));
+		final PlexusConfiguration cnf = factory.create(OrDataGroup.HINT);
+		final OrDataGroup group = (OrDataGroup) entry;
+
+		addConvertedEntries(cnf, factory, group);
+
+		return cnf;
 	}
 }

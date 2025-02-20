@@ -18,25 +18,19 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
+import net.runeduniverse.tools.maven.r4m.grm.model.PackagingData;
 
-@Component(role = CheckDataHandler.class, hint = OrDataGroup.CANONICAL_NAME)
-public class OrCheckDataHandler extends ACheckDataHandler {
+@Component(role = DataFactory.class, hint = PackagingData.HINT)
+public class PackagingDataFactory extends ADataFactory {
 
 	@Override
-	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
-			final DataEntry entry) {
-		if (!(entry instanceof OrDataGroup))
+	public DataEntry createEntry(PlexusConfiguration cnf) {
+		if (!ExecutionData.HINT.equals(cnf.getName()))
 			return null;
 
-		final PlexusConfiguration cnf = factory.create(OrDataGroup.HINT);
-		final OrDataGroup group = (OrDataGroup) entry;
-
-		addConvertedEntries(cnf, factory, group);
-
-		return cnf;
+		return new PackagingData().setProcedure(getAttributeAsId(cnf, "procedure"));
 	}
 }

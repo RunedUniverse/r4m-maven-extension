@@ -18,15 +18,15 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 
-public abstract class ACheckDataFactory implements CheckDataFactory {
+public abstract class ADataFactory implements DataFactory {
 
-	@Requirement(role = CheckDataConverter.class)
-	protected CheckDataConverter converter;
+	@Requirement(role = DataConverter.class)
+	protected DataConverter converter;
 
 	protected DataEntry convertEntry(final PlexusConfiguration cnf) {
 		return this.converter.convertEntry(cnf);

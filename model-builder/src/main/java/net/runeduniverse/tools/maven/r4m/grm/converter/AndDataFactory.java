@@ -18,19 +18,19 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup;
 
-@Component(role = CheckDataFactory.class, hint = NotDataGroup.HINT)
-public class NotCheckDataFactory extends ACheckDataFactory {
+@Component(role = DataFactory.class, hint = AndDataGroup.HINT)
+public class AndDataFactory extends ADataFactory {
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!NotDataGroup.HINT.equals(cnf.getName()))
+		if (!AndDataGroup.HINT.equals(cnf.getName()))
 			return null;
 
-		final NotDataGroup group = new NotDataGroup();
+		final AndDataGroup group = new AndDataGroup();
 
 		addConvertedEntries(group, cnf.getChildren());
 

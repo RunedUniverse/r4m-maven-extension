@@ -19,17 +19,17 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup;
 
-@Component(role = CheckDataFactory.class, hint = WhenDataGroup.HINT)
-public class WhenCheckDataFactory extends ACheckDataFactory {
+@Component(role = DataFactory.class, hint = WhenDataGroup.HINT)
+public class WhenDataFactory extends ADataFactory {
 
-	@Requirement(role = CheckDataConverter.class)
-	protected CheckDataConverter factory;
+	@Requirement(role = DataConverter.class)
+	protected DataConverter factory;
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {

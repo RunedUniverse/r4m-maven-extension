@@ -24,7 +24,7 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
@@ -39,7 +39,7 @@ public class XmlWriter implements GoalRequirementModelWriter {
 	protected final ConfigurationFactory<PlexusConfiguration> factory;
 
 	@Requirement
-	protected CheckDataConverter converter;
+	protected DataConverter converter;
 
 	public XmlWriter() {
 		this(XmlPlexusConfiguration::new);

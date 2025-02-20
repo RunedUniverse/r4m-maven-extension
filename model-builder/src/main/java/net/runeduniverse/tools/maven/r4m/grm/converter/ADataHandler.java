@@ -18,16 +18,16 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataConverter;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.CheckDataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
+import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 
-public abstract class ACheckDataHandler implements CheckDataHandler {
+public abstract class ADataHandler implements DataHandler {
 
-	@Requirement(role = CheckDataConverter.class)
-	protected CheckDataConverter converter;
+	@Requirement(role = DataConverter.class)
+	protected DataConverter converter;
 
 	@Override
 	public PlexusConfiguration createConfiguration(final ConfigurationFactory<PlexusConfiguration> factory,

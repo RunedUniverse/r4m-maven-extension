@@ -24,15 +24,15 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
-public interface GoalRequirementDataFactory {
+public interface GoalRequirementViewFactory {
 
-	public ProjectView createProjectData(final MavenProject mvnProject);
+	public ProjectView createProjectView(final MavenProject mvnProject);
 
-	public RuntimeView createRuntimeData(final ExecutionArchiveSelectorConfig cnf, final String phase);
+	public RuntimeView createRuntimeView(final ExecutionArchiveSelectorConfig cnf, final String phase);
 
-	public GoalView createGoalData(final MojoExecution mojoExecution);
+	public GoalView createGoalView(final MojoExecution mojoExecution);
 
-	public EntityView createEntityData(final ProjectView projectData, final RuntimeView runtimeData,
+	public EntityView createEntityView(final ProjectView projectData, final RuntimeView runtimeData,
 			final GoalView goalData);
 
 }

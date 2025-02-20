@@ -77,7 +77,7 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementViewFactory;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
@@ -155,7 +155,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	protected Map<String, AdvancedLifecycleMappingDelegate> lifecycleMappingDelegates;
 
 	@Requirement
-	protected GoalRequirementDataFactory grmDataFactory;
+	protected GoalRequirementViewFactory grmViewFactory;
 
 	@Requirement(role = MojoExecutionConfigurator.class)
 	protected Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
@@ -359,7 +359,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	protected void sortMojosByProxy(final ExecutionArchiveSelectorConfig pemSelectorConfig,
 			final GoalRequirementArchiveSelectorConfig grmSelectorConfig,
 			final Map<String, List<MojoExecution>> phaseToMojoMapping) {
-		final ProjectView projectData = this.grmDataFactory.createProjectData(grmSelectorConfig.getActiveProject());
+		final ProjectView projectView = this.grmViewFactory.createProjectView(grmSelectorConfig.getActiveProject());
 
 		final GoalRequirementArchiveSelection selection = this.grmSelector.compileSelection(grmSelectorConfig);
 		final Comparator<EntityView> comparator = selection.getComparator();
@@ -367,11 +367,11 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		for (Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
 			final List<MojoExecution> executions = entry.getValue();
 			final Map<EntityView, MojoExecution> proxyMap = new LinkedHashMap<>();
-			final RuntimeView runtimeData = this.grmDataFactory.createRuntimeData(pemSelectorConfig, entry.getKey());
+			final RuntimeView runtimeView = this.grmViewFactory.createRuntimeView(pemSelectorConfig, entry.getKey());
 
 			for (MojoExecution mojoExec : executions) {
-				final GoalView goalData = this.grmDataFactory.createGoalData(mojoExec);
-				proxyMap.put(this.grmDataFactory.createEntityData(projectData, runtimeData, goalData), mojoExec);
+				final GoalView goalView = this.grmViewFactory.createGoalView(mojoExec);
+				proxyMap.put(this.grmViewFactory.createEntityView(projectView, runtimeView, goalView), mojoExec);
 			}
 
 			final List<EntityView> entityList = new LinkedList<>();

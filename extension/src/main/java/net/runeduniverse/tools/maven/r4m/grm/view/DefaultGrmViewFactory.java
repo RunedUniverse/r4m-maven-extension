@@ -22,35 +22,35 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementDataFactory;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementViewFactory;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
-@Component(role = GoalRequirementDataFactory.class)
-public class DefaultGrmViewFactory implements GoalRequirementDataFactory {
+@Component(role = GoalRequirementViewFactory.class)
+public class DefaultGrmViewFactory implements GoalRequirementViewFactory {
 
 	@Requirement
 	protected DefaultLifecycles defaultLifeCycles;
 
-	public ProjectView createProjectData(final MavenProject mvnProject) {
+	public ProjectView createProjectView(final MavenProject mvnProject) {
 		return new DefaultProjectView(mvnProject.getGroupId(), mvnProject.getArtifactId(), mvnProject.getPackaging());
 	}
 
-	public RuntimeView createRuntimeData(final ExecutionArchiveSelectorConfig cnf, final String phase) {
+	public RuntimeView createRuntimeView(final ExecutionArchiveSelectorConfig cnf, final String phase) {
 		final Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
 		return new DefaultRuntimeView(lifecycle == null ? null : lifecycle.getId(), phase, cnf.getModes(),
 				cnf.getActiveProfiles(), cnf.getInactiveProfiles(), cnf.getProvidedProfiles(),
 				cnf.getActiveExecutions());
 	}
 
-	public GoalView createGoalData(final MojoExecution mojoExecution) {
+	public GoalView createGoalView(final MojoExecution mojoExecution) {
 		return new DefaultGoalView(mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getGoal());
 	}
 
-	public EntityView createEntityData(final ProjectView projectData, final RuntimeView runtimeData,
+	public EntityView createEntityView(final ProjectView projectData, final RuntimeView runtimeData,
 			final GoalView goalData) {
 		return new DefaultEntityView(projectData, runtimeData, goalData);
 	}

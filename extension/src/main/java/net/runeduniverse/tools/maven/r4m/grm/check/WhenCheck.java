@@ -60,10 +60,10 @@ public class WhenCheck extends OrCheck {
 
 	@Override
 	public boolean evaluate(EntityView entity) {
-		if (this.always)
-			return true;
 		if (this.never)
 			return false;
+		if (this.always)
+			return true;
 		return super.evaluate(entity);
 	}
 

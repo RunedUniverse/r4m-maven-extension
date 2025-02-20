@@ -24,11 +24,11 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 public abstract class DefaultCheck implements Condition<EntityView> {
 
 	@Override
-	public boolean evaluate(EntityView entity) {
+	public boolean evaluate(final EntityView entity) {
 		return and(this::valuesAreValid, check()).eval(entity);
 	}
 
-	protected boolean valuesAreValid(EntityView data) {
+	protected boolean valuesAreValid(final EntityView data) {
 		return isValid();
 	}
 
@@ -44,20 +44,20 @@ public abstract class DefaultCheck implements Condition<EntityView> {
 		return d -> d != null;
 	}
 
-	protected static DataCheck<EntityView> project(DataCheck<ProjectView> check) {
+	protected static DataCheck<EntityView> project(final DataCheck<ProjectView> check) {
 		return d -> check.eval(d.getProject());
 	}
 
-	protected static DataCheck<EntityView> runtime(DataCheck<RuntimeView> check) {
+	protected static DataCheck<EntityView> runtime(final DataCheck<RuntimeView> check) {
 		return d -> check.eval(d.getRuntime());
 	}
 
-	protected static DataCheck<EntityView> goal(DataCheck<GoalView> check) {
+	protected static DataCheck<EntityView> goal(final DataCheck<GoalView> check) {
 		return d -> check.eval(d.getGoal());
 	}
 
 	@SafeVarargs
-	protected static <T> DataCheck<T> and(DataCheck<T>... checks) {
+	protected static <T> DataCheck<T> and(final DataCheck<T>... checks) {
 		return new DataCheck<T>() {
 			@Override
 			public boolean eval(T data) {
@@ -71,7 +71,7 @@ public abstract class DefaultCheck implements Condition<EntityView> {
 	}
 
 	@SafeVarargs
-	protected static <T> DataCheck<T> or(DataCheck<T>... checks) {
+	protected static <T> DataCheck<T> or(final DataCheck<T>... checks) {
 		return new DataCheck<T>() {
 			@Override
 			public boolean eval(T data) {
@@ -87,6 +87,7 @@ public abstract class DefaultCheck implements Condition<EntityView> {
 	@FunctionalInterface
 	public interface DataCheck<T> {
 
-		public boolean eval(T data);
+		public boolean eval(final T data);
+
 	}
 }

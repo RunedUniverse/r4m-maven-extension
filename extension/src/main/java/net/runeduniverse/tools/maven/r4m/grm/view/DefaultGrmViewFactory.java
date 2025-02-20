@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.view;
 
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
@@ -30,28 +30,28 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 @Component(role = GoalRequirementDataFactory.class)
-public class DefaultGrmDataFactory implements GoalRequirementDataFactory {
+public class DefaultGrmViewFactory implements GoalRequirementDataFactory {
 
 	@Requirement
 	protected DefaultLifecycles defaultLifeCycles;
 
 	public ProjectView createProjectData(final MavenProject mvnProject) {
-		return new DefaultProjectData(mvnProject.getGroupId(), mvnProject.getArtifactId(), mvnProject.getPackaging());
+		return new DefaultProjectView(mvnProject.getGroupId(), mvnProject.getArtifactId(), mvnProject.getPackaging());
 	}
 
 	public RuntimeView createRuntimeData(final ExecutionArchiveSelectorConfig cnf, final String phase) {
 		final Lifecycle lifecycle = this.defaultLifeCycles.get(phase);
-		return new DefaultRuntimeData(lifecycle == null ? null : lifecycle.getId(), phase, cnf.getModes(),
+		return new DefaultRuntimeView(lifecycle == null ? null : lifecycle.getId(), phase, cnf.getModes(),
 				cnf.getActiveProfiles(), cnf.getInactiveProfiles(), cnf.getProvidedProfiles(),
 				cnf.getActiveExecutions());
 	}
 
 	public GoalView createGoalData(final MojoExecution mojoExecution) {
-		return new DefaultGoalData(mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getGoal());
+		return new DefaultGoalView(mojoExecution.getGroupId(), mojoExecution.getArtifactId(), mojoExecution.getGoal());
 	}
 
 	public EntityView createEntityData(final ProjectView projectData, final RuntimeView runtimeData,
 			final GoalView goalData) {
-		return new DefaultEntityData(projectData, runtimeData, goalData);
+		return new DefaultEntityView(projectData, runtimeData, goalData);
 	}
 }

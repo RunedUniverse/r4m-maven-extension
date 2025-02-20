@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.view;
 
-import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 
-public class DefaultProjectData implements ProjectView {
+public class DefaultGoalView implements GoalView {
 
 	protected String groupId;
 	protected String artifactId;
-	protected String packaging;
+	protected String goalId;
 
-	protected DefaultProjectData() {
+	protected DefaultGoalView() {
 	}
 
-	public DefaultProjectData(final String groupId, final String artifactId, final String packaging) {
+	public DefaultGoalView(final String groupId, final String artifactId, final String goalId) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
-		this.packaging = packaging;
+		this.goalId = goalId;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class DefaultProjectData implements ProjectView {
 	}
 
 	@Override
-	public String getPackaging() {
-		return this.packaging;
+	public String getGoalId() {
+		return this.goalId;
 	}
 }

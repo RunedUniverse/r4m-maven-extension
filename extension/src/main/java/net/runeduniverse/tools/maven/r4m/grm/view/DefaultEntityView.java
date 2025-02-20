@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.view;
 
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultEntityData implements EntityView {
+public class DefaultEntityView implements EntityView {
 
 	protected ProjectView project = null;
 	protected RuntimeView runtime = null;
 	protected GoalView goal = null;
 
-	protected DefaultEntityData() {
+	protected DefaultEntityView() {
 	}
 
-	public DefaultEntityData(final ProjectView projectData, final RuntimeView runtimeData, final GoalView goalData) {
+	public DefaultEntityView(final ProjectView projectData, final RuntimeView runtimeData, final GoalView goalData) {
 		this.project = projectData;
 		this.runtime = runtimeData;
 		this.goal = goalData;

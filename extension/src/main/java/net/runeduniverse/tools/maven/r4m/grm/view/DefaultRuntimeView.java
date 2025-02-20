@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.data;
+package net.runeduniverse.tools.maven.r4m.grm.view;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class DefaultRuntimeData implements RuntimeView {
+public class DefaultRuntimeView implements RuntimeView {
 
 	protected final Set<String> modes = new LinkedHashSet<>();
 	protected final Set<String> activeProfileIds = new LinkedHashSet<>();
@@ -31,10 +31,10 @@ public class DefaultRuntimeData implements RuntimeView {
 	protected String lifecycleId;
 	protected String phaseId;
 
-	protected DefaultRuntimeData() {
+	protected DefaultRuntimeView() {
 	}
 
-	public DefaultRuntimeData(final String lifecycleId, final String phaseId, final Set<String> modes,
+	public DefaultRuntimeView(final String lifecycleId, final String phaseId, final Set<String> modes,
 			final Set<String> activeProfileIds, final Set<String> inactiveProfileIds,
 			final Set<String> providedProfileIds, final Set<String> activeExecutionIds) {
 		this.lifecycleId = lifecycleId;

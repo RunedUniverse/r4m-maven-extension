@@ -83,9 +83,14 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		return map;
 	}
 
-	protected void merge(final Map<GoalData, Set<DataGroup>> keyIndex,
-			final Map<DataGroup, Set<MergeDataGroup>> baseMap, final Map<DataGroup, Set<MergeDataGroup>> domMap,
-			final GoalRequirementCombineMethod forceMethod) {
+	protected void merge(final Map<DataGroup, Set<MergeDataGroup>> baseMap,
+			final Map<DataGroup, Set<MergeDataGroup>> domMap, final GoalRequirementCombineMethod forceMethod) {
+		// index base goals
+		final Map<GoalData, Set<DataGroup>> keyIndex = new LinkedHashMap<>();
+		for (DataGroup group : baseMap.keySet()) {
+			indexGoalRef(keyIndex, group);
+		}
+
 		for (Entry<DataGroup, Set<MergeDataGroup>> entry : domMap.entrySet()) {
 			// evaluate combination method
 			final Set<MergeDataGroup> remove = new LinkedHashSet<>();
@@ -106,10 +111,6 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			}
 			// get all keys of the same goal
 			final Set<DataGroup> keys = keyIndex.getOrDefault(findGoalData(entry.getKey()), new LinkedHashSet<>());
-
-			keys.retainAll(baseMap.keySet());
-			if (keys.isEmpty())
-				keys.add(entry.getKey());
 
 			// apply method
 			for (DataGroup keyData : keys) {
@@ -231,42 +232,30 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			return;
 		}
 
-		final Map<GoalData, Set<DataGroup>> keyIndex = new LinkedHashMap<>();
-
 		// get PACKAGING entries as base
 		Map<DataGroup, Set<MergeDataGroup>> baseBefore = filterBySource(before, GoalRequirementSource.PACKAGING);
 		Map<DataGroup, Set<MergeDataGroup>> baseAfter = filterBySource(after, GoalRequirementSource.PACKAGING);
-		// index base goals
-		indexGoalRefs(keyIndex, baseBefore);
-		indexGoalRefs(keyIndex, baseAfter);
 		// get WORKFLOW entries as dominant
 		domBefore = filterBySource(before, GoalRequirementSource.WORKFLOW);
 		domAfter = filterBySource(after, GoalRequirementSource.WORKFLOW);
 		// merge GRM = WORKFLOW -> PACKAGING
-		merge(keyIndex, baseBefore, domBefore, null);
-		merge(keyIndex, baseAfter, domAfter, null);
+		merge(baseBefore, domBefore, null);
+		merge(baseAfter, domAfter, null);
 		// mark entries base entries as dominant
 		domBefore = baseBefore;
 		domAfter = baseAfter;
 		// get PLUGIN entries as base
 		baseBefore = filterBySource(before, GoalRequirementSource.PLUGIN);
 		baseAfter = filterBySource(after, GoalRequirementSource.PLUGIN);
-		// clear index & index new batch of entries
-		keyIndex.clear();
-		indexGoalRefs(keyIndex, baseBefore);
-		indexGoalRefs(keyIndex, baseAfter);
 		// merge GRM = GRM -> PLUGIN
-		merge(keyIndex, baseBefore, domBefore, GoalRequirementCombineMethod.REPLACE);
-		merge(keyIndex, baseAfter, domAfter, GoalRequirementCombineMethod.REPLACE);
-		// index dominant batch of entries
-		indexGoalRefs(keyIndex, domBefore);
-		indexGoalRefs(keyIndex, domAfter);
+		merge(baseBefore, domBefore, GoalRequirementCombineMethod.REPLACE);
+		merge(baseAfter, domAfter, GoalRequirementCombineMethod.REPLACE);
 		// get OVERRIDE entries as dominant
 		domBefore = filterBySource(before, GoalRequirementSource.OVERRIDE);
 		domAfter = filterBySource(after, GoalRequirementSource.OVERRIDE);
 		// merge GRM = OVERRIDE -> GRM
-		merge(keyIndex, baseBefore, domBefore, null);
-		merge(keyIndex, baseAfter, domAfter, null);
+		merge(baseBefore, domBefore, null);
+		merge(baseAfter, domAfter, null);
 
 		reduce(baseBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
 		reduce(baseAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
@@ -287,22 +276,6 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 			for (MergeDataGroup group : entry.getValue()) {
 				set.add(match, null, this.converter.convertEntry(group));
 			}
-		}
-
-	}
-
-	protected void indexGoalRefs(final Map<GoalData, Set<DataGroup>> index,
-			final Map<DataGroup, Set<MergeDataGroup>> map) {
-
-		for (DataGroup group : map.keySet()) {
-			indexGoalRef(index, group);
-		}
-
-		for (Set<MergeDataGroup> valueSet : map.values()) {
-			if (valueSet == null || valueSet.isEmpty())
-				continue;
-			for (MergeDataGroup group : valueSet)
-				indexGoalRef(index, group);
 		}
 	}
 

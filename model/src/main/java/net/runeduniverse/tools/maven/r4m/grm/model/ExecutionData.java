@@ -21,12 +21,16 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class ExecutionData implements DataEntry, Recordable {
+public class ExecutionData extends ADataEntry implements DataEntry, Recordable {
 
 	public static final String HINT = "execution";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData";
 
 	protected String id = null;
+
+	public ExecutionData() {
+		super(HINT);
+	}
 
 	public String getId() {
 		return this.id;

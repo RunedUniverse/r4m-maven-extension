@@ -21,8 +21,9 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class GoalData implements DataEntry, Recordable {
+public class GoalData extends ADataEntry implements DataEntry, Recordable {
 
+	public static final String HINT = "goal";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.GoalData";
 
 	public static final String ERR_MSG_LOCKED_OBJECT = "Object is unmodifyable as it was already locked!";
@@ -33,6 +34,10 @@ public class GoalData implements DataEntry, Recordable {
 	protected String id = null;
 	protected String goalId = null;
 	protected Integer hash = null;
+
+	public GoalData() {
+		super(HINT);
+	}
 
 	public String getGroupId() {
 		return this.groupId;

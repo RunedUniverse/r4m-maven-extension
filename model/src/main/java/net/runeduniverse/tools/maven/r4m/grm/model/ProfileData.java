@@ -21,7 +21,7 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class ProfileData implements DataEntry, Recordable {
+public class ProfileData extends ADataEntry implements DataEntry, Recordable {
 
 	public static final String HINT = "profile";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.ProfileData";
@@ -33,6 +33,10 @@ public class ProfileData implements DataEntry, Recordable {
 
 	protected String id = null;
 	protected String state = null;
+
+	public ProfileData() {
+		super(HINT);
+	}
 
 	public String getId() {
 		return this.id;

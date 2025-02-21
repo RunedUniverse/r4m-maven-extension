@@ -21,12 +21,16 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class PackagingData implements DataEntry, Recordable {
+public class PackagingData extends ADataEntry implements DataEntry, Recordable {
 
 	public static final String HINT = "packaging";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.PackagingData";
 
 	protected String procedure = null;
+
+	public PackagingData() {
+		super(HINT);
+	}
 
 	public String getProcedure() {
 		return this.procedure;

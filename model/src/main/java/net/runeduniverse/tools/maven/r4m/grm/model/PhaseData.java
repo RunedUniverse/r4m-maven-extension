@@ -21,12 +21,16 @@ import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
-public class PhaseData implements DataEntry, Recordable {
+public class PhaseData extends ADataEntry implements DataEntry, Recordable {
 
 	public static final String HINT = "phase";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.PhaseData";
 
 	protected String id = null;
+
+	public PhaseData() {
+		super(HINT);
+	}
 
 	public String getId() {
 		return this.id;

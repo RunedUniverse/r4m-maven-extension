@@ -13,30 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.converter;
+package net.runeduniverse.tools.maven.r4m.grm.check.converter;
 
 import org.codehaus.plexus.component.annotations.Component;
-import org.codehaus.plexus.configuration.PlexusConfiguration;
+import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataHandler;
-import net.runeduniverse.tools.maven.r4m.grm.converter.api.ConfigurationFactory;
+import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.tools.maven.r4m.grm.check.NotCheck;
+import net.runeduniverse.tools.maven.r4m.grm.check.converter.api.CheckConverter;
+import net.runeduniverse.tools.maven.r4m.grm.check.converter.api.CheckFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.NotDataModifier;
+import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
-@Component(role = DataHandler.class, hint = NotDataModifier.CANONICAL_NAME)
-public class NotDataHandler extends ADataHandler {
+@Component(role = CheckFactory.class, hint = NotDataModifier.CANONICAL_NAME)
+public class NotDataModifierCheckFactory extends AModifierCheckFactory {
+
+	@Requirement
+	protected CheckConverter converter;
 
 	@Override
-	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
-			final DataEntry entry) {
+	public Condition<EntityView> createCheck(final DataEntry entry) {
 		if (!(entry instanceof NotDataModifier))
 			return null;
+		final NotDataModifier data = (NotDataModifier) entry;
+		final NotCheck check = new NotCheck();
 
-		final PlexusConfiguration cnf = factory.create(NotDataModifier.HINT);
-		final NotDataModifier mod = (NotDataModifier) entry;
+		convertEntry(data, check);
 
-		addConvertedEntry(cnf, factory, mod.getEntry());
-
-		return cnf;
+		return check;
 	}
 }

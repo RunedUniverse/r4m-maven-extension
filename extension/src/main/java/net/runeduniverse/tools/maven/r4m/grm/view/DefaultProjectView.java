@@ -43,7 +43,7 @@ public class DefaultProjectView implements ProjectView {
 	}
 
 	@Override
-	public String getPackaging() {
+	public String getPackagingProcedure() {
 		return this.packaging;
 	}
 }

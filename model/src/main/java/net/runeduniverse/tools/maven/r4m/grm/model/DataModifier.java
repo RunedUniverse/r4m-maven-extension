@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.view.api;
+package net.runeduniverse.tools.maven.r4m.grm.model;
 
-public interface ProjectView {
+public interface DataModifier extends DataEntry {
 
-	public String getGroupId();
+	public DataEntry getEntry();
 
-	public String getArtifactId();
+	public boolean setEntry(final DataEntry entry);
 
-	public String getPackagingProcedure();
+	public DataModifier copy();
+
 }

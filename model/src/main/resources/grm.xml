@@ -38,7 +38,7 @@
 			</groupId>
 			<artifactId>r4m-maven-extension</artifactId>
 			<prerequisites>
-				<goal id="pre-pack" source="workflow" method.combine="default">
+				<goal id="pre-pack" source="override" method.combine="default">
 					<groupId>
 						<!-- (opt - maven groupId) -->
 						net.runeduniverse.tools.maven.r4m

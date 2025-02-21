@@ -15,23 +15,21 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import java.util.LinkedHashSet;
-
-public class NotDataGroup extends ADataGroup<LinkedHashSet<DataEntry>> {
+public class NotDataModifier extends ADataModifier {
 
 	public static final String HINT = "not";
-	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.NotDataModifier";
 
-	public NotDataGroup() {
+	public NotDataModifier() {
 		this(HINT);
 	}
 
-	protected NotDataGroup(final String type) {
-		super(type, LinkedHashSet<DataEntry>::new);
+	protected NotDataModifier(final String type) {
+		super(type);
 	}
 
 	@Override
-	public DataGroup copy() {
-		return _copy(new NotDataGroup(type()));
+	public DataModifier copy() {
+		return _copy(new NotDataModifier(type()));
 	}
 }

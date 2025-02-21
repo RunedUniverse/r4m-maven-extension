@@ -20,19 +20,19 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.grm.model.NotDataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.NotDataModifier;
 
-@Component(role = DataFactory.class, hint = NotDataGroup.HINT)
+@Component(role = DataFactory.class, hint = NotDataModifier.HINT)
 public class NotDataFactory extends ADataFactory {
 
 	@Override
 	public DataEntry createEntry(PlexusConfiguration cnf) {
-		if (!NotDataGroup.HINT.equals(cnf.getName()))
+		if (!NotDataModifier.HINT.equals(cnf.getName()))
 			return null;
 
-		final NotDataGroup group = new NotDataGroup();
+		final NotDataModifier group = new NotDataModifier();
 
-		addConvertedEntries(group, cnf.getChildren());
+		setConvertedEntry(group, cnf.getChildren());
 
 		return group;
 	}

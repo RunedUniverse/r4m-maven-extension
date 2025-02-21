@@ -22,6 +22,7 @@ import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.converter.api.DataFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
+import net.runeduniverse.tools.maven.r4m.grm.model.DataModifier;
 
 public abstract class ADataFactory implements DataFactory {
 
@@ -37,6 +38,20 @@ public abstract class ADataFactory implements DataFactory {
 		if (entry == null)
 			return false;
 		return group.addEntry(entry);
+	}
+
+	protected void setConvertedEntry(final DataModifier modifier, final PlexusConfiguration[] cnf) {
+		if (cnf == null || cnf.length == 0)
+			return;
+		for (int i = 0; i < cnf.length; i++) {
+			if (cnf[i] != null) {
+				final DataEntry entry = convertEntry(cnf[i]);
+				if (entry == null)
+					continue;
+				modifier.setEntry(entry);
+				return;
+			}
+		}
 	}
 
 	protected void addConvertedEntries(final DataGroup group, final PlexusConfiguration[] cnf) {

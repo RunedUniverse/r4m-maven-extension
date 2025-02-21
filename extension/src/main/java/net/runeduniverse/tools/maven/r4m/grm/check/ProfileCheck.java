@@ -21,6 +21,12 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
+import net.runeduniverse.lib.utils.conditions.api.Condition.ConditionInfo;
+
 public class ProfileCheck extends ACheck {
 
 	protected ProfileData data = null;
@@ -83,5 +89,15 @@ public class ProfileCheck extends ACheck {
 		if (this.data == null || other.data == null)
 			return false;
 		return this.data.equals(other.data);
+	}
+
+	@Override
+	public List<ConditionInfo> getInfo() {
+		final List<ConditionInfo> lst = new LinkedList<>();
+		if (this.data != null) {
+			lst.add(new DefaultConditionInfo("id", getId()));
+			lst.add(new DefaultConditionInfo("state", getState()));
+		}
+		return lst;
 	}
 }

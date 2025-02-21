@@ -17,6 +17,11 @@ package net.runeduniverse.tools.maven.r4m.grm.check;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
+import net.runeduniverse.lib.utils.conditions.api.Condition.ConditionInfo;
 import net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
@@ -65,5 +70,14 @@ public class LifecycleCheck extends ACheck {
 		if (this.data == null || other.data == null)
 			return false;
 		return this.data.equals(other.data);
+	}
+
+	@Override
+	public List<ConditionInfo> getInfo() {
+		final List<ConditionInfo> lst = new LinkedList<>();
+		if (this.data != null) {
+			lst.add(new DefaultConditionInfo("id", getId()));
+		}
+		return lst;
 	}
 }

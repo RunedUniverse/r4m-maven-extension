@@ -18,9 +18,13 @@ package net.runeduniverse.tools.maven.r4m.grm.check;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class PhaseIdCheck extends DefaultCheck {
+public class PhaseIdCheck extends ACheck {
 
 	protected String phaseId = null;
+
+	public PhaseIdCheck(final String type) {
+		super(type);
+	}
 
 	public String getPhaseId() {
 		return this.phaseId;

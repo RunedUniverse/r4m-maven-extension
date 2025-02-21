@@ -19,6 +19,10 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
 public class ProfileMissingCheck extends DefaultProfileCheck {
 
+	public ProfileMissingCheck(final String type) {
+		super(type);
+	}
+
 	@Override
 	protected boolean eval(RuntimeView data) {
 		return !data.getProvidedProfileIds()

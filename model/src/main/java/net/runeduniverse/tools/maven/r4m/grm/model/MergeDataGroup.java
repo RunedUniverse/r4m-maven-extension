@@ -17,7 +17,11 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 
-public class MergeDataGroup extends AndDataGroup {
+public class MergeDataGroup extends MatchDataGroup {
+
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup";
+	public static final String MODEL_MATCH_BEFORE_TYPE = "before";
+	public static final String MODEL_MATCH_AFTER_TYPE = "after";
 
 	private GoalRequirementSource source = null;
 	private GoalRequirementCombineMethod combineMethod = null;

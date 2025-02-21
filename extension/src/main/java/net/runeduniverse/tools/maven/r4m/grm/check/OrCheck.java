@@ -24,11 +24,29 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public class OrCheck extends OrCondition<EntityView> {
 
-	public OrCheck() {
+	private final String type;
+
+	public OrCheck(final String type) {
 		super(new LinkedHashSet<>());
+		this.type = type;
 	}
 
-	public OrCheck(final Collection<Condition<EntityView>> conditions) {
+	public OrCheck(final String type, final Collection<Condition<EntityView>> conditions) {
 		super(conditions);
+		this.type = type;
+	}
+
+	@Override
+	public String getType() {
+		return this.type;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof OrCheck))
+			return false;
+		return super.equals(obj);
 	}
 }

@@ -18,9 +18,13 @@ package net.runeduniverse.tools.maven.r4m.grm.check;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public abstract class DefaultProfileCheck extends DefaultCheck {
+public abstract class DefaultProfileCheck extends ACheck {
 
 	protected String profileId = null;
+
+	public DefaultProfileCheck(final String type) {
+		super(type);
+	}
 
 	public String getProfileId() {
 		return this.profileId;

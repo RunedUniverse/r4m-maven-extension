@@ -19,59 +19,66 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
+import net.runeduniverse.tools.maven.r4m.grm.model.WhenDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public class WhenCheck extends OrCheck {
 
-	protected boolean always = false;
-	protected boolean never = false;
+	protected WhenDataGroup data = null;
 
-	public WhenCheck() {
-		super();
+	public WhenCheck(final String type) {
+		super(type);
 	}
 
-	@Override
-	public String getType() {
-		return "when";
+	public void setData(final WhenDataGroup data) {
+		this.data = data;
 	}
 
 	public boolean getAlwaysActive() {
-		return this.always;
+		return this.data == null ? false : this.data.getAlwaysActive();
 	}
 
 	public boolean getNeverActive() {
-		return this.never;
-	}
-
-	public void setAlwaysActive(boolean value) {
-		this.always = value;
-	}
-
-	public void setNeverActive(boolean value) {
-		this.never = value;
+		return this.data == null ? false : this.data.getNeverActive();
 	}
 
 	@Override
 	public boolean isValid() {
-		if (this.always || this.never)
+		if (this.data == null)
+			return false;
+		if (getAlwaysActive() || getNeverActive())
 			return true;
 		return super.isValid();
 	}
 
 	@Override
 	public boolean evaluate(EntityView entity) {
-		if (this.never)
-			return false;
-		if (this.always)
+		if (getNeverActive())
 			return true;
+		if (getAlwaysActive())
+			return false;
 		return super.evaluate(entity);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof WhenCheck))
+			return false;
+		final WhenCheck other = (WhenCheck) obj;
+		if (getAlwaysActive() != other.getAlwaysActive() || getNeverActive() != other.getNeverActive())
+			return false;
+		return super.equals(obj);
 	}
 
 	@Override
 	public List<ConditionInfo> getInfo() {
 		final List<ConditionInfo> lst = new LinkedList<>();
-		lst.add(new DefaultConditionInfo("always", Boolean.toString(this.always)));
-		lst.add(new DefaultConditionInfo("never", Boolean.toString(this.never)));
+		if (this.data != null) {
+			lst.add(new DefaultConditionInfo("always", Boolean.toString(this.data.getAlwaysActive())));
+			lst.add(new DefaultConditionInfo("never", Boolean.toString(this.data.getNeverActive())));
+		}
 		return lst;
 	}
 }

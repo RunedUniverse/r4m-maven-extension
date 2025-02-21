@@ -19,6 +19,10 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
 public class ProfileActiveCheck extends DefaultProfileCheck {
 
+	public ProfileActiveCheck(final String type) {
+		super(type);
+	}
+
 	@Override
 	protected boolean eval(RuntimeView data) {
 		return data.getActiveProfileIds()

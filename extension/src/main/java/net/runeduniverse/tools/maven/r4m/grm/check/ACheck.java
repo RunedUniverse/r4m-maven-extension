@@ -15,13 +15,25 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
+import net.runeduniverse.lib.utils.conditions.ACondition;
 import net.runeduniverse.lib.utils.conditions.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public abstract class DefaultCheck implements Condition<EntityView> {
+public abstract class ACheck extends ACondition<EntityView> implements Condition<EntityView> {
+
+	private final String type;
+
+	public ACheck(final String type) {
+		this.type = type;
+	}
+
+	@Override
+	public String getType() {
+		return this.type;
+	}
 
 	@Override
 	public boolean evaluate(final EntityView entity) {

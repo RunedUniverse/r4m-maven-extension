@@ -23,6 +23,8 @@ import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class GoalData implements DataEntry, Recordable {
 
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.GoalData";
+
 	public static final String ERR_MSG_LOCKED_OBJECT = "Object is unmodifyable as it was already locked!";
 
 	private boolean locked = false;

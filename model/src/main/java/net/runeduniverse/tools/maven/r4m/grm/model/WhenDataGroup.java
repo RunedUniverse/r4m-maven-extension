@@ -18,6 +18,8 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
+import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+
 public class WhenDataGroup extends OrDataGroup implements Recordable {
 
 	public static final String HINT = "when";
@@ -76,7 +78,7 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() ^ Boolean.hashCode(getAlwaysActive()) ^ Boolean.hashCode(getNeverActive());
+		return super.hashCode() ^ hash(getAlwaysActive()) ^ hash(getNeverActive());
 	}
 
 	@Override

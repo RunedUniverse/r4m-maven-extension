@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.grm.check;
+package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
-import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
+public class MatchDataGroup extends AndDataGroup {
 
-public class NotCheck extends NotCondition<EntityView> {
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.grm.model.MatchDataGroup";
+	public static final String MODEL_MATCH_ITEM_TYPE = "match";
+
+	public MatchDataGroup(final String type) {
+		super(type);
+	}
+
+	@Override
+	public MatchDataGroup copy() {
+		return _copyEntriesTo(new MatchDataGroup(type()));
+	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof NotCheck))
-			return false;
-		return super.equals(obj);
+		return obj instanceof MatchDataGroup && super.equals(obj);
 	}
 }

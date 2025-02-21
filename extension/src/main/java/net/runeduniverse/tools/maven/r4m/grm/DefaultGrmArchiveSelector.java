@@ -225,8 +225,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		domBefore = filterBySource(before, GoalRequirementSource.EFFECTIVE);
 		domAfter = filterBySource(after, GoalRequirementSource.EFFECTIVE);
 		if (!domBefore.isEmpty() || !domAfter.isEmpty()) {
-			reduce(domBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
-			reduce(domAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
+			reduce(domBefore, reductionSupplierOfType(MergeDataGroup.MODEL_MATCH_BEFORE_TYPE));
+			reduce(domAfter, reductionSupplierOfType(MergeDataGroup.MODEL_MATCH_AFTER_TYPE));
 			// done => effective sources override everything!
 			convertToEntrySet(domBefore, domAfter, set);
 			return;
@@ -257,8 +257,8 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 		merge(baseBefore, domBefore, null);
 		merge(baseAfter, domAfter, null);
 
-		reduce(baseBefore, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_BEFORE_TAG));
-		reduce(baseAfter, reductionSupplierOfType(DefaultDataConverter.CNF_MATCH_AFTER_TAG));
+		reduce(baseBefore, reductionSupplierOfType(MergeDataGroup.MODEL_MATCH_BEFORE_TYPE));
+		reduce(baseAfter, reductionSupplierOfType(MergeDataGroup.MODEL_MATCH_AFTER_TYPE));
 		// done => effective sources override everything!
 		convertToEntrySet(baseBefore, baseAfter, set);
 	}

@@ -18,9 +18,13 @@ package net.runeduniverse.tools.maven.r4m.grm.check;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class LifecycleIdCheck extends DefaultCheck {
+public class LifecycleIdCheck extends ACheck {
 
 	protected String lifecycleId = null;
+
+	public LifecycleIdCheck(final String type) {
+		super(type);
+	}
 
 	public String getPhaseId() {
 		return this.lifecycleId;

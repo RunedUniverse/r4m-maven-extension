@@ -19,24 +19,43 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 
-public class GoalCheck extends DefaultCheck {
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-	protected String goal = null;
+public class GoalCheck extends ACheck {
 
-	public String getGoal() {
-		return this.goal;
+	protected GoalData data = null;
+
+	public GoalCheck(final String type) {
+		super(type);
 	}
 
-	public void setGoal(String goalId) {
-		this.goal = goalId;
+	public void setData(final GoalData data) {
+		this.data = data;
+	}
+
+	public String getGroupId() {
+		return this.data == null ? "" : this.data.getGroupId();
+	}
+
+	public String getArtifactId() {
+		return this.data == null ? "" : this.data.getArtifactId();
+	}
+
+	public String getGoalId() {
+		return this.data == null ? "" : this.data.getGoalId();
 	}
 
 	@Override
 	public boolean isValid() {
-		return this.goal != null;
+		if (this.data == null)
+			return false;
+		if (isBlank(getGroupId()) || isBlank(getArtifactId()) || isBlank(getGoalId()))
+			return false;
+		return true;
 	}
 
 	@Override
@@ -44,14 +63,33 @@ public class GoalCheck extends DefaultCheck {
 		return and(nonNull(), goal(and(nonNull(), this::eval)));
 	}
 
-	protected boolean eval(GoalView data) {
-		return this.goal.equals(data.getGoalId());
+	protected boolean eval(final GoalView data) {
+		return getGroupId().equals(data.getGroupId()) && getArtifactId().equals(data.getArtifactId())
+				&& getGoalId().equals(data.getGoalId());
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof GoalCheck))
+			return false;
+		final GoalCheck other = (GoalCheck) obj;
+		if (this.data == other.data)
+			return true;
+		if (this.data == null || other.data == null)
+			return false;
+		return this.data.equals(other.data);
 	}
 
 	@Override
 	public List<ConditionInfo> getInfo() {
 		final List<ConditionInfo> lst = new LinkedList<>();
-		lst.add(new DefaultConditionInfo("goalId", this.goal));
+		if (this.data != null) {
+			lst.add(new DefaultConditionInfo("groupId", getGroupId()));
+			lst.add(new DefaultConditionInfo("artifactId", getArtifactId()));
+			lst.add(new DefaultConditionInfo("goalId", getGoalId()));
+		}
 		return lst;
 	}
 }

@@ -24,11 +24,29 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public class AndCheck extends AndCondition<EntityView> {
 
-	public AndCheck() {
+	private final String type;
+
+	public AndCheck(final String type) {
 		super(new LinkedHashSet<>());
+		this.type = type;
 	}
 
-	public AndCheck(final Collection<Condition<EntityView>> conditions) {
+	public AndCheck(final String type, final Collection<Condition<EntityView>> conditions) {
 		super(conditions);
+		this.type = type;
+	}
+
+	@Override
+	public String getType() {
+		return this.type;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof AndCheck))
+			return false;
+		return super.equals(obj);
 	}
 }

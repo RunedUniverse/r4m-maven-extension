@@ -34,6 +34,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.AndDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
+import net.runeduniverse.tools.maven.r4m.grm.model.MatchDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
@@ -69,12 +70,12 @@ public class DefaultDataConverter implements DataConverter {
 		final GoalContainer containerData = new GoalContainer(match, new OrDataGroup(), new OrDataGroup());
 
 		for (PlexusConfiguration entry : preqCnf.getChildren()) {
-			containerData.addPrerequisiteEntry(collectRequirementData(CNF_MATCH_BEFORE_TAG, entry, defaultGroupId,
-					defaultArtifactId, defaultSource));
+			containerData.addPrerequisiteEntry(collectRequirementData(MergeDataGroup.MODEL_MATCH_BEFORE_TYPE, entry,
+					defaultGroupId, defaultArtifactId, defaultSource));
 		}
 		for (PlexusConfiguration entry : depCnf.getChildren()) {
-			containerData.addDependentEntry(collectRequirementData(CNF_MATCH_AFTER_TAG, entry, defaultGroupId,
-					defaultArtifactId, defaultSource));
+			containerData.addDependentEntry(collectRequirementData(MergeDataGroup.MODEL_MATCH_AFTER_TYPE, entry,
+					defaultGroupId, defaultArtifactId, defaultSource));
 		}
 
 		return containerData;
@@ -128,12 +129,7 @@ public class DefaultDataConverter implements DataConverter {
 
 	protected DataGroup collectMatchData(final PlexusConfiguration cnf, final String defaultGroupId,
 			final String defaultArtifactId) {
-		final AndDataGroup group = new AndDataGroup() {
-			@Override
-			public String type() {
-				return "match";
-			}
-		};
+		final AndDataGroup group = new MatchDataGroup(MatchDataGroup.MODEL_MATCH_ITEM_TYPE);
 		collectGoalData(cnf, defaultGroupId, defaultArtifactId, group);
 		return group;
 	}

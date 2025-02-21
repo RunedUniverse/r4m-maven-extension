@@ -19,6 +19,10 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
 public class ProfileInactiveCheck extends DefaultProfileCheck {
 
+	public ProfileInactiveCheck(final String type) {
+		super(type);
+	}
+
 	@Override
 	protected boolean eval(RuntimeView data) {
 		return data.getInactiveProfileIds()

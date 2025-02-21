@@ -66,6 +66,13 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 	}
 
 	@Override
+	public boolean valid() {
+		if (this.never)
+			return true;
+		return super.valid();
+	}
+
+	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = ModelUtils.createEntryTree(this);
 

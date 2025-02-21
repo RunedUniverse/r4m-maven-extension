@@ -23,4 +23,8 @@ public interface DataModifier extends DataEntry {
 
 	public DataModifier copy();
 
+	public default boolean valid() {
+		final DataEntry e = getEntry();
+		return e != null && e.valid();
+	}
 }

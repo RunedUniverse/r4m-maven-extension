@@ -192,13 +192,14 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 						reduction.setRequired(b);
 						reduction.addEntry(e.getKey()
 								.copy());
-						reduction.addEntry(when);
 
 						if (when.getAlwaysActive() || when.getNeverActive()) {
 							// this automatically invalidates all other conditions!
 							when.getEntries()
 									.clear();
 						}
+						if (when.valid())
+							reduction.addEntry(when);
 					}
 				}
 			}

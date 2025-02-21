@@ -25,4 +25,14 @@ public interface DataGroup extends DataEntry {
 
 	public DataGroup copy();
 
+	public default boolean valid() {
+		final Collection<DataEntry> c = getEntries();
+		if (c == null || c.isEmpty())
+			return false;
+		for (DataEntry e : c) {
+			if (!e.valid())
+				return false;
+		}
+		return true;
+	}
 }

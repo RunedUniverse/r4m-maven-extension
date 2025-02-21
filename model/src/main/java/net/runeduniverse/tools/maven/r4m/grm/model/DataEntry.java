@@ -22,4 +22,8 @@ public interface DataEntry {
 	public default String type() {
 		return getClass().getSimpleName();
 	}
+
+	public default boolean valid() {
+		return true;
+	}
 }

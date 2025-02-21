@@ -38,7 +38,6 @@ import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.grm.check.converter.api.CheckConverter;
-import net.runeduniverse.tools.maven.r4m.grm.converter.DefaultDataConverter;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
@@ -110,7 +109,13 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 				}
 			}
 			// get all keys of the same goal
-			final Set<DataGroup> keys = keyIndex.getOrDefault(findGoalData(entry.getKey()), new LinkedHashSet<>());
+			final DataGroup key = entry.getKey();
+			final Set<DataGroup> keys = keyIndex.computeIfAbsent(findGoalData(key), k -> {
+				// in case the key was not previously used -> add it
+				final Set<DataGroup> set = new LinkedHashSet<>();
+				set.add(key);
+				return set;
+			});
 
 			// apply method
 			for (DataGroup keyData : keys) {
@@ -123,8 +128,10 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 						final boolean required = base.getRequired();
 
 						for (MergeDataGroup g : remove) {
-							if (baseGoal.equals(findGoalData(g)) && required == g.getRequired())
+							if (baseGoal.equals(findGoalData(g)) && required == g.getRequired()) {
 								i.remove();
+								break;
+							}
 						}
 					}
 				baseSet.addAll(append);

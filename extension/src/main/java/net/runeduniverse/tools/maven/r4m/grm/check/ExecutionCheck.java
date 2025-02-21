@@ -15,28 +15,33 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public class LifecycleIdCheck extends ACheck {
+public class ExecutionCheck extends ACheck {
 
-	protected String lifecycleId = null;
+	protected ExecutionData data = null;
 
-	public LifecycleIdCheck(final String type) {
+	public ExecutionCheck(final String type) {
 		super(type);
 	}
 
-	public String getPhaseId() {
-		return this.lifecycleId;
+	public void setData(final ExecutionData data) {
+		this.data = data;
 	}
 
-	public void setPhaseId(String lifecycleId) {
-		this.lifecycleId = lifecycleId;
+	public String getId() {
+		return this.data == null ? "" : this.data.getId();
 	}
 
 	@Override
 	public boolean isValid() {
-		return this.lifecycleId != null;
+		if (this.data == null)
+			return false;
+		return !isBlank(getId());
 	}
 
 	@Override
@@ -44,7 +49,22 @@ public class LifecycleIdCheck extends ACheck {
 		return and(nonNull(), runtime(and(nonNull(), this::eval)));
 	}
 
-	protected boolean eval(RuntimeView data) {
-		return this.lifecycleId.equals(data.getLifecycleId());
+	protected boolean eval(final RuntimeView view) {
+		return view.getActiveExecutionIds()
+				.contains(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof ExecutionCheck))
+			return false;
+		final ExecutionCheck other = (ExecutionCheck) obj;
+		if (this.data == other.data)
+			return true;
+		if (this.data == null || other.data == null)
+			return false;
+		return this.data.equals(other.data);
 	}
 }

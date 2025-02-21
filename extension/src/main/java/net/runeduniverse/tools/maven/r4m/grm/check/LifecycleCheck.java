@@ -15,28 +15,33 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+import net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
-public abstract class DefaultProfileCheck extends ACheck {
+public class LifecycleCheck extends ACheck {
 
-	protected String profileId = null;
+	protected LifecycleData data = null;
 
-	public DefaultProfileCheck(final String type) {
+	public LifecycleCheck(final String type) {
 		super(type);
 	}
 
-	public String getProfileId() {
-		return this.profileId;
+	public void setData(final LifecycleData data) {
+		this.data = data;
 	}
 
-	public void setProfileId(String executionId) {
-		this.profileId = executionId;
+	public String getId() {
+		return this.data == null ? "" : this.data.getId();
 	}
 
 	@Override
 	public boolean isValid() {
-		return this.profileId != null;
+		if (this.data == null)
+			return false;
+		return !isBlank(getId());
 	}
 
 	@Override
@@ -44,5 +49,21 @@ public abstract class DefaultProfileCheck extends ACheck {
 		return and(nonNull(), runtime(and(nonNull(), this::eval)));
 	}
 
-	protected abstract boolean eval(RuntimeView data);
+	protected boolean eval(final RuntimeView view) {
+		return getId().equals(view.getLifecycleId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+		if (!(obj instanceof LifecycleCheck))
+			return false;
+		final LifecycleCheck other = (LifecycleCheck) obj;
+		if (this.data == other.data)
+			return true;
+		if (this.data == null || other.data == null)
+			return false;
+		return this.data.equals(other.data);
+	}
 }

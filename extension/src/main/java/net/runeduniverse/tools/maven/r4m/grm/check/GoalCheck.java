@@ -53,9 +53,7 @@ public class GoalCheck extends ACheck {
 	public boolean isValid() {
 		if (this.data == null)
 			return false;
-		if (isBlank(getGroupId()) || isBlank(getArtifactId()) || isBlank(getGoalId()))
-			return false;
-		return true;
+		return !(isBlank(getGroupId()) || isBlank(getArtifactId()) || isBlank(getGoalId()));
 	}
 
 	@Override
@@ -63,13 +61,13 @@ public class GoalCheck extends ACheck {
 		return and(nonNull(), goal(and(nonNull(), this::eval)));
 	}
 
-	protected boolean eval(final GoalView data) {
-		return getGroupId().equals(data.getGroupId()) && getArtifactId().equals(data.getArtifactId())
-				&& getGoalId().equals(data.getGoalId());
+	protected boolean eval(final GoalView view) {
+		return getGroupId().equals(view.getGroupId()) && getArtifactId().equals(view.getArtifactId())
+				&& getGoalId().equals(view.getGoalId());
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 		if (!(obj instanceof GoalCheck))

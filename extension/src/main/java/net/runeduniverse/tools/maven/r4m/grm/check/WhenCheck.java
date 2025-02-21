@@ -52,7 +52,7 @@ public class WhenCheck extends OrCheck {
 	}
 
 	@Override
-	public boolean evaluate(EntityView entity) {
+	public boolean evaluate(final EntityView entity) {
 		if (getNeverActive())
 			return true;
 		if (getAlwaysActive())

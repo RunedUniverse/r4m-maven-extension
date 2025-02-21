@@ -21,7 +21,7 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 public class NotCheck extends NotCondition<EntityView> {
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof NotCheck))
 			return false;
 		return super.equals(obj);

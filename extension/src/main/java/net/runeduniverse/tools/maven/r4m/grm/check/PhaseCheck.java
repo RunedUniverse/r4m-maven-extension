@@ -15,16 +15,15 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.LinkedList;
 import java.util.List;
 
 import net.runeduniverse.lib.utils.conditions.DefaultConditionInfo;
-import net.runeduniverse.lib.utils.conditions.api.Condition.ConditionInfo;
 import net.runeduniverse.tools.maven.r4m.grm.model.PhaseData;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class PhaseCheck extends ACheck {
 

@@ -35,27 +35,6 @@ public abstract class ACheck extends ACondition<EntityView> implements Condition
 		return this.type;
 	}
 
-	@Override
-	public boolean evaluate(final EntityView entity) {
-		return and(this::valuesAreValid, check()).eval(entity);
-	}
-
-	protected boolean valuesAreValid(final EntityView data) {
-		return isValid();
-	}
-
-	protected DataCheck<EntityView> check() {
-		return d -> false;
-	}
-
-	protected static <T> DataCheck<T> isNull() {
-		return d -> d == null;
-	}
-
-	protected static <T> DataCheck<T> nonNull() {
-		return d -> d != null;
-	}
-
 	protected static DataCheck<EntityView> project(final DataCheck<ProjectView> check) {
 		return d -> check.eval(d.getProject());
 	}
@@ -66,40 +45,5 @@ public abstract class ACheck extends ACondition<EntityView> implements Condition
 
 	protected static DataCheck<EntityView> goal(final DataCheck<GoalView> check) {
 		return d -> check.eval(d.getGoal());
-	}
-
-	@SafeVarargs
-	protected static <T> DataCheck<T> and(final DataCheck<T>... checks) {
-		return new DataCheck<T>() {
-			@Override
-			public boolean eval(T data) {
-				for (DataCheck<T> check : checks) {
-					if (!check.eval(data))
-						return false;
-				}
-				return true;
-			}
-		};
-	}
-
-	@SafeVarargs
-	protected static <T> DataCheck<T> or(final DataCheck<T>... checks) {
-		return new DataCheck<T>() {
-			@Override
-			public boolean eval(T data) {
-				for (DataCheck<T> check : checks) {
-					if (check.eval(data))
-						return true;
-				}
-				return false;
-			}
-		};
-	}
-
-	@FunctionalInterface
-	public interface DataCheck<T> {
-
-		public boolean eval(final T data);
-
 	}
 }

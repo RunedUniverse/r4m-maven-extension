@@ -30,7 +30,7 @@ public class Archive extends AProjectBoundArchive<ExecutionArchiveSector> implem
 	}
 
 	@Override
-	protected void _updateSector(ExecutionArchiveSector parent, ExecutionArchiveSector child) {
+	protected void _updateSector(final ExecutionArchiveSector child, final ExecutionArchiveSector parent) {
 		if (child == null)
 			return;
 		child.setParent(parent);

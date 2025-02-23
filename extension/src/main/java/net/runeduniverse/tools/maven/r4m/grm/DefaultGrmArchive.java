@@ -32,7 +32,7 @@ public class DefaultGrmArchive extends AProjectBoundArchive<GoalRequirementArchi
 	}
 
 	@Override
-	protected void _updateSector(final GoalRequirementArchiveSector parent, final GoalRequirementArchiveSector child) {
+	protected void _updateSector(final GoalRequirementArchiveSector child, final GoalRequirementArchiveSector parent) {
 		if (child == null)
 			return;
 		child.setParent(parent);

@@ -60,7 +60,7 @@ public abstract class AProjectBoundArchive<S> extends AProjectBoundRegistry<S>
 		return sector;
 	}
 
-	protected void _updateSector(final S parent, final S child) {
+	protected void _updateSector(final S child, final S parent) {
 	}
 
 	@Override

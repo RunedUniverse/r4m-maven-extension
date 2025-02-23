@@ -20,12 +20,21 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/*
+ * merge-procedure of sources
+ *
+ * 1. EFFECTIVE beats all other definitions if it exists!
+ * 2. $pem = WORKFLOW merges with PACKAGING by replacing all lifecycles which are also defined in PACKAGING
+ * 3. $pem = $pem merges with PLUGIN by replacing all goals which are also defined in PLUGIN
+ * 4. $pem = OVERRIDE merges with $pem by replacing all lifecycles which are also defined in $pem
+ */
 public class ExecutionSource {
 
 	@Deprecated
 	public static final Map<String, ExecutionSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
 
 	public static final ExecutionSource OVERRIDE = new ExecutionSource("override");
+	public static final ExecutionSource WORKFLOW = new ExecutionSource("workflow");
 	public static final ExecutionSource PACKAGING = new ExecutionSource("packaging");
 	public static final ExecutionSource PLUGIN = new ExecutionSource("plugin");
 	@Deprecated
@@ -59,11 +68,12 @@ public class ExecutionSource {
 		if (isBlank(key))
 			return null;
 
-		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
+		key = key.trim()
+				.toLowerCase();
+		final ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
 		if (source == null)
 			return new ExecutionSource(key);
 		else
 			return source;
 	}
-
 }

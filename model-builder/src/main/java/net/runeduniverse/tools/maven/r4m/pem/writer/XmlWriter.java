@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.writer;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -42,7 +40,9 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
-@Component(role = ProjectExecutionModelWriter.class, hint = "default")
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+@Component(role = ProjectExecutionModelWriter.class, hint = "xml")
 public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Requirement(role = ExecutionRestrictionWriter.class)
@@ -70,19 +70,27 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final ProjectExecutionModel pem) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("project-execution-model");
+		final String version = getVersion(pem);
+		final PlexusConfiguration node = new XmlPlexusConfiguration("project-execution-model");
 		node.setAttribute("xmlns", "https://api.runeduniverse.net/runes4tools/r4m-pem");
 		node.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
 		node.setAttribute("xsi:schemaLocation",
 				"https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v"
-						+ ModelProperties.MODEL_VERSION.replace('.', '_') + ".xsd");
-		node.addChild("modelVersion", ModelProperties.MODEL_VERSION);
+						+ version.replace('.', '_') + ".xsd");
+		node.addChild("modelVersion", version);
 
-		PlexusConfiguration executionsNode = node.getChild("executions", true);
+		final PlexusConfiguration executionsNode = node.getChild("executions", true);
 		for (Execution exec : pem.getExecutions())
 			executionsNode.addChild(convert(exec));
 
 		return node;
+	}
+
+	protected String getVersion(final ProjectExecutionModel pem) {
+		final String version = pem.getVersion();
+		if (isBlank(version))
+			return ModelProperties.MODEL_VERSION;
+		return version;
 	}
 
 	@Override
@@ -163,8 +171,11 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (!goal.getModes()
 				.isEmpty()) {
 			PlexusConfiguration modeNodes = node.getChild("modes", true);
-			for (String mode : goal.getModes())
-				modeNodes.addChild(mode, null);
+			for (String mode : goal.getModes()) {
+				if (isBlank(mode))
+					continue;
+				modeNodes.addChild(convertMode(mode));
+			}
 		}
 
 		if (goal.getOptional() != null)
@@ -174,6 +185,12 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (goal.hasFork())
 			node.addChild(convert(goal.getFork()));
 
+		return node;
+	}
+
+	protected PlexusConfiguration convertMode(final String id) {
+		PlexusConfiguration node = new XmlPlexusConfiguration("mode");
+		node.setAttribute("id", id);
 		return node;
 	}
 
@@ -189,8 +206,8 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 						.setAttribute("id", execution);
 		}
 
-		if (fork.getMode() != null)
-			node.addChild("mode", fork.getMode());
+		if (!isBlank(fork.getMode()))
+			node.addChild(convertMode(fork.getMode()));
 
 		if (fork.getPhases() != null && !fork.getPhases()
 				.isEmpty()) {

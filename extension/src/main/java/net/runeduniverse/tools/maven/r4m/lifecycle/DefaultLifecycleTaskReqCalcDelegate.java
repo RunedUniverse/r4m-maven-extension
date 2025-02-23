@@ -44,9 +44,8 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 	@Requirement
 	private DefaultLifecycles defaultLifeCycles;
 
-	protected void modifyEntry(final Entry entry, final boolean plain) {
-		// modify Entry after parsing
-	}
+	// modify Entry after parsing
+	protected abstract void modifyEntry(final Entry entry, final boolean plain);
 
 	protected Entry parseEntry(String phase) {
 		final Entry entry = new Entry(false, false, true);
@@ -93,7 +92,7 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 	}
 
 	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
-		List<Entry> entries = new LinkedList<>();
+		final List<Entry> entries = new LinkedList<>();
 		Entry entry = null;
 		String phase = null;
 
@@ -138,7 +137,7 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 	protected LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String startPhaseId,
 			final String endPhaseId, final boolean before, final boolean includeStartPhase, final boolean between,
 			final boolean includeEndPhase, final boolean after) {
-		List<String> sequence = new LinkedList<>();
+		final List<String> sequence = new LinkedList<>();
 		short stage = 0;
 		for (String phase : lifecycle.getPhases()) {
 			if (phase.equals(startPhaseId)) {
@@ -183,16 +182,16 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 		// remove all redundant entries
 		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
-			Entry entry = i.next();
+			final Entry entry = i.next();
 			if (entry == null) {
 				i.remove();
 				continue;
 			}
 			if (!entry.getInclude() || i.previousIndex() == -1 || i.nextIndex() == entries.size())
 				continue;
-			Entry previous = entries.get(i.previousIndex());
-			Entry next = entries.get(i.nextIndex());
-			Lifecycle lifecycle = entry.getLifecycle();
+			final Entry previous = entries.get(i.previousIndex());
+			final Entry next = entries.get(i.nextIndex());
+			final Lifecycle lifecycle = entry.getLifecycle();
 			if (!lifecycle.equals(previous.getLifecycle()) || !lifecycle.equals(next.getLifecycle())
 					|| !checkOrder(lifecycle, previous.getPhase(), entry.getPhase())
 					|| !checkOrder(lifecycle, entry.getPhase(), next.getPhase()))
@@ -203,13 +202,12 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 		// calculate TaskRequest's
 		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
-			Entry startEntry = i.next();
-			Entry endEntry = i.hasNext() ? i.next() : null;
-			Lifecycle lifecycle = startEntry.getLifecycle();
+			final Entry startEntry = i.next();
+			final Entry endEntry = i.hasNext() ? i.next() : null;
+			final Lifecycle lifecycle = startEntry.getLifecycle();
 			if (endEntry == null) {
-				requests.add(
-						calculateTaskRequest(startEntry.getLifecycle(), startEntry.getPhase(), startEntry.getPhase(),
-								startEntry.getBefore(), startEntry.getInclude(), false, false, startEntry.getAfter()));
+				requests.add(calculateTaskRequest(lifecycle, startEntry.getPhase(), startEntry.getPhase(),
+						startEntry.getBefore(), startEntry.getInclude(), false, false, startEntry.getAfter()));
 				break;
 			}
 			if (!lifecycle.equals(endEntry.getLifecycle())) {
@@ -291,7 +289,5 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 		public void setInclude(boolean include) {
 			this.include = include;
 		}
-
 	}
-
 }

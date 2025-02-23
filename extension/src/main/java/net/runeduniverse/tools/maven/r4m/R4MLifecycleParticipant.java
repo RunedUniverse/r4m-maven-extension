@@ -67,9 +67,9 @@ import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
@@ -77,8 +77,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	public static final String ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM = //
 			"Failed to load maven-extension ClassRealm";
-	public static final String ERR_FAILED_TO_LOAD_PEM = //
-			"Failed while loading pem.xml from project";
+	public static final String ERR_FAILED_TO_LOAD_MODELS = //
+			"Failed while loading pem.xml & grm.xml from project";
 
 	public static final String PLEXUS_DEFAULT_MAVEN_HINT = "maven-default";
 
@@ -87,7 +87,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	@Requirement
 	private Settings settings;
 	@Requirement
-	private ExecutionArchive archive;
+	private ExecutionArchive pemArchive;
+	@Requirement
+	private GoalRequirementArchive grmArchive;
 	@Requirement(role = MavenProjectScanner.class)
 	private List<MavenProjectScanner> mavenProjectScanner;
 	@Requirement
@@ -147,16 +149,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				// outdated version of the plexus-utils
 				realm = world.getRealm("plexus.core")
 						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.api");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.eventspy.api");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.model");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.trigger");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.parser.restrictions");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.trigger");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m.pem.writer.restrictions");
-				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils.logging.logs");
+				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m");
+				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils");
 			}
 
 			Thread.currentThread()
@@ -195,7 +189,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} catch (Exception e) {
-			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_PEM, e);
+			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
 			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
 			throw ex;
 		} finally {
@@ -242,6 +236,10 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.settings.setGeneratePluginExecutionsOnFork(
 				buildBooleanProperty(prop, "r4m.generate-plugin-executions-on-fork"));
 
+		// debug
+		this.settings.setDebugDumpGrmEntriesBeforeExecution(
+				buildTextProperty(prop, "r4m.debug.dump-grm-entries-before-execution", "all", "reduced"));
+
 		this.settings.selectDefaults();
 	}
 
@@ -256,6 +254,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions-on-fork.default", "true");
+		// debug
+		properties.setProperty("r4m.debug.dump-grm-entries-before-execution.default", "reduced");
 
 		return properties;
 	}
@@ -314,12 +314,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final MavenProject mvnProject) throws Exception {
-
-		ExecutionArchiveSlice projectSlice = this.archive.getSlice(mvnProject);
-		if (projectSlice == null)
-			projectSlice = this.archive.createSlice(mvnProject);
-		else
-			return;
+		this.pemArchive.createSector(mvnProject);
+		this.grmArchive.createSector(mvnProject);
 
 		Set<Plugin> unidentifiablePlugins = this.unidentifiablePlugins.get(mvnProject);
 		if (unidentifiablePlugins == null) {
@@ -331,7 +327,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				.addAll(extPlugins);
 
 		for (MavenProjectScanner scanner : this.mavenProjectScanner)
-			scanner.scan(mvnSession, extPlugins, unidentifiablePlugins, mvnProject, projectSlice);
+			scanner.scan(mvnSession, extPlugins, unidentifiablePlugins, mvnProject);
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
@@ -432,7 +428,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		return Collections.unmodifiableList(artifacts);
 	}
 
-	protected void modifyLifecycleExecutionPlanCalculator() {
+	private void modifyLifecycleExecutionPlanCalculator() {
 		String defaultExecPlanCalcName = DefaultLifecycleExecutionPlanCalculator.class.getCanonicalName();
 		DefaultLifecycleExecutionPlanCalculator defaultExecPlanCalc = null;
 

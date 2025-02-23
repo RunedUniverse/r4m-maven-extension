@@ -40,6 +40,7 @@ public class R4MSettings implements Settings {
 	private Property<Boolean> patchMojoOnFork = null;
 	private Property<Boolean> generatePluginExecutions = null;
 	private Property<Boolean> generatePluginExecutionsOnFork = null;
+	private Property<String> debugDumpGrmEntriesBeforeExecution = null;
 
 	@Override
 	public Collection<Property<?>> getAllProperties() {
@@ -130,6 +131,11 @@ public class R4MSettings implements Settings {
 	@Override
 	public Property<Boolean> getGeneratePluginExecutionsOnFork() {
 		return this.generatePluginExecutionsOnFork;
+	}
+
+	@Override
+	public Property<String> getDebugDumpGrmEntriesBeforeExecution() {
+		return this.debugDumpGrmEntriesBeforeExecution;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -223,6 +229,17 @@ public class R4MSettings implements Settings {
 		}
 	}
 
+	@Override
+	public void setDebugDumpGrmEntriesBeforeExecution(Property<String> value) {
+		synchronized (this.properties) {
+			this.properties.values()
+					.remove(this.debugDumpGrmEntriesBeforeExecution);
+			if (value != null)
+				this.properties.put(value.getId(), value);
+			this.debugDumpGrmEntriesBeforeExecution = value;
+		}
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 
 	protected boolean redirectSetProperty(Property<?> value) {
@@ -250,6 +267,9 @@ public class R4MSettings implements Settings {
 			return true;
 		case "r4m.patch-mojo-on-fork":
 			setPatchMojoOnFork((Property<Boolean>) value);
+			return true;
+		case "r4m.debug.dump-grm-entries-before-execution":
+			setDebugDumpGrmEntriesBeforeExecution((Property<String>) value);
 			return true;
 		}
 		return false;
@@ -281,8 +301,10 @@ public class R4MSettings implements Settings {
 		case "r4m.patch-mojo-on-fork":
 			setPatchMojoOnFork(null);
 			return true;
+		case "debug.dump-grm-entries-before-execution":
+			setDebugDumpGrmEntriesBeforeExecution(null);
+			return true;
 		}
 		return false;
 	}
-
 }

@@ -1,0 +1,290 @@
+<?xml version="1.1"?>
+<!--
+
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-grm"
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-grm"
+	elementFormDefault="qualified">
+
+	<xs:element name="goal-requirement-model" type="Model" />
+	<xs:complexType name="Model">
+		<xs:all>
+			<xs:element name="modelVersion" type="xs:string"
+				default="1.0.0" />
+			<xs:element name="goals">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="goal" type="Goal" minOccurs="0"
+							maxOccurs="unbounded" />
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="Goal">
+		<xs:all>
+			<xs:element name="groupId" type="ArtifactGroupId"
+				minOccurs="0">
+				<!-- (opt - from plugin) -->
+			</xs:element>
+			<xs:element name="artifactId" type="AnyId" minOccurs="0">
+				<!-- (opt - from plugin) -->
+			</xs:element>
+			<xs:element name="when" type="WhenCheck" minOccurs="0" />
+			<xs:element name="prerequisites" type="RefGoalGroup"
+				minOccurs="0" />
+			<xs:element name="dependents" type="RefGoalGroup"
+				minOccurs="0" />
+		</xs:all>
+		<xs:attribute name="id" type="AnyId" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="RefGoalGroup">
+		<xs:sequence>
+			<xs:element name="goal" type="RefGoal" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RefGoal">
+		<xs:all>
+			<xs:element name="groupId" type="ArtifactGroupId"
+				minOccurs="0" default="org.apache.maven.plugins" />
+			<xs:element name="artifactId" type="AnyId" />
+			<xs:element name="when" type="WhenCheck" minOccurs="0" />
+		</xs:all>
+		<xs:attribute name="id" type="AnyId" use="required" />
+		<xs:attribute name="source" use="optional"
+			default="plugin">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="override" />
+					<xs:enumeration value="workflow" />
+					<xs:enumeration value="packaging" />
+					<xs:enumeration value="plugin" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="required" use="optional"
+			default="false">
+			<xs:annotation>
+				<xs:documentation>
+					Only define a prerequisite/dependency as
+					'required' when the goal can not function properly otherwise!
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="true" />
+					<xs:enumeration value="false" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="method.combine" use="optional"
+			default="default">
+			<xs:annotation>
+				<xs:documentation>
+					This option only effects specified sources,
+					furthermore the 'default' definitions are as follows:
+					»source="workflow"« = "replace", »source="override"« = "replace"
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="replace" />
+					<xs:enumeration value="append" />
+					<xs:enumeration value="remove" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="CheckBranch">
+		<xs:sequence>
+			<xs:group ref="CheckGroup" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:group name="CheckGroup">
+		<xs:choice>
+			<xs:element name="execution" type="ExecutionCheck" />
+			<xs:element name="packaging" type="PackagingCheck" />
+			<xs:element name="lifecycle" type="LifecycleCheck" />
+			<xs:element name="phase" type="PhaseCheck" />
+			<xs:element name="profile" type="ProfileCheck" />
+			<xs:element name="and" type="CheckBranch" />
+			<xs:element name="or" type="CheckBranch" />
+			<xs:element name="not">
+				<xs:complexType>
+					<xs:group ref="CheckGroup" minOccurs="0" />
+				</xs:complexType>
+			</xs:element>
+		</xs:choice>
+	</xs:group>
+
+	<xs:complexType name="WhenCheck">
+		<xs:sequence>
+			<xs:element name="always" minOccurs="0" maxOccurs="1">
+				<xs:complexType />
+			</xs:element>
+			<xs:element name="never" minOccurs="0" maxOccurs="1">
+				<xs:complexType />
+			</xs:element>
+			<xs:group ref="CheckGroup" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="ExecutionCheck">
+		<xs:attribute name="id" type="ExecutionId" use="required" />
+	</xs:complexType>
+	<xs:complexType name="PackagingCheck">
+		<xs:attribute name="procedure" type="PackagingProcedure"
+			use="required" />
+	</xs:complexType>
+	<xs:complexType name="LifecycleCheck">
+		<xs:attribute name="id" type="LifecycleId" use="required" />
+	</xs:complexType>
+	<xs:complexType name="PhaseCheck">
+		<xs:attribute name="id" type="PhaseId" use="required" />
+	</xs:complexType>
+	<xs:complexType name="ProfileCheck">
+		<xs:attribute name="id" type="AnyId" use="required" />
+		<xs:attribute name="state" use="optional"
+			default="active">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="active" />
+					<xs:enumeration value="inactive" />
+					<xs:enumeration value="missing" />
+					<xs:enumeration value="provided" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+
+	<xs:simpleType name="AnyId">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\s*\S+\s*" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PackagingProcedure">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="pom" />
+					<xs:enumeration value="jar" />
+					<xs:enumeration value="maven-plugin" />
+					<xs:enumeration value="ejb" />
+					<xs:enumeration value="war" />
+					<xs:enumeration value="ear" />
+					<xs:enumeration value="rar" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ExecutionId">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="LifecycleId">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="PhaseId">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<!-- Clean Lifecycle -->
+					<xs:enumeration value="pre-clean" />
+					<xs:enumeration value="clean" />
+					<xs:enumeration value="post-clean" />
+					<!-- Default Lifecycle -->
+					<xs:enumeration value="validate" />
+					<xs:enumeration value="initialize" />
+					<xs:enumeration value="generate-sources" />
+					<xs:enumeration value="process-sources" />
+					<xs:enumeration value="generate-resources" />
+					<xs:enumeration value="process-resources" />
+					<xs:enumeration value="compile" />
+					<xs:enumeration value="process-classes" />
+					<xs:enumeration value="generate-test-sources" />
+					<xs:enumeration value="process-test-sources" />
+					<xs:enumeration value="generate-test-resources" />
+					<xs:enumeration value="process-test-resources" />
+					<xs:enumeration value="test-compile" />
+					<xs:enumeration value="process-test-classes" />
+					<xs:enumeration value="test" />
+					<xs:enumeration value="prepare-package" />
+					<xs:enumeration value="package" />
+					<xs:enumeration value="pre-integration-test" />
+					<xs:enumeration value="integration-test" />
+					<xs:enumeration value="post-integration-test" />
+					<xs:enumeration value="verify" />
+					<xs:enumeration value="install" />
+					<xs:enumeration value="deploy" />
+					<!-- Site Lifecycle -->
+					<xs:enumeration value="pre-site" />
+					<xs:enumeration value="site" />
+					<xs:enumeration value="post-site" />
+					<xs:enumeration value="site-deploy" />
+					<!-- R4M - Help Lifecycle -->
+					<xs:enumeration value="help" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ModeId">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="default" />
+					<xs:enumeration value="dev" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="ArtifactGroupId">
+		<xs:union memberTypes="AnyId">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="org.apache.maven.plugins" />
+					<xs:enumeration value="org.codehaus.mojo" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+
+</xs:schema>

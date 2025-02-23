@@ -1,3 +1,24 @@
+def installArtifact(modId) {
+	def mod = getModule(id: modId);
+	if(!mod.active()) {
+		skipStage()
+		return
+	}
+	try {
+		sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
+	} finally {
+		dir(path: "${ mod.path() }/target") {
+			sh 'ls -l'
+			// copy pom & signatures
+			sh "cp *.pom *.asc ${ RESULT_PATH }"
+			// copy packaging specific files
+			if(mod.hasTag('pack-jar')) {
+				sh "cp *.jar ${ RESULT_PATH }"
+			}
+		}
+	}
+}
+
 node {
 	withModules {
 		tool(name: 'maven-latest', type: 'maven')
@@ -23,12 +44,12 @@ node {
 			sh "mkdir -p ${ RESULT_PATH }"
 			sh "mkdir -p ${ ARCHIVE_PATH }"
 			
-			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'parent', 'pom' ]
-			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'bom',    'pom' ]
-			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [  ]
-			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [  ]
-			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [  ]
-			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [  ]
+			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'pack-pom', 'parent' ]
+			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'pack-pom', 'bom'    ]
+			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar'           ]
+			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar'           ]
 		}
 
 		stage('Init Modules') {
@@ -62,7 +83,7 @@ node {
 					skipStage()
 					return
 				}
-				sh "mvn-dev -P ${ REPOS },validate,license-apache2-approve -pl=${ module.relPathFrom('r4m-parent') }"
+				sh "mvn-dev -P ${ REPOS },validate -pl=${ module.relPathFrom('r4m-parent') }"
 			}
 		}
 
@@ -82,80 +103,20 @@ node {
 			}
 		}
 		stage('Install R4M Bill of Sources') {
-			def mod = getModule(id: 'r4m-sources');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-sources');
 		}
 
 		stage('Install R4M Model') {
-			def mod = getModule(id: 'r4m-model');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-model');
 		}
 		stage('Install R4M API') {
-			def mod = getModule(id: 'r4m-api');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-api');
 		}
 		stage('Install R4M Model Builder') {
-			def mod = getModule(id: 'r4m-model-builder');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-model-builder');
 		}
 		stage('Install R4M Extension') {
-			def mod = getModule(id: 'r4m-extension');
-			if(!mod.active()) {
-				skipStage()
-				return
-			}
-			try {
-				sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
-			} finally {
-				dir(path: "${ mod.path() }/target") {
-					sh 'ls -l'
-					sh "cp *.pom *.jar *.asc ${ RESULT_PATH }"
-				}
-			}
+			installArtifact('r4m-extension');
 		}
 
 		stage('Test') {
@@ -195,19 +156,19 @@ node {
 					skipStage()
 					return
 				}
-				stage('Develop'){
-					sh "mvn-dev -P ${ REPOS },dist-repo-development,deploy -pl=${ mod.relPathFrom('r4m-parent') }"
+				def deployProfilePrefix = 'deploy';
+				if(mod.hasTag('pack-pom')) {
+					deployProfilePrefix = 'deploy-pom';
 				}
-				def signedDeployProfile = 'deploy-signed';
-				if(mod.hasTag('pom')) {
-					signedDeployProfile = 'deploy-pom-signed';
+				stage('Develop'){
+					sh "mvn-dev -P ${ REPOS },dist-repo-development,${ deployProfilePrefix } -pl=${ mod.relPathFrom('r4m-parent') }"
 				}
 				stage('Release') {
 					if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.GIT_BRANCH != 'master') {
 						skipStage()
 						return
 					}
-					sh "mvn-dev -P ${ REPOS },dist-repo-releases,${ signedDeployProfile } -pl=${ mod.relPathFrom('r4m-parent') }"
+					sh "mvn-dev -P ${ REPOS },dist-repo-releases,${ deployProfilePrefix }-signed -pl=${ mod.relPathFrom('r4m-parent') }"
 				}
 				stage('Stage at Maven-Central') {
 					if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.GIT_BRANCH != 'master') {
@@ -215,7 +176,7 @@ node {
 						return
 					}
 					// never add : -P ${REPOS} => this is ment to fail here
-					sh "mvn-dev -P repo-releases,dist-repo-maven-central,${ signedDeployProfile } -pl=${ mod.relPathFrom('r4m-parent') }"
+					sh "mvn-dev -P repo-releases,dist-repo-maven-central,${ deployProfilePrefix }-signed -pl=${ mod.relPathFrom('r4m-parent') }"
 					sshagent (credentials: ['RunedUniverse-Jenkins']) {
 						sh "git push origin \$(git-create-version-tag ${ mod.id() } ${ mod.relPathFrom('r4m-parent') })"
 					}

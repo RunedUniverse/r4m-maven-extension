@@ -112,6 +112,14 @@
 	<profiles>
 		<profile>
 			<id>dev-install</id>
+			<repositories>
+				<!-- dev-repo contains: development builds -->
+				<repository>
+					<id>runeduniverse-development</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-development/</url>
+				</repository>
+			</repositories>
 			<build>
 				<defaultGoal>clean formatter:format license:format install</defaultGoal>
 			</build>
@@ -180,6 +188,14 @@
 			<build>
 				<defaultGoal>
 					org.apache.maven.plugins:maven-jar-plugin:jar
+					org.apache.maven.plugins:maven-deploy-plugin:deploy
+				</defaultGoal>
+			</build>
+		</profile>
+		<profile>
+			<id>deploy-pom</id>
+			<build>
+				<defaultGoal>
 					org.apache.maven.plugins:maven-deploy-plugin:deploy
 				</defaultGoal>
 			</build>
@@ -480,7 +496,6 @@
 								<header>${root-dir}/src/license/header.txt</header>
 								<excludes>
 									<exclude>**/.mvn/repo/**</exclude>
-									<exclude>**/resources/**</exclude>
 									<exclude>**/license/**</exclude>
 									<exclude>**/target/**</exclude>
 								</excludes>

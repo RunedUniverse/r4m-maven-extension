@@ -19,30 +19,59 @@
 <extension>
 
 	<exportedPackages>
-		<!-- r4m-maven-extension -->
+		<!-- r4m-maven-extension : api -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.converter.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.parser.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.view.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.writer.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.indexer.api
+		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojo
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos.api
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojo.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
-		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.view.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.scanner.api
+		</exportedPackage>
+
+		<!-- r4m-maven-extension : model -->
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.model
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
 		</exportedPackage>
 
 		<!-- runeduniverse-utils -->
-		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.logging</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.common
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.common.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging
+		</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditions
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditions.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditions.tools
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven
+		</exportedPackage>
 	</exportedPackages>
 
 	<exportedArtifacts>
@@ -60,6 +89,8 @@
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditions
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven
 		</exportedArtifact>

@@ -99,7 +99,7 @@ Package the project with the custom defined modes 'my-mode' & 'my-test-mode' and
 ### Help Lifecycle [6]
 Runes4Maven (r4m) provides the help lifecycle. With this the cmd `mvn help` is finally viable. Runes4Maven does **not** crawl build-plugins to attach their help goals to the `help` lifecycle.
 
-But we recommend every build-plugin developer to attach their help goals to this lifecycle. In case the default maven way does not work for you, we recommend you to include a `plugin-pem.xml` file with the same syntax as the PEM in your jar under the path `META-INF/r4m/plugin-pem.xml` and set the execution 'source' field to `plugin`. You may of course also attach all your other goals to lifecycles in the same way.
+But we recommend every build-plugin developer to attach their help goals to this lifecycle. In case the default maven way does not work for you, we recommend you to include a `pem.xml` file with the same syntax as the PEM in your jar under the path `META-INF/r4m/pem.xml` and set the execution 'source' field to `plugin`. You may of course also attach all your other goals to lifecycles in the same way.
 
 
 ## Goals

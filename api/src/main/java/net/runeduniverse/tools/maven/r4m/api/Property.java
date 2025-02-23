@@ -20,13 +20,20 @@ import java.util.Set;
 public interface Property<T> extends Comparable<Property<?>> {
 
 	@Override
-	public default int compareTo(Property<?> o) {
+	public default int compareTo(final Property<?> o) {
 		if (this == o)
 			return 0;
-		if (this.getId() == null)
-			return o.getId() == null ? 0 : -1;
-		return this.getId()
-				.compareTo(o.getId());
+		final String id = getId(), oid = o.getId();
+		if (id == null)
+			return oid == null ? 0 : -1;
+		// debug to bottom
+		if (id.contains(".debug.")) {
+			if (!oid.contains(".debug."))
+				return 1;
+		} else if (oid.contains(".debug."))
+			return -1;
+		// normal str compare
+		return id.compareTo(oid);
 	}
 
 	public String getId();

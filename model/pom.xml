@@ -38,7 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
-		<minor-version>0</minor-version>
+		<minor-version>1</minor-version>
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 	</properties>
@@ -107,4 +107,23 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<targetPath>META-INF/r4m</targetPath>
+				<includes>
+					<include>r4m-pem-v*.xsd</include>
+				</includes>
+			</resource>
+			<resource>
+				<directory>${basedir}</directory>
+				<targetPath>META-INF</targetPath>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+		</resources>
+	</build>
 </project>

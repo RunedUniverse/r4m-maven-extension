@@ -65,17 +65,19 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */
 
-		Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
+		final Map<String, Map<Integer, List<MojoExecution>>> mappings = new LinkedHashMap<>();
 
 		mappings.put(lifecyclePhase, new TreeMap<>());
 
 		for (Entry<ExecutionView, List<GoalView>> entry : selection.selectPhase(lifecyclePhase)
 				.entrySet()) {
 			for (GoalView goal : entry.getValue()) {
-				Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(lifecyclePhase);
+				final Map<Integer, List<MojoExecution>> phaseBindings = mappings.get(lifecyclePhase);
 				if (phaseBindings != null) {
-					MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(goal.getDescriptor(), entry.getKey()
-							.getId(), Source.LIFECYCLE, selection.getSelectorConfig());
+					final MojoExecutionAdapter mojoExecution = new MojoExecutionAdapter(goal.getDescriptor(),
+							entry.getKey()
+									.getId(),
+							Source.LIFECYCLE, selection.getSelectorConfig());
 					mojoExecution.setLifecyclePhase(lifecyclePhase);
 					mojoExecution.setFork(goal.getFork());
 					addMojoExecution(phaseBindings, mojoExecution, 0);
@@ -83,10 +85,10 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 			}
 		}
 
-		Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
+		final Map<String, List<MojoExecution>> lifecycleMappings = new LinkedHashMap<>();
 
 		for (Map.Entry<String, Map<Integer, List<MojoExecution>>> entry : mappings.entrySet()) {
-			List<MojoExecution> mojoExecutions = new ArrayList<>();
+			final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
 			for (List<MojoExecution> executions : entry.getValue()
 					.values()) {

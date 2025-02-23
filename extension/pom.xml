@@ -41,7 +41,7 @@
 		<artifact-version>0</artifact-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
-		<model-version>1.0.0</model-version>
+		<model-version>1.1.0</model-version>
 		<model-builder-version>0</model-builder-version>
 	</properties>
 

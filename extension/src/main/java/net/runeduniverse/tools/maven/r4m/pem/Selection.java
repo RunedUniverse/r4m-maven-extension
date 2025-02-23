@@ -136,7 +136,7 @@ public class Selection implements ExecutionArchiveSelection {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Selection");
+		final CompoundTree tree = new CompoundTree("PEM Selection");
 
 		for (ExecutionView view : views)
 			tree.append(view.toRecord());

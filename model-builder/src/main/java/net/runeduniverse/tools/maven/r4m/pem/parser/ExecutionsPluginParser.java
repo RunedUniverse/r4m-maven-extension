@@ -74,8 +74,8 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 			return null;
 		}
 
-		ProjectExecutionModel model = new ProjectExecutionModel(ExecutionsPluginParser.class,
-				ExecutionsPluginParser.HINT);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setParser(ExecutionsPluginParser.class, ExecutionsPluginParser.HINT);
 
 		model.setVersion(ModelProperties.MODEL_VERSION);
 
@@ -180,5 +180,4 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 			return lifecycle;
 		return new Lifecycle(id);
 	}
-
 }

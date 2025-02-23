@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.apache.commons.io.input.XmlStreamReader;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
@@ -48,7 +48,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
-@Component(role = ProjectExecutionModelParser.class, hint = "default")
+@Component(role = ProjectExecutionModelParser.class, hint = "xml")
 public class XmlParser implements ProjectExecutionModelParser {
 
 	@Requirement(role = ExecutionRestrictionParser.class)
@@ -58,19 +58,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 	@Override
 	public void parseModel(ProjectExecutionModel pem, InputStream input) throws Exception {
-		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-
-		// Apache Maven 3.8.4
-		// injects the wrong or no plexus-utils
-		// as such we forcefully load it with a different ClassRealm see
-		// net.runeduniverse.tools.maven.r4m.R4MLifecycleParticipant
-		// and pull the class directly from parent
-		// Reader reader = new XmlStreamReader(input);
-		Class<?> xmlStreamReader = currentRealm.loadClassFromParent("org.codehaus.plexus.util.xml.XmlStreamReader");
-		Reader reader = (Reader) xmlStreamReader.getConstructor(InputStream.class)
-				.newInstance(input);
-
+		final Reader reader = new XmlStreamReader(input);
 		PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
@@ -294,13 +282,20 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 		Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 
-		final PlexusConfiguration modesNode = goalNode.getChild("modes", true);
-		Set<String> modes = new LinkedHashSet<>(0);
-		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
-			String name = modeNode.getName();
-			if (!isBlank(name))
-				modes.add(name);
-		}
+		final Set<String> modes = new LinkedHashSet<String>(0) {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public boolean add(String e) {
+				if (isBlank(e))
+					return false;
+				return super.add(e);
+			}
+		};
+
+		parseModes(modes, goalNode.getChild("modes", false));
+
 		// no modes selected!
 		if (modes.isEmpty())
 			return false;
@@ -313,6 +308,35 @@ public class XmlParser implements ProjectExecutionModelParser {
 		return true;
 	}
 
+	protected boolean parseModes(final Collection<String> modes, final PlexusConfiguration modesNode) {
+		if (modesNode == null)
+			return false;
+		for (PlexusConfiguration modeNode : modesNode.getChildren()) {
+			parseMode(modes, modeNode);
+		}
+		return true;
+	}
+
+	protected boolean parseMode(final Collection<String> modes, final PlexusConfiguration modeNode) {
+		if (modeNode == null)
+			return false;
+
+		String name = modeNode.getName();
+		if (isBlank(name))
+			return false;
+
+		String id = modeNode.getAttribute("id");
+		if (id == null) {
+			modes.add(name.trim());
+			return true;
+		}
+		if (isBlank(id) || !name.equals("mode"))
+			return false;
+
+		modes.add(id.trim());
+		return true;
+	}
+
 	protected boolean parseFork(final Goal goal, final PlexusConfiguration forkNode) {
 		if (forkNode == null)
 			return false;
@@ -320,8 +344,10 @@ public class XmlParser implements ProjectExecutionModelParser {
 		Fork fork = new Fork();
 
 		final PlexusConfiguration modeNode = forkNode.getChild("mode", false);
-		if (modeNode != null)
-			fork.setMode(modeNode.getValue());
+		if (modeNode != null) {
+			String modeId = modeNode.getAttribute("id");
+			fork.setMode(isBlank(modeId) ? null : modeId.trim());
+		}
 
 		Set<String> executions = new LinkedHashSet<>(0);
 		parseTargetExecutions(executions, forkNode.getChild("executions", false));

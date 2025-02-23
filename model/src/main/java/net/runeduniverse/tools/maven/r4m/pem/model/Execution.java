@@ -61,9 +61,10 @@ public class Execution implements Recordable {
 	@SuppressWarnings("unchecked")
 	public <T> Set<ExecutionTrigger<T>> getTrigger(Class<T> dataType) {
 		Set<ExecutionTrigger<T>> result = new LinkedHashSet<>();
-		for (ExecutionTrigger<?> trigger : this.trigger)
+		for (ExecutionTrigger<?> trigger : this.trigger) {
 			if (dataType.isAssignableFrom(trigger.getDataType()))
 				result.add((ExecutionTrigger<T>) trigger);
+		}
 		return result;
 	}
 
@@ -90,9 +91,10 @@ public class Execution implements Recordable {
 	@SuppressWarnings("unchecked")
 	public <T> Set<ExecutionRestriction<T>> getRestrictions(Class<T> dataType) {
 		Set<ExecutionRestriction<T>> result = new LinkedHashSet<>();
-		for (ExecutionRestriction<?> restriction : this.restrictions)
+		for (ExecutionRestriction<?> restriction : this.restrictions) {
 			if (dataType.isAssignableFrom(restriction.getDataType()))
 				result.add((ExecutionRestriction<T>) restriction);
+		}
 		return result;
 	}
 
@@ -125,9 +127,10 @@ public class Execution implements Recordable {
 	}
 
 	public void addRestriction(ExecutionRestriction<?> value) {
-		for (ExecutionRestriction<?> restriction : this.restrictions)
+		for (ExecutionRestriction<?> restriction : this.restrictions) {
 			if (restriction != null && restriction.equals(value))
 				return;
+		}
 		this.restrictions.add(value);
 	}
 

@@ -359,10 +359,34 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	protected void sortMojosByProxy(final ExecutionArchiveSelectorConfig pemSelectorConfig,
 			final GoalRequirementArchiveSelectorConfig grmSelectorConfig,
 			final Map<String, List<MojoExecution>> phaseToMojoMapping) {
+		// r4m.debug.dump-grm-entries-before-execution = "all"|"reduced"
+		final short debug;
+		if (this.log.isDebugEnabled()) {
+			switch (this.settings.getDebugDumpGrmEntriesBeforeExecution()
+					.getSelected()) {
+			case "reduced":
+				debug = 1;
+				break;
+			case "all":
+				debug = 2;
+				break;
+			default:
+				debug = 0;
+				break;
+			}
+		} else {
+			debug = 0;
+		}
+
 		final ProjectView projectView = this.grmViewFactory.createProjectView(grmSelectorConfig.getActiveProject());
 
 		final GoalRequirementArchiveSelection selection = this.grmSelector.compileSelection(grmSelectorConfig);
 		final Comparator<EntityView> comparator = selection.getComparator();
+
+		if (1 < debug) {
+			this.log.debug("Complete GRM Celection Dump");
+			this.log.debug(selection.toString());
+		}
 
 		for (Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
 			final List<MojoExecution> executions = entry.getValue();
@@ -376,6 +400,14 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 			final List<EntityView> entityList = new LinkedList<>();
 			entityList.addAll(proxyMap.keySet());
+
+			if (0 < debug) {
+				this.log.debug("Reduced GRM Celection Dump");
+				this.log.debug(selection.clone()
+						.filterByApplicableData(entityList)
+						.toString());
+			}
+
 			entityList.sort(comparator);
 
 			executions.clear();

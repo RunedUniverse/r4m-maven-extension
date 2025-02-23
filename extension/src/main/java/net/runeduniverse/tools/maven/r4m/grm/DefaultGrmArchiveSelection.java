@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
+import java.util.Collection;
 import java.util.Comparator;
 
 import net.runeduniverse.lib.utils.conditions.tools.ConditionComparator;
@@ -43,6 +44,17 @@ public class DefaultGrmArchiveSelection implements GoalRequirementArchiveSelecti
 	@Override
 	public GoalRequirementArchiveSelectorConfig getSelectorConfig() {
 		return this.selectorConfig;
+	}
+
+	@Override
+	public GoalRequirementArchiveSelection clone() {
+		return new DefaultGrmArchiveSelection(getSelectorConfig().clone(), this.conditionSet.clone());
+	}
+
+	@Override
+	public GoalRequirementArchiveSelection filterByApplicableData(final Collection<EntityView> entities) {
+		this.conditionSet.filterByApplicableData(entities);
+		return this;
 	}
 
 	@Override

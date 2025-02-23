@@ -45,6 +45,8 @@ public interface Settings {
 
 	public Property<Boolean> getGeneratePluginExecutionsOnFork();
 
+	public Property<String> getDebugDumpGrmEntriesBeforeExecution();
+
 	public void setLifecycleTaskRequestCalculator(Property<String> value);
 
 	public void setLifecycleTaskRequestCalculatorOnFork(Property<String> value);
@@ -60,5 +62,7 @@ public interface Settings {
 	public void setGeneratePluginExecutions(Property<Boolean> value);
 
 	public void setGeneratePluginExecutionsOnFork(Property<Boolean> value);
+
+	public void setDebugDumpGrmEntriesBeforeExecution(Property<String> value);
 
 }

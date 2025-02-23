@@ -70,7 +70,6 @@ public class StatusMojo extends AbstractMojo {
 		for (Property<?> prop : props)
 			logTextEntry(prop, fancy);
 		getLog().info("");
-		getLog().info("");
 	}
 
 	private void logTextEntry(Property<?> entry, Boolean fancy) {

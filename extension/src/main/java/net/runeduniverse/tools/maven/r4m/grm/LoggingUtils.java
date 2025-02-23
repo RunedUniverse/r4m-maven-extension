@@ -58,13 +58,13 @@ public class LoggingUtils {
 			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
-		subTree = new CompoundTree("match before");
+		subTree = new CompoundTree("execute after");
 		con = entry.getMatchBefore();
 		if (con != null) {
 			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
-		subTree = new CompoundTree("match after");
+		subTree = new CompoundTree("execute before");
 		con = entry.getMatchAfter();
 		if (con != null) {
 			subTree.append(indexer.toRecord(con));

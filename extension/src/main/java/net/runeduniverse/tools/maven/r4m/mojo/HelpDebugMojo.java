@@ -55,7 +55,13 @@ public class HelpDebugMojo extends AbstractMojo {
 		getLog().info("     -------------------------------------------------------------------");
 		getLog().info("     Can be used to trace where an unwanted GRM originated from.");
 		getLog().info("");
+		getLog().info(" ----------------------------- Properties ------------------------------");
+		getLog().info("");
+		getLog().info(" r4m.debug.dump-grm-entries-before-execution");
+		getLog().info("     Options: 'all' / 'reduced'");
+		getLog().info("     -------------------------------------------------------------------");
+		getLog().info("     This property defines the level of detail, when logging the");
+		getLog().info("     grm-selection, pre task-execution in debug mode (-X)");
 		getLog().info("");
 	}
-
 }

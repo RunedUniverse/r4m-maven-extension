@@ -236,6 +236,10 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.settings.setGeneratePluginExecutionsOnFork(
 				buildBooleanProperty(prop, "r4m.generate-plugin-executions-on-fork"));
 
+		// debug
+		this.settings.setDebugDumpGrmEntriesBeforeExecution(
+				buildTextProperty(prop, "r4m.debug.dump-grm-entries-before-execution", "all", "reduced"));
+
 		this.settings.selectDefaults();
 	}
 
@@ -250,6 +254,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions.default", "true");
 		properties.setProperty("r4m.generate-plugin-executions-on-fork.default", "true");
+		// debug
+		properties.setProperty("r4m.debug.dump-grm-entries-before-execution.default", "reduced");
 
 		return properties;
 	}

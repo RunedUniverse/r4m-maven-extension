@@ -89,7 +89,6 @@ public class HelpTaskMojo extends AbstractMojo {
 		getLog().info("   'my-test-mode' and executions 'pipeline' & 'test':");
 		getLog().info("       my-mode,my-test-mode/package]@pipeline,test");
 		getLog().info("");
-		getLog().info("");
 	}
 
 }

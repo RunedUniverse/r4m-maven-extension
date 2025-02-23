@@ -60,6 +60,5 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info("     Prints the debug help-page.");
 		getLog().info("     It lists debug goals which can help trace unexpected problems.");
 		getLog().info("");
-		getLog().info("");
 	}
 }

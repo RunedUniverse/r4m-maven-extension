@@ -39,7 +39,9 @@
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
 		<artifact-version>0</artifact-version>
+		<artifact-release>1</artifact-release>
 		<sources-version>0</sources-version>
+		<sources-release>1</sources-release>
 		<api-version>0</api-version>
 		<model-version>1.1.0</model-version>
 		<model-builder-version>0</model-builder-version>
@@ -258,6 +260,89 @@
 						<goals>
 							<goal>generate-metadata</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<copyPom>true</copyPom>
+					<excludeScope>provided</excludeScope>
+					<excludeArtifactIds>commons-io,commons-lang3</excludeArtifactIds>
+					<prependGroupId>true</prependGroupId>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>de.dentrassi.maven</groupId>
+				<artifactId>rpm</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+						<configuration>
+							<skipSigning>true</skipSigning>
+							<packageName>${project.artifactId}</packageName>
+							<release>${artifact-release}</release>
+							<entries>
+								<!-- package the maven extension -->
+								<entry>
+									<name>
+										/usr/share/maven/lib/ext/${project.artifactId}-${project.version}.jar</name>
+									<file>
+										${project.build.directory}/${project.artifactId}-${project.version}.jar</file>
+								</entry>
+							</entries>
+							<requires>
+								<!-- declare the lib artifact as required -->
+								<require>
+									${project.artifactId}-lib ge
+									${major-version}.${minor-version}.${sources-version}</require>
+							</requires>
+						</configuration>
+					</execution>
+					<execution>
+						<id>pack-libs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>rpm</goal>
+						</goals>
+						<configuration>
+							<skipSigning>true</skipSigning>
+							<packageName>${project.artifactId}-lib</packageName>
+							<version>
+								${major-version}.${minor-version}.${sources-version}</version>
+							<release>${sources-release}</release>
+							<entries>
+								<!-- package the maven extension libs -->
+								<entry>
+									<name>
+										/usr/share/maven/lib/
+									</name>
+									<collect>
+										<from>
+											${project.build.directory}/dependency
+										</from>
+										<includes>
+											<include>*.jar</include>
+										</includes>
+									</collect>
+								</entry>
+							</entries>
+							<requires>
+								<!-- declare the maven-lib artifact as required -->
+								<require>maven-lib ge ${maven-version-min}</require>
+							</requires>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>

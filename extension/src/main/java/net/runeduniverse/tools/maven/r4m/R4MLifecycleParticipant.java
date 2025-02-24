@@ -58,8 +58,11 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-import net.runeduniverse.tools.maven.r4m.api.Extension;
-import net.runeduniverse.tools.maven.r4m.api.Property;
+import net.runeduniverse.lib.utils.maven.ext.DefaultExtension;
+import net.runeduniverse.lib.utils.maven.ext.api.Extension;
+import net.runeduniverse.lib.utils.maven.ext.config.AbstractProperty;
+import net.runeduniverse.lib.utils.maven.ext.config.ConfigBuilder;
+import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
@@ -86,6 +89,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private EventSpyDispatcher dispatcher;
 	@Requirement
 	private Settings settings;
+	@Requirement
+	private SettingsFactory settingsFactory;
 	@Requirement
 	private ExecutionArchive pemArchive;
 	@Requirement
@@ -130,7 +135,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.mavenProjectScanner = new LinkedList<>(this.mavenProjectScanner);
 		this.mavenProjectScanner.sort(null);
 
-		compileSettings(mvnSession);
+		this.settingsFactory.setup(mvnSession);
 
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
 
@@ -139,8 +144,10 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		ClassWorld world = currentRealm.getWorld();
 
 		try {
-			ClassRealm realm;
-			if (this.coreExtension) {
+			final ClassRealm realm;
+			if ("plexus.core".equals(currentRealm.getId())) {
+				realm = currentRealm;
+			} else if (this.coreExtension) {
 				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));
 				realm = world.getRealm("maven.ext");
 			} else {
@@ -213,82 +220,6 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				return true;
 		}
 		return false;
-	}
-
-	private void compileSettings(final MavenSession mvnSession) {
-		Properties prop = defaultProperties();
-		prop.putAll(mvnSession.getSystemProperties());
-		prop.putAll(mvnSession.getCurrentProject()
-				.getProperties());
-		prop.putAll(mvnSession.getUserProperties());
-
-		this.settings.setLifecycleTaskRequestCalculator(buildTextPropertyAddPlexusHints(prop,
-				"r4m.lifecycle-task-request-calculator", LifecycleTaskRequestCalculatorDelegate.class));
-		this.settings.setLifecycleTaskRequestCalculatorOnFork(buildTextPropertyAddPlexusHints(prop,
-				"r4m.lifecycle-task-request-calculator-on-fork", LifecycleTaskRequestCalculatorDelegate.class));
-		this.settings.setMissingBuildPluginHandler(
-				buildTextProperty(prop, "r4m.missing-build-plugin-handler", "skip", "warn", "scan", "download"));
-		this.settings.setActiveProfilesInheritance(
-				buildTextProperty(prop, "r4m.active-profiles-inheritance", "upstream", "top-level", "false"));
-		this.settings.setFancyOutput(buildBooleanProperty(prop, "r4m.fancy-output"));
-		this.settings.setPatchMojoOnFork(buildBooleanProperty(prop, "r4m.patch-mojo-on-fork"));
-		this.settings.setGeneratePluginExecutions(buildBooleanProperty(prop, "r4m.generate-plugin-executions"));
-		this.settings.setGeneratePluginExecutionsOnFork(
-				buildBooleanProperty(prop, "r4m.generate-plugin-executions-on-fork"));
-
-		// debug
-		this.settings.setDebugDumpGrmEntriesBeforeExecution(
-				buildTextProperty(prop, "r4m.debug.dump-grm-entries-before-execution", "all", "reduced"));
-
-		this.settings.selectDefaults();
-	}
-
-	private Properties defaultProperties() {
-		Properties properties = new Properties();
-
-		properties.setProperty("r4m.lifecycle-task-request-calculator.default", "sequential");
-		properties.setProperty("r4m.lifecycle-task-request-calculator-on-fork.default", "sequential");
-		properties.setProperty("r4m.missing-build-plugin-handler.default", "warn");
-		properties.setProperty("r4m.active-profiles-inheritance.default", "upstream");
-		properties.setProperty("r4m.fancy-output.default", "true");
-		properties.setProperty("r4m.patch-mojo-on-fork.default", "true");
-		properties.setProperty("r4m.generate-plugin-executions.default", "true");
-		properties.setProperty("r4m.generate-plugin-executions-on-fork.default", "true");
-		// debug
-		properties.setProperty("r4m.debug.dump-grm-entries-before-execution.default", "reduced");
-
-		return properties;
-	}
-
-	private Property<Boolean> buildBooleanProperty(final Properties properties, final String key) {
-		AbstractProperty<Boolean> property = new AbstractProperty<>(key);
-		String defaultValue = properties.getProperty(key + ".default");
-		String selectedValue = properties.getProperty(key);
-		property.setDefault(defaultValue == null ? null : "true".equals(defaultValue));
-		property.setSelected(selectedValue == null ? null : "true".equals(selectedValue));
-		property.add(true, false);
-		return property;
-	}
-
-	private Property<String> buildTextProperty(final Properties properties, final String key, final String... options) {
-		AbstractProperty<String> property = new AbstractProperty<>(key);
-		property.setDefault(properties.getProperty(key + ".default"));
-		property.setSelected(properties.getProperty(key));
-		property.add(options);
-		return property;
-	}
-
-	private Property<String> buildTextPropertyAddPlexusHints(final Properties properties, final String key,
-			final Class<?> plexusRole) {
-		AbstractProperty<String> property = new AbstractProperty<>(key);
-		property.setDefault(properties.getProperty(key + ".default"));
-		property.setSelected(properties.getProperty(key));
-		try {
-			property.addAll(this.container.lookupMap(plexusRole)
-					.keySet());
-		} catch (ComponentLookupException e) {
-		}
-		return property;
 	}
 
 	private Set<Plugin> discoverPlugins(final MavenSession mvnSession, final MavenProject mvnProject) throws Exception {
@@ -482,14 +413,14 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 	private static Extension fromExtRealm(ClassRealm realm) {
 		String id = realm.getId();
-		final DefaultExtension ext = new DefaultExtension();
-		ext.setClassRealm(realm);
 		if (id.startsWith("coreExtension>")) {
 			id = id.substring(14);
 		} else if (id.startsWith("extension>")) {
 			id = id.substring(10);
 		} else
 			return null;
+		final DefaultExtension ext = new DefaultExtension();
+		ext.setClassRealm(realm);
 		int idx = id.indexOf(':');
 		ext.setGroupId(id.substring(0, idx));
 		id = id.substring(idx + 1);

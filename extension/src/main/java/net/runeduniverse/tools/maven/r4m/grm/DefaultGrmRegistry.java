@@ -18,9 +18,9 @@ package net.runeduniverse.tools.maven.r4m.grm;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 
+import net.runeduniverse.lib.utils.maven.ext.indexer.APluginBoundRegistry;
 import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistry;
 import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector;
-import net.runeduniverse.tools.maven.r4m.indexer.APluginBoundRegistry;
 
 @Component(role = PluginRequirementRegistry.class, instantiationStrategy = "keep-alive")
 public class DefaultGrmRegistry extends APluginBoundRegistry<PluginRequirementRegistrySector>

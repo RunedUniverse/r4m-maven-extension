@@ -143,6 +143,10 @@
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven-ext</artifactId>
+		</dependency>
 
 		<!-- COMPILER -->
 		<!-- dependency for plexus annotation -->
@@ -364,7 +368,10 @@
 							<skip>true</skip>
 							<copyPom>true</copyPom>
 							<excludeScope>provided</excludeScope>
-							<excludeArtifactIds>commons-io,commons-lang3</excludeArtifactIds>
+							<!-- usually we'd exclude 'commons-io' as it should
+							be provided by maven-core but thats currently not
+							the case! (tested on: F40 2025-02-24) -->
+							<excludeArtifactIds>commons-lang3</excludeArtifactIds>
 							<prependGroupId>true</prependGroupId>
 						</configuration>
 					</execution>

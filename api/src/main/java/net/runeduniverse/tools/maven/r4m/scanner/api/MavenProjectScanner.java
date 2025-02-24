@@ -29,11 +29,11 @@ public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 
 	@Override
 	public default int compareTo(MavenProjectScanner o) {
-		if (getPriority() == o.getPriority())
+		if (this == o)
 			return 0;
-		if (getPriority() < o.getPriority())
-			return -1;
-		return 1;
+		if (o == null)
+			return 1;
+		return Integer.compare(getPriority(), o.getPriority());
 	}
 
 	public int getPriority();

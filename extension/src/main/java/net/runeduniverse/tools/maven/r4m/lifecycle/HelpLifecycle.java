@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem;
+package net.runeduniverse.tools.maven.r4m.lifecycle;
 
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import org.apache.maven.lifecycle.Lifecycle;
+import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.lib.utils.maven.ext.indexer.APluginBoundRegistry;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
+@Component(role = Lifecycle.class, hint = HelpLifecycle.HINT)
+public class HelpLifecycle extends Lifecycle {
 
-@Component(role = PluginExecutionRegistry.class, instantiationStrategy = "keep-alive")
-public class Registry extends APluginBoundRegistry<PluginExecutionRegistrySector> implements PluginExecutionRegistry {
+	public static final String HINT = "help";
+	public static final String[] PHASES = { "help" };
 
-	@Override
-	protected PluginExecutionRegistrySector _newSector(final PluginDescriptor mvnPluginDescriptor) {
-		return new RegistrySector();
+	public HelpLifecycle() {
+		super(HINT, new ArrayList<>(Arrays.asList(PHASES)), new LinkedHashMap<String, LifecyclePhase>(1));
 	}
 }

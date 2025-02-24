@@ -30,8 +30,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.maven.ext.api.Extension;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
-import net.runeduniverse.tools.maven.r4m.api.Extension;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
@@ -113,6 +113,8 @@ public class PatchingEventSpy implements EventSpy {
 	}
 
 	private void printExtensionState(PatchingEvent event) {
+		if (event.getType() == Type.INFO_ELEVATING_TO_PLEXUS_REALM)
+			this.log.info("State: Core-Extension (system)");
 		if (event.getType() == Type.INFO_ELEVATING_TO_CORE_REALM)
 			this.log.info("State: Core-Extension");
 		if (event.getType() == Type.INFO_ELEVATING_TO_BUILD_REALM) {

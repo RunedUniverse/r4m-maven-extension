@@ -119,6 +119,10 @@
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-maven</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven-ext</artifactId>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

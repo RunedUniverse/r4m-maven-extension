@@ -15,9 +15,6 @@ def installArtifact(modId) {
 			if(mod.hasTag('pack-jar')) {
 				sh "cp *.jar ${ RESULT_PATH }"
 			}
-			if(mod.hasTag('pack-rpm')) {
-				sh "cp *.rpm ${ ARCHIVE_PATH }"
-			}
 		}
 	}
 }
@@ -47,12 +44,12 @@ node {
 			sh "mkdir -p ${ RESULT_PATH }"
 			sh "mkdir -p ${ ARCHIVE_PATH }"
 			
-			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'pack-pom', 'parent'   ]
-			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'pack-pom', 'bom'      ]
-			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar'             ]
-			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar'             ]
-			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar'             ]
-			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar', 'pack-rpm' ]
+			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'pack-pom', 'parent'     ]
+			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'pack-pom', 'src', 'bom' ]
+			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar', 'src'        ]
+			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar', 'src'        ]
+			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar', 'src'        ]
+			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar'               ]
 		}
 
 		stage('Init Modules') {
@@ -76,8 +73,8 @@ node {
 				skipStage()
 				return
 			}
-			sh "mvn-dev -P ${ REPOS } dependency:purge-local-repository -DactTransitively=false -DreResolve=false --non-recursive"
-			sh "mvn-dev -P ${ REPOS } dependency:resolve-plugins -U"
+			sh "mvn-dev -P ${ REPOS } dependency:purge-local-repository -DreResolve=false"
+			sh "mvn-dev -P ${ REPOS } dependency:go-offline -U"
 		}
 
 		stage('Code Validation') {
@@ -120,6 +117,40 @@ node {
 		}
 		stage('Install R4M Extension') {
 			installArtifact('r4m-extension');
+		}
+
+		stage('Build System Packages') {
+			def modParent = getModule(id: 'r4m-parent');
+			def modExt    = getModule(id: 'r4m-extension');
+			def modSrc    = getModule(id: 'r4m-sources');
+			stage('R4M Extension') {
+				if(!modExt.active()) {
+					skipStage()
+					return
+				}
+				try {
+					sh "mvn-dev -P ${ REPOS },pack-ext -pl=${ modParent.relPathTo(modExt) }"
+				} finally {
+					dir(path: "${ modExt.path() }/target") {
+						// copy packages
+						sh "cp *.rpm ${ ARCHIVE_PATH }"
+					}
+				}
+			}
+			stage('R4M Library') {
+				if(!checkAllModules(withTagIn: [ 'src' ], active: true)) {
+					skipStage()
+					return
+				}
+				try {
+					sh "mvn-dev -P ${ REPOS },pack-lib -pl=${ modParent.relPathTo(modExt) }"
+				} finally {
+					dir(path: "${ modExt.path() }/target") {
+						// copy packages
+						sh "cp *-lib-*.rpm ${ ARCHIVE_PATH }"
+					}
+				}
+			}
 		}
 
 		stage('Test') {

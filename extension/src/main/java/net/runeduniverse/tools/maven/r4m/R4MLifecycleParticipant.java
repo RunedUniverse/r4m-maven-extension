@@ -146,6 +146,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		try {
 			final ClassRealm realm;
 			if ("plexus.core".equals(currentRealm.getId())) {
+				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_PLEXUS_REALM));
 				realm = currentRealm;
 			} else if (this.coreExtension) {
 				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));

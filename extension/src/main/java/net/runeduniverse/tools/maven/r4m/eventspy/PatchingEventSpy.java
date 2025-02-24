@@ -64,6 +64,7 @@ public class PatchingEventSpy implements EventSpy {
 		case INFO_PATCHING_ABORTED:
 			printBox(event);
 			break;
+		case INFO_ELEVATING_TO_PLEXUS_REALM:
 		case INFO_ELEVATING_TO_CORE_REALM:
 		case INFO_ELEVATING_TO_BUILD_REALM:
 			printExtensionState(event);

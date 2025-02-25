@@ -24,8 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.AbstractMavenLifecycleParticipant;
@@ -39,16 +37,12 @@ import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginContainer;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
-import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
@@ -58,28 +52,21 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-import net.runeduniverse.lib.utils.maven.ext.DefaultExtension;
+import net.runeduniverse.lib.utils.maven.ext.BootstrapMavenLifecycleParticipant;
 import net.runeduniverse.lib.utils.maven.ext.api.Extension;
-import net.runeduniverse.lib.utils.maven.ext.config.AbstractProperty;
-import net.runeduniverse.lib.utils.maven.ext.config.ConfigBuilder;
-import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
-import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
-public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
+public class R4MLifecycleParticipant extends BootstrapMavenLifecycleParticipant {
 
-	public static final String ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM = //
-			"Failed to load maven-extension ClassRealm";
 	public static final String ERR_FAILED_TO_LOAD_MODELS = //
 			"Failed while loading pem.xml & grm.xml from project";
 
@@ -98,16 +85,9 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	@Requirement(role = MavenProjectScanner.class)
 	private List<MavenProjectScanner> mavenProjectScanner;
 	@Requirement
-	private PlexusContainer container;
-	@Requirement
-	private MavenPluginManager mavenPluginManager;
-	@Requirement
 	private PluginDependenciesResolver pluginDependenciesResolver;
 
 	private final Set<Extension> extensions = new LinkedHashSet<>();
-	private final Map<MavenProject, Set<Plugin>> unidentifiablePlugins = new LinkedHashMap<>();
-
-	private boolean coreExtension = false;
 
 	/**
 	 * Invoked after MavenSession instance has been created.
@@ -118,7 +98,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 */
 	@Override
 	public void afterSessionStart(MavenSession mvnSession) throws MavenExecutionException {
-		this.coreExtension = true;
+		super.afterSessionStart(mvnSession);
 
 		mvnSession.getSettings()
 				.addPluginGroup(Runes4MavenProperties.GROUP_ID);
@@ -137,111 +117,44 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 		this.settingsFactory.setup(mvnSession);
 
-		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
+		patchMaven(mvnSession);
+	}
 
-		ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
-				.getContextClassLoader();
-		ClassWorld world = currentRealm.getWorld();
+	@Override
+	protected ClassRealm createBuildExtensionRealm(final ClassRealm plexusCore, final ClassRealm currentRealm)
+			throws DuplicateRealmException {
+		// we need to reinitiate the r4m-maven-extension realm because maven injects an
+		// outdated version of the plexus-utils
+		final ClassRealm realm = plexusCore
+				.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
+		realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m");
+		realm.importFrom(currentRealm, "net.runeduniverse.lib.utils");
+		return realm;
+	}
+
+	@Override
+	protected boolean patchMaven(final MavenSession mvnSession, final boolean isCoreExt,
+			final Set<Extension> extensions, final Set<Plugin> extPlugins) throws MavenExecutionException {
+		this.extensions.addAll(extensions);
 
 		try {
-			final ClassRealm realm;
-			if ("plexus.core".equals(currentRealm.getId())) {
-				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_PLEXUS_REALM));
-				realm = currentRealm;
-			} else if (this.coreExtension) {
-				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));
-				realm = world.getRealm("maven.ext");
-			} else {
-				this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_BUILD_REALM));
-				// we need to reinitiate the r4m-maven-extension realm because maven injects an
-				// outdated version of the plexus-utils
-				realm = world.getRealm("plexus.core")
-						.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
-				realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m");
-				realm.importFrom(currentRealm, "net.runeduniverse.lib.utils");
-			}
-
-			Thread.currentThread()
-					.setContextClassLoader(realm);
-
-			this.extensions.addAll(scanCoreExtensions(world.getRealms()));
-			final Set<Plugin> extPlugins = new LinkedHashSet<>();
-
-			for (MavenProject mvnProject : mvnSession.getAllProjects())
-				extPlugins.addAll(discoverPlugins(mvnSession, mvnProject));
-
-			if (!this.extensions.isEmpty()) {
-				this.dispatcher.onEvent(ExtensionPatchingEvent
-						.createInfoEvent(Type.INFO_EXTENSIONS_DETECTED, mvnSession.getAllProjects(), extensions)
-						.readonly());
-			}
-
 			for (MavenProject mvnProject : mvnSession.getAllProjects())
 				scanProject(mvnSession, extPlugins, mvnProject);
-
-			if ("scan".equals(this.settings.getMissingBuildPluginHandler()
-					.getSelected())) {
-				this.dispatcher
-						.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED));
-				// collect indirectly referenced build-plugins after seeding the archive
-				for (MavenProject mvnProject : mvnSession.getAllProjects())
-					loadReferencedPlugins(mvnSession, mvnProject);
-				this.dispatcher
-						.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED));
-			}
-
-			modifyLifecycleExecutionPlanCalculator();
-
-		} catch (DuplicateRealmException | NoSuchRealmException e) {
-			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MAVEN_EXTENSION_CLASSREALM, e);
-			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
-			throw ex;
 		} catch (Exception e) {
-			MavenExecutionException ex = new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
-			this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
-			throw ex;
-		} finally {
-			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_RETURNING_TO_EXTENSION_REALM));
-			Thread.currentThread()
-					.setContextClassLoader(currentRealm);
+			throw new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
 		}
 
-		if (checkUnidentifiablePlugins()) {
-			this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
-					this.unidentifiablePlugins));
+		if ("scan".equals(this.settings.getMissingBuildPluginHandler()
+				.getSelected())) {
+			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED));
+			// collect indirectly referenced build-plugins after seeding the archive
+			for (MavenProject mvnProject : mvnSession.getAllProjects())
+				loadReferencedPlugins(mvnSession, mvnProject);
+			this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_FINISHED));
 		}
 
-		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_FINISHED));
-	}
-
-	private boolean checkUnidentifiablePlugins() {
-		for (Entry<MavenProject, Set<Plugin>> entry : this.unidentifiablePlugins.entrySet()) {
-			final Set<Plugin> set = entry.getValue();
-			if (set != null && !set.isEmpty())
-				return true;
-		}
-		return false;
-	}
-
-	private Set<Plugin> discoverPlugins(final MavenSession mvnSession, final MavenProject mvnProject) throws Exception {
-		Set<Plugin> unidentifiablePlugins = this.unidentifiablePlugins.get(mvnProject);
-		if (unidentifiablePlugins == null) {
-			this.unidentifiablePlugins.put(mvnProject, unidentifiablePlugins = new LinkedHashSet<>());
-		}
-
-		final Set<Plugin> extPlugins = new LinkedHashSet<>();
-		for (Extension ext : this.extensions) {
-			final Plugin plugin = ext.asPlugin(mvnProject);
-			try {
-				if (ext.locatePluginDescriptor(this.mavenPluginManager, mvnSession.getRepositorySession(),
-						mvnProject)) {
-					extPlugins.add(plugin);
-				}
-			} catch (InvalidPluginDescriptorException e) {
-				unidentifiablePlugins.add(plugin);
-			}
-		}
-		return extPlugins;
+		modifyLifecycleExecutionPlanCalculator();
+		return true;
 	}
 
 	private void scanProject(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
@@ -401,34 +314,44 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED));
 	}
 
-	private static Collection<Extension> scanCoreExtensions(final Collection<ClassRealm> realms) {
-		final Collection<Extension> extensions = new LinkedHashSet<>();
-		for (ClassRealm realm : realms) {
-			Extension ext = fromExtRealm(realm);
-			if (ext == null)
-				continue;
-			extensions.add(ext);
-		}
-		return Collections.unmodifiableCollection(extensions);
+	@Override
+	protected void _patchEventInfo_PatchingStarted() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_STARTED));
 	}
 
-	private static Extension fromExtRealm(ClassRealm realm) {
-		String id = realm.getId();
-		if (id.startsWith("coreExtension>")) {
-			id = id.substring(14);
-		} else if (id.startsWith("extension>")) {
-			id = id.substring(10);
-		} else
-			return null;
-		final DefaultExtension ext = new DefaultExtension();
-		ext.setClassRealm(realm);
-		int idx = id.indexOf(':');
-		ext.setGroupId(id.substring(0, idx));
-		id = id.substring(idx + 1);
-		idx = id.indexOf(':');
-		ext.setArtifactId(id.substring(0, idx));
-		ext.setVersion(id.substring(idx + 1));
-		return ext;
+	@Override
+	protected void _patchEventInfo_SwitchRealmToPlexus() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_PLEXUS_REALM));
 	}
 
+	@Override
+	protected void _patchEventInfo_SwitchRealmToMavenExt() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));
+	}
+
+	@Override
+	protected void _patchEventInfo_SwitchRealmToBuildExt() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_BUILD_REALM));
+	}
+
+	@Override
+	protected void _patchEventError_PatchingAborted(MavenExecutionException ex) {
+		this.dispatcher.onEvent(PatchingEvent.createErrorEvent(Type.INFO_PATCHING_ABORTED, ex));
+	}
+
+	@Override
+	protected void _patchEventInfo_ResetRealm() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_RETURNING_TO_EXTENSION_REALM));
+	}
+
+	@Override
+	protected void _patchEventInfo_UnidentifiablePluginsDetected(Collection<MavenProject> projects) {
+		this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
+				this.unidentifiablePlugins));
+	}
+
+	@Override
+	protected void _patchEventInfo_PatchingFinished() {
+		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_PATCHING_FINISHED));
+	}
 }

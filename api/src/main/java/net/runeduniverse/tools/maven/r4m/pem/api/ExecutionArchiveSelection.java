@@ -42,5 +42,4 @@ public interface ExecutionArchiveSelection extends Recordable {
 		public void modify(final Set<ExecutionView> views);
 
 	}
-
 }

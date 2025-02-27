@@ -38,7 +38,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
-import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -56,7 +56,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 	protected MavenPluginManager manager;
 	@Requirement
 	protected PluginExecutionRegistry registry;
-	@Requirement
+	@Requirement(hint = "xml")
 	protected ProjectExecutionModelParser parser;
 
 	@Override
@@ -72,9 +72,10 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return null;
 		}
 
-		PluginExecutionRegistrySlice slice = this.registry.getSlice(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId());
+		PluginExecutionRegistrySector slice = this.registry.getSector(mvnPlugin.getGroupId(),
+				mvnPlugin.getArtifactId());
 		if (slice == null)
-			slice = this.registry.createSlice(mvnPluginDescriptor);
+			slice = this.registry.createSector(mvnPluginDescriptor);
 
 		ProjectExecutionModel model = slice.getModel(PluginParser.class, PluginParser.HINT);
 		if (model != null)
@@ -86,26 +87,30 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 	}
 
 	protected ProjectExecutionModel parseModel(final PluginDescriptor mvnPluginDescriptor) throws Exception {
-		final ProjectExecutionModel model = new ProjectExecutionModel(PluginParser.class, PluginParser.HINT);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
 		final File pluginFile = mvnPluginDescriptor.getPluginArtifact()
 				.getFile();
+
+		model.setParser(PluginParser.class, PluginParser.HINT);
+
 		try {
 			if (pluginFile.isFile()) {
 				try (JarFile pluginJar = new JarFile(pluginFile, false)) {
-					ZipEntry executionDescriptorEntry = pluginJar
-							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
+					final ZipEntry xmlFileEntry = pluginJar
+							.getEntry(Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
 
-					if (executionDescriptorEntry != null) {
-						try (InputStream is = pluginJar.getInputStream(executionDescriptorEntry)) {
+					if (xmlFileEntry != null) {
+						try (InputStream is = pluginJar.getInputStream(xmlFileEntry)) {
 							this.parser.parseModel(model, is);
 						}
 					}
 				}
 			} else {
-				File executionXml = new File(pluginFile, Runes4MavenProperties.METAINF.RUNES4MAVEN.EXECUTIONS);
+				final File xmlFile = new File(pluginFile,
+						Runes4MavenProperties.METAINF.RUNES4MAVEN.PROJECT_EXECUTION_MODEL_FILE);
 
-				if (executionXml.isFile()) {
-					try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
+				if (xmlFile.isFile()) {
+					try (InputStream is = new BufferedInputStream(new FileInputStream(xmlFile))) {
 						this.parser.parseModel(model, is);
 					}
 				}
@@ -117,5 +122,4 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		}
 		return model;
 	}
-
 }

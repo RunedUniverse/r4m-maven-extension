@@ -25,8 +25,9 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = MavenProjectScanner.class, hint = PackagingProjectScanner.HINT)
@@ -36,6 +37,8 @@ public class PackagingProjectScanner implements MavenProjectScanner {
 
 	@Requirement(role = ProjectExecutionModelPackagingParser.class)
 	private Map<String, ProjectExecutionModelPackagingParser> pemPackagingParser;
+	@Requirement
+	private ExecutionArchive pemArchive;
 
 	@Override
 	public int getPriority() {
@@ -44,9 +47,11 @@ public class PackagingProjectScanner implements MavenProjectScanner {
 
 	@Override
 	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
-			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
-		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values())
-			projectSlice.register(parser.parse());
+			MavenProject mvnProject) throws Exception {
+		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values()) {
+			final ProjectExecutionModel model = parser.parse();
+			this.pemArchive.getSector(mvnProject)
+					.register(model);
+		}
 	}
-
 }

@@ -15,35 +15,37 @@
  */
 package net.runeduniverse.tools.maven.r4m.eventspy.api;
 
-import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 
 public interface MavenPluginPatchingEvent extends PatchingEvent {
 
-	public Collection<Plugin> getEffectedPlugins();
+	public Map<MavenProject, Set<Plugin>> getEffectedPluginsPerProject();
 
-	public static MavenPluginEvent createInfoEvent(Type type, Collection<Plugin> effectedPlugins) {
+	public static MavenPluginEvent createInfoEvent(Type type, Map<MavenProject, Set<Plugin>> effectedPlugins) {
 		return new MavenPluginEvent(type, null, effectedPlugins);
 	}
 
 	public static MavenPluginEvent createErrorEvent(Type type, Exception exception,
-			Collection<Plugin> effectedPlugins) {
-		return new MavenPluginEvent(type, exception, effectedPlugins);
+			Map<MavenProject, Set<Plugin>> effectedPluginsPerProject) {
+		return new MavenPluginEvent(type, exception, effectedPluginsPerProject);
 	}
 
 	public class MavenPluginEvent extends PatchingEvent.BasicEvent implements MavenPluginPatchingEvent {
 
-		protected Collection<Plugin> effectedPlugins = null;
+		protected Map<MavenProject, Set<Plugin>> effectedPlugins = null;
 
-		public MavenPluginEvent(Type type, Exception exception, Collection<Plugin> effectedPlugins) {
+		public MavenPluginEvent(Type type, Exception exception, Map<MavenProject, Set<Plugin>> effectedPlugins) {
 			super(type, exception);
 			this.effectedPlugins = effectedPlugins;
 		}
 
 		@Override
-		public Collection<Plugin> getEffectedPlugins() {
-			return effectedPlugins;
+		public Map<MavenProject, Set<Plugin>> getEffectedPluginsPerProject() {
+			return this.effectedPlugins;
 		}
 
 	}

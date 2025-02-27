@@ -52,10 +52,9 @@ public class ProfileTriggerProvided extends ProfileTrigger {
 			return true;
 		if (!(obj instanceof ProfileTriggerProvided))
 			return false;
-		ProfileTriggerProvided trigger = (ProfileTriggerProvided) obj;
+		final ProfileTriggerProvided trigger = (ProfileTriggerProvided) obj;
 		if (getProfileId() == null)
-			if (trigger.getProfileId() != null)
-				return false;
+			return trigger.getProfileId() == null;
 		return getProfileId().equals(trigger.getProfileId());
 	}
 

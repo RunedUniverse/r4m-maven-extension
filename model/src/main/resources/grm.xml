@@ -1,0 +1,186 @@
+<!--
+
+    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!-- <goal-execution-order-model xmlns="https://api.runeduniverse.net/runes4tools/r4m-geom" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-grm 
+	https://api.runeduniverse.net/runes4tools/r4m-grm-v1_0_0.xsd"> -->
+<goal-requirement-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-grm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-grm r4m-grm-v1_0_0.xsd">
+
+	<modelVersion>1.0.0</modelVersion>
+	<goals>
+		<goal id="x">
+			<dependents>
+				<goal id="x" source="plugin">
+					<artifactId>yy</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+		<goal id="pack">
+			<groupId>
+				net.runeduniverse.tools.maven.r4m
+			</groupId>
+			<artifactId>r4m-maven-extension</artifactId>
+			<prerequisites>
+				<goal id="pre-pack" source="override" method.combine="default">
+					<groupId>
+						<!-- (opt - maven groupId) -->
+						net.runeduniverse.tools.maven.r4m
+					</groupId>
+					<artifactId>r4m-maven-extension</artifactId>
+					<when>
+						<!-- (opt - always) -->
+						<!-- conditions following each other inside the <when> block form an 
+							OR condition -->
+						<always />
+						<and>
+							<execution id="pipeline" />
+							<packaging procedure="jar" />
+							<lifecycle id="clean" />
+							<profile id="dev-install" state="inactive" />
+							<not>
+								<profile id="build" state="provided" />
+							</not>
+						</and>
+					</when>
+				</goal>
+			</prerequisites>
+			<dependents>
+				<goal id="wrap-pack">
+					<groupId>
+						<!-- (opt - maven groupId) -->
+						net.runeduniverse.tools.maven.r4m
+					</groupId>
+					<artifactId>r4m-maven-extension</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<!-- example : formatting -->
+
+		<goal id="format">
+			<groupId>net.revelc.code.formatter</groupId>
+			<artifactId>formatter-maven-plugin</artifactId>
+			<dependents>
+				<goal id="format" source="plugin">
+					<groupId>com.mycila</groupId>
+					<artifactId>license-maven-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<goal id="format">
+			<groupId>com.mycila</groupId>
+			<artifactId>license-maven-plugin</artifactId>
+			<prerequisites>
+				<goal id="format" source="plugin">
+					<groupId>net.revelc.code.formatter</groupId>
+					<artifactId>formatter-maven-plugin</artifactId>
+				</goal>
+			</prerequisites>
+		</goal>
+
+		<!-- example : compile -->
+
+		<goal id="compile">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+			<dependents>
+				<goal id="testCompile" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<!-- example : packaging -->
+
+		<goal id="test-jar">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-jar-plugin</artifactId>
+			<prerequisites>
+				<goal id="jar" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+				</goal>
+			</prerequisites>
+		</goal>
+
+		<goal id="test-jar-no-fork">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-source-plugin</artifactId>
+			<prerequisites>
+				<goal id="jar-no-fork" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-source-plugin</artifactId>
+				</goal>
+			</prerequisites>
+		</goal>
+
+		<goal id="test-jar">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-javadoc-plugin</artifactId>
+			<prerequisites>
+				<goal id="jar" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-javadoc-plugin</artifactId>
+				</goal>
+			</prerequisites>
+		</goal>
+
+		<!-- example : artifact attachment -->
+
+		<goal id="attach-artifact">
+			<groupId>org.codehaus.mojo</groupId>
+			<artifactId>build-helper-maven-plugin</artifactId>
+			<dependents>
+				<goal id="install" source="workflow">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</goal>
+				<goal id="deploy" source="workflow">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+		<goal id="sign">
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-gpg-plugin</artifactId>
+			<prerequisites>
+				<goal id="attach-artifact" source="workflow">
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+				</goal>
+			</prerequisites>
+			<dependents>
+				<goal id="install" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-install-plugin</artifactId>
+				</goal>
+				<goal id="deploy" source="plugin">
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-deploy-plugin</artifactId>
+				</goal>
+			</dependents>
+		</goal>
+
+	</goals>
+</goal-requirement-model>

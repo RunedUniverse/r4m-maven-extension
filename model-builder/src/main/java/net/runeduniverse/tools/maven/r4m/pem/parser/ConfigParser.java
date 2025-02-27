@@ -40,19 +40,20 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 
 	@Requirement
 	protected Logger log;
-	@Requirement
+	@Requirement(hint = "xml")
 	protected ProjectExecutionModelParser parser;
 
 	@Override
 	public ProjectExecutionModel parse(MavenProject mvnProject) throws Exception {
 
-		File executionXml = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
+		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
 
-		ProjectExecutionModel model = new ProjectExecutionModel(ConfigParser.class, ConfigParser.HINT);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setEffective(true);
+		model.setParser(ConfigParser.class, ConfigParser.HINT);
 
-		if (executionXml.isFile()) {
-			try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
+		if (xmlFile.isFile()) {
+			try (InputStream is = new BufferedInputStream(new FileInputStream(xmlFile))) {
 				this.parser.parseModel(model, is);
 			} catch (IOException | XmlPullParserException e) {
 				this.log.error(String.format(ERR_MSG_PARSE_PEM, Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE,

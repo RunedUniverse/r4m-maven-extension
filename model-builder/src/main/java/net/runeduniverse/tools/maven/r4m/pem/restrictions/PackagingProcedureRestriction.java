@@ -57,10 +57,9 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 			return true;
 		if (!(obj instanceof PackagingProcedureRestriction))
 			return false;
-		PackagingProcedureRestriction restriction = (PackagingProcedureRestriction) obj;
+		final PackagingProcedureRestriction restriction = (PackagingProcedureRestriction) obj;
 		if (this.procedure == null)
-			if (restriction.getPackagingProcedure() != null)
-				return false;
+			return restriction.getPackagingProcedure() == null;
 		return this.procedure.equals(restriction.getPackagingProcedure());
 	}
 

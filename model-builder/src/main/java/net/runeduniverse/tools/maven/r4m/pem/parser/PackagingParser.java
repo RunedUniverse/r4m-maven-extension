@@ -29,7 +29,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
+import net.runeduniverse.lib.utils.maven.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
@@ -54,11 +54,11 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 	@Override
 	public ProjectExecutionModel parse() {
-		Set<Execution> effExecutions = new LinkedHashSet<>();
+		final Set<Execution> effExecutions = new LinkedHashSet<>();
 
 		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : this.mappings.entrySet()) {
-			Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
-			Map<String, Execution> executions = new LinkedHashMap<>();
+			final Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
+			final Map<String, Execution> executions = new LinkedHashMap<>();
 			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
 					.getLifecycles()
 					.values()) {
@@ -72,7 +72,8 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 			effExecutions.addAll(executions.values());
 		}
 
-		ProjectExecutionModel model = new ProjectExecutionModel(PackagingParser.class, PackagingParser.HINT);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setParser(PackagingParser.class, PackagingParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 		model.addExecutions(effExecutions);
 		return model;

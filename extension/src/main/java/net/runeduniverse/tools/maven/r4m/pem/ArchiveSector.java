@@ -25,7 +25,7 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
+import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;

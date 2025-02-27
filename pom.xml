@@ -107,6 +107,9 @@
 		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
 		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
 		<plugin-maven-deploy-version>3.0.0-M2</plugin-maven-deploy-version>
+		<!-- ARTIFACT VERSIONS - PACKAGER -->
+		<plugin-maven-dependency-version>3.6.1</plugin-maven-dependency-version>
+		<plugin-dentrassi-rpm-version>1.13.0</plugin-dentrassi-rpm-version>
 	</properties>
 
 	<profiles>
@@ -117,7 +120,8 @@
 				<repository>
 					<id>runeduniverse-development</id>
 					<url>
-						https://nexus.runeduniverse.net/repository/maven-development/</url>
+						https://nexus.runeduniverse.net/repository/maven-development/
+					</url>
 				</repository>
 			</repositories>
 			<build>
@@ -540,6 +544,16 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-gpg-plugin</artifactId>
 					<version>${plugin-maven-gpg-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${plugin-maven-dependency-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>de.dentrassi.maven</groupId>
+					<artifactId>rpm</artifactId>
+					<version>${plugin-dentrassi-rpm-version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

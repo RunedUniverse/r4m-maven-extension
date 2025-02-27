@@ -15,19 +15,20 @@
  */
 package net.runeduniverse.tools.maven.r4m.api;
 
-import java.util.Collection;
+import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
+import net.runeduniverse.lib.utils.maven.ext.config.api.PropertyStore;
 
-public interface Settings {
+public interface Settings extends PropertyStore {
 
-	public Collection<Property<?>> getAllProperties();
-
-	public void selectDefaults();
-
-	public Property<?> getProperty(String id);
-
-	public void setProperty(Property<?> value);
-
-	public void removeProperty(String id);
+	public static final String PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR = "r4m.lifecycle-task-request-calculator";
+	public static final String PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK = "r4m.lifecycle-task-request-calculator-on-fork";
+	public static final String PROP_MISSING_BUILD_PLUGIN_HANDLER = "r4m.missing-build-plugin-handler";
+	public static final String PROP_ACTIVE_PROFILES_INHERITANCE = "r4m.active-profiles-inheritance";
+	public static final String PROP_FANCY_OUTPUT = "r4m.fancy-output";
+	public static final String PROP_PATCH_MOJO_ON_FORK = "r4m.patch-mojo-on-fork";
+	public static final String PROP_GENERATE_PLUGIN_EXECUTIONS = "r4m.generate-plugin-executions";
+	public static final String PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK = "r4m.generate-plugin-executions-on-fork";
+	public static final String PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION = "r4m.debug.dump-grm-entries-before-execution";
 
 	public Property<String> getLifecycleTaskRequestCalculator();
 

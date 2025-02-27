@@ -84,10 +84,6 @@
 		<url>https://github.com/RunedUniverse/r4m-maven-extension/issues</url>
 	</issueManagement>
 
-	<prerequisites>
-		<maven>${maven-version-min}</maven>
-	</prerequisites>
-
 	<dependencies>
 		<dependency>
 			<groupId>net.runeduniverse.tools.maven.r4m</groupId>
@@ -118,6 +114,10 @@
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-maven</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven-ext</artifactId>
 		</dependency>
 	</dependencies>
 

@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.pem.api;
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.logs.Recordable;
-import net.runeduniverse.tools.maven.r4m.indexer.api.ProjectBoundEntry;
+import net.runeduniverse.lib.utils.maven.ext.indexer.api.ProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 

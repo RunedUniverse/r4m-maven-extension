@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
@@ -36,7 +37,6 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementSource;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils;
-import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundEntry;
 
 public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementArchiveSector>
 		implements GoalRequirementArchiveSector {

@@ -17,7 +17,8 @@ package net.runeduniverse.tools.maven.r4m.pem;
 
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
-import net.runeduniverse.tools.maven.r4m.indexer.AProjectBoundArchive;
+
+import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 

@@ -194,63 +194,6 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>pack-lib</id>
-			<build>
-				<defaultGoal>
-					org.apache.maven.plugins:maven-dependency-plugin:copy-dependencies@pack-lib
-					de.dentrassi.maven:rpm:rpm@pack-lib
-				</defaultGoal>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>pack-lib</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>de.dentrassi.maven</groupId>
-						<artifactId>rpm</artifactId>
-						<executions>
-							<execution>
-								<id>pack-lib</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>pack-ext</id>
-			<build>
-				<defaultGoal>
-					de.dentrassi.maven:rpm:rpm@pack-ext
-				</defaultGoal>
-				<plugins>
-					<plugin>
-						<groupId>de.dentrassi.maven</groupId>
-						<artifactId>rpm</artifactId>
-						<executions>
-							<execution>
-								<id>pack-ext</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<!-- DEVELOPMENT -->
 		<profile>
 			<id>dev-install</id>
@@ -277,36 +220,6 @@
 							<appendAssemblyId>false</appendAssemblyId>
 							<finalName>r4m-ext-${project.version}</finalName>
 						</configuration>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>pack-lib</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>de.dentrassi.maven</groupId>
-						<artifactId>rpm</artifactId>
-						<executions>
-							<execution>
-								<id>pack-ext</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-							<execution>
-								<id>pack-lib</id>
-								<configuration>
-									<skip>false</skip>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -352,105 +265,6 @@
 						<goals>
 							<goal>generate-metadata</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>pack-lib</id>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-							<copyPom>true</copyPom>
-							<excludeScope>provided</excludeScope>
-							<!-- usually we'd exclude 'commons-io' as it should
-							be provided by maven-core but thats currently not
-							the case! (tested on: F40 2025-02-24) -->
-							<excludeArtifactIds>commons-lang3</excludeArtifactIds>
-							<prependGroupId>true</prependGroupId>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>de.dentrassi.maven</groupId>
-				<artifactId>rpm</artifactId>
-				<executions>
-					<execution>
-						<id>pack-ext</id>
-						<phase>package</phase>
-						<goals>
-							<goal>rpm</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-							<attach>false</attach>
-							<skipSigning>true</skipSigning>
-							<packageName>${project.artifactId}</packageName>
-							<release>${artifact-release}</release>
-							<entries>
-								<!-- package the maven extension -->
-								<entry>
-									<name>
-										/usr/share/maven/lib/ext/${project.artifactId}-${project.version}.jar
-									</name>
-									<file>
-										${project.build.directory}/${project.artifactId}-${project.version}.jar
-									</file>
-								</entry>
-							</entries>
-							<requires>
-								<!-- declare the lib artifact as required -->
-								<require>
-									${project.artifactId}-lib ge
-									${major-version}.${minor-version}.${sources-version}
-								</require>
-							</requires>
-						</configuration>
-					</execution>
-					<execution>
-						<id>pack-lib</id>
-						<phase>package</phase>
-						<goals>
-							<goal>rpm</goal>
-						</goals>
-						<configuration>
-							<skip>true</skip>
-							<attach>false</attach>
-							<skipSigning>true</skipSigning>
-							<packageName>${project.artifactId}-lib</packageName>
-							<version>
-								${major-version}.${minor-version}.${sources-version}
-							</version>
-							<release>${sources-release}</release>
-							<entries>
-								<!-- package the maven extension libs -->
-								<entry>
-									<name>
-										/usr/share/maven/lib/
-									</name>
-									<collect>
-										<from>
-											${project.build.directory}/dependency
-										</from>
-										<includes>
-											<include>*.jar</include>
-										</includes>
-									</collect>
-								</entry>
-							</entries>
-							<requires>
-								<!-- declare the maven-lib artifact as required -->
-								<require>
-									maven-lib ge ${maven-version-min}
-								</require>
-							</requires>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>

@@ -121,7 +121,7 @@ public class R4MLifecycleParticipant extends BootstrapMavenLifecycleParticipant 
 	}
 
 	@Override
-	protected ClassRealm createBuildExtensionRealm(final ClassRealm plexusCore, final ClassRealm currentRealm)
+	protected ClassRealm createExtensionRealm(final ClassRealm plexusCore, final ClassRealm currentRealm)
 			throws DuplicateRealmException {
 		// we need to reinitiate the r4m-maven-extension realm because maven injects an
 		// outdated version of the plexus-utils

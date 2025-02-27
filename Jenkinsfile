@@ -119,6 +119,9 @@ node {
 			installArtifact('r4m-extension');
 		}
 
+		// System Packages are on hold see the GitHub Issue:
+		// https://github.com/RunedUniverse/r4m-maven-extension/issues/17
+		/*
 		stage('Build System Packages') {
 			def modParent = getModule(id: 'r4m-parent');
 			def modExt    = getModule(id: 'r4m-extension');
@@ -152,6 +155,7 @@ node {
 				}
 			}
 		}
+		*/
 
 		stage('Test') {
 			if(!checkAllModules(withTagIn: [ 'test' ], active: true)) {

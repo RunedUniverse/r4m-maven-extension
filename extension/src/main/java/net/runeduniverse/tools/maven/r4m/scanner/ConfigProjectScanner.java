@@ -53,8 +53,8 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 	}
 
 	@Override
-	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
-			MavenProject mvnProject) throws Exception {
+	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> invalidPlugins,
+			final MavenProject mvnProject) throws Exception {
 		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
 			final ProjectExecutionModel model = parser.parse(mvnProject);
 			this.pemArchive.getSector(mvnProject)

@@ -39,6 +39,6 @@ public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 	public int getPriority();
 
 	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
-			final Set<Plugin> unidentifiablePlugins, final MavenProject mvnProject) throws Exception;
+			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception;
 
 }

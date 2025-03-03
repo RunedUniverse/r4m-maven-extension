@@ -53,12 +53,12 @@ public class PluginProjectScanner implements MavenProjectScanner {
 		return 0;
 	}
 
-	private boolean isIdentifiable(final Set<Plugin> unidentifiablePlugins, Plugin mvnPlugin) {
-		if (mvnPlugin == null || unidentifiablePlugins.contains(mvnPlugin))
+	private boolean isValid(final Set<Plugin> invalidPlugins, Plugin mvnPlugin) {
+		if (mvnPlugin == null || invalidPlugins.contains(mvnPlugin))
 			return false;
 
 		if (mvnPlugin.getVersion() == null) {
-			unidentifiablePlugins.add(mvnPlugin);
+			invalidPlugins.add(mvnPlugin);
 			return false;
 		}
 
@@ -66,10 +66,10 @@ public class PluginProjectScanner implements MavenProjectScanner {
 	}
 
 	@Override
-	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
+	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> invalidPlugins,
 			MavenProject mvnProject) throws Exception {
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
-			if (isIdentifiable(unidentifiablePlugins, mvnPlugin))
+			if (isValid(invalidPlugins, mvnPlugin))
 				try {
 					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values()) {
 						final ProjectExecutionModel model = parser.parse(mvnProject.getRemotePluginRepositories(),
@@ -84,7 +84,7 @@ public class PluginProjectScanner implements MavenProjectScanner {
 								.register(model);
 					}
 				} catch (PluginResolutionException e) {
-					unidentifiablePlugins.add(mvnPlugin);
+					invalidPlugins.add(mvnPlugin);
 				}
 		}
 	}

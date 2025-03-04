@@ -83,7 +83,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	 */
 	private ExecutionArchive archive;
 	/**
-	 * @component
+	 * @component roleHint="xml"
 	 */
 	private ProjectExecutionModelWriter writer;
 	/**

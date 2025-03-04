@@ -42,7 +42,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ProjectExecutionModelWriter.class, hint = "xml")
+@Component(role = ProjectExecutionModelWriter.class, hint = "xml", instantiationStrategy = "singleton")
 public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Requirement(role = ExecutionRestrictionWriter.class)

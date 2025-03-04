@@ -26,6 +26,8 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.check.converter.api
+		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.converter.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.parser.api
@@ -33,8 +35,6 @@
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.view.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.writer.api
-		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.indexer.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
@@ -72,6 +72,14 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.maven
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.config.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.data.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.indexer.api
+		</exportedPackage>
 	</exportedPackages>
 
 	<exportedArtifacts>
@@ -93,6 +101,8 @@
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditions
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-ext
 		</exportedArtifact>
 	</exportedArtifacts>
 

@@ -44,6 +44,7 @@
 		<runeduniverse-utils-common-version>1.2.0</runeduniverse-utils-common-version>
 		<runeduniverse-utils-conditions-version>1.0.0</runeduniverse-utils-conditions-version>
 		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
+		<runeduniverse-utils-plexus-version>1.0.0</runeduniverse-utils-plexus-version>
 		<runeduniverse-utils-maven-version>1.0.0</runeduniverse-utils-maven-version>
 		<runeduniverse-utils-maven-ext-version>1.0.0</runeduniverse-utils-maven-ext-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
@@ -135,6 +136,11 @@
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-logging</artifactId>
 				<version>${runeduniverse-utils-logging-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>net.runeduniverse.lib.utils</groupId>
+				<artifactId>utils-plexus</artifactId>
+				<version>${runeduniverse-utils-plexus-version}</version>
 			</dependency>
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>

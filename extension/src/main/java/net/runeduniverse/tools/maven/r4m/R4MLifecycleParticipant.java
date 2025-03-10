@@ -59,9 +59,11 @@ import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 import net.runeduniverse.lib.utils.maven.ext.MvnCorePatcher;
 import net.runeduniverse.lib.utils.maven.ext.api.ExtensionIndex;
 import net.runeduniverse.lib.utils.maven.ext.data.api.Extension;
+import net.runeduniverse.lib.utils.maven.ext.data.api.ExtensionData;
 import net.runeduniverse.lib.utils.maven.ext.data.api.PluginData;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
@@ -160,6 +162,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		patcher.onInfo_SwitchRealmToBuildExt(this::_patchEventInfo_SwitchRealmToBuildExt);
 		patcher.onError_PatchingAborted(this::_patchEventError_PatchingAborted);
 		patcher.onInfo_ResetRealm(this::_patchEventInfo_ResetRealm);
+		patcher.onInfo_ExtensionsDetected(this::_patchEventInfo_ExtensionsDetected);
 		patcher.onInfo_InvalidPluginsDetected(this::_patchEventInfo_InvalidPluginsDetected);
 		patcher.onInfo_PatchingFinished(this::_patchEventInfo_PatchingFinished);
 	}
@@ -383,6 +386,13 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_RETURNING_TO_EXTENSION_REALM));
 	}
 
+	private void _patchEventInfo_ExtensionsDetected(final Collection<MavenProject> allProjects,
+			final ExtensionData data) {
+		this.dispatcher.onEvent(
+				ExtensionPatchingEvent.createInfoEvent(Type.INFO_EXTENSIONS_DETECTED, allProjects, data.getExtensions())
+						.readonly());
+	}
+
 	private void _patchEventInfo_InvalidPluginsDetected(final Collection<MavenProject> projects,
 			final PluginData data) {
 		// add invalid extension plugins
@@ -393,8 +403,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			set.addAll(entry.getValue());
 		}
 		// exec event with all known invalid plugins
-		this.dispatcher.onEvent(MavenPluginPatchingEvent.createInfoEvent(Type.WARN_UNIDENTIFIABLE_PLUGIN_DETECTED,
-				this.invalidPlugins));
+		this.dispatcher.onEvent(
+				MavenPluginPatchingEvent.createInfoEvent(Type.WARN_INVALID_PLUGIN_DETECTED, this.invalidPlugins));
 	}
 
 	private void _patchEventInfo_PatchingFinished() {

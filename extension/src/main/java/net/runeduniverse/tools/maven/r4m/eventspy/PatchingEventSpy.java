@@ -56,7 +56,7 @@ public class PatchingEventSpy implements EventSpy {
 		if (!(eventObj instanceof PatchingEvent))
 			return;
 
-		PatchingEvent event = (PatchingEvent) eventObj;
+		final PatchingEvent event = (PatchingEvent) eventObj;
 
 		switch (event.getType()) {
 		case INFO_PATCHING_STARTED:
@@ -72,11 +72,14 @@ public class PatchingEventSpy implements EventSpy {
 		case INFO_EXTENSIONS_DETECTED:
 			printDetectedExtensions(event);
 			break;
-		case WARN_UNIDENTIFIABLE_PLUGIN_DETECTED:
-			warnUnidentifiablePlugins(event);
+		case WARN_INVALID_PLUGIN_DETECTED:
+			warnInvalidPlugins(event);
 			break;
 		case INFO_LIFECYCLE_EXEC_PLAN_CALC_STARTED:
 		case INFO_LIFECYCLE_EXEC_PLAN_CALC_FINISHED:
+		case WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_LOCATE_PLEXUS_COMPONENT:
+		case WARN_LIFECYCLE_EXEC_PLAN_CALC_FAILED_TO_RELEASE_PLEXUS_COMPONENT:
+		case DEBUG_LIFECYCLE_EXEC_PLAN_CALC_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR:
 			handlePatchingLifecycleExecutionPlan(event);
 			break;
 		case INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED:
@@ -178,25 +181,25 @@ public class PatchingEventSpy implements EventSpy {
 		this.log.info("");
 	}
 
-	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD = //
+	private static final String WARN_INVALID_PLUGIN_DETECTED_HEAD = //
 			"\033[1;31mFollowing Plugins or one of their dependencies could not be resolved:\u001B[0m";
-	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_PROJECT = //
+	private static final String WARN_INVALID_PLUGIN_DETECTED_PROJECT = //
 			"  project: %s";
-	private static final String WARN_UNIDENTIFIABLE_PLUGIN_DETECTED = //
+	private static final String WARN_INVALID_PLUGIN_DETECTED = //
 			"  » %s:%s:%s";
 
-	private void warnUnidentifiablePlugins(PatchingEvent event) {
-		Map<MavenProject, Set<Plugin>> unidentifiablePluginsMap = new LinkedHashMap<>();
+	private void warnInvalidPlugins(PatchingEvent event) {
+		Map<MavenProject, Set<Plugin>> invalidPluginsMap = new LinkedHashMap<>();
 		if (event instanceof MavenPluginPatchingEvent)
-			unidentifiablePluginsMap.putAll(((MavenPluginPatchingEvent) event).getEffectedPluginsPerProject());
-		if (unidentifiablePluginsMap.isEmpty())
+			invalidPluginsMap.putAll(((MavenPluginPatchingEvent) event).getEffectedPluginsPerProject());
+		if (invalidPluginsMap.isEmpty())
 			return;
-		this.log.warn(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_HEAD);
-		for (Entry<MavenProject, Set<Plugin>> entry : unidentifiablePluginsMap.entrySet()) {
+		this.log.warn(WARN_INVALID_PLUGIN_DETECTED_HEAD);
+		for (Entry<MavenProject, Set<Plugin>> entry : invalidPluginsMap.entrySet()) {
 			final MavenProject mvnProject = entry.getKey();
-			this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED_PROJECT, id(mvnProject)));
+			this.log.warn(String.format(WARN_INVALID_PLUGIN_DETECTED_PROJECT, id(mvnProject)));
 			for (Plugin mvnPlugin : entry.getValue())
-				this.log.warn(String.format(WARN_UNIDENTIFIABLE_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
+				this.log.warn(String.format(WARN_INVALID_PLUGIN_DETECTED, mvnPlugin.getGroupId(),
 						mvnPlugin.getArtifactId(), mvnPlugin.getVersion()));
 		}
 		this.log.info("");

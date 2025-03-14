@@ -39,7 +39,7 @@
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
 		<patch-version>0</patch-version>
-		<artifactt-release>1</artifactt-release>
+		<artifact-release>1</artifact-release>
 		<sources-version>0</sources-version>
 		<sources-release>1</sources-release>
 		<api-version>0</api-version>

@@ -36,6 +36,8 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
  *
  * @goal status
  * @requiresProject false
+ * @requiresReports false
+ * @threadSafe true
  * @since 1.0.0
  * @author VenaNocta
  */

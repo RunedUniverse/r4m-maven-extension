@@ -47,6 +47,9 @@ import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceW
  * generates the full pem.xml from all active maven defaults
  *
  * @goal gen-full-pem
+ * @requiresProject true
+ * @requiresReports false
+ * @threadSafe true
  * @since 1.0.0
  * @author VenaNocta
  */

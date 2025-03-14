@@ -24,6 +24,8 @@ import org.apache.maven.plugin.MojoFailureException;
  *
  * @goal help-tasks
  * @requiresProject false
+ * @requiresReports false
+ * @threadSafe true
  * @since 1.0.0
  * @author VenaNocta
  */

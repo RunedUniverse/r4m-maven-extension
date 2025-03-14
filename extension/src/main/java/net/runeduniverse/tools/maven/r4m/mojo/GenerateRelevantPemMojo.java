@@ -51,6 +51,9 @@ import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.def
  * generates the rel-pem.xml from all relevant executions
  *
  * @goal gen-rel-pem
+ * @requiresProject true
+ * @requiresReports false
+ * @threadSafe true
  * @since 1.0.0
  * @author VenaNocta
  */

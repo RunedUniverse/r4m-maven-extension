@@ -32,7 +32,9 @@ import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFail
  * Prints all registered PEMs
  *
  * @goal debug-show-pem-archive
- * @requiresProject true
+ * @requiresProject false
+ * @requiresReports false
+ * @threadSafe true
  * @since 1.1.0
  * @author VenaNocta
  */

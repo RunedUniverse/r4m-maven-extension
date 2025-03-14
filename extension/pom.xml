@@ -290,6 +290,20 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<configuration>
 					<goalPrefix>r4m</goalPrefix>
+					<requiredJavaVersion>${java-target-version}</requiredJavaVersion>
+					<requiredMavenVersion>${maven-version-min}</requiredMavenVersion>
+					<!--
+						========================================================== -->
+					<!-- we have to use the javadoc notation because the           -->
+					<!-- annotations uses static enums, which for example          -->
+					<!-- restrict forking other non-default lifecyles!             -->
+					<!--
+						https://maven.apache.org/plugin-tools/maven-plugin-tools-java/index.html -->
+					<!--
+						========================================================== -->
+					<extractors>
+						<extractor>java-javadoc</extractor>
+					</extractors>
 				</configuration>
 			</plugin>
 			<plugin>

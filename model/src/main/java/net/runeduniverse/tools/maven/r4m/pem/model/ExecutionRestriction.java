@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface ExecutionRestriction<T> extends Recordable {
 

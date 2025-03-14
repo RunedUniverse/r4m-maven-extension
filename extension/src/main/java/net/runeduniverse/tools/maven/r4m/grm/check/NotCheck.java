@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import net.runeduniverse.lib.utils.conditions.NotCondition;
+import net.runeduniverse.lib.utils.conditional.NotCondition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public class NotCheck extends NotCondition<EntityView> {

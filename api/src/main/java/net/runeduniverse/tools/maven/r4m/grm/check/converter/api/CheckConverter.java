@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check.converter.api;
 
-import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 

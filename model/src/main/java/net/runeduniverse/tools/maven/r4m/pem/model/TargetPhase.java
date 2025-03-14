@@ -18,8 +18,9 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class TargetPhase implements Recordable {
 
@@ -60,7 +61,7 @@ public class TargetPhase implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Target Phase");
+		CompoundTree tree = new DefaultCompoundTree("Target Phase");
 
 		tree.append("id", this.id);
 

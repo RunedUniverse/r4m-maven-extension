@@ -21,8 +21,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Execution implements Recordable {
 
@@ -150,13 +151,13 @@ public class Execution implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Execution");
+		CompoundTree tree = new DefaultCompoundTree("Execution");
 
 		tree.append("id", this.id);
 		tree.append("source", this.source.key());
 		tree.append("inherited", Boolean.toString(this.inherited));
 
-		CompoundTree restrictionsTree = new CompoundTree("Restrictions");
+		CompoundTree restrictionsTree = new DefaultCompoundTree("Restrictions");
 		boolean restrictionsExist = false;
 
 		if (!this.restrictions.isEmpty()) {
@@ -168,7 +169,7 @@ public class Execution implements Recordable {
 		if (restrictionsExist)
 			tree.append(restrictionsTree);
 
-		CompoundTree triggerTree = new CompoundTree("Trigger");
+		CompoundTree triggerTree = new DefaultCompoundTree("Trigger");
 		boolean triggerExist = false;
 
 		if (this.activeAlways) {

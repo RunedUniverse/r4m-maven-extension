@@ -15,13 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireExecutionArchive;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -46,6 +39,13 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireExecutionArchive;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
 
 /**
  * generates the rel-pem.xml from all relevant executions

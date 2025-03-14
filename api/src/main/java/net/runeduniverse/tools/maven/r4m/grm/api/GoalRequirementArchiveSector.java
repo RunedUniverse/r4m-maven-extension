@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.api;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.lib.utils.maven.ext.indexer.api.ProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 

@@ -17,8 +17,9 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import java.util.Collection;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public final class ModelUtils {
 
@@ -53,7 +54,7 @@ public final class ModelUtils {
 	}
 
 	public static CompoundTree createEntryTree(final DataEntry entry) {
-		final CompoundTree tree = new CompoundTree(entry instanceof DataGroup ? "group" : "entry", entry.type());
+		final CompoundTree tree = new DefaultCompoundTree(entry instanceof DataGroup ? "group" : "entry", entry.type());
 		tree.append("class", entry.getClass()
 				.getCanonicalName());
 		return tree;

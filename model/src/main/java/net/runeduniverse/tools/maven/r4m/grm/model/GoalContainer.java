@@ -16,8 +16,10 @@
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
 import java.util.Collection;
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class GoalContainer implements Recordable {
 
@@ -69,7 +71,7 @@ public class GoalContainer implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new CompoundTree("GoalContainer");
+		final CompoundTree tree = new DefaultCompoundTree("GoalContainer");
 		CompoundTree subtree = ModelUtils.toRecord(this.matchData);
 		if (subtree != null)
 			tree.append(subtree);

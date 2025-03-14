@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.api;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.lib.utils.maven.ext.indexer.api.ProjectBoundRegistry;
 
 public interface GoalRequirementArchive extends ProjectBoundRegistry<GoalRequirementArchiveSector>, Recordable {

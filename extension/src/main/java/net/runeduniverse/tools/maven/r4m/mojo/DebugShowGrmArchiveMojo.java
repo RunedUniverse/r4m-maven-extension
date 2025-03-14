@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireGoalRequirementArchive;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -26,6 +24,9 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
+
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireGoalRequirementArchive;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
 
 /**
  * Prints all registered PEMs

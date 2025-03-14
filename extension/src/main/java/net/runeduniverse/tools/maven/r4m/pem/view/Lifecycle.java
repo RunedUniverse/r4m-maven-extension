@@ -18,8 +18,9 @@ package net.runeduniverse.tools.maven.r4m.pem.view;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
@@ -54,7 +55,7 @@ public class Lifecycle implements LifecycleView {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("LifecycleView");
+		CompoundTree tree = new DefaultCompoundTree("LifecycleView");
 
 		tree.append("id", this.id);
 

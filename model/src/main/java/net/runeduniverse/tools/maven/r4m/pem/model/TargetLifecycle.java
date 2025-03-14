@@ -15,10 +15,11 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class TargetLifecycle implements Recordable {
 
@@ -79,7 +80,7 @@ public class TargetLifecycle implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Target Lifecycle");
+		CompoundTree tree = new DefaultCompoundTree("Target Lifecycle");
 
 		tree.append("id", this.id);
 

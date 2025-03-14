@@ -21,7 +21,8 @@ import java.util.Set;
 
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
@@ -137,7 +138,7 @@ public class Goal implements GoalView {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("GoalView");
+		CompoundTree tree = new DefaultCompoundTree("GoalView");
 
 		tree.append("groupId", this.groupId)
 				.append("artifactId", this.artifactId)

@@ -17,7 +17,8 @@ package net.runeduniverse.tools.maven.r4m.grm;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
 
 public class DefaultGrmSelectorConfig implements GoalRequirementArchiveSelectorConfig {
@@ -50,10 +51,10 @@ public class DefaultGrmSelectorConfig implements GoalRequirementArchiveSelectorC
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new CompoundTree("GRM Selector Config");
+		final CompoundTree tree = new DefaultCompoundTree("GRM Selector Config");
 
 		if (this.mvnProject != null)
-			tree.append(new CompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())
+			tree.append(new DefaultCompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())
 					.append("artifactId", this.mvnProject.getArtifactId())
 					.append("version", this.mvnProject.getVersion()));
 

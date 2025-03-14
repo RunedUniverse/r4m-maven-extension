@@ -15,8 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 

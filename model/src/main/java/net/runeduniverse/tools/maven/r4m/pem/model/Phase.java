@@ -19,8 +19,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Phase implements Recordable {
 
@@ -50,7 +51,7 @@ public class Phase implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Phase");
+		CompoundTree tree = new DefaultCompoundTree("Phase");
 
 		tree.append("id", this.id);
 

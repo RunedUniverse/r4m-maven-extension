@@ -17,7 +17,7 @@ package net.runeduniverse.tools.maven.r4m.pem.view.api;
 
 import java.util.Map;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface LifecycleView extends Recordable {
 

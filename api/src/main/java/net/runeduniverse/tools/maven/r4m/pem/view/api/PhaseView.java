@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.pem.view.api;
 import java.util.Collection;
 import java.util.List;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface PhaseView extends Recordable {
 

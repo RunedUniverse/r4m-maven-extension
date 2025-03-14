@@ -21,8 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Fork implements Recordable {
 
@@ -132,7 +133,7 @@ public class Fork implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Fork");
+		CompoundTree tree = new DefaultCompoundTree("Fork");
 
 		if (!this.isValid()) {
 			tree.append("[WARNING]", "insufficient information -> will be ignored!");
@@ -148,14 +149,14 @@ public class Fork implements Recordable {
 			tree.append(this.lifecycle.toRecord());
 
 		if (this.phases != null && !this.phases.isEmpty()) {
-			CompoundTree phasesTree = new CompoundTree("phases");
+			CompoundTree phasesTree = new DefaultCompoundTree("phases");
 			for (TargetPhase phase : this.phases)
 				phasesTree.append(phase.toRecord());
 			tree.append(phasesTree);
 		}
 
 		if (!this.excludePhases.isEmpty()) {
-			CompoundTree phasesTree = new CompoundTree("excluded phases");
+			CompoundTree phasesTree = new DefaultCompoundTree("excluded phases");
 			for (TargetPhase phase : this.excludePhases)
 				phasesTree.append(phase.toRecord());
 			tree.append(phasesTree);

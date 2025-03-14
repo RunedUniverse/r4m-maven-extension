@@ -15,8 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.check;
 
-import net.runeduniverse.lib.utils.conditions.ACondition;
-import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.lib.utils.conditional.ACondition;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;

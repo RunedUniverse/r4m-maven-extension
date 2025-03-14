@@ -30,7 +30,7 @@
 	<version>${major-version}.${minor-version}.${artifact-version}</version>
 	<packaging>jar</packaging>
 
-	<name>Runes4Maven Project Execution Model</name>
+	<name>Runes4Maven Model</name>
 	<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 	<inceptionYear>2022</inceptionYear>
 

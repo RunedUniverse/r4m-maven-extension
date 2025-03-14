@@ -18,8 +18,8 @@ package net.runeduniverse.tools.maven.r4m.grm.check;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
-import net.runeduniverse.lib.utils.conditions.OrCondition;
-import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.lib.utils.conditional.OrCondition;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public class OrCheck extends OrCondition<EntityView> {

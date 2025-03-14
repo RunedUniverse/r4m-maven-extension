@@ -26,7 +26,8 @@ import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
@@ -144,12 +145,12 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 		CompoundTree keyTree = null;
 		CompoundTree subTree = null;
 		for (DataGroup key : keyList) {
-			tree.append(keyTree = new CompoundTree("--- Goal Matches ---"));
-			keyTree.append(subTree = new CompoundTree("» item"));
+			tree.append(keyTree = new DefaultCompoundTree("--- Goal Matches ---"));
+			keyTree.append(subTree = new DefaultCompoundTree("» item"));
 			subTree.append(ModelUtils.toRecord(key));
-			keyTree.append(subTree = new CompoundTree("» before"));
+			keyTree.append(subTree = new DefaultCompoundTree("» before"));
 			appendEntries(subTree, this.matchBefore.get(key));
-			keyTree.append(subTree = new CompoundTree("» after"));
+			keyTree.append(subTree = new DefaultCompoundTree("» after"));
 			appendEntries(subTree, this.matchAfter.get(key));
 		}
 
@@ -213,19 +214,19 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 				CompoundTree sourceTree = map.get(source);
 				if (sourceTree == null)
 					map.put(source,
-							sourceTree = new CompoundTree("source", source == null ? "< null >" : source.key()));
+							sourceTree = new DefaultCompoundTree("source", source == null ? "< null >" : source.key()));
 
 				sourceTree.append(ModelUtils.toRecord(mergeGroup));
 			}
 		}
 
-		CompoundTree subTree = new CompoundTree("origin", "user-defined");
+		CompoundTree subTree = new DefaultCompoundTree("origin", "user-defined");
 		for (CompoundTree treeEntry : userMap.values()) {
 			subTree.append(treeEntry);
 		}
 		tree.append(subTree);
 
-		subTree = new CompoundTree("origin", "project-defined");
+		subTree = new DefaultCompoundTree("origin", "project-defined");
 		for (CompoundTree treeEntry : projectMap.values()) {
 			subTree.append(treeEntry);
 		}

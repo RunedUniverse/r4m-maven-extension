@@ -20,8 +20,9 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class ProjectExecutionModel implements Recordable {
 
@@ -79,7 +80,7 @@ public class ProjectExecutionModel implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("ProjectExecutionModel");
+		CompoundTree tree = new DefaultCompoundTree("ProjectExecutionModel");
 
 		for (Recordable execution : executions)
 			tree.append(execution.toRecord());

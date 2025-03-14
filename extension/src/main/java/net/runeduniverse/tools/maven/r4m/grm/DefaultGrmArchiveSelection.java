@@ -18,9 +18,10 @@ package net.runeduniverse.tools.maven.r4m.grm;
 import java.util.Collection;
 import java.util.Comparator;
 
-import net.runeduniverse.lib.utils.conditions.tools.ConditionComparator;
-import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.conditional.tool.ConditionComparator;
+import net.runeduniverse.lib.utils.conditional.tool.RelationEntrySet;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
@@ -28,10 +29,10 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 public class DefaultGrmArchiveSelection implements GoalRequirementArchiveSelection {
 
 	protected final GoalRequirementArchiveSelectorConfig selectorConfig;
-	protected final EntrySet<EntityView> conditionSet;
+	protected final RelationEntrySet<EntityView> conditionSet;
 
 	public DefaultGrmArchiveSelection(final GoalRequirementArchiveSelectorConfig selectorConfig,
-			final EntrySet<EntityView> conditionSet) {
+			final RelationEntrySet<EntityView> conditionSet) {
 		this.selectorConfig = selectorConfig;
 		this.conditionSet = conditionSet;
 	}
@@ -59,7 +60,7 @@ public class DefaultGrmArchiveSelection implements GoalRequirementArchiveSelecti
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new CompoundTree("GRM Selection");
+		final CompoundTree tree = new DefaultCompoundTree("GRM Selection");
 
 		tree.append(LoggingUtils.toRecord(this.conditionSet));
 

@@ -19,8 +19,9 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Goal implements Recordable {
 
@@ -166,7 +167,7 @@ public class Goal implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Goal");
+		CompoundTree tree = new DefaultCompoundTree("Goal");
 
 		tree.append("groupId", this.groupId)
 				.append("artifactId", this.artifactId)

@@ -17,7 +17,7 @@ package net.runeduniverse.tools.maven.r4m.grm.check.converter;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.lib.utils.conditions.api.Condition;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
 import net.runeduniverse.tools.maven.r4m.grm.check.ExecutionCheck;
 import net.runeduniverse.tools.maven.r4m.grm.check.converter.api.CheckFactory;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;

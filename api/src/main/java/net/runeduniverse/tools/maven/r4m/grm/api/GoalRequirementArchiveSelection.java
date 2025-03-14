@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.api;
 import java.util.Collection;
 import java.util.Comparator;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public interface GoalRequirementArchiveSelection extends Recordable, Cloneable {

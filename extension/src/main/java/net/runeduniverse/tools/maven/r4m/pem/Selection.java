@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
@@ -136,7 +137,7 @@ public class Selection implements ExecutionArchiveSelection {
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new CompoundTree("PEM Selection");
+		final CompoundTree tree = new DefaultCompoundTree("PEM Selection");
 
 		for (ExecutionView view : views)
 			tree.append(view.toRecord());

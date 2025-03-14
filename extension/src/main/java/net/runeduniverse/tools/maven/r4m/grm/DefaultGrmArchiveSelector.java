@@ -28,9 +28,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.lib.utils.conditions.api.Condition;
-import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
-import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
+import net.runeduniverse.lib.utils.conditional.tool.ConditionIndexer;
+import net.runeduniverse.lib.utils.conditional.tool.RelationEntrySet;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
@@ -218,7 +218,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	}
 
 	@SuppressWarnings("deprecation")
-	protected void getChecks(final GoalRequirementArchiveSector sector, final EntrySet<EntityView> set) {
+	protected void getChecks(final GoalRequirementArchiveSector sector, final RelationEntrySet<EntityView> set) {
 		final Map<DataGroup, Set<MergeDataGroup>> before = collectMatches(sector, //
 				GoalRequirementArchiveSector::getBeforeMatches, //
 				GoalRequirementArchiveSector::getEffectiveBeforeMatches);
@@ -272,7 +272,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	}
 
 	protected void convertToEntrySet(final Map<DataGroup, Set<MergeDataGroup>> before,
-			final Map<DataGroup, Set<MergeDataGroup>> after, final EntrySet<EntityView> set) {
+			final Map<DataGroup, Set<MergeDataGroup>> after, final RelationEntrySet<EntityView> set) {
 		for (Entry<DataGroup, Set<MergeDataGroup>> entry : before.entrySet()) {
 			final Condition<EntityView> match = this.converter.convertEntry(entry.getKey());
 			for (MergeDataGroup group : entry.getValue()) {
@@ -298,7 +298,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	@Override
 	public GoalRequirementArchiveSelection compileSelection(final GoalRequirementArchiveSelectorConfig selectorConfig) {
 		final MavenProject mvnProject = selectorConfig.getActiveProject();
-		final EntrySet<EntityView> set = new EntrySet<>();
+		final RelationEntrySet<EntityView> set = new RelationEntrySet<>();
 		if (mvnProject == null)
 			return new DefaultGrmArchiveSelection(selectorConfig.clone(), set);
 

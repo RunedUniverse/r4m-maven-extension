@@ -19,8 +19,9 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
@@ -64,7 +65,7 @@ public class Phase implements PhaseView {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("PhaseView");
+		CompoundTree tree = new DefaultCompoundTree("PhaseView");
 
 		tree.append("id", this.id);
 

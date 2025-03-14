@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -26,8 +24,11 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
@@ -256,13 +257,13 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new CompoundTree("PEM Selector Config");
+		final CompoundTree tree = new DefaultCompoundTree("PEM Selector Config");
 
 		if (this.dirty)
 			tree.append("[WARNING]", "The SelectorConfig was not compiled prior to recording!");
 
 		if (this.mvnProject != null)
-			tree.append(new CompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())
+			tree.append(new DefaultCompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())
 					.append("artifactId", this.mvnProject.getArtifactId())
 					.append("version", this.mvnProject.getVersion()));
 

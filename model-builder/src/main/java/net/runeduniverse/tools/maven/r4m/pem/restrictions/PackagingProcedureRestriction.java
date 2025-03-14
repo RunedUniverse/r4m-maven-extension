@@ -15,7 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.restrictions;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
@@ -65,7 +66,7 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 
 	@Override
 	public CompoundTree toRecord() {
-		return new CompoundTree("packaging-procedure", this.procedure);
+		return new DefaultCompoundTree("packaging-procedure", this.procedure);
 	}
 
 }

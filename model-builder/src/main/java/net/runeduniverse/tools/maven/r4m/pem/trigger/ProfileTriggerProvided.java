@@ -15,7 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.trigger;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 public class ProfileTriggerProvided extends ProfileTrigger {
@@ -39,7 +40,7 @@ public class ProfileTriggerProvided extends ProfileTrigger {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("ProfileTrigger");
+		CompoundTree tree = new DefaultCompoundTree("ProfileTrigger");
 
 		tree.append("is-provided", this.profileId);
 

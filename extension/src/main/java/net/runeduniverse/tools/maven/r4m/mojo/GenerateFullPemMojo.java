@@ -15,12 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireExecutionArchive;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,10 +33,15 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireExecutionArchive;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
 
 /**
  * generates the full pem.xml from all active maven defaults

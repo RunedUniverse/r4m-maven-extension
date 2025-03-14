@@ -15,11 +15,11 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
+
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
 import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
-
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
 
 public class GoalData extends ADataEntry implements DataEntry, Recordable {
 

@@ -22,7 +22,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 

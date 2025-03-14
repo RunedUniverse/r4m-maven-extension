@@ -109,7 +109,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-conditions</artifactId>
+			<artifactId>utils-conditional</artifactId>
 			<exclusions>
 				<!-- managed by sources -->
 				<exclusion>

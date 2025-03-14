@@ -15,24 +15,25 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
-import net.runeduniverse.lib.utils.conditions.api.Condition;
-import net.runeduniverse.lib.utils.conditions.tools.ConditionIndexer;
-import net.runeduniverse.lib.utils.conditions.tools.Entry;
-import net.runeduniverse.lib.utils.conditions.tools.EntrySet;
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.conditional.api.Condition;
+import net.runeduniverse.lib.utils.conditional.tool.ConditionIndexer;
+import net.runeduniverse.lib.utils.conditional.tool.RelationEntry;
+import net.runeduniverse.lib.utils.conditional.tool.RelationEntrySet;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class LoggingUtils {
 
-	public static CompoundTree toRecord(final EntrySet<?> set) {
+	public static CompoundTree toRecord(final RelationEntrySet<?> set) {
 		if (set == null)
 			return null;
 		if (set instanceof Recordable)
 			return ((Recordable) set).toRecord();
 
-		final CompoundTree tree = new CompoundTree(set.getClass()
+		final CompoundTree tree = new DefaultCompoundTree(set.getClass()
 				.getCanonicalName());
-		for (Entry<?> entry : set) {
+		for (RelationEntry<?> entry : set) {
 			final CompoundTree subTree = toRecord(entry);
 			if (subTree == null)
 				continue;
@@ -41,30 +42,30 @@ public class LoggingUtils {
 		return tree;
 	}
 
-	public static CompoundTree toRecord(final Entry<?> entry) {
+	public static CompoundTree toRecord(final RelationEntry<?> entry) {
 		if (entry == null)
 			return null;
 		if (entry instanceof Recordable)
 			return ((Recordable) entry).toRecord();
 
-		final CompoundTree tree = new CompoundTree(entry.getClass()
+		final CompoundTree tree = new DefaultCompoundTree(entry.getClass()
 				.getCanonicalName());
 		final ConditionIndexer indexer = new ConditionIndexer();
 		tree.append("valid", Boolean.toString(entry.validate(indexer)));
 
-		CompoundTree subTree = new CompoundTree("match entity");
+		CompoundTree subTree = new DefaultCompoundTree("match entity");
 		Condition<?> con = entry.getMatchItem();
 		if (con != null) {
 			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
-		subTree = new CompoundTree("execute after");
+		subTree = new DefaultCompoundTree("execute after");
 		con = entry.getMatchBefore();
 		if (con != null) {
 			subTree.append(indexer.toRecord(con));
 			tree.append(subTree);
 		}
-		subTree = new CompoundTree("execute before");
+		subTree = new DefaultCompoundTree("execute before");
 		con = entry.getMatchAfter();
 		if (con != null) {
 			subTree.append(indexer.toRecord(con));

@@ -124,33 +124,10 @@
 
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-common</artifactId>
-				<version>${runeduniverse-utils-common-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-conditions</artifactId>
-				<version>${runeduniverse-utils-conditions-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-logging</artifactId>
-				<version>${runeduniverse-utils-logging-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-plexus</artifactId>
-				<version>${runeduniverse-utils-plexus-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-maven</artifactId>
-				<version>${runeduniverse-utils-maven-version}</version>
-			</dependency>
-			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-maven-ext</artifactId>
-				<version>${runeduniverse-utils-maven-ext-version}</version>
+				<artifactId>utils-bom</artifactId>
+				<version>2.0.0</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<!-- COMPILER -->

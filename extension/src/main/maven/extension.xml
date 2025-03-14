@@ -62,13 +62,15 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.logging
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
+		<exportedPackage>net.runeduniverse.lib.utils.logging.log
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.conditions
+		<exportedPackage>net.runeduniverse.lib.utils.logging.log.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.conditions.api
+		<exportedPackage>net.runeduniverse.lib.utils.conditional
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.conditions.tools
+		<exportedPackage>net.runeduniverse.lib.utils.conditional.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditional.tool
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.maven
 		</exportedPackage>
@@ -94,13 +96,23 @@
 		</exportedArtifact>
 
 		<!-- runeduniverse-utils -->
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-common-api
+		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging-api
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
 		</exportedArtifact>
-		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditions
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditional-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditional
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-api
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-ext-api
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-ext
 		</exportedArtifact>

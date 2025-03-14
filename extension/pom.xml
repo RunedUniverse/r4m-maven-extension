@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-maven-extension</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>${major-version}.${minor-version}.${patch-version}</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Runes4Maven Extension</name>
@@ -38,8 +38,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>0</artifact-version>
-		<artifact-release>1</artifact-release>
+		<patch-version>0</patch-version>
+		<artifactt-release>1</artifactt-release>
 		<sources-version>0</sources-version>
 		<sources-release>1</sources-release>
 		<api-version>0</api-version>
@@ -156,35 +156,22 @@
 					<groupId>org.eclipse.sisu</groupId>
 					<artifactId>org.eclipse.sisu.plexus</artifactId>
 				</exclusion>
-				<!-- managed by sources -->
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-common</artifactId>
-				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-maven-ext</artifactId>
 			<exclusions>
+				<!-- provided by maven-core -->
 				<exclusion>
 					<groupId>org.apache.maven</groupId>
 					<artifactId>maven-core</artifactId>
 				</exclusion>
-				<!-- managed by sources -->
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-plexus</artifactId>
-				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-conditional</artifactId>
 		</dependency>
 
 		<!-- COMPILER -->

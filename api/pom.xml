@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-api</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>${major-version}.${minor-version}.${patch-version}</version>
 	<packaging>jar</packaging>
 
 	<name>Runes4Maven API</name>
@@ -38,7 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
-		<artifact-version>0</artifact-version>
+		<patch-version>0</patch-version>
 		<sources-version>0</sources-version>
 		<model-version>1.1.0</model-version>
 	</properties>
@@ -101,78 +101,24 @@
 		<!-- logging utilities-->
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-common</artifactId>
+			<artifactId>utils-logging-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-logging</artifactId>
+			<artifactId>utils-conditional-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-conditional</artifactId>
-			<exclusions>
-				<!-- managed by sources -->
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-logging</artifactId>
-				</exclusion>
-			</exclusions>
+			<artifactId>utils-maven-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-maven</artifactId>
+			<artifactId>utils-maven-ext-api</artifactId>
 			<exclusions>
 				<!-- managed by sources -->
 				<exclusion>
 					<groupId>org.apache.maven</groupId>
 					<artifactId>maven-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-plexus</artifactId>
-			<exclusions>
-				<!-- provided by maven-core -->
-				<exclusion>
-					<groupId>org.codehaus.plexus</groupId>
-					<artifactId>plexus-classworlds</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.eclipse.sisu</groupId>
-					<artifactId>org.eclipse.sisu.plexus</artifactId>
-				</exclusion>
-				<!-- managed by sources -->
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-common</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-maven-ext</artifactId>
-			<exclusions>
-				<!-- managed by sources -->
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-common</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-logging</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>net.runeduniverse.lib.utils</groupId>
-					<artifactId>utils-plexus</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

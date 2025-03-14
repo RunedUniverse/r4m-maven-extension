@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-model-builder</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>${major-version}.${minor-version}.${patch-version}</version>
 	<packaging>jar</packaging>
 
 	<name>Runes4Maven Model Builder</name>
@@ -38,7 +38,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
-		<artifact-version>0</artifact-version>
+		<patch-version>0</patch-version>
 		<sources-version>0</sources-version>
 		<api-version>0</api-version>
 		<model-version>1.1.0</model-version>

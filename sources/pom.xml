@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-bom-sources</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>${major-version}.${minor-version}.${patch-version}</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Bill of Sources</name>
@@ -38,19 +38,14 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>0</artifact-version>
+		<patch-version>0</patch-version>
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>1.2.0</runeduniverse-utils-common-version>
-		<runeduniverse-utils-conditions-version>1.0.0</runeduniverse-utils-conditions-version>
-		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
-		<runeduniverse-utils-plexus-version>1.0.0</runeduniverse-utils-plexus-version>
-		<runeduniverse-utils-maven-version>1.0.0</runeduniverse-utils-maven-version>
-		<runeduniverse-utils-maven-ext-version>1.0.0</runeduniverse-utils-maven-ext-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
 		<apache-commons-lang3-version>3.8.1</apache-commons-lang3-version>
 		<apache-commons-io-version>2.6</apache-commons-io-version>
-		<!-- ARTIFACT VERSIONS - TESTING -->
+		<!-- ARTIFACT VERSIONS - BOMs -->
+		<runeduniverse-utils-bom-version>2.0.0</runeduniverse-utils-bom-version>
 	</properties>
 
 
@@ -125,7 +120,7 @@
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
 				<artifactId>utils-bom</artifactId>
-				<version>2.0.0</version>
+				<version>${runeduniverse-utils-bom-version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

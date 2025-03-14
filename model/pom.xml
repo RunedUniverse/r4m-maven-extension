@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-model</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>${major-version}.${minor-version}.${patch-version}</version>
 	<packaging>jar</packaging>
 
 	<name>Runes4Maven Model</name>
@@ -39,7 +39,7 @@
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
 		<minor-version>1</minor-version>
-		<artifact-version>0</artifact-version>
+		<patch-version>0</patch-version>
 		<sources-version>0</sources-version>
 	</properties>
 

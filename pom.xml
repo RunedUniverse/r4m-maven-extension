@@ -92,23 +92,23 @@
 		<!-- ARTIFACT VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
 		<!-- ARTIFACT VERSIONS - COMPILER -->
-		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
-		<plexus-component-version>1.7.1</plexus-component-version>
-		<plugin-maven-clean-version>3.1.0</plugin-maven-clean-version>
-		<plugin-maven-toolchains-version>3.1.0</plugin-maven-toolchains-version>
-		<plugin-maven-resources-version>3.2.0</plugin-maven-resources-version>
-		<plugin-maven-compiler-version>3.8.0</plugin-maven-compiler-version>
-		<plugin-maven-jar-version>3.0.2</plugin-maven-jar-version>
-		<plugin-maven-source-version>3.2.1</plugin-maven-source-version>
-		<plugin-maven-javadoc-version>3.2.0</plugin-maven-javadoc-version>
-		<plugin-maven-install-version>3.0.0-M1</plugin-maven-install-version>
-		<plugin-revelc-formatter-version>2.23.0</plugin-revelc-formatter-version>
-		<plugin-mycila-license-version>4.2.rc1</plugin-mycila-license-version>
-		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
-		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
-		<plugin-maven-deploy-version>3.0.0-M2</plugin-maven-deploy-version>
+		<maven-plugin-plugin-version>3.15.1</maven-plugin-plugin-version>
+		<plexus-component-version>2.2.0</plexus-component-version>
+		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
+		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
+		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>
+		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
+		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
+		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
+		<plugin-maven-javadoc-version>3.11.2</plugin-maven-javadoc-version>
+		<plugin-maven-install-version>3.1.4</plugin-maven-install-version>
+		<plugin-revelc-formatter-version>2.25.0</plugin-revelc-formatter-version>
+		<plugin-mycila-license-version>4.6</plugin-mycila-license-version>
+		<plugin-maven-gpg-version>3.2.7</plugin-maven-gpg-version>
+		<plugin-mojohaus-build-helper-version>3.6.0</plugin-mojohaus-build-helper-version>
+		<plugin-maven-deploy-version>3.1.4</plugin-maven-deploy-version>
 		<!-- ARTIFACT VERSIONS - PACKAGER -->
-		<plugin-maven-dependency-version>3.6.1</plugin-maven-dependency-version>
+		<plugin-maven-dependency-version>3.8.1</plugin-maven-dependency-version>
 		<plugin-dentrassi-rpm-version>1.13.0</plugin-dentrassi-rpm-version>
 	</properties>
 

@@ -93,7 +93,7 @@
 		<maven-version-min>3.3.9</maven-version-min>
 		<!-- ARTIFACT VERSIONS - COMPILER -->
 		<maven-plugin-plugin-version>3.15.1</maven-plugin-plugin-version>
-		<plexus-component-version>2.2.0</plexus-component-version>
+		<plexus-component-version>1.7.1</plexus-component-version>
 		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
 		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
 		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>

@@ -88,7 +88,7 @@
 		<!-- VERSIONS -->
 		<major-version>1</major-version>
 		<minor-version>1</minor-version>
-		<artifact-version>0</artifact-version>
+		<patch-version>X</patch-version>
 		<!-- ARTIFACT VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
 		<!-- ARTIFACT VERSIONS - COMPILER -->

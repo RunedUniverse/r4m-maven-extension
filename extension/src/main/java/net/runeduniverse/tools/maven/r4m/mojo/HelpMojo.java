@@ -19,6 +19,11 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import net.runeduniverse.tools.maven.r4m.api.Settings;
+
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+
 /**
  * prints the help-page
  *
@@ -31,8 +36,16 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class HelpMojo extends AbstractMojo {
 
+	/**
+	 * @component
+	 */
+	private Settings settings;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		boolean supported = supportsExtensionFeatures(this.settings);
+		if (!supported)
+			warnExtensionFeatureState(getLog());
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Help\033[m");
 		getLog().info("");
@@ -43,6 +56,24 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info("     Prints goal/lifecycle tasks help-page.");
 		getLog().info("     It describes how the new build argument 'lifecycle-tasks' works.");
 		getLog().info("");
+		if (supported) {
+			extInfo();
+		}
+		getLog().info(" r4m:status");
+		getLog().info("     Shows the status of all r4m features.");
+		getLog().info("");
+		getLog().info(" r4m:help-debug");
+		getLog().info("     Prints the debug help-page.");
+		getLog().info("     It lists debug goals which can help trace unexpected problems.");
+		getLog().info("");
+		if (!supported) {
+			getLog().info("\033[1m ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ Disabled ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼\033[m");
+			getLog().info("");
+			extInfo();
+		}
+	}
+
+	private void extInfo() {
 		getLog().info(" r4m:gen-full-pem");
 		getLog().info("     Discovers all loaded Executions which influence the current project");
 		getLog().info("     build lifecycles. Discovered Executions will be condensed as much");
@@ -54,13 +85,6 @@ public class HelpMojo extends AbstractMojo {
 		getLog().info("     the current project build lifecycles. Discovered Executions will be");
 		getLog().info("     condensed as much as possible and written to the 'rel-pem.xml' file");
 		getLog().info("     in the defined build directory.");
-		getLog().info("");
-		getLog().info(" r4m:status");
-		getLog().info("     Shows the status of all r4m features.");
-		getLog().info("");
-		getLog().info(" r4m:help-debug");
-		getLog().info("     Prints the debug help-page.");
-		getLog().info("     It lists debug goals which can help trace unexpected problems.");
 		getLog().info("");
 	}
 }

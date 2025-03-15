@@ -26,6 +26,7 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
 @Component(role = Settings.class, instantiationStrategy = "keep-alive")
 public class R4MSettings extends APropertyStore implements Settings {
 
+	private LoadState loadState = LoadState.PLUGIN;
 	private Property<String> lifecycleTaskRequestCalculator = null;
 	private Property<String> lifecycleTaskRequestCalculatorOnFork = null;
 	private Property<String> missingBuildPluginHandler = null;
@@ -41,6 +42,11 @@ public class R4MSettings extends APropertyStore implements Settings {
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public LoadState getLoadState() {
+		return this.loadState;
+	}
 
 	@Override
 	public Property<String> getLifecycleTaskRequestCalculator() {
@@ -89,56 +95,60 @@ public class R4MSettings extends APropertyStore implements Settings {
 
 	//////////////////////////////////////////////////////////////////////////
 
+	public void setLoadState(final LoadState state) {
+		this.loadState = state;
+	}
+
 	@Override
-	public void setLifecycleTaskRequestCalculator(Property<String> value) {
+	public void setLifecycleTaskRequestCalculator(final Property<String> value) {
 		this.lifecycleTaskRequestCalculator = value;
 		super.redirectSetProperty(PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR, value);
 	}
 
 	@Override
-	public void setLifecycleTaskRequestCalculatorOnFork(Property<String> value) {
+	public void setLifecycleTaskRequestCalculatorOnFork(final Property<String> value) {
 		this.lifecycleTaskRequestCalculatorOnFork = value;
 		super.redirectSetProperty(PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK, value);
 	}
 
 	@Override
-	public void setMissingBuildPluginHandler(Property<String> value) {
+	public void setMissingBuildPluginHandler(final Property<String> value) {
 		this.missingBuildPluginHandler = value;
 		super.redirectSetProperty(PROP_MISSING_BUILD_PLUGIN_HANDLER, value);
 	}
 
 	@Override
-	public void setActiveProfilesInheritance(Property<String> value) {
+	public void setActiveProfilesInheritance(final Property<String> value) {
 		this.activeProfilesInheritance = value;
 		super.redirectSetProperty(PROP_ACTIVE_PROFILES_INHERITANCE, value);
 	}
 
 	@Override
-	public void setFancyOutput(Property<Boolean> value) {
+	public void setFancyOutput(final Property<Boolean> value) {
 		this.fancyOutput = value;
 		super.redirectSetProperty(PROP_FANCY_OUTPUT, value);
 	}
 
 	@Override
-	public void setPatchMojoOnFork(Property<Boolean> value) {
+	public void setPatchMojoOnFork(final Property<Boolean> value) {
 		this.patchMojoOnFork = value;
 		super.redirectSetProperty(PROP_PATCH_MOJO_ON_FORK, value);
 	}
 
 	@Override
-	public void setGeneratePluginExecutions(Property<Boolean> value) {
+	public void setGeneratePluginExecutions(final Property<Boolean> value) {
 		this.generatePluginExecutions = value;
 		super.redirectSetProperty(PROP_GENERATE_PLUGIN_EXECUTIONS, value);
 	}
 
 	@Override
-	public void setGeneratePluginExecutionsOnFork(Property<Boolean> value) {
+	public void setGeneratePluginExecutionsOnFork(final Property<Boolean> value) {
 		this.generatePluginExecutionsOnFork = value;
 		super.redirectSetProperty(PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK, value);
 	}
 
 	@Override
-	public void setDebugDumpGrmEntriesBeforeExecution(Property<String> value) {
+	public void setDebugDumpGrmEntriesBeforeExecution(final Property<String> value) {
 		this.debugDumpGrmEntriesBeforeExecution = value;
 		super.redirectSetProperty(PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION, value);
 	}

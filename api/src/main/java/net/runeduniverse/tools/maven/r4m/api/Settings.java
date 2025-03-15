@@ -30,6 +30,8 @@ public interface Settings extends PropertyStore {
 	public static final String PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK = "r4m.generate-plugin-executions-on-fork";
 	public static final String PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION = "r4m.debug.dump-grm-entries-before-execution";
 
+	public LoadState getLoadState();
+
 	public Property<String> getLifecycleTaskRequestCalculator();
 
 	public Property<String> getLifecycleTaskRequestCalculatorOnFork();
@@ -47,6 +49,8 @@ public interface Settings extends PropertyStore {
 	public Property<Boolean> getGeneratePluginExecutionsOnFork();
 
 	public Property<String> getDebugDumpGrmEntriesBeforeExecution();
+
+	public void setLoadState(LoadState state);
 
 	public void setLifecycleTaskRequestCalculator(Property<String> value);
 
@@ -66,4 +70,7 @@ public interface Settings extends PropertyStore {
 
 	public void setDebugDumpGrmEntriesBeforeExecution(Property<String> value);
 
+	public static enum LoadState {
+		SYSTEM_EXTENSION, CORE_EXTENSION, BUILD_EXTENSION, PLUGIN
+	}
 }

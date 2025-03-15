@@ -22,6 +22,8 @@
 		<!-- r4m-maven-extension : api -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.SettingsFactory
+		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api

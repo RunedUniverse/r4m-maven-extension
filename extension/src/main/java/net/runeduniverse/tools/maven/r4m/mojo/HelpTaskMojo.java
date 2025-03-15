@@ -15,9 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 /**
  * prints the task help-page
@@ -31,8 +36,15 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class HelpTaskMojo extends AbstractMojo {
 
+	/**
+	 * @component
+	 */
+	private Settings settings;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (!supportsExtensionFeatures(this.settings))
+			warnExtensionFeatureState(getLog());
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Goal/Lifecycle Tasks Help\033[m");
 		getLog().info("");

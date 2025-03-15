@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -24,12 +22,18 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
+import net.runeduniverse.tools.maven.r4m.SettingsFactory;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
 
 /**
  * prints the status-page
@@ -58,12 +62,31 @@ public class StatusMojo extends AbstractMojo {
 	 * @component
 	 */
 	private Settings settings;
+	/**
+	 * @component
+	 */
+	private SettingsFactory settingsFactory;
+	/**
+	 * @parameter default-value="${session}"
+	 * @readonly
+	 */
+	private MavenSession mvnSession;
+
+	private boolean getFancyOutput() {
+		final Property<Boolean> fancy = this.settings.getFancyOutput();
+		if (fancy != null)
+			return fancy.getSelected();
+		this.settingsFactory.setup(this.mvnSession);
+		return this.settings.getFancyOutput()
+				.getSelected();
+	}
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		if (!supportsExtensionFeatures(this.settings))
+			warnExtensionFeatureState(getLog());
 		getLog().info("");
-		Boolean fancy = this.settings.getFancyOutput()
-				.getSelected();
+		Boolean fancy = getFancyOutput();
 		getLog().info("\033[1mRunes4Maven Status\033[m");
 		if (fancy)
 			getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));

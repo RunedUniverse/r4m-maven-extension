@@ -31,7 +31,6 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
-import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.DefaultLifecycleExecutionPlanCalculator;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -61,8 +60,10 @@ import net.runeduniverse.lib.utils.maven.ext.api.ExtensionIndex;
 import net.runeduniverse.lib.utils.maven.ext.data.api.Extension;
 import net.runeduniverse.lib.utils.maven.ext.data.api.ExtensionData;
 import net.runeduniverse.lib.utils.maven.ext.data.api.PluginData;
+import net.runeduniverse.lib.utils.maven.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.api.Settings.LoadState;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
 import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
@@ -89,7 +90,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	@Requirement
 	private PlexusContainer container;
 	@Requirement
-	private EventSpyDispatcher dispatcher;
+	private EventSpyDispatcherProxy dispatcher;
 	@Requirement
 	private Settings settings;
 	@Requirement
@@ -127,7 +128,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 */
 	@Override
 	public void afterSessionStart(MavenSession mvnSession) throws MavenExecutionException {
-		getMvnCorePatcher().markAsCoreExtension();
+		getMvnCorePatcher().flagAsCoreExtension();
 
 		mvnSession.getSettings()
 				.addPluginGroup(Runes4MavenProperties.GROUP_ID);
@@ -155,11 +156,13 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		final MvnCorePatcher patcher = getMvnCorePatcher();
 
 		patcher.withExtensionRealmFactory(this::createExtensionRealm);
+		patcher.withBuildExtensionSupport(this.dispatcher.getFeatureState());
 		// register event hooks
 		patcher.onInfo_PatchingStarted(this::_patchEventInfo_PatchingStarted);
 		patcher.onInfo_SwitchRealmToPlexus(this::_patchEventInfo_SwitchRealmToPlexus);
 		patcher.onInfo_SwitchRealmToMavenExt(this::_patchEventInfo_SwitchRealmToMavenExt);
 		patcher.onInfo_SwitchRealmToBuildExt(this::_patchEventInfo_SwitchRealmToBuildExt);
+		patcher.onInfo_InvalidBuildExtension(this::_patchEventInfo_InvalidBuildExt);
 		patcher.onError_PatchingAborted(this::_patchEventError_PatchingAborted);
 		patcher.onInfo_ResetRealm(this::_patchEventInfo_ResetRealm);
 		patcher.onInfo_ExtensionsDetected(this::_patchEventInfo_ExtensionsDetected);
@@ -367,15 +370,36 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	}
 
 	private void _patchEventInfo_SwitchRealmToPlexus() {
+		this.settings.setLoadState(LoadState.SYSTEM_EXTENSION);
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_PLEXUS_REALM));
 	}
 
 	private void _patchEventInfo_SwitchRealmToMavenExt() {
+		this.settings.setLoadState(LoadState.CORE_EXTENSION);
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_CORE_REALM));
 	}
 
 	private void _patchEventInfo_SwitchRealmToBuildExt() {
+		this.settings.setLoadState(LoadState.BUILD_EXTENSION);
 		this.dispatcher.onEvent(PatchingEvent.createInfoEvent(Type.INFO_ELEVATING_TO_BUILD_REALM));
+	}
+
+	private void _patchEventInfo_InvalidBuildExt() {
+		this.settings.setLoadState(LoadState.BUILD_EXTENSION);
+		this.log.fatalError("╔══════════════════════════════════════════════════════════════════════╗");
+		this.log.fatalError("║                            \033[1m! ATTENTION !\033[m                             ║");
+		this.log.fatalError("║                                                                      ║");
+		this.log.fatalError("║ If you are seeing this message, loading R4M as a build-extension     ║");
+		this.log.fatalError("║    is not supported on your version of Maven!                        ║");
+		this.log.fatalError("╟──────────────────────────────────────────────────────────────────────╢");
+		this.log.fatalError("║ To resolve this R4M has to be configured as a core-extension!        ║");
+		this.log.fatalError("║   Please check your configuration!                                   ║");
+		this.log.fatalError("║                                                                      ║");
+		this.log.fatalError("║   Quick Fix: 'mvn r4m:prj-setup'                                     ║");
+		this.log.fatalError("║                                                                      ║");
+		this.log.fatalError("╟──────────────────────────────────────────────────────────────────────╢");
+		this.log.fatalError("║  Maven Patching was be skipped - most functionality is unavailable!  ║");
+		this.log.fatalError("╚══════════════════════════════════════════════════════════════════════╝");
 	}
 
 	private void _patchEventError_PatchingAborted(final MavenExecutionException ex) {

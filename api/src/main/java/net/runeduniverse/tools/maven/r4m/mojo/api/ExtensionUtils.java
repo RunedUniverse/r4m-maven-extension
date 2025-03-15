@@ -31,6 +31,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -43,22 +44,33 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 
 public interface ExtensionUtils {
 
+	public static void warnExtensionFeatureState(final Log log) {
+		log.warn("╔══════════════════════════════════════════════════════════════════════╗");
+		log.warn("║  R4M is not loaded correctly! - Most functionality is unavailable!   ║");
+		log.warn("╟──────────────────────────────────────────────────────────────────────╢");
+		log.warn("║  Enable all features by loading R4M as a core-extension!             ║");
+		log.warn("╚══════════════════════════════════════════════════════════════════════╝");
+	}
+
 	public static void mojoFailureExtensionLoading(final Log log) throws MojoFailureException {
 		log.error("");
-		log.error("  R4M is not loaded as extension!");
+		log.error("  R4M is not correctly loaded, check your configuration!");
 		log.error("");
-		log.error("  Please check your configuration!");
-		log.error("");
-		log.error("  Example Build-Extension inclusion:");
-		log.error("");
-		log.error("  <plugin>");
-		log.error("      <groupId>net.runeduniverse.tools.maven.r4m</groupId>");
-		log.error("      <artifactId>r4m-maven-extension</artifactId>");
-		log.error("      <version>[0.0.0,)</version>");
-		log.error("      <extensions>true</extensions>");
-		log.error("  </plugin>");
-		log.error("");
-		throw new MojoFailureException("R4M is not loaded as extension!");
+		throw new MojoFailureException("R4M is not correctly loaded!");
+	}
+
+	public static boolean supportsExtensionFeatures(final Settings settings) {
+		if (settings == null)
+			return false;
+		switch (settings.getLoadState()) {
+		case SYSTEM_EXTENSION:
+		case CORE_EXTENSION:
+			return true;
+		case BUILD_EXTENSION:
+		case PLUGIN:
+		default:
+			return false;
+		}
 	}
 
 	@SuppressWarnings("deprecation")

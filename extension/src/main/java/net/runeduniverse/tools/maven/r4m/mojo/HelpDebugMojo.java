@@ -15,9 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 /**
  * prints the help-debug-page
@@ -31,10 +36,22 @@ import org.apache.maven.plugin.MojoFailureException;
  */
 public class HelpDebugMojo extends AbstractMojo {
 
+	/**
+	 * @component
+	 */
+	private Settings settings;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		boolean unsupported = !supportsExtensionFeatures(this.settings);
+		if (unsupported)
+			warnExtensionFeatureState(getLog());
 		getLog().info("");
 		getLog().info("\033[1mRunes4Maven Help: Debug\033[m");
+		if (unsupported) {
+			getLog().info("");
+			getLog().info("\033[1m ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ Disabled ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼\033[m");
+		}
 		getLog().info("");
 		getLog().info(" r4m:help-debug");
 		getLog().info("     Prints this help-page");

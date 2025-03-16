@@ -115,6 +115,7 @@
 				<targetPath>META-INF/r4m</targetPath>
 				<includes>
 					<include>r4m-pem-v*.xsd</include>
+					<include>r4m-grm-v*.xsd</include>
 				</includes>
 			</resource>
 			<resource>

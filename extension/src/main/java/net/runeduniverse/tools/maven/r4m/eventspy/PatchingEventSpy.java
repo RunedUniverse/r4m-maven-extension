@@ -176,7 +176,7 @@ public class PatchingEventSpy implements EventSpy {
 				}
 			}
 			// print extension
-			this.log.info(String.format(INFO_EXTENSIONS_DETECTED_STATUS, "<all>", "extension"));
+			this.log.info(String.format(INFO_EXTENSIONS_DETECTED_STATUS, "< all >", "extension"));
 		}
 		this.log.info("");
 	}

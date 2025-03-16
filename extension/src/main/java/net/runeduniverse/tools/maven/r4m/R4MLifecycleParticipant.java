@@ -76,6 +76,8 @@ import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 @Component(role = AbstractMavenLifecycleParticipant.class, hint = R4MProperties.R4M_LIFECYCLE_PARTICIPANT_HINT)
 public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
+	public static final String ERR_FAILED_TO_LOOKUP_EVENT_SPY_DISPATCHER = //
+			"Failed to lookup EventSpyDispatcher from Maven-Core";
 	public static final String ERR_FAILED_TO_LOAD_MODELS = //
 			"Failed while loading pem.xml & grm.xml from project";
 	public static final String ERR_FAILED_TO_RESOLVE_PLUGIN_ARTIFACT = //
@@ -127,7 +129,14 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	 * construction.
 	 */
 	@Override
-	public void afterSessionStart(MavenSession mvnSession) throws MavenExecutionException {
+	public void afterSessionStart(final MavenSession mvnSession) throws MavenExecutionException {
+		final ClassRealm currentRealm = (ClassRealm) Thread.currentThread()
+				.getContextClassLoader();
+		try {
+			this.dispatcher.locateDispatcherProxy(currentRealm);
+		} catch (ComponentLookupException e) {
+			this.log.fatalError(ERR_FAILED_TO_LOOKUP_EVENT_SPY_DISPATCHER, e);
+		}
 		getMvnCorePatcher().flagAsCoreExtension();
 
 		mvnSession.getSettings()

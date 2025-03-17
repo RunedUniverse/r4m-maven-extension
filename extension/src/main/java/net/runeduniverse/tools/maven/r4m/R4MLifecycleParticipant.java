@@ -137,6 +137,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		} catch (ComponentLookupException e) {
 			this.log.fatalError(ERR_FAILED_TO_LOOKUP_EVENT_SPY_DISPATCHER, e);
 		}
+
 		getMvnCorePatcher().flagAsCoreExtension();
 
 		mvnSession.getSettings()
@@ -156,12 +157,12 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 
 		this.settingsFactory.setup(mvnSession);
 
-		setupMvnCorePatcher();
+		setupMvnCorePatcher(mvnSession);
 
 		getMvnCorePatcher().patchMaven(mvnSession, this::patchMaven);
 	}
 
-	private void setupMvnCorePatcher() {
+	private void setupMvnCorePatcher(final MavenSession mvnSession) {
 		final MvnCorePatcher patcher = getMvnCorePatcher();
 
 		patcher.withExtensionRealmFactory(this::createExtensionRealm);
@@ -171,7 +172,11 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		patcher.onInfo_SwitchRealmToPlexus(this::_patchEventInfo_SwitchRealmToPlexus);
 		patcher.onInfo_SwitchRealmToMavenExt(this::_patchEventInfo_SwitchRealmToMavenExt);
 		patcher.onInfo_SwitchRealmToBuildExt(this::_patchEventInfo_SwitchRealmToBuildExt);
-		patcher.onInfo_InvalidBuildExtension(this::_patchEventInfo_InvalidBuildExt);
+		patcher.onInfo_InvalidBuildExtension(() -> {
+			mvnSession.getSettings()
+					.addPluginGroup(Runes4MavenProperties.GROUP_ID);
+			R4MLifecycleParticipant.this._patchEventInfo_InvalidBuildExt();
+		});
 		patcher.onError_PatchingAborted(this::_patchEventError_PatchingAborted);
 		patcher.onInfo_ResetRealm(this::_patchEventInfo_ResetRealm);
 		patcher.onInfo_ExtensionsDetected(this::_patchEventInfo_ExtensionsDetected);

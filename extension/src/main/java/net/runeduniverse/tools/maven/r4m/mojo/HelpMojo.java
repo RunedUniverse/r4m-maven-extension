@@ -19,10 +19,15 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
+import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 /**
  * prints the help-page
@@ -36,6 +41,8 @@ import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExte
  */
 public class HelpMojo extends AbstractMojo {
 
+	public static final String POM_PROP_FILE_TEMPLATE = "META-INF/maven/%s/%s/pom.properties";
+
 	/**
 	 * @component
 	 */
@@ -43,11 +50,25 @@ public class HelpMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		final Properties p = new Properties();
+		try (final InputStream stream = getClass().getClassLoader()
+				.getResourceAsStream(
+						String.format(POM_PROP_FILE_TEMPLATE, R4MProperties.GROUP_ID, R4MProperties.ARTIFACT_ID))) {
+			if (stream != null) {
+				p.load(stream);
+			}
+		} catch (IOException | IllegalArgumentException ignored) {
+			if (getLog().isDebugEnabled())
+				getLog().error("Failed to load pom.properties from Mojo source!", ignored);
+		}
+		String version = p.getProperty("version");
+		version = version == null ? "" : " (v" + version.trim() + ")";
+
 		boolean supported = supportsExtensionFeatures(this.settings);
 		if (!supported)
 			warnExtensionFeatureState(getLog());
 		getLog().info("");
-		getLog().info("\033[1mRunes4Maven Help\033[m");
+		getLog().info("\033[1mRunes4Maven Help" + version + "\033[m");
 		getLog().info("");
 		getLog().info(" r4m:help");
 		getLog().info("     Prints this help-page");
@@ -61,6 +82,9 @@ public class HelpMojo extends AbstractMojo {
 		}
 		getLog().info(" r4m:status");
 		getLog().info("     Shows the status of all r4m features.");
+		getLog().info("");
+		getLog().info(" r4m:setup");
+		getLog().info("     Configures the r4m-maven-extension" + version + " as a Core-Extension.");
 		getLog().info("");
 		getLog().info(" r4m:help-debug");
 		getLog().info("     Prints the debug help-page.");

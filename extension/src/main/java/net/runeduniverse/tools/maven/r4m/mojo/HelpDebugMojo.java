@@ -15,14 +15,16 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.asVersionTag;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.getR4MVersionFromArtifact;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
 
 /**
  * prints the help-debug-page
@@ -43,11 +45,12 @@ public class HelpDebugMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		final String version = asVersionTag(getR4MVersionFromArtifact(getClass(), getLog()));
 		boolean unsupported = !supportsExtensionFeatures(this.settings);
 		if (unsupported)
 			warnExtensionFeatureState(getLog());
 		getLog().info("");
-		getLog().info("\033[1mRunes4Maven Help: Debug\033[m");
+		getLog().info("\033[1mRunes4Maven Help: Debug" + version + "\033[m");
 		if (unsupported) {
 			getLog().info("");
 			getLog().info("\033[1m ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ Disabled ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼\033[m");

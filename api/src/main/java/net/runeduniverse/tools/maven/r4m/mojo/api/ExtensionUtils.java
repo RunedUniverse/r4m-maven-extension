@@ -15,6 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo.api;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -22,14 +24,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
+import net.runeduniverse.lib.utils.maven.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
@@ -71,6 +76,32 @@ public interface ExtensionUtils {
 		default:
 			return false;
 		}
+	}
+
+	public static <T extends Mojo> String getVersionFromArtifact(final Class<T> clazz, final Log log,
+			final String groupId, final String artifactId) {
+		final Properties p = new Properties();
+		try (final InputStream stream = clazz.getClassLoader()
+				.getResourceAsStream(
+						String.format(MavenProperties.METAINF.MAVEN.TMP_POM_PROPERTIES, groupId, artifactId))) {
+			if (stream != null) {
+				p.load(stream);
+			}
+		} catch (IOException | IllegalArgumentException ignored) {
+			if (log.isDebugEnabled())
+				log.error("Failed to load pom.properties from Mojo source!", ignored);
+		}
+		return p.getProperty("version");
+	}
+
+	public static <T extends Mojo> String getR4MVersionFromArtifact(final Class<T> clazz, final Log log) {
+		return getVersionFromArtifact(clazz, log, Runes4MavenProperties.GROUP_ID, Runes4MavenProperties.ARTIFACT_ID);
+	}
+
+	public static String asVersionTag(final String version) {
+		if (version == null)
+			return "";
+		return " (v" + version.trim() + ")";
 	}
 
 	@SuppressWarnings("deprecation")

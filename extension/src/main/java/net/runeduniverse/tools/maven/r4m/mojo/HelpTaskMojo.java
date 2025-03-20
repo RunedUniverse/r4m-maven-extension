@@ -15,14 +15,16 @@
  */
 package net.runeduniverse.tools.maven.r4m.mojo;
 
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
-import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
-
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.asVersionTag;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.getR4MVersionFromArtifact;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
 
 /**
  * prints the task help-page
@@ -43,10 +45,11 @@ public class HelpTaskMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
+		final String version = asVersionTag(getR4MVersionFromArtifact(getClass(), getLog()));
 		if (!supportsExtensionFeatures(this.settings))
 			warnExtensionFeatureState(getLog());
 		getLog().info("");
-		getLog().info("\033[1mRunes4Maven Goal/Lifecycle Tasks Help\033[m");
+		getLog().info("\033[1mRunes4Maven Goal/Lifecycle Tasks Help" + version + "\033[m");
 		getLog().info("");
 		getLog().info(" Maven tasks can be either goal or lifecycle tasks.");
 		getLog().info("   Lifecycle Tasks are sometimes refered to as 'phases'.");

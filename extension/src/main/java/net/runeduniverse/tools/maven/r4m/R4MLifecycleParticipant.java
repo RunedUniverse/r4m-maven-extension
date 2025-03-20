@@ -188,8 +188,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			throws DuplicateRealmException {
 		// we need to reinitiate the r4m-maven-extension realm because maven injects an
 		// outdated version of the plexus-utils
-		final ClassRealm realm = plexusCore
-				.createChildRealm("extension>net.runeduniverse.tools.maven.r4m:r4m-maven-extension");
+		final ClassRealm realm = plexusCore.createChildRealm(R4MProperties.BUILD_EXTENSION_REALM_ID);
 		realm.importFrom(currentRealm, "net.runeduniverse.tools.maven.r4m");
 		realm.importFrom(currentRealm, "net.runeduniverse.lib.utils");
 		return realm;
@@ -409,7 +408,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.log.fatalError("║ To resolve this R4M has to be configured as a core-extension!        ║");
 		this.log.fatalError("║   Please check your configuration!                                   ║");
 		this.log.fatalError("║                                                                      ║");
-		this.log.fatalError("║   Quick Fix: 'mvn r4m:prj-setup'                                     ║");
+		this.log.fatalError("║   Quick Fix: 'mvn r4m:setup'                                         ║");
 		this.log.fatalError("║                                                                      ║");
 		this.log.fatalError("╟──────────────────────────────────────────────────────────────────────╢");
 		this.log.fatalError("║  Maven Patching was be skipped - most functionality is unavailable!  ║");

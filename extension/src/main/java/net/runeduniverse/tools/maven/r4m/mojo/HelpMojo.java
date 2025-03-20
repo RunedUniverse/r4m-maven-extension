@@ -24,6 +24,8 @@ import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.getR4MVersionFromArtifact;
+import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.asVersionTag;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,8 +43,6 @@ import java.util.Properties;
  */
 public class HelpMojo extends AbstractMojo {
 
-	public static final String POM_PROP_FILE_TEMPLATE = "META-INF/maven/%s/%s/pom.properties";
-
 	/**
 	 * @component
 	 */
@@ -50,20 +50,7 @@ public class HelpMojo extends AbstractMojo {
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
-		final Properties p = new Properties();
-		try (final InputStream stream = getClass().getClassLoader()
-				.getResourceAsStream(
-						String.format(POM_PROP_FILE_TEMPLATE, R4MProperties.GROUP_ID, R4MProperties.ARTIFACT_ID))) {
-			if (stream != null) {
-				p.load(stream);
-			}
-		} catch (IOException | IllegalArgumentException ignored) {
-			if (getLog().isDebugEnabled())
-				getLog().error("Failed to load pom.properties from Mojo source!", ignored);
-		}
-		String version = p.getProperty("version");
-		version = version == null ? "" : " (v" + version.trim() + ")";
-
+		final String version = asVersionTag(getR4MVersionFromArtifact(getClass(), getLog()));
 		boolean supported = supportsExtensionFeatures(this.settings);
 		if (!supported)
 			warnExtensionFeatureState(getLog());

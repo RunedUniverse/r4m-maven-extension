@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.pem;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -34,6 +35,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
+	private final Properties properties = new Properties();
 	private final Set<String> activeExecutions = new LinkedHashSet<>();
 	private final Set<String> activeProfiles = new LinkedHashSet<>();
 	private final Set<String> providedProfiles = new LinkedHashSet<>();
@@ -147,6 +149,13 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
+	public ExecutionArchiveSelectorConfig clearProperties() {
+		this.dirty = true;
+		this.properties.clear();
+		return this;
+	}
+
+	@Override
 	public ExecutionArchiveSelectorConfig clearPackagingProcedure() {
 		this.dirty = true;
 		this.packagingProcedure = null;
@@ -184,6 +193,11 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public MavenProject getActiveProject() {
 		return this.mvnProject;
+	}
+
+	@Override
+	public Properties getProperties() {
+		return this.properties;
 	}
 
 	@Override
@@ -233,6 +247,11 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 			return;
 
 		this.dirty = false;
+
+		this.properties.clear();
+		this.properties.putAll(mvnSession.getSystemProperties());
+		this.properties.putAll(this.mvnProject.getProperties());
+		this.properties.putAll(mvnSession.getUserProperties());
 
 		if (this.providedProfiles.isEmpty()) {
 			this.providedProfiles.addAll(mvnSession.getSettings()

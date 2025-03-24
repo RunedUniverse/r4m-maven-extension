@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -60,6 +61,8 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig clearActiveProject();
 
+	public ExecutionArchiveSelectorConfig clearProperties();
+
 	public ExecutionArchiveSelectorConfig clearPackagingProcedure();
 
 	public ExecutionArchiveSelectorConfig clearActiveExecution();
@@ -71,6 +74,8 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 	public ExecutionArchiveSelectorConfig clearModes();
 
 	public MavenProject getActiveProject();
+
+	public Properties getProperties();
 
 	public String getPackagingProcedure();
 

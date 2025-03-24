@@ -48,7 +48,7 @@ public class SettingsFactory {
 
 		builder.withProperties( //
 				mvnSession::getSystemProperties, //
-				mvnSession.getCurrentProject()::getProperties, //
+				mvnSession.getTopLevelProject()::getProperties, //
 				mvnSession::getUserProperties //
 		);
 

@@ -91,6 +91,13 @@
 						</xs:documentation>
 					</xs:annotation>
 				</xs:element>
+				<xs:element name="property" type="Property">
+					<xs:annotation>
+						<xs:documentation>
+							Used to match a property.
+						</xs:documentation>
+					</xs:annotation>
+				</xs:element>
 				<xs:any namespace="##other">
 					<xs:annotation>
 						<xs:documentation>
@@ -101,6 +108,53 @@
 				</xs:any>
 			</xs:choice>
 		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="Property">
+		<xs:attribute name="id" type="AnyId" use="required" />
+		<xs:attribute name="inverted" type="BooleanValue"
+			use="optional" default="false">
+			<xs:annotation>
+				<xs:documentation>
+					If 'inverted' is set to 'true', this check's
+					result will be inverted.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="exists" type="BooleanValue"
+			use="optional" default="true">
+			<xs:annotation>
+				<xs:documentation>
+					If 'exists' is set to 'false', this check is true
+					if no property with the given id exists at the point in time of
+					evaluation.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="value" type="AnyId" use="optional">
+			<xs:annotation>
+				<xs:documentation>
+					The 'value' will only be matched if 'exists' is
+					set to 'true'. If 'value' is not set and 'exists' is set to 'true'
+					the result will be true if any property with the given 'id' exists.
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="match" use="optional"
+			default="equals">
+			<xs:annotation>
+				<xs:documentation>
+					Defines how the 'value' will be evaluated.
+				</xs:documentation>
+			</xs:annotation>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="equals" />
+					<xs:enumeration value="equals-ignore-case" />
+					<xs:enumeration value="regex" />
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
 	</xs:complexType>
 
 	<xs:complexType name="ExecutionTriggers">
@@ -221,14 +275,8 @@
 			<xs:element name="fork" type="Fork" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="AnyId" use="required" />
-		<xs:attribute name="optional" use="optional"
-			default="true">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="true" />
-					<xs:enumeration value="false" />
-				</xs:restriction>
-			</xs:simpleType>
+		<xs:attribute name="optional" type="BooleanValue"
+			use="optional" default="true">
 		</xs:attribute>
 	</xs:complexType>
 
@@ -376,6 +424,12 @@
 	<xs:simpleType name="AnyId">
 		<xs:restriction base="xs:string">
 			<xs:pattern value="\s*\S+\s*" />
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="BooleanValue">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="true" />
+			<xs:enumeration value="false" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="PackagingId">

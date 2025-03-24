@@ -20,6 +20,8 @@ import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+
 public class PackagingProcedureRestriction implements ExecutionRestriction<ExecutionArchiveSelectorConfig> {
 
 	public static final String HINT = "packaging-procedure";
@@ -59,14 +61,11 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 		if (!(obj instanceof PackagingProcedureRestriction))
 			return false;
 		final PackagingProcedureRestriction restriction = (PackagingProcedureRestriction) obj;
-		if (this.procedure == null)
-			return restriction.getPackagingProcedure() == null;
-		return this.procedure.equals(restriction.getPackagingProcedure());
+		return objectEquals(this.procedure, restriction.getPackagingProcedure());
 	}
 
 	@Override
 	public CompoundTree toRecord() {
 		return new DefaultCompoundTree("packaging-procedure", this.procedure);
 	}
-
 }

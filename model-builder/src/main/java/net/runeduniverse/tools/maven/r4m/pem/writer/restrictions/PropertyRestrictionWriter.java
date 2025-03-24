@@ -36,19 +36,23 @@ public class PropertyRestrictionWriter implements ExecutionRestrictionWriter {
 		setAttribute(node, "id", rest.getId());
 		setAttributeSkipDefault(node, "inverted", rest.getInverted(), false);
 		setAttributeSkipDefault(node, "exists", rest.getExists(), true);
-		setAttributeSkipDefault(node, "value", rest.getValue(), null);
+		setAttribute(node, "value", rest.getValue());
 		setAttributeSkipDefault(node, "match", rest.getMatchType(), MatchType.EQUALS);
 
 		return true;
 	}
 
 	protected void setAttribute(final PlexusConfiguration node, final String name, final String value) {
+		if (value == null)
+			return;
 		node.setAttribute(name, value);
 	}
 
 	protected void setAttributeSkipDefault(final PlexusConfiguration node, final String name, final Object value,
 			final Object defaultValue) {
-		if (defaultValue.equals(value))
+		if (value == null)
+			return;
+		if (defaultValue != null && defaultValue.equals(value))
 			return;
 		node.setAttribute(name, value.toString());
 	}

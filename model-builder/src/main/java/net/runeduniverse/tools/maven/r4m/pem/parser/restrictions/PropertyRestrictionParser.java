@@ -24,6 +24,8 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction.MatchType;
 
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
 @Component(role = ExecutionRestrictionParser.class, hint = PropertyRestriction.HINT)
 public class PropertyRestrictionParser implements ExecutionRestrictionParser {
 
@@ -34,6 +36,9 @@ public class PropertyRestrictionParser implements ExecutionRestrictionParser {
 		final boolean exists = asBoolean(node.getAttribute("exists", null), true);
 		final String value = asId(node.getAttribute("value", null));
 		final MatchType type = asMatchType(node.getAttribute("match", null), MatchType.EQUALS);
+		// skip invalid restriction
+		if (isBlank(id))
+			return null;
 		return new PropertyRestriction(id, inverted, exists, value, type);
 	}
 

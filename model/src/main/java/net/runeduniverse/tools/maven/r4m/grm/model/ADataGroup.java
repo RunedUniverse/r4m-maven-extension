@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
 import java.util.Collection;
 import java.util.function.Supplier;

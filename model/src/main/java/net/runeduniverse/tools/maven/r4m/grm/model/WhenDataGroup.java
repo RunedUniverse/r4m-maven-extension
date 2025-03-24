@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
 public class WhenDataGroup extends OrDataGroup implements Recordable {
 

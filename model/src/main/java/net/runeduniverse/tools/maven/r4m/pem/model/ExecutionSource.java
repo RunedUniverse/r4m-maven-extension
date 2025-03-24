@@ -15,10 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import net.runeduniverse.lib.utils.common.api.Keyed;
+
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.keyedEquals;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 /*
  * merge-procedure of sources
@@ -28,7 +32,7 @@ import java.util.Map;
  * 3. $pem = $pem merges with PLUGIN by replacing all goals which are also defined in PLUGIN
  * 4. $pem = OVERRIDE merges with $pem by replacing all lifecycles which are also defined in $pem
  */
-public class ExecutionSource {
+public class ExecutionSource implements Keyed {
 
 	@Deprecated
 	public static final Map<String, ExecutionSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
@@ -47,16 +51,19 @@ public class ExecutionSource {
 		ExecutionSource.KNOWN_SOURCES.put(key, this);
 	}
 
+	@Override
 	public String key() {
 		return this.key;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ExecutionSource))
-			return false;
+	public int hashCode() {
+		return hash(this.key);
+	}
 
-		return this.key.equals(((ExecutionSource) obj).key());
+	@Override
+	public boolean equals(final Object obj) {
+		return keyedEquals(ExecutionSource.class, this, obj);
 	}
 
 	@Override

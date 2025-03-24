@@ -18,8 +18,8 @@ package net.runeduniverse.tools.maven.r4m.grm.model;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
-import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.strEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.StringUtils.strEquals;
 
 public class PackagingData extends ADataEntry implements DataEntry, Recordable {
 

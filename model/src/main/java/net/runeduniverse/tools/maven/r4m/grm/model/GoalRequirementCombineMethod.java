@@ -15,12 +15,15 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class GoalRequirementCombineMethod {
+import net.runeduniverse.lib.utils.common.api.Keyed;
+
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+public class GoalRequirementCombineMethod implements Keyed {
 
 	@Deprecated
 	private static final Map<String, GoalRequirementCombineMethod> KNOWN_VALUES = new LinkedHashMap<>(4);
@@ -37,8 +40,14 @@ public class GoalRequirementCombineMethod {
 		GoalRequirementCombineMethod.KNOWN_VALUES.put(key, this);
 	}
 
+	@Override
 	public String key() {
 		return this.key;
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(this.key);
 	}
 
 	@Override

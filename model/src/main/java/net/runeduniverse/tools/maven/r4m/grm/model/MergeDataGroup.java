@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm.model;
 
-import static net.runeduniverse.tools.maven.r4m.grm.model.ModelUtils.hash;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
 public class MergeDataGroup extends MatchDataGroup {
 

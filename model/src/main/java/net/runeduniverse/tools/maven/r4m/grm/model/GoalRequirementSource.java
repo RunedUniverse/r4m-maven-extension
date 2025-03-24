@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
+import net.runeduniverse.lib.utils.common.api.Keyed;
+
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 /*
@@ -30,7 +33,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
  * 3. $grm = $grm merges with PLUGIN by replacing all goals which are also defined in PLUGIN, required flag must match for replace and remove!
  * 4. $grm = OVERRIDE merges with $grm by replacing (configurable!) all goals which are also defined in $grm
  */
-public class GoalRequirementSource {
+public class GoalRequirementSource implements Keyed {
 
 	@Deprecated
 	private static final Map<String, GoalRequirementSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
@@ -64,12 +67,18 @@ public class GoalRequirementSource {
 		GoalRequirementSource.KNOWN_PRIORITIES.add(this.priority);
 	}
 
+	@Override
 	public String key() {
 		return this.key;
 	}
 
 	public GoalRequirementCombineMethod defaultCombineMethod() {
 		return this.defaultCombineMethod;
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(this.key);
 	}
 
 	@Override

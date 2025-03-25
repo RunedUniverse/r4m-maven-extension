@@ -166,8 +166,7 @@
 				<xs:annotation>
 					<xs:documentation>
 						Configures this execution to be never active.
-						Overrides 'always' active
-						flag!
+						Overrides 'always' active flag!
 					</xs:documentation>
 				</xs:annotation>
 				<xs:complexType />

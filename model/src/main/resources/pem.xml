@@ -37,13 +37,13 @@
 							<goals>
 								<goal id="compiler-summary">
 									<modes>
-										<mode id="default"/>
-										<mode id="dev"/>
+										<mode id="default" />
+										<mode id="dev" />
 									</modes>
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<mode id="default"/>
+										<mode id="default" />
 										<executions>
 											<execution id="default" />
 										</executions>
@@ -56,13 +56,13 @@
 							<goals>
 								<goal id="compiler-summary" optional="true">
 									<modes>
-										<mode id="default"/>
-										<mode id="dev"/>
+										<mode id="default" />
+										<mode id="dev" />
 									</modes>
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<fork>
-										<mode id="default"/>										
+										<mode id="default" />
 										<executions>
 											<execution id="test" />
 										</executions>

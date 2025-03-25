@@ -39,19 +39,14 @@
 
 	<xs:complexType name="Execution">
 		<xs:all>
-			<xs:element name="inherited" default="true" minOccurs="0">
+			<xs:element name="inherited" type="BooleanValue"
+				default="true" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
 						Whether the execution should be propagated to
 						downstream projects.
 					</xs:documentation>
 				</xs:annotation>
-				<xs:simpleType>
-					<xs:restriction base="xs:string">
-						<xs:enumeration value="true" />
-						<xs:enumeration value="false" />
-					</xs:restriction>
-				</xs:simpleType>
 			</xs:element>
 			<xs:element name="restrictions"
 				type="ExecutionRestrictions" minOccurs="0" />
@@ -159,8 +154,24 @@
 
 	<xs:complexType name="ExecutionTriggers">
 		<xs:choice>
-			<xs:element name="always" minOccurs="0" maxOccurs="1" />
-			<xs:element name="never" minOccurs="0" maxOccurs="1" />
+			<xs:element name="always" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Configures this execution to be always active.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType />
+			</xs:element>
+			<xs:element name="never" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>
+						Configures this execution to be never active.
+						Overrides 'always' active
+						flag!
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType />
+			</xs:element>
 			<xs:sequence>
 				<xs:element name="default" minOccurs="0" maxOccurs="1">
 					<xs:annotation>
@@ -169,6 +180,7 @@
 							Execution got explicitly specified via maven '@execution-id'.
 						</xs:documentation>
 					</xs:annotation>
+					<xs:complexType />
 				</xs:element>
 				<xs:element name="on-call" minOccurs="0" maxOccurs="1">
 					<xs:annotation>
@@ -177,6 +189,7 @@
 							'@execution-id'.
 						</xs:documentation>
 					</xs:annotation>
+					<xs:complexType />
 				</xs:element>
 				<xs:choice minOccurs="0" maxOccurs="unbounded">
 					<xs:element name="active-profile" type="Profile">

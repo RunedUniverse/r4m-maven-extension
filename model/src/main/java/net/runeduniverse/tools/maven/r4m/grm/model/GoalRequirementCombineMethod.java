@@ -66,11 +66,7 @@ public class GoalRequirementCombineMethod implements Keyed {
 
 		key = key.trim()
 				.toLowerCase();
-		final GoalRequirementCombineMethod source = GoalRequirementCombineMethod.KNOWN_VALUES.get(key);
-		if (source == null)
-			return new GoalRequirementCombineMethod(key);
-		else
-			return source;
+		return GoalRequirementCombineMethod.KNOWN_VALUES.getOrDefault(key, new GoalRequirementCombineMethod(key));
 	}
 
 	public static GoalRequirementCombineMethod get(final String key) {

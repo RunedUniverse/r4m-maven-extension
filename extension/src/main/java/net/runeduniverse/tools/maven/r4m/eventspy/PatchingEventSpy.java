@@ -47,11 +47,11 @@ public class PatchingEventSpy implements EventSpy {
 	private Logger log;
 
 	@Override
-	public void init(Context context) throws Exception {
+	public void init(final Context context) throws Exception {
 	}
 
 	@Override
-	public void onEvent(Object eventObj) throws Exception {
+	public void onEvent(final Object eventObj) throws Exception {
 
 		if (!(eventObj instanceof PatchingEvent))
 			return;
@@ -97,14 +97,14 @@ public class PatchingEventSpy implements EventSpy {
 	public void close() throws Exception {
 	}
 
-	protected String id(MavenProject mvnProject) {
+	protected String id(final MavenProject mvnProject) {
 		if (mvnProject == null)
 			return null;
 		return String.format("%s:%s:%s:%s", mvnProject.getGroupId(), mvnProject.getArtifactId(),
 				mvnProject.getPackaging(), mvnProject.getVersion());
 	}
 
-	private void printBox(PatchingEvent event) {
+	private void printBox(final PatchingEvent event) {
 		if (event.getType() == Type.INFO_PATCHING_STARTED) {
 			this.log.info("------------------------------------------------------------------------\033[m");
 			this.log.info("\033[1mRunes4Maven Extension: patching Maven\033[m");
@@ -116,7 +116,7 @@ public class PatchingEventSpy implements EventSpy {
 			this.log.error("\033[1;31mpatching aborted\u001B[0m", event.getException());
 	}
 
-	private void printExtensionState(PatchingEvent event) {
+	private void printExtensionState(final PatchingEvent event) {
 		if (event.getType() == Type.INFO_ELEVATING_TO_PLEXUS_REALM)
 			this.log.info("State: Core-Extension (system)");
 		if (event.getType() == Type.INFO_ELEVATING_TO_CORE_REALM)
@@ -134,13 +134,12 @@ public class PatchingEventSpy implements EventSpy {
 	private static final String INFO_EXTENSIONS_DETECTED_STATUS = //
 			"    - %-51s [ %10s ]";
 
-	private void printDetectedExtensions(PatchingEvent patchingEvent) {
-		ExtensionPatchingEvent event = null;
+	private void printDetectedExtensions(final PatchingEvent patchingEvent) {
+		final ExtensionPatchingEvent event;
 		if (patchingEvent instanceof ExtensionPatchingEvent)
 			event = (ExtensionPatchingEvent) patchingEvent;
-		if (event == null) {
+		else
 			return;
-		}
 		this.log.info(INFO_EXTENSIONS_DETECTED_HEAD);
 
 		final Collection<MavenProject> projects = event.getProjects();
@@ -188,8 +187,8 @@ public class PatchingEventSpy implements EventSpy {
 	private static final String WARN_INVALID_PLUGIN_DETECTED = //
 			"  » %s:%s:%s";
 
-	private void warnInvalidPlugins(PatchingEvent event) {
-		Map<MavenProject, Set<Plugin>> invalidPluginsMap = new LinkedHashMap<>();
+	private void warnInvalidPlugins(final PatchingEvent event) {
+		final Map<MavenProject, Set<Plugin>> invalidPluginsMap = new LinkedHashMap<>();
 		if (event instanceof MavenPluginPatchingEvent)
 			invalidPluginsMap.putAll(((MavenPluginPatchingEvent) event).getEffectedPluginsPerProject());
 		if (invalidPluginsMap.isEmpty())
@@ -212,11 +211,11 @@ public class PatchingEventSpy implements EventSpy {
 	private static final String DEBUG_UPDATING_PLEXUS_COMPONENT_DESCRIPTOR = //
 			"Updating ComponentDescriptor of Component<%s> to Role<%s>\tHint: %s";
 
-	private void handlePatchingLifecycleExecutionPlan(PatchingEvent event) {
-		Map<String, CharSequence> data = null;
+	private void handlePatchingLifecycleExecutionPlan(final PatchingEvent event) {
+		final Map<String, CharSequence> data;
 		if (event instanceof MessagePatchingEvent)
 			data = ((MessagePatchingEvent) event).getMessage();
-		if (data == null) {
+		else {
 			if (event.getType() == Type.INFO_LIFECYCLE_EXEC_PLAN_CALC_STARTED)
 				this.log.debug("patching LifecycleExecutionPlanCalculator");
 			return;
@@ -244,36 +243,36 @@ public class PatchingEventSpy implements EventSpy {
 			"  %-54s [%3s | %2.3f s]";
 	private Map<CharSequence, StopWatch> scanRefPluginsStopWatches = new LinkedHashMap<>();
 
-	private void handleScanningReferencedPlugins(PatchingEvent event) {
-		Map<String, CharSequence> data = null;
+	private void handleScanningReferencedPlugins(final PatchingEvent event) {
+		final Map<String, CharSequence> data;
 		if (event instanceof MessagePatchingEvent)
 			data = ((MessagePatchingEvent) event).getMessage();
-		if (data != null) {
-			if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED) {
-				StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
-				if (watch == null) {
-					watch = new StopWatch();
-					this.scanRefPluginsStopWatches.put(data.get("maven-project"), watch);
-				} else
-					watch.reset();
-				watch.start();
-				return;
+		else {
+			if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED) {
+				this.log.info("");
+				this.log.info(INFO_SCANNING_BUNDLED_PLUGINS_STARTED);
 			}
-			if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_FINISHED) {
-				StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
-				if (watch == null || !watch.isStarted())
-					return;
-				watch.stop();
-				long elapsedTime = watch.getTime(TimeUnit.MILLISECONDS);
-				this.log.info(String.format(INFO_SCANNING_BUNDLED_PLUGINS_RESULT, data.get("maven-project"),
-						data.get("amount"), (double) elapsedTime / 1000));
-				return;
-			}
+			return;
 		}
-		if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_STARTED) {
-			this.log.info("");
-			this.log.info(INFO_SCANNING_BUNDLED_PLUGINS_STARTED);
+		if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED) {
+			StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
+			if (watch == null) {
+				watch = new StopWatch();
+				this.scanRefPluginsStopWatches.put(data.get("maven-project"), watch);
+			} else
+				watch.reset();
+			watch.start();
+			return;
+		}
+		if (event.getType() == Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_FINISHED) {
+			final StopWatch watch = this.scanRefPluginsStopWatches.get(data.get("maven-project"));
+			if (watch == null || !watch.isStarted())
+				return;
+			watch.stop();
+			long elapsedTime = watch.getTime(TimeUnit.MILLISECONDS);
+			this.log.info(String.format(INFO_SCANNING_BUNDLED_PLUGINS_RESULT, data.get("maven-project"),
+					data.get("amount"), (double) elapsedTime / 1000));
+			return;
 		}
 	}
-
 }

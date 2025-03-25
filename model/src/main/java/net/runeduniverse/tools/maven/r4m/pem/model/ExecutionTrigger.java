@@ -21,8 +21,8 @@ public interface ExecutionTrigger<T> extends Recordable {
 
 	public String getHint();
 
-	public Class<T> getDataType();
+	public <D extends T> Class<D> getDataType();
 
-	public boolean isActive(final T data);
+	public boolean isActive(T data);
 
 }

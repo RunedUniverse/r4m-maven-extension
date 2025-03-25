@@ -15,8 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.eventspy.api;
 
-import java.util.Collections;
 import java.util.Map;
+
+import net.runeduniverse.lib.utils.common.CollectionUtils;
 
 public interface MessagePatchingEvent extends PatchingEvent {
 
@@ -24,11 +25,12 @@ public interface MessagePatchingEvent extends PatchingEvent {
 
 	public CharSequence getMessage(String key);
 
-	public static MessageEvent createInfoEvent(Type type, Map<String, CharSequence> message) {
+	public static MessageEvent createInfoEvent(final Type type, final Map<String, CharSequence> message) {
 		return new MessageEvent(type, null, message);
 	}
 
-	public static MessageEvent createErrorEvent(Type type, Exception exception, Map<String, CharSequence> message) {
+	public static MessageEvent createErrorEvent(final Type type, final Exception exception,
+			final Map<String, CharSequence> message) {
 		return new MessageEvent(type, exception, message);
 	}
 
@@ -36,7 +38,7 @@ public interface MessagePatchingEvent extends PatchingEvent {
 
 		protected Map<String, CharSequence> message = null;
 
-		public MessageEvent(Type type, Exception exception, Map<String, CharSequence> message) {
+		public MessageEvent(final Type type, Exception exception, final Map<String, CharSequence> message) {
 			super(type, exception);
 			this.message = message;
 		}
@@ -44,7 +46,7 @@ public interface MessagePatchingEvent extends PatchingEvent {
 		public MessageEvent readonly() {
 			if (this.message == null)
 				return this;
-			this.message = Collections.unmodifiableMap(this.message);
+			this.message = CollectionUtils.unmodifiable(this.message);
 			return this;
 		}
 
@@ -54,7 +56,7 @@ public interface MessagePatchingEvent extends PatchingEvent {
 		}
 
 		@Override
-		public CharSequence getMessage(String key) {
+		public CharSequence getMessage(final String key) {
 			if (this.message == null)
 				return null;
 			return this.message.get(key);

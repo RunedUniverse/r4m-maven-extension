@@ -51,19 +51,21 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 	private Map<String, ExecutionTriggerWriter> triggerWriter;
 
 	@Override
-	public void writeModel(OutputStream stream, ProjectExecutionModel pem) throws IOException {
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem) throws IOException {
 		stream.write(convert(pem).toString()
 				.getBytes());
 	}
 
 	@Override
-	public void writeModel(OutputStream stream, ProjectExecutionModel pem, Charset charset) throws IOException {
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final Charset charset)
+			throws IOException {
 		stream.write(convert(pem).toString()
 				.getBytes(charset));
 	}
 
 	@Override
-	public void writeModel(OutputStream stream, ProjectExecutionModel pem, String charsetName) throws IOException {
+	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final String charsetName)
+			throws IOException {
 		stream.write(convert(pem).toString()
 				.getBytes(charsetName));
 	}
@@ -95,7 +97,7 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final Execution execution) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("execution");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("execution");
 		node.setAttribute("source", execution.getSource()
 				.key());
 		node.setAttribute("id", execution.getId());
@@ -113,7 +115,7 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 			}
 		}
 
-		PlexusConfiguration triggerNodes = new XmlPlexusConfiguration("triggers");
+		final PlexusConfiguration triggerNodes = new XmlPlexusConfiguration("triggers");
 		if (execution.isAlwaysActive())
 			triggerNodes.addChild("always", null);
 		if (execution.isDefaultActive())
@@ -121,14 +123,14 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (execution.isNeverActive())
 			triggerNodes.addChild("never", null);
 		for (ExecutionTrigger<?> trigger : execution.getTrigger()) {
-			ExecutionTriggerWriter writer = this.triggerWriter.get(trigger.getHint());
+			final ExecutionTriggerWriter writer = this.triggerWriter.get(trigger.getHint());
 			if (writer != null)
 				writer.append(triggerNodes, trigger);
 		}
 		if (0 < triggerNodes.getChildCount())
 			node.addChild(triggerNodes);
 
-		PlexusConfiguration lifecycleNodes = node.getChild("lifecycles", true);
+		final PlexusConfiguration lifecycleNodes = node.getChild("lifecycles", true);
 		for (Lifecycle lifecycle : execution.getLifecycles()
 				.values())
 			lifecycleNodes.addChild(convert(lifecycle));
@@ -138,10 +140,10 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final Lifecycle lifecycle) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
 		node.setAttribute("id", lifecycle.getId());
 
-		PlexusConfiguration phaseNodes = node.getChild("phases", true);
+		final PlexusConfiguration phaseNodes = node.getChild("phases", true);
 		for (Phase phase : lifecycle.getPhases()
 				.values())
 			phaseNodes.addChild(convert(phase));
@@ -151,10 +153,10 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final Phase phase) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("phase");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("phase");
 		node.setAttribute("id", phase.getId());
 
-		PlexusConfiguration goalNodes = node.getChild("goals", true);
+		final PlexusConfiguration goalNodes = node.getChild("goals", true);
 		for (Goal goal : phase.getGoals())
 			goalNodes.addChild(convert(goal));
 
@@ -163,14 +165,14 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final Goal goal) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("goal");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("goal");
 		node.setAttribute("id", goal.getGoalId());
 		node.addChild("groupId", goal.getGroupId());
 		node.addChild("artifactId", goal.getArtifactId());
 
 		if (!goal.getModes()
 				.isEmpty()) {
-			PlexusConfiguration modeNodes = node.getChild("modes", true);
+			final PlexusConfiguration modeNodes = node.getChild("modes", true);
 			for (String mode : goal.getModes()) {
 				if (isBlank(mode))
 					continue;
@@ -189,18 +191,18 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 	}
 
 	protected PlexusConfiguration convertMode(final String id) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("mode");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("mode");
 		node.setAttribute("id", id);
 		return node;
 	}
 
 	@Override
 	public PlexusConfiguration convert(final Fork fork) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("fork");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("fork");
 
 		if (!fork.getExecutions()
 				.isEmpty()) {
-			PlexusConfiguration executionNodes = node.getChild("executions", true);
+			final PlexusConfiguration executionNodes = node.getChild("executions", true);
 			for (String execution : fork.getExecutions())
 				executionNodes.getChild("execution", true)
 						.setAttribute("id", execution);
@@ -211,14 +213,14 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 		if (fork.getPhases() != null && !fork.getPhases()
 				.isEmpty()) {
-			PlexusConfiguration phaseNodes = node.getChild("phases", true);
+			final PlexusConfiguration phaseNodes = node.getChild("phases", true);
 			for (TargetPhase phase : fork.getPhases())
 				phaseNodes.addChild(convert(phase));
 		}
 
 		if (!fork.getExcludedPhases()
 				.isEmpty()) {
-			PlexusConfiguration excludedPhaseNodes = node.getChild("excludedPhases", true);
+			final PlexusConfiguration excludedPhaseNodes = node.getChild("excludedPhases", true);
 			for (TargetPhase phase : fork.getExcludedPhases())
 				excludedPhaseNodes.addChild(convert(phase));
 		}
@@ -231,7 +233,7 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final TargetLifecycle targetLifecycle) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
 		node.setAttribute("id", targetLifecycle.getId());
 
 		if (!isBlank(targetLifecycle.getStartPhase()))
@@ -244,12 +246,12 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 
 	@Override
 	public PlexusConfiguration convert(final TargetPhase targetPhase) {
-		PlexusConfiguration node = new XmlPlexusConfiguration("phase");
+		final PlexusConfiguration node = new XmlPlexusConfiguration("phase");
 		node.setAttribute("id", targetPhase.getId());
 
 		if (!targetPhase.getExecutions()
 				.isEmpty()) {
-			PlexusConfiguration executionNodes = node.getChild("executions", true);
+			final PlexusConfiguration executionNodes = node.getChild("executions", true);
 			for (String execution : targetPhase.getExecutions())
 				executionNodes.getChild("execution", true)
 						.setAttribute("id", execution);

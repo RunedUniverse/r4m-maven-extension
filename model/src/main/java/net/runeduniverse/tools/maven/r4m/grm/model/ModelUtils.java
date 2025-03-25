@@ -23,7 +23,7 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public final class ModelUtils {
 
-	public static CompoundTree toRecord(DataEntry entry) {
+	public static CompoundTree toRecord(final DataEntry entry) {
 		if (entry == null)
 			return null;
 		if (entry instanceof Recordable)
@@ -33,13 +33,13 @@ public final class ModelUtils {
 		return getRecord(entry);
 	}
 
-	public static CompoundTree getRecord(DataEntry entry) {
+	public static CompoundTree getRecord(final DataEntry entry) {
 		if (entry == null)
 			return null;
 		return createEntryTree(entry);
 	}
 
-	public static CompoundTree getRecord(DataGroup group) {
+	public static CompoundTree getRecord(final DataGroup group) {
 		if (group == null)
 			return null;
 		final CompoundTree tree = createEntryTree(group);
@@ -47,7 +47,7 @@ public final class ModelUtils {
 		return tree;
 	}
 
-	public static CompoundTree getRecord(Recordable recordable) {
+	public static CompoundTree getRecord(final Recordable recordable) {
 		if (recordable == null)
 			return null;
 		return recordable.toRecord();

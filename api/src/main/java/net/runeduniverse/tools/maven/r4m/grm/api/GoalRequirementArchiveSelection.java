@@ -29,6 +29,6 @@ public interface GoalRequirementArchiveSelection extends Recordable, Cloneable {
 
 	public GoalRequirementArchiveSelection clone();
 
-	public GoalRequirementArchiveSelection filterByApplicableData(final Collection<EntityView> entities);
+	public GoalRequirementArchiveSelection filterByApplicableData(Collection<EntityView> entities);
 
 }

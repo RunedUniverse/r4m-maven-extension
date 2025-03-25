@@ -27,11 +27,12 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Fork implements Recordable {
 
-	private String mode = null;
-	private final Set<String> executions = new LinkedHashSet<>(0);
-	private TargetLifecycle lifecycle = null;
-	private List<TargetPhase> phases = null;
-	private final List<TargetPhase> excludePhases = new LinkedList<>();
+	protected final Set<String> executions = new LinkedHashSet<>(0);
+	protected final List<TargetPhase> excludePhases = new LinkedList<>();
+
+	protected String mode = null;
+	protected TargetLifecycle lifecycle = null;
+	protected List<TargetPhase> phases = null;
 
 	public TargetLifecycle getLifecycle() {
 		return this.lifecycle;
@@ -68,23 +69,23 @@ public class Fork implements Recordable {
 		return false;
 	}
 
-	public void setLifecycle(TargetLifecycle lifecycle) {
+	public void setLifecycle(final TargetLifecycle lifecycle) {
 		this.lifecycle = lifecycle;
 	}
 
-	public void setMode(String value) {
+	public void setMode(final String value) {
 		this.mode = value;
 	}
 
-	public void addExecutions(Collection<String> executions) {
+	public void addExecutions(final Collection<String> executions) {
 		this.executions.addAll(executions);
 	}
 
-	public void setPhases(List<TargetPhase> phases) {
+	public void setPhases(final List<TargetPhase> phases) {
 		this.phases = phases;
 	}
 
-	public void addExcludedPhases(Collection<TargetPhase> excludedPhases) {
+	public void addExcludedPhases(final Collection<TargetPhase> excludedPhases) {
 		// check for uniquity by equals
 		for (TargetPhase phase : excludedPhases)
 			if (!this.excludePhases.contains(phase))
@@ -92,13 +93,13 @@ public class Fork implements Recordable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof Fork))
 			return false;
-		Fork fork = (Fork) obj;
+		final Fork fork = (Fork) obj;
 
 		if (this.mode == null) {
 			if (fork.getMode() != null)
@@ -133,7 +134,7 @@ public class Fork implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Fork");
+		final CompoundTree tree = new DefaultCompoundTree("Fork");
 
 		if (!this.isValid()) {
 			tree.append("[WARNING]", "insufficient information -> will be ignored!");
@@ -149,14 +150,14 @@ public class Fork implements Recordable {
 			tree.append(this.lifecycle.toRecord());
 
 		if (this.phases != null && !this.phases.isEmpty()) {
-			CompoundTree phasesTree = new DefaultCompoundTree("phases");
+			final CompoundTree phasesTree = new DefaultCompoundTree("phases");
 			for (TargetPhase phase : this.phases)
 				phasesTree.append(phase.toRecord());
 			tree.append(phasesTree);
 		}
 
 		if (!this.excludePhases.isEmpty()) {
-			CompoundTree phasesTree = new DefaultCompoundTree("excluded phases");
+			final CompoundTree phasesTree = new DefaultCompoundTree("excluded phases");
 			for (TargetPhase phase : this.excludePhases)
 				phasesTree.append(phase.toRecord());
 			tree.append(phasesTree);

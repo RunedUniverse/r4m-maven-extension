@@ -61,7 +61,7 @@ public class DefaultGrmRegistrySector implements PluginRequirementRegistrySector
 	}
 
 	@Override
-	public GoalRequirementModel getModel(Class<?> parserType, String parserHint) {
+	public GoalRequirementModel getModel(final Class<?> parserType, final String parserHint) {
 		return this.hintedOrigins.get(createKey(parserType, parserHint));
 	}
 
@@ -70,7 +70,7 @@ public class DefaultGrmRegistrySector implements PluginRequirementRegistrySector
 		return new LinkedHashSet<>(this.hintedOrigins.values());
 	}
 
-	protected static String createKey(Class<?> parserType, String parserHint) {
+	protected static String createKey(final Class<?> parserType, String parserHint) {
 		if (isBlank(parserHint))
 			parserHint = "default";
 		if (parserType == null)

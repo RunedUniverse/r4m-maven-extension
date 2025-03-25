@@ -25,11 +25,11 @@ public interface PluginRequirementRegistrySector {
 
 	public Set<GoalContainer> getGoalContainer();
 
-	public void addGoalContainer(final Collection<GoalContainer> values);
+	public void addGoalContainer(Collection<GoalContainer> values);
 
-	public void includeModel(final GoalRequirementModel model);
+	public void includeModel(GoalRequirementModel model);
 
-	public GoalRequirementModel getModel(final Class<?> parserType, final String parserHint);
+	public GoalRequirementModel getModel(Class<?> parserType, String parserHint);
 
 	public Set<GoalRequirementModel> getModels();
 

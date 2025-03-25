@@ -23,7 +23,7 @@ public interface TaskData {
 
 	public String[] getModes();
 
-	public default String getPrimaryExecutionOrDefault(String other) {
+	public default String getPrimaryExecutionOrDefault(final String other) {
 		final String[] e = getExecutions();
 		if (e == null)
 			return other;

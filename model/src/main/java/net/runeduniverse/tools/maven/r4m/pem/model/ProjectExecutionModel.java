@@ -26,11 +26,12 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class ProjectExecutionModel implements Recordable {
 
-	private String version;
-	private Class<?> parserType = null;
-	private String parserHint = null;
-	private boolean effective = false;
-	private Set<Execution> executions = new LinkedHashSet<>(0);
+	protected final Set<Execution> executions = new LinkedHashSet<>(0);
+
+	protected String version;
+	protected Class<?> parserType = null;
+	protected String parserHint = null;
+	protected boolean effective = false;
 
 	public ProjectExecutionModel() {
 		this.parserHint = null;
@@ -57,30 +58,30 @@ public class ProjectExecutionModel implements Recordable {
 		return Collections.unmodifiableSet(this.executions);
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(final String version) {
 		this.version = version;
 	}
 
-	public void setParser(Class<?> type, String hint) {
+	public void setParser(final Class<?> type, final String hint) {
 		this.parserType = type;
 		this.parserHint = hint;
 	}
 
-	public void setEffective(boolean value) {
+	public void setEffective(final boolean value) {
 		this.effective = value;
 	}
 
-	public void addExecution(Execution execution) {
+	public void addExecution(final Execution execution) {
 		this.executions.add(execution);
 	}
 
-	public void addExecutions(Collection<Execution> executions) {
+	public void addExecutions(final Collection<Execution> executions) {
 		this.executions.addAll(executions);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("ProjectExecutionModel");
+		final CompoundTree tree = new DefaultCompoundTree("ProjectExecutionModel");
 
 		for (Recordable execution : executions)
 			tree.append(execution.toRecord());

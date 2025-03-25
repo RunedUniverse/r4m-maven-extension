@@ -23,11 +23,11 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class TargetLifecycle implements Recordable {
 
-	private String id;
-	private String startPhase = null;
-	private String stopPhase = null;
+	protected final String id;
+	protected String startPhase = null;
+	protected String stopPhase = null;
 
-	public TargetLifecycle(String id) {
+	public TargetLifecycle(final String id) {
 		this.id = id;
 	}
 
@@ -43,22 +43,22 @@ public class TargetLifecycle implements Recordable {
 		return this.stopPhase;
 	}
 
-	public void setStartPhase(String value) {
+	public void setStartPhase(final String value) {
 		this.startPhase = value;
 	}
 
-	public void setStopPhase(String value) {
+	public void setStopPhase(final String value) {
 		this.stopPhase = value;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof TargetLifecycle))
 			return false;
-		TargetLifecycle lifecycle = (TargetLifecycle) obj;
+		final TargetLifecycle lifecycle = (TargetLifecycle) obj;
 
 		if (!this.id.equals(lifecycle.getId()))
 			return false;
@@ -80,7 +80,7 @@ public class TargetLifecycle implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Target Lifecycle");
+		final CompoundTree tree = new DefaultCompoundTree("Target Lifecycle");
 
 		tree.append("id", this.id);
 

@@ -32,7 +32,7 @@ public class WhenDataFactory extends ADataFactory {
 	protected DataConverter factory;
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!WhenDataGroup.HINT.equals(cnf.getName()))
 			return null;
 
@@ -44,7 +44,7 @@ public class WhenDataFactory extends ADataFactory {
 	}
 
 	@Override
-	protected boolean addConvertedEntry(DataGroup group, PlexusConfiguration cnf) {
+	protected boolean addConvertedEntry(final DataGroup group, final PlexusConfiguration cnf) {
 		if (group instanceof WhenDataGroup) {
 			final WhenDataGroup when = (WhenDataGroup) group;
 			if ("always".equals(cnf.getName())) {

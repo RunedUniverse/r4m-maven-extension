@@ -25,22 +25,22 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Goal implements Recordable {
 
-	private String groupId;
-	private String artifactId;
-	private String goalId;
-	private Boolean optional = null;
-	private Fork fork = null;
+	protected final Set<String> modes = new LinkedHashSet<>();
 
-	private final Set<String> modes = new LinkedHashSet<>();
+	protected String groupId;
+	protected String artifactId;
+	protected String goalId;
+	protected Boolean optional = null;
+	protected Fork fork = null;
 
 	public Goal() {
 	}
 
-	public Goal(String mvnGoalKey) {
+	public Goal(final String mvnGoalKey) {
 		parseMvnGoalKey(mvnGoalKey);
 	}
 
-	public Goal(String groupId, String artifactId, String goalId) {
+	public Goal(final String groupId, final String artifactId, final String goalId) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.goalId = goalId;
@@ -74,29 +74,29 @@ public class Goal implements Recordable {
 		return this.fork;
 	}
 
-	public Goal addModes(String... modes) {
+	public Goal addModes(final String... modes) {
 		for (String mode : modes)
 			this.modes.add(mode);
 		return this;
 	}
 
-	public Goal addModes(Collection<String> modes) {
+	public Goal addModes(final Collection<String> modes) {
 		this.modes.addAll(modes);
 		return this;
 	}
 
-	public Goal setOptional(Boolean optional) {
+	public Goal setOptional(final Boolean optional) {
 		this.optional = optional;
 		return this;
 	}
 
-	public Goal setFork(Fork fork) {
+	public Goal setFork(final Fork fork) {
 		this.fork = fork;
 		return this;
 	}
 
-	public boolean parseMvnGoalKey(String mvnGoalKey) {
-		String[] keyValues = mvnGoalKey.split(":");
+	public boolean parseMvnGoalKey(final String mvnGoalKey) {
+		final String[] keyValues = mvnGoalKey.split(":");
 
 		switch (keyValues.length) {
 		case 2:
@@ -123,13 +123,13 @@ public class Goal implements Recordable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof Goal))
 			return false;
-		Goal goal = (Goal) obj;
+		final Goal goal = (Goal) obj;
 
 		if (this.groupId == null) {
 			if (goal.getGroupId() != null)
@@ -167,7 +167,7 @@ public class Goal implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Goal");
+		final CompoundTree tree = new DefaultCompoundTree("Goal");
 
 		tree.append("groupId", this.groupId)
 				.append("artifactId", this.artifactId)

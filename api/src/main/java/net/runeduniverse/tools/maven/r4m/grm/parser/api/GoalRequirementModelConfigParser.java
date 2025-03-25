@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
 public interface GoalRequirementModelConfigParser {
 
-	public GoalRequirementModel parse(final MavenProject mvnProject) throws Exception;
+	public GoalRequirementModel parse(MavenProject mvnProject) throws Exception;
 
 }

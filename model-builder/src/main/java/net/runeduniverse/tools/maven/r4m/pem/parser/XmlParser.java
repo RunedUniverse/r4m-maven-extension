@@ -57,9 +57,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 	protected Map<String, ExecutionTriggerParser> execTriggerParser;
 
 	@Override
-	public void parseModel(ProjectExecutionModel pem, InputStream input) throws Exception {
+	public void parseModel(final ProjectExecutionModel pem, final InputStream input) throws Exception {
 		final Reader reader = new XmlStreamReader(input);
-		PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
+		final PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
 		parseExecutions(pem, cnf.getChild("executions", false));
@@ -68,7 +68,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 	protected boolean parseModelVersion(final ProjectExecutionModel model, final PlexusConfiguration versionNode) {
 		if (versionNode == null)
 			return false;
-		String value = versionNode.getValue();
+		final String value = versionNode.getValue();
 		if (isBlank(value))
 			return false;
 		model.setVersion(value);
@@ -79,9 +79,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration execNodes[] = nodeList.getChildren("execution");
+		final PlexusConfiguration execNodes[] = nodeList.getChildren("execution");
 		if (execNodes.length > 0) {
-			List<Execution> executions = new LinkedList<>();
+			final List<Execution> executions = new LinkedList<>();
 			for (PlexusConfiguration execNode : execNodes) {
 				parseExecution(executions, execNode);
 			}
@@ -94,12 +94,12 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (execNode == null)
 			return false;
 
-		String id = execNode.getAttribute("id");
-		ExecutionSource source = ExecutionSource.create(execNode.getAttribute("source"));
+		final String id = execNode.getAttribute("id");
+		final ExecutionSource source = ExecutionSource.create(execNode.getAttribute("source"));
 		if (isBlank(id) || source == null)
 			return false;
 
-		Execution execution = new Execution(id, source);
+		final Execution execution = new Execution(id, source);
 		list.add(execution);
 
 		parseInherited(execution, execNode.getChild("inherited", false));
@@ -113,7 +113,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 	protected boolean parseInherited(final Execution exec, final PlexusConfiguration inheritedNode) {
 		if (inheritedNode == null)
 			return false;
-		String value = inheritedNode.getValue();
+		final String value = inheritedNode.getValue();
 		if (isBlank(value))
 			return false;
 		if (value.equalsIgnoreCase("true"))
@@ -129,14 +129,14 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration triggerNodes[] = nodeList.getChildren();
+		final PlexusConfiguration triggerNodes[] = nodeList.getChildren();
 		if (triggerNodes.length > 0) {
 			for (PlexusConfiguration triggerNode : triggerNodes) {
-				String name = triggerNode.getName();
-				ExecutionRestrictionParser parser = this.execRestrictionParser.get(name);
+				final String name = triggerNode.getName();
+				final ExecutionRestrictionParser parser = this.execRestrictionParser.get(name);
 				if (parser == null)
 					continue;
-				ExecutionRestriction<?> restriction = parser.parse(triggerNode);
+				final ExecutionRestriction<?> restriction = parser.parse(triggerNode);
 				if (restriction == null)
 					continue;
 				exec.addRestriction(restriction);
@@ -149,10 +149,10 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration triggerNodes[] = nodeList.getChildren();
+		final PlexusConfiguration triggerNodes[] = nodeList.getChildren();
 		if (triggerNodes.length > 0) {
 			for (PlexusConfiguration triggerNode : triggerNodes) {
-				String name = triggerNode.getName();
+				final String name = triggerNode.getName();
 				switch (name) {
 				case "on-call":
 					// DO NOTING
@@ -170,10 +170,10 @@ public class XmlParser implements ProjectExecutionModelParser {
 					break;
 
 				default:
-					ExecutionTriggerParser parser = this.execTriggerParser.get(name);
+					final ExecutionTriggerParser parser = this.execTriggerParser.get(name);
 					if (parser == null)
 						break;
-					ExecutionTrigger<?> trigger = parser.parse(triggerNode);
+					final ExecutionTrigger<?> trigger = parser.parse(triggerNode);
 					if (trigger == null)
 						break;
 					exec.addTrigger(trigger);
@@ -188,9 +188,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration lifecycleNodes[] = nodeList.getChildren("lifecycle");
+		final PlexusConfiguration lifecycleNodes[] = nodeList.getChildren("lifecycle");
 		if (lifecycleNodes.length > 0) {
-			List<Lifecycle> lifecycles = new LinkedList<>();
+			final List<Lifecycle> lifecycles = new LinkedList<>();
 			for (PlexusConfiguration lifecycleNode : lifecycleNodes) {
 				parseLifecycle(lifecycles, lifecycleNode);
 			}
@@ -203,11 +203,11 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (lifecycleNode == null)
 			return false;
 
-		String id = lifecycleNode.getAttribute("id");
+		final String id = lifecycleNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 
-		Lifecycle lifecycle = new Lifecycle(id);
+		final Lifecycle lifecycle = new Lifecycle(id);
 		list.add(lifecycle);
 
 		parsePhases(lifecycle, lifecycleNode.getChild("phases", false));
@@ -219,9 +219,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration phaseNodes[] = nodeList.getChildren("phase");
+		final PlexusConfiguration phaseNodes[] = nodeList.getChildren("phase");
 		if (phaseNodes.length > 0) {
-			List<Phase> phases = new LinkedList<>();
+			final List<Phase> phases = new LinkedList<>();
 			for (PlexusConfiguration phaseNode : phaseNodes) {
 				parsePhase(phases, phaseNode);
 			}
@@ -234,11 +234,11 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (phaseNode == null)
 			return false;
 
-		String id = phaseNode.getAttribute("id");
+		final String id = phaseNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 
-		Phase phase = new Phase(id);
+		final Phase phase = new Phase(id);
 		list.add(phase);
 
 		parseGoals(phase, phaseNode.getChild("goals", false));
@@ -250,9 +250,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (nodeList == null || nodeList.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration goalNodes[] = nodeList.getChildren("goal");
+		final PlexusConfiguration goalNodes[] = nodeList.getChildren("goal");
 		if (goalNodes.length > 0) {
-			List<Goal> goals = new LinkedList<>();
+			final List<Goal> goals = new LinkedList<>();
 			for (PlexusConfiguration goalNode : goalNodes) {
 				parseGoal(goals, goalNode);
 			}
@@ -265,22 +265,22 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (goalNode == null)
 			return false;
 
-		String id = goalNode.getAttribute("id");
+		final String id = goalNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 
-		String groupId = goalNode.getChild("groupId")
+		final String groupId = goalNode.getChild("groupId")
 				.getValue();
-		String artifactId = goalNode.getChild("artifactId")
+		final String artifactId = goalNode.getChild("artifactId")
 				.getValue();
-		String goalId = goalNode.getAttribute("id");
+		final String goalId = goalNode.getAttribute("id");
 		if (isBlank(groupId) || isBlank(artifactId) || isBlank(goalId))
 			return false;
 
-		String optionalValue = goalNode.getAttribute("optional");
-		Boolean optional = isBlank(optionalValue) ? null : Boolean.parseBoolean(optionalValue);
+		final String optionalValue = goalNode.getAttribute("optional");
+		final Boolean optional = isBlank(optionalValue) ? null : Boolean.parseBoolean(optionalValue);
 
-		Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
+		final Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 
 		final Set<String> modes = new LinkedHashSet<String>(0) {
 
@@ -321,11 +321,11 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (modeNode == null)
 			return false;
 
-		String name = modeNode.getName();
+		final String name = modeNode.getName();
 		if (isBlank(name))
 			return false;
 
-		String id = modeNode.getAttribute("id");
+		final String id = modeNode.getAttribute("id");
 		if (id == null) {
 			modes.add(name.trim());
 			return true;
@@ -341,7 +341,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (forkNode == null)
 			return false;
 
-		Fork fork = new Fork();
+		final Fork fork = new Fork();
 
 		final PlexusConfiguration modeNode = forkNode.getChild("mode", false);
 		if (modeNode != null) {
@@ -349,17 +349,17 @@ public class XmlParser implements ProjectExecutionModelParser {
 			fork.setMode(isBlank(modeId) ? null : modeId.trim());
 		}
 
-		Set<String> executions = new LinkedHashSet<>(0);
+		final Set<String> executions = new LinkedHashSet<>(0);
 		parseTargetExecutions(executions, forkNode.getChild("executions", false));
 		fork.addExecutions(executions);
 
 		parseTargetLifecycle(fork, forkNode.getChild("lifecycle", false));
 
-		List<TargetPhase> phases = new LinkedList<>();
+		final List<TargetPhase> phases = new LinkedList<>();
 		parseTargetPhases(phases, forkNode.getChild("phases", false));
 		fork.setPhases(phases);
 
-		Set<TargetPhase> excludedPhases = new LinkedHashSet<>(0);
+		final Set<TargetPhase> excludedPhases = new LinkedHashSet<>(0);
 		parseTargetPhases(excludedPhases, forkNode.getChild("excludedPhases", false));
 		fork.addExcludedPhases(excludedPhases);
 
@@ -371,11 +371,11 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (lifecycleNode == null)
 			return false;
 
-		String id = lifecycleNode.getAttribute("id");
+		final String id = lifecycleNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 
-		TargetLifecycle lifecycle = new TargetLifecycle(id);
+		final TargetLifecycle lifecycle = new TargetLifecycle(id);
 
 		final PlexusConfiguration startNode = lifecycleNode.getChild("startPhase", false);
 		if (startNode != null)
@@ -394,7 +394,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (phasesNode == null || phasesNode.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration phaseNodes[] = phasesNode.getChildren("phase");
+		final PlexusConfiguration phaseNodes[] = phasesNode.getChildren("phase");
 		if (phaseNodes.length > 0) {
 			for (PlexusConfiguration phaseNode : phaseNodes)
 				parseTargetPhase(targetPhases, phaseNode);
@@ -406,14 +406,14 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (phaseNode == null)
 			return false;
 
-		String id = phaseNode.getAttribute("id");
+		final String id = phaseNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 
-		TargetPhase phase = new TargetPhase(id);
+		final TargetPhase phase = new TargetPhase(id);
 		list.add(phase);
 
-		Set<String> executions = new LinkedHashSet<>(0);
+		final Set<String> executions = new LinkedHashSet<>(0);
 		parseTargetExecutions(executions, phaseNode.getChild("executions", false));
 		phase.addExecutions(executions);
 
@@ -425,7 +425,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (executionsNode == null || executionsNode.getChildCount() == 0)
 			return false;
 
-		PlexusConfiguration execNodes[] = executionsNode.getChildren("execution");
+		final PlexusConfiguration execNodes[] = executionsNode.getChildren("execution");
 		if (execNodes.length > 0) {
 			for (PlexusConfiguration execNode : execNodes)
 				parseTargetExecution(executions, execNode);
@@ -437,7 +437,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (execNode == null)
 			return false;
 
-		String id = execNode.getAttribute("id");
+		final String id = execNode.getAttribute("id");
 		if (isBlank(id))
 			return false;
 

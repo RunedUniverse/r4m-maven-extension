@@ -57,10 +57,10 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 	private Logger log;
 
 	@Override
-	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession session, MavenProject project,
-			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
-			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-			MojoNotFoundException, InvalidPluginDescriptorException {
+	public Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession session,
+			final MavenProject project, final Lifecycle lifecycle, final String lifecyclePhase,
+			final ExecutionArchiveSelection selection) throws PluginNotFoundException, PluginResolutionException,
+			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 		/*
 		 * Initialize mapping from lifecycle phase to bound mojos.
 		 */
@@ -104,13 +104,7 @@ public class DefaultAdvancedLifecycleMappingDelegate implements AdvancedLifecycl
 
 	private void addMojoExecution(final Map<Integer, List<MojoExecution>> phaseBindings,
 			final MojoExecution mojoExecution, final int priority) {
-		List<MojoExecution> mojoExecutions = phaseBindings.get(priority);
-
-		if (mojoExecutions == null) {
-			mojoExecutions = new ArrayList<>();
-			phaseBindings.put(priority, mojoExecutions);
-		}
-
+		final List<MojoExecution> mojoExecutions = phaseBindings.computeIfAbsent(priority, k -> new ArrayList<>());
 		mojoExecutions.add(mojoExecution);
 	}
 

@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.ExecutionData;
 public class ExecutionDataFactory extends ADataFactory {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!ExecutionData.HINT.equals(cnf.getName()))
 			return null;
 

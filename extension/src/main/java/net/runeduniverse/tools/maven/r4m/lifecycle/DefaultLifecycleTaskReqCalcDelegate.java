@@ -93,7 +93,6 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
 		final List<Entry> entries = new LinkedList<>();
-		Entry entry = null;
 		String phase = null;
 
 		while (task != null) {
@@ -105,7 +104,7 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 				phase = task;
 				task = null;
 			}
-			entry = parseEntry(phase);
+			final Entry entry = parseEntry(phase);
 			if (entry == null)
 				continue;
 			phase = entry.getPhase();
@@ -234,15 +233,16 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 			this(null, null);
 		}
 
-		public Entry(String phase, Lifecycle lifecycle) {
+		public Entry(final String phase, final Lifecycle lifecycle) {
 			this(phase, lifecycle, false, false, true);
 		}
 
-		public Entry(boolean before, boolean after, boolean include) {
+		public Entry(final boolean before, final boolean after, final boolean include) {
 			this(null, null, before, after, include);
 		}
 
-		public Entry(String phase, Lifecycle lifecycle, boolean before, boolean after, boolean include) {
+		public Entry(final String phase, final Lifecycle lifecycle, final boolean before, final boolean after,
+				final boolean include) {
 			this.phase = phase;
 			this.lifecycle = lifecycle;
 			this.before = before;

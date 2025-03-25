@@ -53,7 +53,7 @@ public class PluginProjectScanner implements MavenProjectScanner {
 		return 0;
 	}
 
-	private boolean isValid(final Set<Plugin> invalidPlugins, Plugin mvnPlugin) {
+	private boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
 		if (mvnPlugin == null || invalidPlugins.contains(mvnPlugin))
 			return false;
 
@@ -66,8 +66,8 @@ public class PluginProjectScanner implements MavenProjectScanner {
 	}
 
 	@Override
-	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> invalidPlugins,
-			MavenProject mvnProject) throws Exception {
+	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
+			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
 		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
 			if (isValid(invalidPlugins, mvnPlugin))
 				try {

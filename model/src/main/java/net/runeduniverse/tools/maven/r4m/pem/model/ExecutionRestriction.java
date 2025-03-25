@@ -23,6 +23,6 @@ public interface ExecutionRestriction<T> extends Recordable {
 
 	public <D extends T> Class<D> getDataType();
 
-	public boolean isActive(final T data);
+	public boolean isActive(T data);
 
 }

@@ -19,11 +19,12 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.GoalView;
 
 public class DefaultGoalView implements GoalView {
 
-	protected String groupId;
-	protected String artifactId;
-	protected String goalId;
+	final protected String groupId;
+	final protected String artifactId;
+	final protected String goalId;
 
 	protected DefaultGoalView() {
+		this(null, null, null);
 	}
 
 	public DefaultGoalView(final String groupId, final String artifactId, final String goalId) {

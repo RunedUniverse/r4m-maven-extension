@@ -32,28 +32,26 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 public interface ProjectExecutionModelWriter {
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem) throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem) throws IOException;
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final Charset charset)
-			throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, Charset charset) throws IOException;
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final String charsetName)
-			throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, String charsetName) throws IOException;
 
-	public PlexusConfiguration convert(final ProjectExecutionModel pem);
+	public PlexusConfiguration convert(ProjectExecutionModel pem);
 
-	public PlexusConfiguration convert(final Execution execution);
+	public PlexusConfiguration convert(Execution execution);
 
-	public PlexusConfiguration convert(final Lifecycle lifecycle);
+	public PlexusConfiguration convert(Lifecycle lifecycle);
 
-	public PlexusConfiguration convert(final Phase phase);
+	public PlexusConfiguration convert(Phase phase);
 
-	public PlexusConfiguration convert(final Goal goal);
+	public PlexusConfiguration convert(Goal goal);
 
-	public PlexusConfiguration convert(final Fork fork);
+	public PlexusConfiguration convert(Fork fork);
 
-	public PlexusConfiguration convert(final TargetLifecycle targetLifecycle);
+	public PlexusConfiguration convert(TargetLifecycle targetLifecycle);
 
-	public PlexusConfiguration convert(final TargetPhase targetPhase);
+	public PlexusConfiguration convert(TargetPhase targetPhase);
 
 }

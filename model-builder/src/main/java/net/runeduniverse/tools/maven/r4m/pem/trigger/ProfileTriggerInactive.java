@@ -23,7 +23,7 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 
 	public static final String HINT = "inactive-profile";
 
-	public ProfileTriggerInactive(String profileId) {
+	public ProfileTriggerInactive(final String profileId) {
 		super(profileId);
 	}
 
@@ -40,7 +40,7 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("ProfileTrigger");
+		final CompoundTree tree = new DefaultCompoundTree("ProfileTrigger");
 
 		tree.append("is-inactive", this.profileId);
 
@@ -48,7 +48,7 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == this)
 			return true;
 		if (!(obj instanceof ProfileTriggerInactive))

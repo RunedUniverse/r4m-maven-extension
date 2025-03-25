@@ -179,12 +179,12 @@ public interface ExtensionUtils {
 					// cant find it -> already merged
 					continue;
 				// check if special condition is active!
-				boolean matchRestrictions = origExec.getRestrictions()
+				final boolean matchRestrictions = origExec.getRestrictions()
 						.isEmpty();
 				boolean gotReduced = false;
 
 				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-					Execution exec = iExec.next();
+					final Execution exec = iExec.next();
 
 					if (!isSimilar(origExec, exec, false))
 						continue;
@@ -193,8 +193,8 @@ public interface ExtensionUtils {
 								.isEmpty())
 							continue;
 
-					Execution reduced = merge(origExec, exec, false);
-					boolean isReduced = !reduced.getLifecycles()
+					final Execution reduced = merge(origExec, exec, false);
+					final boolean isReduced = !reduced.getLifecycles()
 							.isEmpty();
 
 					if (exec.getLifecycles()
@@ -223,7 +223,7 @@ public interface ExtensionUtils {
 					continue;
 
 				for (ListIterator<Execution> iExec = execCol.listIterator(); iExec.hasNext();) {
-					Execution exec = iExec.next();
+					final Execution exec = iExec.next();
 
 					if (!isSimilar(remExec, exec, true))
 						continue;
@@ -267,13 +267,13 @@ public interface ExtensionUtils {
 		Objects.requireNonNull(domExec);
 		Objects.requireNonNull(secExec);
 
-		Execution mergeExecution = createEquivalent(domExec);
+		final Execution mergeExecution = createEquivalent(domExec);
 		mergeExecution.addRestrictions(secExec.getRestrictions());
 
 		for (Iterator<Lifecycle> iDomLifecycle = domExec.getLifecycles()
 				.values()
 				.iterator(); iDomLifecycle.hasNext();) {
-			Lifecycle domLifecycle = iDomLifecycle.next();
+			final Lifecycle domLifecycle = iDomLifecycle.next();
 			Lifecycle secLifecycle = secExec.getLifecycle(domLifecycle.getId());
 			if (secLifecycle == null)
 				if (force)
@@ -287,7 +287,7 @@ public interface ExtensionUtils {
 			for (Iterator<Phase> iDomPhase = domLifecycle.getPhases()
 					.values()
 					.iterator(); iDomPhase.hasNext();) {
-				Phase domPhase = iDomPhase.next();
+				final Phase domPhase = iDomPhase.next();
 				Phase secPhase = secLifecycle.getPhase(domPhase.getId());
 				if (secPhase == null)
 					if (force)
@@ -336,7 +336,7 @@ public interface ExtensionUtils {
 			for (Iterator<Lifecycle> iSecLifecycle = secExec.getLifecycles()
 					.values()
 					.iterator(); iSecLifecycle.hasNext();) {
-				Lifecycle secLifecycle = iSecLifecycle.next();
+				final Lifecycle secLifecycle = iSecLifecycle.next();
 				Lifecycle mergeLifecycle = mergeExecution.getLifecycle(secLifecycle.getId());
 				if (mergeLifecycle == null)
 					mergeLifecycle = new Lifecycle(secLifecycle.getId());
@@ -344,7 +344,7 @@ public interface ExtensionUtils {
 				for (Iterator<Phase> iSecPhase = secLifecycle.getPhases()
 						.values()
 						.iterator(); iSecPhase.hasNext();) {
-					Phase secPhase = iSecPhase.next();
+					final Phase secPhase = iSecPhase.next();
 					Phase mergePhase = mergeLifecycle.getPhase(secPhase.getId());
 					if (mergePhase == null)
 						mergePhase = new Phase(secPhase.getId());
@@ -376,13 +376,13 @@ public interface ExtensionUtils {
 	public static void merge(final Phase domPhase, final Phase secPhase, final Phase mergePhase) {
 		for (Iterator<Goal> iDomGoal = domPhase.getGoals()
 				.iterator(); iDomGoal.hasNext();) {
-			Goal domGoal = iDomGoal.next();
+			final Goal domGoal = iDomGoal.next();
 			for (Iterator<Goal> iSecGoal = secPhase.getGoals()
 					.iterator(); iSecGoal.hasNext();) {
-				Goal secGoal = iSecGoal.next();
+				final Goal secGoal = iSecGoal.next();
 				if (!isSimilar(domGoal, secGoal, false))
 					continue;
-				Goal mergeGoal = createEquivalent(domGoal);
+				final Goal mergeGoal = createEquivalent(domGoal);
 				mergeGoal.addModes(secGoal.getModes());
 				mergePhase.addGoal(mergeGoal);
 				iSecGoal.remove();
@@ -478,7 +478,7 @@ public interface ExtensionUtils {
 	}
 
 	public static Execution createEquivalent(final Execution original) {
-		Execution equivalent = new Execution(original.getId(), original.getSource());
+		final Execution equivalent = new Execution(original.getId(), original.getSource());
 		equivalent.setInherited(original.isInherited());
 		equivalent.setAlwaysActive(original.isAlwaysActive());
 		equivalent.setDefaultActive(original.isDefaultActive());
@@ -490,7 +490,7 @@ public interface ExtensionUtils {
 	}
 
 	public static Goal createEquivalent(final Goal original) {
-		Goal equivalent = new Goal(original.getGroupId(), original.getArtifactId(), original.getGoalId());
+		final Goal equivalent = new Goal(original.getGroupId(), original.getArtifactId(), original.getGoalId());
 		equivalent.addModes(original.getModes());
 		equivalent.setOptional(original.getOptional());
 		equivalent.setFork(original.getFork());
@@ -500,14 +500,14 @@ public interface ExtensionUtils {
 	public static void replaceWithEquivalents(final Set<Execution> executions) {
 		final Set<Execution> equivalents = new LinkedHashSet<>();
 		for (Execution exec : executions) {
-			Execution equivalentExec = createEquivalent(exec);
+			final Execution equivalentExec = createEquivalent(exec);
 			for (Lifecycle lifecycle : exec.getLifecycles()
 					.values()) {
-				Lifecycle equivalentLifecycle = new Lifecycle(lifecycle.getId());
+				final Lifecycle equivalentLifecycle = new Lifecycle(lifecycle.getId());
 				equivalentExec.putLifecycle(equivalentLifecycle);
 				for (Phase phase : lifecycle.getPhases()
 						.values()) {
-					Phase equivalentPhase = new Phase(phase.getId());
+					final Phase equivalentPhase = new Phase(phase.getId());
 					equivalentLifecycle.putPhase(equivalentPhase);
 					equivalentPhase.addGoals(phase.getGoals());
 				}

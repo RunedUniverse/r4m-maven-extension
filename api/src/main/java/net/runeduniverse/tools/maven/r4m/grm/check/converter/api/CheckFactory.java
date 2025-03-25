@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public interface CheckFactory {
 
-	public Condition<EntityView> createCheck(final DataEntry entry);
+	public Condition<EntityView> createCheck(DataEntry entry);
 
 }

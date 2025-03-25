@@ -87,12 +87,12 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 			for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
 					.getMojos()) {
-				Goal goal = new Goal();
+				final Goal goal = new Goal();
 				if (!goal.parseMvnGoalKey(mojoMapping.getGoal())) {
 					// invalid goal!
 					continue;
 				}
-				String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
+				final String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
 				Execution execution = executions.get(executionId);
 				if (execution == null) {
 					execution = new Execution(executionId, ExecutionSource.PACKAGING);

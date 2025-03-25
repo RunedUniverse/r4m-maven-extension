@@ -15,14 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem;
 
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilter;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -47,7 +46,6 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
@@ -57,7 +55,9 @@ import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
-import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
+
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilter;
 
 @Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
 public class Selector implements ExecutionArchiveSelector {
@@ -77,7 +77,7 @@ public class Selector implements ExecutionArchiveSelector {
 	@Requirement
 	private ExecutionArchive archive;
 
-	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, Goal goal) {
+	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, final Goal goal) {
 		for (String mode : cnf.getModes())
 			if (goal.getModes()
 					.contains(mode))
@@ -85,9 +85,9 @@ public class Selector implements ExecutionArchiveSelector {
 		return false;
 	}
 
-	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, GoalView goalView,
-			boolean download) {
-		Plugin plugin = cnf.getActiveProject()
+	protected boolean acquireMojoDescriptor(final ExecutionArchiveSelectorConfig cnf, final GoalView goalView,
+			final boolean download) {
+		final Plugin plugin = cnf.getActiveProject()
 				.getPlugin(goalView.getGroupId() + ":" + goalView.getArtifactId());
 		boolean loadManaged = true;
 
@@ -100,7 +100,7 @@ public class Selector implements ExecutionArchiveSelector {
 				return false;
 		}
 
-		MojoDescriptor descriptor = null;
+		final MojoDescriptor descriptor;
 		try {
 			if (loadManaged)
 				descriptor = this.pluginManager.getMojoDescriptor(plugin, goalView.getGoalId(), cnf.getActiveProject()
@@ -125,41 +125,29 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> aggregate(final ExecutionArchiveSelectorConfig cnf,
-			Collection<Execution> executions) {
-		boolean warn = "warn".equals(this.settings.getMissingBuildPluginHandler()
+			final Collection<Execution> executions) {
+		final boolean warn = "warn".equals(this.settings.getMissingBuildPluginHandler()
 				.getSelected());
-		boolean download = "download".equals(this.settings.getMissingBuildPluginHandler()
+		final boolean download = "download".equals(this.settings.getMissingBuildPluginHandler()
 				.getSelected());
-		Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
+		final Map<String, Map<ExecutionSource, ExecutionView>> map = new LinkedHashMap<>();
 
 		for (Execution execution : executions) {
-			Map<ExecutionSource, ExecutionView> entry = map.get(execution.getId());
-			if (entry == null) {
-				entry = new LinkedHashMap<>();
-				map.put(execution.getId(), entry);
-			}
-			ExecutionView executionView = entry.get(execution.getSource());
-			if (executionView == null) {
-				executionView = ViewFactory.createExecution(execution.getId());
-				entry.put(execution.getSource(), executionView);
-			}
+			final Map<ExecutionSource, ExecutionView> entry = map.computeIfAbsent(execution.getId(),
+					k -> new LinkedHashMap<>());
+			final ExecutionView executionView = entry.computeIfAbsent(execution.getSource(),
+					k -> ViewFactory.createExecution(execution.getId()));
 			for (Lifecycle lifecycle : execution.getLifecycles()
 					.values()) {
-				LifecycleView lifecycleView = executionView.getLifecycle(lifecycle.getId());
-				if (lifecycleView == null) {
-					lifecycleView = ViewFactory.createLifecycle(lifecycle.getId());
-					executionView.put(lifecycleView);
-				}
+				final LifecycleView lifecycleView = executionView.computeLifecycleIfAbsent(lifecycle.getId(),
+						k -> ViewFactory.createLifecycle(k));
 				for (Phase phase : lifecycle.getPhases()
 						.values()) {
-					PhaseView phaseView = lifecycleView.getPhase(phase.getId());
-					if (phaseView == null) {
-						phaseView = ViewFactory.createPhase(phase.getId());
-						lifecycleView.put(phaseView);
-					}
+					final PhaseView phaseView = lifecycleView.computePhaseIfAbsent(phase.getId(),
+							k -> ViewFactory.createPhase(k));
 					for (Goal goal : phase.getGoals())
 						if (this.validateGoal(cnf, goal)) {
-							GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
+							final GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
 									goal.getGoalId());
 							goalView.addModes(goal.getModes());
 							goalView.setOptional(goal.getOptional() != null && goal.getOptional());
@@ -177,10 +165,10 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	protected ExecutionView merge(final ExecutionArchiveSelectorConfig cnf, final ExecutionView base,
-			final ExecutionView dominant, boolean lifecycleOverride, boolean goalOverride) {
+			final ExecutionView dominant, final boolean lifecycleOverride, final boolean goalOverride) {
 		for (LifecycleView domLifecycle : dominant.getLifecycles()
 				.values()) {
-			LifecycleView baseLifecycle = base.getLifecycles()
+			final LifecycleView baseLifecycle = base.getLifecycles()
 					.get(domLifecycle.getId());
 			if (lifecycleOverride || baseLifecycle == null) {
 				base.put(domLifecycle);
@@ -188,7 +176,7 @@ public class Selector implements ExecutionArchiveSelector {
 			}
 
 			// remove all dominant goals from base phases, which can only be executed once
-			Map<GoalView, PhaseView> basePhaseIndex = new HashMap<>();
+			final Map<GoalView, PhaseView> basePhaseIndex = new HashMap<>();
 			for (PhaseView basePhase : baseLifecycle.getPhases()
 					.values())
 				for (GoalView goal : basePhase.getGoals())
@@ -208,7 +196,7 @@ public class Selector implements ExecutionArchiveSelector {
 			// push all dominant phases and goals into base lifecycles
 			for (PhaseView domPhase : domLifecycle.getPhases()
 					.values()) {
-				PhaseView basePhase = baseLifecycle.getPhases()
+				final PhaseView basePhase = baseLifecycle.getPhases()
 						.get(domPhase.getId());
 				if (basePhase == null) {
 					baseLifecycle.put(domPhase);
@@ -222,13 +210,13 @@ public class Selector implements ExecutionArchiveSelector {
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSector slice) {
-		Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
+		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
 		getExecutions(cnf, defaultActiveFilter(cnf), views, slice, false);
 		return views;
 	}
 
 	@SuppressWarnings("deprecation")
-	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final ExecutionFilter filter,
+	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final Predicate<Execution> filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
 			final boolean onlyInherited) {
 		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
@@ -243,19 +231,19 @@ public class Selector implements ExecutionArchiveSelector {
 		} else
 			effExecDetected = true;
 
-		Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
+		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
 
 		for (String executionId : dominantViews.keySet()) {
-			Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
-			Map<ExecutionSource, ExecutionView> domEntries = dominantViews.get(executionId);
+			final Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
+			final Map<ExecutionSource, ExecutionView> domEntries = dominantViews.get(executionId);
 			if (baseEntries == null) {
 				baseViews.put(executionId, domEntries);
 				continue;
 			}
 			baseEntries.remove(ExecutionSource.EFFECTIVE);
 			for (ExecutionSource source : domEntries.keySet()) {
-				ExecutionView baseExecution = baseEntries.get(source);
-				ExecutionView domExecution = domEntries.get(source);
+				final ExecutionView baseExecution = baseEntries.get(source);
+				final ExecutionView domExecution = domEntries.get(source);
 				if (baseExecution == null || ExecutionSource.EFFECTIVE.equals(source)) {
 					baseEntries.put(source, domExecution);
 					continue;
@@ -269,19 +257,22 @@ public class Selector implements ExecutionArchiveSelector {
 	}
 
 	@SuppressWarnings("deprecation")
-	protected ExecutionView reduce(final ExecutionArchiveSelectorConfig cnf, String id,
-			Map<ExecutionSource, ExecutionView> views) {
+	protected ExecutionView reduce(final ExecutionArchiveSelectorConfig cnf, final String id,
+			final Map<ExecutionSource, ExecutionView> views) {
 		ExecutionView execution = views.get(ExecutionSource.EFFECTIVE);
 		if (execution != null)
 			return execution;
 
-		ExecutionView workflowView = views.getOrDefault(ExecutionSource.WORKFLOW, ViewFactory.createExecution(id));
-		ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING, ViewFactory.createExecution(id));
+		final ExecutionView workflowView = views.getOrDefault(ExecutionSource.WORKFLOW,
+				ViewFactory.createExecution(id));
+		final ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING,
+				ViewFactory.createExecution(id));
 
 		execution = merge(cnf, packagingView, workflowView, true, false);
 
-		ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
-		ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE, ViewFactory.createExecution(id));
+		final ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
+		final ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE,
+				ViewFactory.createExecution(id));
 
 		execution = merge(cnf, pluginView, execution, false, true);
 		execution = merge(cnf, execution, overrideView, true, false);
@@ -291,11 +282,11 @@ public class Selector implements ExecutionArchiveSelector {
 
 	@Override
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
-		Set<ExecutionView> views = new LinkedHashSet<>();
+		final Set<ExecutionView> views = new LinkedHashSet<>();
 		if (selectorConfig.getActiveProject() == null)
 			return new Selection(selectorConfig.clone(), views);
 
-		ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
+		final ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
 		if (sector == null)
 			return new Selection(selectorConfig.clone(), views);
 

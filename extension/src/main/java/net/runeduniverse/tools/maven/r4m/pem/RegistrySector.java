@@ -42,12 +42,12 @@ public class RegistrySector implements PluginExecutionRegistrySector {
 	}
 
 	@Override
-	public void addExecutions(Collection<Execution> values) {
+	public void addExecutions(final Collection<Execution> values) {
 		this.executions.addAll(values);
 	}
 
 	@Override
-	public void includeModel(ProjectExecutionModel model) {
+	public void includeModel(final ProjectExecutionModel model) {
 		if (model == null || model.getExecutions()
 				.isEmpty())
 			return;
@@ -61,7 +61,7 @@ public class RegistrySector implements PluginExecutionRegistrySector {
 	}
 
 	@Override
-	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint) {
+	public ProjectExecutionModel getModel(final Class<?> parserType, final String parserHint) {
 		return this.hintedOrigins.get(createKey(parserType, parserHint));
 	}
 
@@ -70,7 +70,7 @@ public class RegistrySector implements PluginExecutionRegistrySector {
 		return new LinkedHashSet<>(this.hintedOrigins.values());
 	}
 
-	protected static String createKey(Class<?> parserType, String parserHint) {
+	protected static String createKey(final Class<?> parserType, String parserHint) {
 		if (isBlank(parserHint))
 			parserHint = "default";
 		if (parserType == null)

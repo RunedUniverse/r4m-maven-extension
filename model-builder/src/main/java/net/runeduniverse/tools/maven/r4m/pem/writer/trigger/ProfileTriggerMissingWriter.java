@@ -30,7 +30,7 @@ public class ProfileTriggerMissingWriter implements ExecutionTriggerWriter {
 		if (trigger == null || !(trigger instanceof ProfileTriggerMissing))
 			return false;
 
-		PlexusConfiguration node = triggerNode.getChild(ProfileTriggerMissing.HINT, true);
+		final PlexusConfiguration node = triggerNode.getChild(ProfileTriggerMissing.HINT, true);
 		node.setAttribute("id", ((ProfileTriggerMissing) trigger).getProfileId());
 
 		return true;

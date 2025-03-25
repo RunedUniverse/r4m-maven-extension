@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
@@ -44,24 +45,24 @@ public class Selection implements ExecutionArchiveSelection {
 	}
 
 	@Override
-	public void modify(Modification mod) {
-		mod.modify(this.views);
+	public void modify(final Consumer<Set<ExecutionView>> mod) {
+		mod.accept(this.views);
 		cleanup();
 	}
 
 	protected void cleanup() {
 		for (Iterator<ExecutionView> iExec = views.iterator(); iExec.hasNext();) {
-			ExecutionView exec = iExec.next();
+			final ExecutionView exec = iExec.next();
 
 			for (Iterator<LifecycleView> iLifecycle = exec.getLifecycles()
 					.values()
 					.iterator(); iLifecycle.hasNext();) {
-				LifecycleView lifecycle = iLifecycle.next();
+				final LifecycleView lifecycle = iLifecycle.next();
 
 				for (Iterator<PhaseView> iPhase = lifecycle.getPhases()
 						.values()
 						.iterator(); iPhase.hasNext();) {
-					PhaseView phase = iPhase.next();
+					final PhaseView phase = iPhase.next();
 					if (phase.getGoals()
 							.isEmpty())
 						iPhase.remove();
@@ -77,56 +78,48 @@ public class Selection implements ExecutionArchiveSelection {
 	}
 
 	@Override
-	public Map<ExecutionView, List<GoalView>> selectPhase(String selected) {
-		Map<ExecutionView, List<GoalView>> goalMap = new LinkedHashMap<>();
+	public Map<ExecutionView, List<GoalView>> selectPhase(final String selected) {
+		final Map<ExecutionView, List<GoalView>> goalMap = new LinkedHashMap<>();
 		if (selected == null)
 			return goalMap;
 
-		for (ExecutionView exec : this.views)
+		for (ExecutionView exec : this.views) {
 			for (LifecycleView lifecycle : exec.getLifecycles()
 					.values())
 				for (PhaseView phase : lifecycle.getPhases()
 						.values())
 					if (selected.equals(phase.getId()))
 						for (GoalView goal : phase.getGoals()) {
-							List<GoalView> goals = goalMap.get(exec);
-							if (goals == null) {
-								goals = new LinkedList<>();
-								goalMap.put(exec, goals);
-							}
+							final List<GoalView> goals = goalMap.computeIfAbsent(exec, k -> new LinkedList<>());
 							goals.add(goal);
 						}
+		}
 		return goalMap;
 	}
 
 	@Override
-	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(String... phases) {
+	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(final String... phases) {
 		return selectPhases(Arrays.asList(phases));
 	}
 
 	@Override
-	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(Collection<String> phases) {
-		Map<String, Map<ExecutionView, List<GoalView>>> map = new LinkedHashMap<>();
-		for (ExecutionView exec : this.views)
+	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(final Collection<String> phases) {
+		final Map<String, Map<ExecutionView, List<GoalView>>> map = new LinkedHashMap<>();
+		for (ExecutionView exec : this.views) {
 			for (LifecycleView lifecycle : exec.getLifecycles()
 					.values())
 				for (PhaseView phase : lifecycle.getPhases()
 						.values()) {
-					Map<ExecutionView, List<GoalView>> goalMap = map.get(phase.getId());
+					final String phaseId = phase.getId();
 					for (GoalView goal : phase.getGoals())
 						if (phases.contains(phase.getId())) {
-							if (goalMap == null) {
-								goalMap = new LinkedHashMap<>();
-								map.put(phase.getId(), goalMap);
-							}
-							List<GoalView> goals = goalMap.get(exec);
-							if (goals == null) {
-								goals = new LinkedList<>();
-								goalMap.put(exec, goals);
-							}
+							final Map<ExecutionView, List<GoalView>> goalMap = map.computeIfAbsent(phaseId,
+									k -> new LinkedHashMap<>());
+							final List<GoalView> goals = goalMap.computeIfAbsent(exec, k -> new LinkedList<>());
 							goals.add(goal);
 						}
 				}
+		}
 		return map;
 	}
 

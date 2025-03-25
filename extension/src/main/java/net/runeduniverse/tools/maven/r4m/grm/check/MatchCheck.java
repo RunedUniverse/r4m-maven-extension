@@ -91,7 +91,7 @@ public class MatchCheck extends AndCheck {
 		}
 
 		@Override
-		public boolean remove(Object o) {
+		public boolean remove(final Object o) {
 			final boolean result = super.remove(o);
 			if (result && o instanceof GoalCheck) {
 				this.goalCheck = null;

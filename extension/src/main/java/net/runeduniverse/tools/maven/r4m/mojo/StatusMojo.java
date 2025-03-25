@@ -32,6 +32,7 @@ import net.runeduniverse.tools.maven.r4m.SettingsFactory;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
 
@@ -86,11 +87,11 @@ public class StatusMojo extends AbstractMojo {
 		if (!supportsExtensionFeatures(this.settings))
 			warnExtensionFeatureState(getLog());
 		getLog().info("");
-		Boolean fancy = getFancyOutput();
+		final Boolean fancy = getFancyOutput();
 		getLog().info("\033[1mRunes4Maven Status\033[m");
 		if (fancy)
 			getLog().info(" " + format(TEMPLATE, T_DEFAULT, T_SELECTED));
-		List<Property<?>> props = new LinkedList<>(this.settings.getAllProperties());
+		final List<Property<?>> props = new LinkedList<>(this.settings.getAllProperties());
 		props.sort(null);
 		for (Property<?> prop : props)
 			logTextEntry(prop, fancy);
@@ -112,18 +113,18 @@ public class StatusMojo extends AbstractMojo {
 	}
 
 	private static String format(Collection<?> options, Object defaultValue, Object selectedValue) {
-		Set<Object> values = new LinkedHashSet<>(options);
+		final Set<Object> values = new LinkedHashSet<>(options);
 		if (!isNull(defaultValue))
 			values.add(defaultValue);
 		if (!isNull(selectedValue))
 			values.add(selectedValue);
 
-		StringBuilder result = new StringBuilder("[");
+		final StringBuilder result = new StringBuilder("[");
 		for (Iterator<?> idx = values.iterator(); idx.hasNext();) {
-			Object value = idx.next();
+			final Object value = idx.next();
 
-			result.append(String.format(ITEM_FORMAT, equals(value, defaultValue) ? '4' : '0',
-					equals(value, selectedValue) ? '1' : '2', value.toString()));
+			result.append(String.format(ITEM_FORMAT, objectEquals(value, defaultValue) ? '4' : '0',
+					objectEquals(value, selectedValue) ? '1' : '2', value.toString()));
 
 			if (idx.hasNext())
 				result.append(", ");
@@ -132,18 +133,10 @@ public class StatusMojo extends AbstractMojo {
 				.toString();
 	}
 
-	private static boolean isNull(Object o) {
+	private static boolean isNull(final Object o) {
 		if (o instanceof String)
 			return isBlank((String) o);
 		return o == null;
-	}
-
-	private static boolean equals(Object a, Object b) {
-		if (a == b)
-			return true;
-		if (a == null)
-			return b.equals(a);
-		return a.equals(b);
 	}
 
 }

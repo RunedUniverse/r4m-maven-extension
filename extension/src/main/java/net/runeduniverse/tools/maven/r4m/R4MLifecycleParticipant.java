@@ -235,18 +235,18 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	}
 
 	private void loadReferencedPlugins(final MavenSession mvnSession, final MavenProject mvnProject) {
-		Map<String, CharSequence> eventData = new LinkedHashMap<>();
+		final Map<String, CharSequence> eventData = new LinkedHashMap<>();
 		eventData.put("maven-project", mvnProject.getGroupId() + ':' + mvnProject.getArtifactId());
 
 		this.dispatcher.onEvent(MessagePatchingEvent
 				.createInfoEvent(Type.INFO_SCANNING_FOR_REFERENCED_PLUGINS_BY_PROJECT_STARTED, eventData)
 				.readonly());
 
-		PluginContainer plugins = mvnProject.getBuild();
-		List<Artifact> knownArtifacts = new LinkedList<>();
-		List<Plugin> knownPlugins = new LinkedList<>(plugins.getPlugins());
+		final PluginContainer plugins = mvnProject.getBuild();
+		final List<Artifact> knownArtifacts = new LinkedList<>();
+		final List<Plugin> knownPlugins = new LinkedList<>(plugins.getPlugins());
 		List<Plugin> remainingPlugins = plugins.getPlugins();
-		Map<String, Plugin> managedPlugins = mvnProject.getBuild()
+		final Map<String, Plugin> managedPlugins = mvnProject.getBuild()
 				.getPluginManagement()
 				.getPluginsAsMap();
 		int discoveredPluginAmount = 0;
@@ -271,12 +271,13 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			final MavenProject mvnProject, final List<Artifact> knownArtifacts, final List<Plugin> knownPlugins,
 			final Map<String, Plugin> managedPlugins, final Plugin parentPlugin) {
 		final List<Plugin> referencedPlugins = new LinkedList<>();
-		List<Artifact> artifacts = null;
+		final List<Artifact> artifacts;
 		try {
 			artifacts = resolvePluginArtifacts(parentPlugin, mvnProject.getRemotePluginRepositories(), repoSession);
 		} catch (PluginResolutionException ignored) {
 			if (this.log.isDebugEnabled())
 				this.log.debug(ERR_FAILED_TO_RESOLVE_PLUGIN_ARTIFACT, ignored);
+			return referencedPlugins;
 		}
 		if (artifacts == null)
 			return referencedPlugins;
@@ -286,12 +287,12 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 				continue;
 			knownArtifacts.add(artifact);
 
-			Plugin plugin = new Plugin();
+			final Plugin plugin = new Plugin();
 			plugin.setGroupId(artifact.getGroupId());
 			plugin.setArtifactId(artifact.getArtifactId());
 			plugin.setVersion(artifact.getVersion());
 
-			Plugin pluginInPom = managedPlugins.get(plugin.getKey());
+			final Plugin pluginInPom = managedPlugins.get(plugin.getKey());
 			if (pluginInPom != null) {
 				if (plugin.getVersion() == null)
 					plugin.setVersion(pluginInPom.getVersion());
@@ -318,18 +319,19 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		return referencedPlugins;
 	}
 
-	private List<Artifact> resolvePluginArtifacts(Plugin extensionPlugin, List<RemoteRepository> repositories,
-			RepositorySystemSession session) throws PluginResolutionException {
+	private List<Artifact> resolvePluginArtifacts(final Plugin extensionPlugin,
+			final List<RemoteRepository> repositories, final RepositorySystemSession session)
+			throws PluginResolutionException {
 		final DependencyNode root = pluginDependenciesResolver.resolve(extensionPlugin, null, null, repositories,
 				session);
 		final PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
 		root.accept(nlg);
 
-		List<Artifact> artifacts = new ArrayList<>(nlg.getNodes()
+		final List<Artifact> artifacts = new ArrayList<>(nlg.getNodes()
 				.size());
 		RepositoryUtils.toArtifacts(artifacts, Collections.singleton(root), Collections.<String>emptyList(), null);
 		for (Iterator<Artifact> it = artifacts.iterator(); it.hasNext();) {
-			Artifact artifact = it.next();
+			final Artifact artifact = it.next();
 			if (artifact.getFile() == null) {
 				it.remove();
 			}
@@ -341,7 +343,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		final String defaultExecPlanCalcName = DefaultLifecycleExecutionPlanCalculator.class.getCanonicalName();
 		DefaultLifecycleExecutionPlanCalculator defaultExecPlanCalc = null;
 
-		Map<String, CharSequence> eventData = new LinkedHashMap<>();
+		final Map<String, CharSequence> eventData = new LinkedHashMap<>();
 		eventData.put("component", defaultExecPlanCalcName);
 		eventData.put("role", LifecycleExecutionPlanCalculator.class.getCanonicalName());
 
@@ -402,8 +404,8 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.log.fatalError("╔══════════════════════════════════════════════════════════════════════╗");
 		this.log.fatalError("║                            \033[1m! ATTENTION !\033[m                             ║");
 		this.log.fatalError("║                                                                      ║");
-		this.log.fatalError("║ If you are seeing this message, loading R4M as a build-extension     ║");
-		this.log.fatalError("║    is not supported on your version of Maven!                        ║");
+		this.log.fatalError("║ If you are seeing this message, R4M was loaded as a build-extension  ║");
+		this.log.fatalError("║    which is not supported on your version of Maven!                  ║");
 		this.log.fatalError("╟──────────────────────────────────────────────────────────────────────╢");
 		this.log.fatalError("║ To resolve this R4M has to be configured as a core-extension!        ║");
 		this.log.fatalError("║   Please check your configuration!                                   ║");
@@ -411,7 +413,7 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 		this.log.fatalError("║   Quick Fix: 'mvn r4m:setup'                                         ║");
 		this.log.fatalError("║                                                                      ║");
 		this.log.fatalError("╟──────────────────────────────────────────────────────────────────────╢");
-		this.log.fatalError("║  Maven Patching was be skipped - most functionality is unavailable!  ║");
+		this.log.fatalError("║  Maven Patching was skipped - most functionality is unavailable!     ║");
 		this.log.fatalError("╚══════════════════════════════════════════════════════════════════════╝");
 	}
 

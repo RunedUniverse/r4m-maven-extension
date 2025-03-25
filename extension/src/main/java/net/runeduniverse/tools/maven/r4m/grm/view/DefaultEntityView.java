@@ -22,11 +22,12 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.RuntimeView;
 
 public class DefaultEntityView implements EntityView {
 
-	protected ProjectView project = null;
-	protected RuntimeView runtime = null;
-	protected GoalView goal = null;
+	final protected ProjectView project;
+	final protected RuntimeView runtime;
+	final protected GoalView goal;
 
 	protected DefaultEntityView() {
+		this(null, null, null);
 	}
 
 	public DefaultEntityView(final ProjectView projectData, final RuntimeView runtimeData, final GoalView goalData) {

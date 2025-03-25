@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.EntityView;
 
 public interface CheckConverter {
 
-	public Condition<EntityView> convertEntry(final DataEntry entry);
+	public Condition<EntityView> convertEntry(DataEntry entry);
 
 }

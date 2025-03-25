@@ -30,7 +30,7 @@ public class ProfileTriggerActiveParser implements ExecutionTriggerParser {
 
 	@Override
 	public ExecutionTrigger<ExecutionArchiveSelectorConfig> parse(final PlexusConfiguration node) {
-		String id = node.getAttribute("id");
+		final String id = node.getAttribute("id");
 		if (isBlank(id))
 			return null;
 		return new ProfileTriggerActive(id);

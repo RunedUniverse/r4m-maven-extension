@@ -23,12 +23,10 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
 public interface GoalRequirementModelWriter {
 
-	public void writeModel(final OutputStream stream, final GoalRequirementModel grm) throws IOException;
+	public void writeModel(OutputStream stream, GoalRequirementModel grm) throws IOException;
 
-	public void writeModel(final OutputStream stream, final GoalRequirementModel grm, final Charset charset)
-			throws IOException;
+	public void writeModel(OutputStream stream, GoalRequirementModel grm, Charset charset) throws IOException;
 
-	public void writeModel(final OutputStream stream, final GoalRequirementModel grm, final String charsetName)
-			throws IOException;
+	public void writeModel(OutputStream stream, GoalRequirementModel grm, String charsetName) throws IOException;
 
 }

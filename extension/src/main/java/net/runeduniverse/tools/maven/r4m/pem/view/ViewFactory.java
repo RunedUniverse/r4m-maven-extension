@@ -22,19 +22,19 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 public class ViewFactory {
 
-	public static ExecutionView createExecution(String id) {
+	public static ExecutionView createExecution(final String id) {
 		return new Execution(id);
 	}
 
-	public static LifecycleView createLifecycle(String id) {
+	public static LifecycleView createLifecycle(final String id) {
 		return new Lifecycle(id);
 	}
 
-	public static PhaseView createPhase(String id) {
+	public static PhaseView createPhase(final String id) {
 		return new Phase(id);
 	}
 
-	public static GoalView createGoal(String groupId, String artifactId, String goalId) {
+	public static GoalView createGoal(final String groupId, final String artifactId, final String goalId) {
 		return new Goal(groupId, artifactId, goalId);
 	}
 

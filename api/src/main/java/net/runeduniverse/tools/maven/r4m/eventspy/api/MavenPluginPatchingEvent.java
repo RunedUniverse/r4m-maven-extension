@@ -25,12 +25,13 @@ public interface MavenPluginPatchingEvent extends PatchingEvent {
 
 	public Map<MavenProject, Set<Plugin>> getEffectedPluginsPerProject();
 
-	public static MavenPluginEvent createInfoEvent(Type type, Map<MavenProject, Set<Plugin>> effectedPlugins) {
+	public static MavenPluginEvent createInfoEvent(final Type type,
+			final Map<MavenProject, Set<Plugin>> effectedPlugins) {
 		return new MavenPluginEvent(type, null, effectedPlugins);
 	}
 
-	public static MavenPluginEvent createErrorEvent(Type type, Exception exception,
-			Map<MavenProject, Set<Plugin>> effectedPluginsPerProject) {
+	public static MavenPluginEvent createErrorEvent(final Type type, final Exception exception,
+			final Map<MavenProject, Set<Plugin>> effectedPluginsPerProject) {
 		return new MavenPluginEvent(type, exception, effectedPluginsPerProject);
 	}
 
@@ -38,7 +39,8 @@ public interface MavenPluginPatchingEvent extends PatchingEvent {
 
 		protected Map<MavenProject, Set<Plugin>> effectedPlugins = null;
 
-		public MavenPluginEvent(Type type, Exception exception, Map<MavenProject, Set<Plugin>> effectedPlugins) {
+		public MavenPluginEvent(final Type type, final Exception exception,
+				final Map<MavenProject, Set<Plugin>> effectedPlugins) {
 			super(type, exception);
 			this.effectedPlugins = effectedPlugins;
 		}

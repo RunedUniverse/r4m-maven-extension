@@ -21,7 +21,6 @@ import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 
 public interface DataHandler {
 
-	public PlexusConfiguration createConfiguration(final ConfigurationFactory<PlexusConfiguration> factory,
-			final DataEntry entry);
+	public PlexusConfiguration createConfiguration(ConfigurationFactory<PlexusConfiguration> factory, DataEntry entry);
 
 }

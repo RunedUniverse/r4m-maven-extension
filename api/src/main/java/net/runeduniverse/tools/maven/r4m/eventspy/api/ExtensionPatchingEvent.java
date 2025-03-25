@@ -16,12 +16,12 @@
 package net.runeduniverse.tools.maven.r4m.eventspy.api;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.common.CollectionUtils;
 import net.runeduniverse.lib.utils.maven.ext.data.api.Extension;
 
 public interface ExtensionPatchingEvent extends PatchingEvent {
@@ -30,43 +30,50 @@ public interface ExtensionPatchingEvent extends PatchingEvent {
 
 	public Set<Extension> getExtensions();
 
-	public static ExtensionEvent createInfoEvent(Type type) {
+	public static ExtensionEvent createInfoEvent(final Type type) {
 		return new ExtensionEvent(type, null);
 	}
 
-	public static ExtensionEvent createInfoEvent(Type type, Collection<MavenProject> projects,
+	public static ExtensionEvent createInfoEvent(final Type type, final Collection<MavenProject> projects,
 			Collection<Extension> extensions) {
 		return new ExtensionEvent(type, null, projects, extensions);
 	}
 
-	public static ExtensionEvent createErrorEvent(Type type, Exception exception) {
+	public static ExtensionEvent createErrorEvent(final Type type, final Exception exception) {
 		return new ExtensionEvent(type, exception);
 	}
 
-	public static ExtensionEvent createErrorEvent(Type type, Exception exception, Collection<MavenProject> projects,
-			Collection<Extension> extensions) {
+	public static ExtensionEvent createErrorEvent(final Type type, final Exception exception,
+			final Collection<MavenProject> projects, Collection<Extension> extensions) {
 		return new ExtensionEvent(type, exception, projects, extensions);
 	}
 
 	public class ExtensionEvent extends PatchingEvent.BasicEvent implements ExtensionPatchingEvent {
 
-		protected Set<MavenProject> projects = new LinkedHashSet<>();
-		protected Set<Extension> extensions = new LinkedHashSet<>();
+		protected Set<MavenProject> projects;
+		protected Set<Extension> extensions;
 
-		public ExtensionEvent(Type type, Exception exception) {
+		protected ExtensionEvent(final Type type, final Exception exception, final Set<MavenProject> projects,
+				final Set<Extension> extensions) {
 			super(type, exception);
+			this.projects = projects;
+			this.extensions = extensions;
 		}
 
-		public ExtensionEvent(Type type, Exception exception, Collection<MavenProject> projects,
-				Collection<Extension> extensions) {
-			super(type, exception);
+		public ExtensionEvent(final Type type, final Exception exception) {
+			this(type, exception, new LinkedHashSet<>(), new LinkedHashSet<>());
+		}
+
+		public ExtensionEvent(final Type type, final Exception exception, final Collection<MavenProject> projects,
+				final Collection<Extension> extensions) {
+			this(type, exception, new LinkedHashSet<>(), new LinkedHashSet<>());
 			this.projects.addAll(projects);
 			this.extensions.addAll(extensions);
 		}
 
 		public ExtensionEvent readonly() {
-			this.projects = Collections.unmodifiableSet(this.projects);
-			this.extensions = Collections.unmodifiableSet(this.extensions);
+			this.projects = CollectionUtils.unmodifiable(this.projects);
+			this.extensions = CollectionUtils.unmodifiable(this.extensions);
 			return this;
 		}
 

@@ -46,7 +46,7 @@ public class ExecutionSource implements Keyed {
 
 	private final String key;
 
-	protected ExecutionSource(String key) {
+	protected ExecutionSource(final String key) {
 		this.key = key;
 		ExecutionSource.KNOWN_SOURCES.put(key, this);
 	}
@@ -77,10 +77,6 @@ public class ExecutionSource implements Keyed {
 
 		key = key.trim()
 				.toLowerCase();
-		final ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
-		if (source == null)
-			return new ExecutionSource(key);
-		else
-			return source;
+		return ExecutionSource.KNOWN_SOURCES.getOrDefault(key, new ExecutionSource(key));
 	}
 }

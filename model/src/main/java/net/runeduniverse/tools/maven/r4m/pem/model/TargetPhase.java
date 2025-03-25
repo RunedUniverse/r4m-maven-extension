@@ -24,10 +24,10 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class TargetPhase implements Recordable {
 
-	private String id;
-	private final Set<String> executions = new LinkedHashSet<>(0);
+	protected final Set<String> executions = new LinkedHashSet<>(0);
+	protected String id;
 
-	public TargetPhase(String id) {
+	public TargetPhase(final String id) {
 		this.id = id;
 	}
 
@@ -39,18 +39,18 @@ public class TargetPhase implements Recordable {
 		return this.executions;
 	}
 
-	public void addExecutions(Set<String> executions) {
+	public void addExecutions(final Set<String> executions) {
 		this.executions.addAll(executions);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof TargetPhase))
 			return false;
-		TargetPhase phase = (TargetPhase) obj;
+		final TargetPhase phase = (TargetPhase) obj;
 
 		if (!this.id.equals(phase.getId()) || !(this.executions.size() == phase.getExecutions()
 				.size() && this.executions.containsAll(phase.getExecutions())))
@@ -61,7 +61,7 @@ public class TargetPhase implements Recordable {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Target Phase");
+		final CompoundTree tree = new DefaultCompoundTree("Target Phase");
 
 		tree.append("id", this.id);
 

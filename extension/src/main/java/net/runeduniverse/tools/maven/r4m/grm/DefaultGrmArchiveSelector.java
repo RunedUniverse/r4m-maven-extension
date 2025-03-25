@@ -209,7 +209,7 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	protected GoalRequirementCombineMethod getCombineMethod(final MergeDataGroup data) {
 		if (data == null)
 			return null;
-		GoalRequirementCombineMethod method = data.getCombineMethod();
+		final GoalRequirementCombineMethod method = data.getCombineMethod();
 		if (GoalRequirementCombineMethod.DEFAULT.equals(method)) {
 			return data.getSource()
 					.defaultCombineMethod();

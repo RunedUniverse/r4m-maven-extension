@@ -164,9 +164,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	// Only used for testing
-	public AdvancedLifecycleExecutionPlanCalculator(BuildPluginManager pluginManager,
-			DefaultLifecycles defaultLifeCycles, MojoDescriptorCreator mojoDescriptorCreator,
-			LifecyclePluginResolver lifecyclePluginResolver) {
+	public AdvancedLifecycleExecutionPlanCalculator(final BuildPluginManager pluginManager,
+			final DefaultLifecycles defaultLifeCycles, final MojoDescriptorCreator mojoDescriptorCreator,
+			final LifecyclePluginResolver lifecyclePluginResolver) {
 		this.pluginManager = pluginManager;
 		this.defaultLifeCycles = defaultLifeCycles;
 		this.mojoDescriptorCreator = mojoDescriptorCreator;
@@ -176,8 +176,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	@Override
-	public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks,
-			boolean setup) throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
+	public MavenExecutionPlan calculateExecutionPlan(final MavenSession session, final MavenProject project,
+			final List<Object> tasks, final boolean setup)
+			throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
 			NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
 		this.lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
@@ -194,14 +195,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	@Override
-	public MavenExecutionPlan calculateExecutionPlan(MavenSession session, MavenProject project, List<Object> tasks)
+	public MavenExecutionPlan calculateExecutionPlan(final MavenSession session, final MavenProject project,
+			final List<Object> tasks)
 			throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
 			NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
 		return calculateExecutionPlan(session, project, tasks, true);
 	}
 
-	protected void setupMojoExecutions(MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions)
+	protected void setupMojoExecutions(final MavenSession session, final MavenProject project,
+			final List<MojoExecution> mojoExecutions)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -211,7 +214,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	@Override
-	public void setupMojoExecution(MavenSession session, MavenProject project, MojoExecution mojoExecution)
+	public void setupMojoExecution(final MavenSession session, final MavenProject project,
+			final MojoExecution mojoExecution)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -256,10 +260,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return resolvedTasks;
 	}
 
-	public List<MojoExecution> calculateMojoExecutions(MavenSession session, MavenProject project, List<TaskData> tasks)
-			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
-			MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
-			PluginVersionResolutionException, LifecyclePhaseNotFoundException {
+	public List<MojoExecution> calculateMojoExecutions(final MavenSession session, final MavenProject project,
+			final List<TaskData> tasks) throws PluginNotFoundException, PluginResolutionException,
+			PluginDescriptorParsingException, MojoNotFoundException, NoPluginFoundForPrefixException,
+			InvalidPluginDescriptorException, PluginVersionResolutionException, LifecyclePhaseNotFoundException {
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
 		final ExecutionArchiveSelectorConfig pemSelectorConfig = this.pemSelectorConfigFactory.createEmptyConfig()
@@ -326,7 +330,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, LifecycleTaskRequest taskRequest, final ExecutionArchiveSelection selection)
+			final MavenProject mvnProject, final LifecycleTaskRequest taskRequest,
+			final ExecutionArchiveSelection selection)
 			throws LifecyclePhaseNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException {
 		/*
@@ -560,7 +565,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	@Override
-	public void calculateForkedExecutions(MojoExecution mojoExecution, MavenSession session)
+	public void calculateForkedExecutions(final MojoExecution mojoExecution, final MavenSession session)
 			throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
 			PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
 			LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -685,7 +690,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected MojoDescriptor patchMojoDescriptorForLogging(final MojoDescriptor mojoDescriptor, final Fork fork) {
-		MojoDescriptor patched = mojoDescriptor.clone();
+		final MojoDescriptor patched = mojoDescriptor.clone();
 		String start = null;
 		String stop = null;
 
@@ -847,7 +852,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected Map<String, List<MojoExecution>> calculateForkMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, final Fork fork, ExecutionArchiveSelectorConfig cnf)
+			final MavenProject mvnProject, final Fork fork, final ExecutionArchiveSelectorConfig cnf)
 			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
 			MojoNotFoundException, InvalidPluginDescriptorException, LifecyclePhaseNotFoundException {
 
@@ -918,7 +923,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 				for (String goal : execution.getGoals()) {
 					String executionId = null;
-					int splitIdx = goal.indexOf('@');
+					final int splitIdx = goal.indexOf('@');
 					if (0 < splitIdx)
 						executionId = goal.substring(splitIdx + 1);
 
@@ -930,11 +935,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					} else
 						forkedMojoDescriptor = this.mojoDescriptorCreator.getMojoDescriptor(goal, session, project);
 
-					Map<String, Object> configurations = mappedConfigurations.get(forkedMojoDescriptor);
-					if (configurations == null) {
-						configurations = new LinkedHashMap<>();
-						mappedConfigurations.put(forkedMojoDescriptor, configurations);
-					}
+					final Map<String, Object> configurations = mappedConfigurations
+							.computeIfAbsent(forkedMojoDescriptor, k -> new LinkedHashMap<>());
 					configurations.put(executionId, executionConfiguration);
 				}
 			}
@@ -993,7 +995,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 
 		final String executionId = mojoExecution.getExecutionId();
-		MojoExecutionAdapter forkedExecution;
+		final MojoExecutionAdapter forkedExecution;
 		if (mojoExecution instanceof MojoExecutionData)
 			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,
 					((MojoExecutionData) mojoExecution).getExecutionArchiveSelectorConfig());
@@ -1018,7 +1020,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return Collections.singletonList(forkedExecution);
 	}
 
-	protected LifecycleTaskRequestCalculatorDelegate selectLifecycleTaskReqCalcDelegate(String hint)
+	protected LifecycleTaskRequestCalculatorDelegate selectLifecycleTaskReqCalcDelegate(final String hint)
 			throws LifecyclePhaseNotFoundException {
 		final LifecycleTaskRequestCalculatorDelegate lifecycleTaskReqCalcDelegate = this.lifecycleTaskRequestDelegates
 				.get(hint);
@@ -1029,19 +1031,16 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 	}
 
 	protected AdvancedLifecycleMappingDelegate selectAdvancedLifecycleMappingDelegate(final Lifecycle lifecycle) {
-		AdvancedLifecycleMappingDelegate delegate;
+		final AdvancedLifecycleMappingDelegate delegate;
 		if (Arrays.binarySearch(DefaultLifecycles.STANDARD_LIFECYCLES, lifecycle.getId()) >= 0) {
 			delegate = this.standardDelegate;
 		} else {
-			delegate = this.lifecycleMappingDelegates.get(lifecycle.getId());
-			if (delegate == null) {
-				delegate = this.standardDelegate;
-			}
+			delegate = this.lifecycleMappingDelegates.getOrDefault(lifecycle.getId(), this.standardDelegate);
 		}
 		return delegate;
 	}
 
-	protected MojoExecutionConfigurator selectExecutionConfigurator(MojoExecution mojoExecution) {
+	protected MojoExecutionConfigurator selectExecutionConfigurator(final MojoExecution mojoExecution) {
 		String configuratorId = mojoExecution.getMojoDescriptor()
 				.getComponentConfigurator();
 		if (configuratorId == null) {

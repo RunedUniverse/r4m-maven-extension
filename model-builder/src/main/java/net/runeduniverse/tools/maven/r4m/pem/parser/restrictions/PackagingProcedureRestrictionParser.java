@@ -30,7 +30,7 @@ public class PackagingProcedureRestrictionParser implements ExecutionRestriction
 
 	@Override
 	public ExecutionRestriction<ExecutionArchiveSelectorConfig> parse(final PlexusConfiguration node) {
-		String procedure = node.getValue();
+		final String procedure = node.getValue();
 		if (isBlank(procedure))
 			return null;
 		return new PackagingProcedureRestriction(procedure);

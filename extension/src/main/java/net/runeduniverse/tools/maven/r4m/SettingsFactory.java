@@ -33,7 +33,7 @@ public class SettingsFactory {
 	private PlexusContainer container;
 
 	public void setup(final MavenSession mvnSession) {
-		final ConfigBuilder<Settings> builder = new ConfigBuilder<>(settings);
+		final ConfigBuilder<Settings> builder = new ConfigBuilder<>(this.settings);
 
 		builder.withDefaultProperty(Settings.PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR, "sequential");
 		builder.withDefaultProperty(Settings.PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK, "sequential");
@@ -66,6 +66,6 @@ public class SettingsFactory {
 		// debug
 		builder.parseTextProperty(Settings.PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION, "all", "reduced");
 
-		settings.resolveSelections();
+		this.settings.resolveSelections();
 	}
 }

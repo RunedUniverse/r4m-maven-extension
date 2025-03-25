@@ -28,17 +28,17 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
 public class Goal implements GoalView {
 
-	private String groupId;
-	private String artifactId;
-	private String goalId;
-	private boolean optional;
-	private Fork fork = null;
-
 	private final Set<String> modes = new LinkedHashSet<>();
 
-	private MojoDescriptor descriptor;
+	private final String groupId;
+	private final String artifactId;
+	private final String goalId;
 
-	public Goal(String groupId, String artifactId, String goalId) {
+	private boolean optional;
+	private Fork fork = null;
+	private MojoDescriptor descriptor = null;
+
+	public Goal(final String groupId, final String artifactId, final String goalId) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.goalId = goalId;
@@ -90,39 +90,39 @@ public class Goal implements GoalView {
 	}
 
 	@Override
-	public void addModes(String... modes) {
+	public void addModes(final String... modes) {
 		for (String mode : modes)
 			this.modes.add(mode);
 	}
 
 	@Override
-	public void addModes(Collection<String> modes) {
+	public void addModes(final Collection<String> modes) {
 		this.modes.addAll(modes);
 	}
 
 	@Override
-	public void setOptional(boolean optional) {
+	public void setOptional(final boolean optional) {
 		this.optional = optional;
 	}
 
 	@Override
-	public void setFork(Fork fork) {
+	public void setFork(final Fork fork) {
 		this.fork = fork;
 	}
 
 	@Override
-	public void setDescriptor(MojoDescriptor descriptor) {
+	public void setDescriptor(final MojoDescriptor descriptor) {
 		this.descriptor = descriptor;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof GoalView))
 			return false;
-		GoalView view = (GoalView) obj;
+		final GoalView view = (GoalView) obj;
 
 		if (!(this.groupId.equals(view.getGroupId()) && this.artifactId.equals(view.getArtifactId())
 				&& this.goalId.equals(view.getGoalId()))
@@ -138,7 +138,7 @@ public class Goal implements GoalView {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("GoalView");
+		final CompoundTree tree = new DefaultCompoundTree("GoalView");
 
 		tree.append("groupId", this.groupId)
 				.append("artifactId", this.artifactId)

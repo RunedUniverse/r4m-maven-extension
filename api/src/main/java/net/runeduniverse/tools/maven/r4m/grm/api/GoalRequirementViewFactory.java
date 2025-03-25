@@ -26,13 +26,12 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 public interface GoalRequirementViewFactory {
 
-	public ProjectView createProjectView(final MavenProject mvnProject);
+	public ProjectView createProjectView(MavenProject mvnProject);
 
-	public RuntimeView createRuntimeView(final ExecutionArchiveSelectorConfig cnf, final String phase);
+	public RuntimeView createRuntimeView(ExecutionArchiveSelectorConfig cnf, String phase);
 
-	public GoalView createGoalView(final MojoExecution mojoExecution);
+	public GoalView createGoalView(MojoExecution mojoExecution);
 
-	public EntityView createEntityView(final ProjectView projectData, final RuntimeView runtimeData,
-			final GoalView goalData);
+	public EntityView createEntityView(ProjectView projectData, RuntimeView runtimeData, GoalView goalData);
 
 }

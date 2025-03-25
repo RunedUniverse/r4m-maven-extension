@@ -17,6 +17,7 @@ package net.runeduniverse.tools.maven.r4m.pem.view;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
@@ -26,10 +27,10 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 public class Lifecycle implements LifecycleView {
 
-	private String id;
-	private Map<String, PhaseView> phases = new LinkedHashMap<>();
+	private final Map<String, PhaseView> phases = new LinkedHashMap<>();
+	private final String id;
 
-	public Lifecycle(String id) {
+	public Lifecycle(final String id) {
 		this.id = id;
 	}
 
@@ -44,18 +45,24 @@ public class Lifecycle implements LifecycleView {
 	}
 
 	@Override
-	public void put(PhaseView phaseView) {
+	public void put(final PhaseView phaseView) {
 		this.phases.put(phaseView.getId(), phaseView);
 	}
 
 	@Override
-	public PhaseView getPhase(String phaseId) {
+	public PhaseView getPhase(final String phaseId) {
 		return this.phases.get(phaseId);
 	}
 
 	@Override
+	public PhaseView computePhaseIfAbsent(final String id,
+			final Function<String, ? extends PhaseView> mappingFunction) {
+		return this.phases.computeIfAbsent(id, mappingFunction);
+	}
+
+	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("LifecycleView");
+		final CompoundTree tree = new DefaultCompoundTree("LifecycleView");
 
 		tree.append("id", this.id);
 

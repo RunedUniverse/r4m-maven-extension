@@ -50,19 +50,21 @@ public class XmlWriter implements GoalRequirementModelWriter {
 	}
 
 	@Override
-	public void writeModel(OutputStream stream, GoalRequirementModel grm) throws IOException {
+	public void writeModel(final OutputStream stream, final GoalRequirementModel grm) throws IOException {
 		stream.write(convert(grm).toString()
 				.getBytes());
 	}
 
 	@Override
-	public void writeModel(OutputStream stream, GoalRequirementModel grm, Charset charset) throws IOException {
+	public void writeModel(final OutputStream stream, final GoalRequirementModel grm, final Charset charset)
+			throws IOException {
 		stream.write(convert(grm).toString()
 				.getBytes(charset));
 	}
 
 	@Override
-	public void writeModel(OutputStream stream, GoalRequirementModel grm, String charsetName) throws IOException {
+	public void writeModel(final OutputStream stream, final GoalRequirementModel grm, final String charsetName)
+			throws IOException {
 		stream.write(convert(grm).toString()
 				.getBytes(charsetName));
 	}
@@ -87,7 +89,7 @@ public class XmlWriter implements GoalRequirementModelWriter {
 		return node;
 	}
 
-	protected PlexusConfiguration convert(GoalContainer container) {
+	protected PlexusConfiguration convert(final GoalContainer container) {
 		return this.converter.convertContainer(this.factory, container);
 	}
 

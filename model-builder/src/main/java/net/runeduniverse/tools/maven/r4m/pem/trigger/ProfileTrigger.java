@@ -20,9 +20,9 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 
 public abstract class ProfileTrigger implements ExecutionTrigger<ExecutionArchiveSelectorConfig> {
 
-	protected String profileId;
+	protected final String profileId;
 
-	public ProfileTrigger(String profileId) {
+	public ProfileTrigger(final String profileId) {
 		this.profileId = profileId;
 	}
 

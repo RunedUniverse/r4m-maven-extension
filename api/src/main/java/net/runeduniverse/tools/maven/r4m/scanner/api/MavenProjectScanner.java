@@ -28,7 +28,7 @@ import org.apache.maven.project.MavenProject;
 public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 
 	@Override
-	public default int compareTo(MavenProjectScanner o) {
+	public default int compareTo(final MavenProjectScanner o) {
 		if (this == o)
 			return 0;
 		if (o == null)
@@ -38,7 +38,7 @@ public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 
 	public int getPriority();
 
-	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
-			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception;
+	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, Set<Plugin> invalidPlugins,
+			MavenProject mvnProject) throws Exception;
 
 }

@@ -110,7 +110,7 @@ public class PropertyRestriction implements ExecutionRestriction<ExecutionArchiv
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 		if (!(obj instanceof PropertyRestriction))
@@ -148,11 +148,10 @@ public class PropertyRestriction implements ExecutionRestriction<ExecutionArchiv
 			return this.key;
 		}
 
-		public static MatchType get(String value) {
+		public static MatchType get(final String value) {
 			if (value == null)
 				return null;
-			value = value.trim();
-			switch (value) {
+			switch (value.trim()) {
 			case "equals":
 				return EQUALS;
 			case "equals-ignore-case":

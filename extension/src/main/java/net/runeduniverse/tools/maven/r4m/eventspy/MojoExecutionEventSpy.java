@@ -37,16 +37,16 @@ public class MojoExecutionEventSpy implements EventSpy {
 	private Logger log;
 
 	@Override
-	public void init(Context context) throws Exception {
+	public void init(final Context context) throws Exception {
 	}
 
 	@Override
-	public void onEvent(Object eventObj) throws Exception {
+	public void onEvent(final Object eventObj) throws Exception {
 
 		if (!(eventObj instanceof ExecutionEvent))
 			return;
 
-		ExecutionEvent event = (ExecutionEvent) eventObj;
+		final ExecutionEvent event = (ExecutionEvent) eventObj;
 
 		switch (event.getType()) {
 		case ForkStarted:
@@ -61,11 +61,11 @@ public class MojoExecutionEventSpy implements EventSpy {
 	public void close() throws Exception {
 	}
 
-	private void handleForkStarted(ExecutionEvent event) {
+	private void handleForkStarted(final ExecutionEvent event) {
 		if (!(event.getMojoExecution() instanceof MojoExecutionData))
 			return;
 		final MojoExecution mojoExec = event.getMojoExecution();
-		MojoExecutionData data = (MojoExecutionData) event.getMojoExecution();
+		final MojoExecutionData data = (MojoExecutionData) event.getMojoExecution();
 
 		if (data.getLifecycleOverlayOrigin() != null)
 			infoConfigurationOverrideApplied(mojoExec, data.getFork(), data.getLifecycleOverlayOrigin());

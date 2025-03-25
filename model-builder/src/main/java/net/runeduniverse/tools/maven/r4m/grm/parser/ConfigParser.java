@@ -44,7 +44,7 @@ public class ConfigParser implements GoalRequirementModelConfigParser {
 	protected GoalRequirementModelParser parser;
 
 	@Override
-	public GoalRequirementModel parse(MavenProject mvnProject) throws Exception {
+	public GoalRequirementModel parse(final MavenProject mvnProject) throws Exception {
 
 		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.GOAL_REQUIREMENT_MODEL_FILE);
 

@@ -28,7 +28,7 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 
 	protected final String procedure;
 
-	public PackagingProcedureRestriction(String packagingProcedure) {
+	public PackagingProcedureRestriction(final String packagingProcedure) {
 		this.procedure = packagingProcedure;
 	}
 
@@ -55,7 +55,7 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 		if (!(obj instanceof PackagingProcedureRestriction))

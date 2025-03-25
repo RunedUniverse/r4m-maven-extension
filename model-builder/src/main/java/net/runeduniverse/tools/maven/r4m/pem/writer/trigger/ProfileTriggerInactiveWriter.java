@@ -30,7 +30,7 @@ public class ProfileTriggerInactiveWriter implements ExecutionTriggerWriter {
 		if (trigger == null || !(trigger instanceof ProfileTriggerInactive))
 			return false;
 
-		PlexusConfiguration node = triggerNode.getChild(ProfileTriggerInactive.HINT, true);
+		final PlexusConfiguration node = triggerNode.getChild(ProfileTriggerInactive.HINT, true);
 		node.setAttribute("id", ((ProfileTriggerInactive) trigger).getProfileId());
 
 		return true;

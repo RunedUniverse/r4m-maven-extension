@@ -17,7 +17,9 @@ package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 
@@ -37,7 +39,7 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link ExecutionFilter} for filtering Executions by
 	 *         relevance utilizing {@code cnf}
 	 */
-	public static ExecutionFilter defaultRelevanceFilter(final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
@@ -75,7 +77,7 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link ExecutionFilter} for filtering for active
 	 *         Executions utilizing {@code cnf}
 	 */
-	public static ExecutionFilter defaultActiveFilter(final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultActiveFilter(final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes

@@ -29,10 +29,10 @@ import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
  */
 public interface LifecycleTaskRequestCalculatorDelegate {
 
-	public List<LifecycleTaskRequest> calculateTaskRequest(final LifecycleTaskData taskData)
+	public List<LifecycleTaskRequest> calculateTaskRequest(LifecycleTaskData taskData)
 			throws LifecyclePhaseNotFoundException;
 
-	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
+	public LifecycleTaskRequest calculateTaskRequest(Lifecycle lifecycle, String phaseId)
 			throws LifecyclePhaseNotFoundException;
 
 }

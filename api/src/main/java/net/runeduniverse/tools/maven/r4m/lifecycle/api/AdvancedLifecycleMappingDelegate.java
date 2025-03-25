@@ -46,9 +46,9 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
  */
 public interface AdvancedLifecycleMappingDelegate {
 
-	public Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, final Lifecycle lifecycle, final String lifecyclePhase,
-			final ExecutionArchiveSelection selection) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
+	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
+			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
+			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+			MojoNotFoundException, InvalidPluginDescriptorException;
 
 }

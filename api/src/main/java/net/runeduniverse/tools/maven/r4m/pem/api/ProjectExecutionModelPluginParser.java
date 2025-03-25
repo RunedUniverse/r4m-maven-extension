@@ -25,7 +25,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelPluginParser {
 
-	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			final Plugin mvnPlugin) throws Exception;
+	public ProjectExecutionModel parse(List<RemoteRepository> repositories, RepositorySystemSession session,
+			Plugin mvnPlugin) throws Exception;
 
 }

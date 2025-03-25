@@ -49,7 +49,7 @@ public interface PatchingEvent {
 		protected Type type = null;
 		protected Exception exception = null;
 
-		public BasicEvent(Type type, Exception exception) {
+		public BasicEvent(final Type type, final Exception exception) {
 			this.type = type;
 			this.exception = exception;
 		}

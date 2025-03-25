@@ -25,7 +25,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 
 public interface GoalRequirementModelPluginParser {
 
-	public GoalRequirementModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			final Plugin mvnPlugin) throws Exception;
+	public GoalRequirementModel parse(List<RemoteRepository> repositories, RepositorySystemSession session,
+			Plugin mvnPlugin) throws Exception;
 
 }

@@ -17,6 +17,7 @@ package net.runeduniverse.tools.maven.r4m.pem.view;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
@@ -26,10 +27,10 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 
 public class Execution implements ExecutionView {
 
-	private String id;
-	private Map<String, LifecycleView> lifecycles = new LinkedHashMap<>();
+	private final Map<String, LifecycleView> lifecycles = new LinkedHashMap<>();
+	private final String id;
 
-	public Execution(String id) {
+	public Execution(final String id) {
 		this.id = id;
 	}
 
@@ -44,18 +45,24 @@ public class Execution implements ExecutionView {
 	}
 
 	@Override
-	public void put(LifecycleView view) {
+	public void put(final LifecycleView view) {
 		this.lifecycles.put(view.getId(), view);
 	}
 
 	@Override
-	public LifecycleView getLifecycle(String lifecycleId) {
+	public LifecycleView getLifecycle(final String lifecycleId) {
 		return this.lifecycles.get(lifecycleId);
 	}
 
 	@Override
+	public LifecycleView computeLifecycleIfAbsent(final String lifecycleId,
+			final Function<String, ? extends LifecycleView> mappingFunction) {
+		return this.lifecycles.computeIfAbsent(lifecycleId, mappingFunction);
+	}
+
+	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("ExecutionView");
+		final CompoundTree tree = new DefaultCompoundTree("ExecutionView");
 
 		tree.append("id", this.id);
 

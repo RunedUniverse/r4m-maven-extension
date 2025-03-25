@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.PhaseData;
 public class PhaseDataFactory extends ADataFactory {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!PhaseData.HINT.equals(cnf.getName()))
 			return null;
 

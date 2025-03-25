@@ -18,6 +18,6 @@ package net.runeduniverse.tools.maven.r4m.grm.converter.api;
 @FunctionalInterface
 public interface ConfigurationFactory<T> {
 
-	public T create(final String name);
+	public T create(String name);
 
 }

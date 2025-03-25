@@ -27,7 +27,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.PackagingData;
 public class PackagingDataFactory extends ADataFactory {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!ExecutionData.HINT.equals(cnf.getName()))
 			return null;
 

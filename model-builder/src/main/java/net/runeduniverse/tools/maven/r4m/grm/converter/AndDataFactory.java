@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 public class AndDataFactory extends ADataFactory {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!AndDataGroup.HINT.equals(cnf.getName()))
 			return null;
 

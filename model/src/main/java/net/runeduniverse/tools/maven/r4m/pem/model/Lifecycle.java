@@ -25,8 +25,8 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Lifecycle implements Recordable {
 
-	private String id;
-	private Map<String, Phase> phases = new LinkedHashMap<>();
+	protected final Map<String, Phase> phases = new LinkedHashMap<>();
+	protected String id;
 
 	public Lifecycle() {
 	}
@@ -39,7 +39,7 @@ public class Lifecycle implements Recordable {
 		return this.id;
 	}
 
-	public Phase getPhase(String phaseId) {
+	public Phase getPhase(final String phaseId) {
 		return this.phases.get(phaseId);
 	}
 
@@ -47,18 +47,18 @@ public class Lifecycle implements Recordable {
 		return this.phases;
 	}
 
-	public void putPhase(Phase phase) {
+	public void putPhase(final Phase phase) {
 		this.phases.put(phase.getId(), phase);
 	}
 
-	public void addPhases(List<Phase> phases) {
+	public void addPhases(final List<Phase> phases) {
 		for (Phase phase : phases)
 			this.phases.put(phase.getId(), phase);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Lifecycle");
+		final CompoundTree tree = new DefaultCompoundTree("Lifecycle");
 
 		tree.append("id", this.id);
 

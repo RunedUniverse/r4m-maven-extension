@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 public class Archive extends AProjectBoundArchive<ExecutionArchiveSector> implements ExecutionArchive {
 
 	@Override
-	protected ExecutionArchiveSector _newSector(MavenProject mvnProject) {
+	protected ExecutionArchiveSector _newSector(final MavenProject mvnProject) {
 		return new ArchiveSector(mvnProject, null, null);
 	}
 

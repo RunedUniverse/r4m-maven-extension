@@ -19,11 +19,12 @@ import net.runeduniverse.tools.maven.r4m.grm.view.api.ProjectView;
 
 public class DefaultProjectView implements ProjectView {
 
-	protected String groupId;
-	protected String artifactId;
-	protected String packaging;
+	final protected String groupId;
+	final protected String artifactId;
+	final protected String packaging;
 
 	protected DefaultProjectView() {
+		this(null, null, null);
 	}
 
 	public DefaultProjectView(final String groupId, final String artifactId, final String packaging) {

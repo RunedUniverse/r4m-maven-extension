@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelConfigParser {
 
-	ProjectExecutionModel parse(MavenProject mvnProject) throws Exception;
+	public ProjectExecutionModel parse(MavenProject mvnProject) throws Exception;
 
 }

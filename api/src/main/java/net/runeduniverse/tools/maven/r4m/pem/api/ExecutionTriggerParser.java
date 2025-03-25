@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 
 public interface ExecutionTriggerParser {
 
-	public ExecutionTrigger<ExecutionArchiveSelectorConfig> parse(final PlexusConfiguration node);
+	public ExecutionTrigger<ExecutionArchiveSelectorConfig> parse(PlexusConfiguration node);
 
 }

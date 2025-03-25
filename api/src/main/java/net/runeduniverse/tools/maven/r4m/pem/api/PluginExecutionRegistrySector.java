@@ -25,11 +25,11 @@ public interface PluginExecutionRegistrySector {
 
 	public Set<Execution> getExecutions();
 
-	public void addExecutions(final Collection<Execution> values);
+	public void addExecutions(Collection<Execution> values);
 
-	public void includeModel(final ProjectExecutionModel model);
+	public void includeModel(ProjectExecutionModel model);
 
-	public ProjectExecutionModel getModel(final Class<?> parserType, final String parserHint);
+	public ProjectExecutionModel getModel(Class<?> parserType, String parserHint);
 
 	public Set<ProjectExecutionModel> getModels();
 

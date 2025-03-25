@@ -25,9 +25,8 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class Phase implements Recordable {
 
-	private String id;
-
-	private List<Goal> goals = new LinkedList<>();
+	protected final List<Goal> goals = new LinkedList<>();
+	protected String id;
 
 	public Phase(final String id) {
 		this.id = id;
@@ -41,17 +40,17 @@ public class Phase implements Recordable {
 		return this.goals;
 	}
 
-	public void addGoal(Goal goal) {
+	public void addGoal(final Goal goal) {
 		this.goals.add(goal);
 	}
 
-	public void addGoals(Collection<Goal> goals) {
+	public void addGoals(final Collection<Goal> goals) {
 		this.goals.addAll(goals);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("Phase");
+		final CompoundTree tree = new DefaultCompoundTree("Phase");
 
 		tree.append("id", this.id);
 

@@ -51,21 +51,21 @@ public class GoalData extends ADataEntry implements DataEntry, Recordable {
 		return this.goalId;
 	}
 
-	public GoalData setGroupId(String groupId) {
+	public GoalData setGroupId(final String groupId) {
 		if (this.locked)
 			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.groupId = groupId;
 		return this;
 	}
 
-	public GoalData setArtifactId(String artifactId) {
+	public GoalData setArtifactId(final String artifactId) {
 		if (this.locked)
 			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.id = artifactId;
 		return this;
 	}
 
-	public GoalData setGoalId(String goalId) {
+	public GoalData setGoalId(final String goalId) {
 		if (this.locked)
 			throw new UnsupportedOperationException(ERR_MSG_LOCKED_OBJECT);
 		this.goalId = goalId;

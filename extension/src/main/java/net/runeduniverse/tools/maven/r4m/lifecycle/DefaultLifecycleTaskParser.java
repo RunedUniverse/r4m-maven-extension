@@ -33,7 +33,7 @@ public class DefaultLifecycleTaskParser implements TaskParser {
 	public LifecycleTaskData parse(final Object taskObject) {
 		if (!(taskObject instanceof LifecycleTask))
 			return null;
-		LifecycleTask lifecycleTask = (LifecycleTask) taskObject;
+		final LifecycleTask lifecycleTask = (LifecycleTask) taskObject;
 		String task = lifecycleTask.getLifecyclePhase();
 		String mode = "";
 

@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.pem.view.api;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
@@ -26,6 +27,9 @@ public interface ExecutionView extends Recordable {
 	public Map<String, LifecycleView> getLifecycles();
 
 	public LifecycleView getLifecycle(String lifecycleId);
+
+	public LifecycleView computeLifecycleIfAbsent(String lifecycleId,
+			Function<String, ? extends LifecycleView> mappingFunction);
 
 	public void put(LifecycleView view);
 

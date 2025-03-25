@@ -44,11 +44,11 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 		return this.never;
 	}
 
-	public void setAlwaysActive(boolean value) {
+	public void setAlwaysActive(final boolean value) {
 		this.always = value;
 	}
 
-	public void setNeverActive(boolean value) {
+	public void setNeverActive(final boolean value) {
 		this.never = value;
 	}
 
@@ -89,7 +89,7 @@ public class WhenDataGroup extends OrDataGroup implements Recordable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!super.equals(obj) || !(obj instanceof WhenDataGroup))
 			return false;
 		final WhenDataGroup data = (WhenDataGroup) obj;

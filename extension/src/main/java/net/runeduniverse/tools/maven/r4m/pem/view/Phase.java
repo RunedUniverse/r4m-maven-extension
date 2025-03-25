@@ -27,10 +27,10 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
 public class Phase implements PhaseView {
 
-	private final String id;
 	private final List<GoalView> goals = new LinkedList<>();
+	private final String id;
 
-	public Phase(String id) {
+	public Phase(final String id) {
 		this.id = id;
 	}
 
@@ -45,19 +45,19 @@ public class Phase implements PhaseView {
 	}
 
 	@Override
-	public void addGoal(GoalView goal) {
+	public void addGoal(final GoalView goal) {
 		if (goal == null)
 			return;
 		this.goals.add(goal);
 	}
 
 	@Override
-	public void removeGoal(GoalView goal) {
+	public void removeGoal(final GoalView goal) {
 		this.goals.remove(goal);
 	}
 
 	@Override
-	public void addNewGoals(Collection<GoalView> goals) {
+	public void addNewGoals(final Collection<GoalView> goals) {
 		for (GoalView goal : goals)
 			if (!this.goals.contains(goal))
 				addGoal(goal);
@@ -65,7 +65,7 @@ public class Phase implements PhaseView {
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new DefaultCompoundTree("PhaseView");
+		final CompoundTree tree = new DefaultCompoundTree("PhaseView");
 
 		tree.append("id", this.id);
 

@@ -46,7 +46,7 @@ public class HelpDebugMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		final String version = asVersionTag(getR4MVersionFromArtifact(getClass(), getLog()));
-		boolean unsupported = !supportsExtensionFeatures(this.settings);
+		final boolean unsupported = !supportsExtensionFeatures(this.settings);
 		if (unsupported)
 			warnExtensionFeatureState(getLog());
 		getLog().info("");

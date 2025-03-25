@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.grm.model.LifecycleData;
 public class LifecycleDataFactory extends ADataFactory {
 
 	@Override
-	public DataEntry createEntry(PlexusConfiguration cnf) {
+	public DataEntry createEntry(final PlexusConfiguration cnf) {
 		if (!LifecycleData.HINT.equals(cnf.getName()))
 			return null;
 

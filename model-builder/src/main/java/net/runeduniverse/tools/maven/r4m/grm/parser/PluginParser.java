@@ -62,9 +62,9 @@ public class PluginParser implements GoalRequirementModelPluginParser {
 
 	@Override
 	public GoalRequirementModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			Plugin mvnPlugin) throws Exception {
+			final Plugin mvnPlugin) throws Exception {
 
-		PluginDescriptor mvnPluginDescriptor = null;
+		final PluginDescriptor mvnPluginDescriptor;
 
 		try {
 			mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);

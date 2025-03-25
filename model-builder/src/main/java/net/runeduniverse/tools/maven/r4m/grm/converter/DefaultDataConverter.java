@@ -91,8 +91,8 @@ public class DefaultDataConverter implements DataConverter {
 		return factory.createEntry(cnf);
 	}
 
-	protected PlexusConfiguration copy(PlexusConfiguration cnf, Collection<String> excludeAttributes,
-			Collection<String> excludeChildren) {
+	protected PlexusConfiguration copy(final PlexusConfiguration cnf, final Collection<String> excludeAttributes,
+			final Collection<String> excludeChildren) {
 		final PlexusConfiguration copy = new DefaultPlexusConfiguration(cnf.getName(), cnf.getValue());
 
 		for (String name : cnf.getAttributeNames()) {
@@ -182,16 +182,14 @@ public class DefaultDataConverter implements DataConverter {
 			return null;
 
 		final List<String> types = collectEntryTypes(entry.getClass());
-		PlexusConfiguration cnf = null;
-		DataHandler handler = null;
 
 		for (String type : types) {
 			// find valid handler
-			handler = this.handler.get(type);
+			final DataHandler handler = this.handler.get(type);
 			if (handler == null)
 				continue;
 			// check if the handler rejects the entry
-			cnf = handler.createConfiguration(factory, entry);
+			final PlexusConfiguration cnf = handler.createConfiguration(factory, entry);
 			if (cnf != null)
 				return cnf;
 		}

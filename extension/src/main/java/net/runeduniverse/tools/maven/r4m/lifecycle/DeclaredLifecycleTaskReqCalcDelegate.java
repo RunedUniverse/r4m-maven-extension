@@ -34,7 +34,7 @@ public class DeclaredLifecycleTaskReqCalcDelegate extends DefaultLifecycleTaskRe
 	@Override
 	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
 			throws LifecyclePhaseNotFoundException {
-		List<String> sequence = new LinkedList<>();
+		final List<String> sequence = new LinkedList<>();
 		sequence.add(phaseId);
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}

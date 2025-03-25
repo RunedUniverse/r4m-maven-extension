@@ -19,7 +19,7 @@ public interface DataModifier extends DataEntry {
 
 	public DataEntry getEntry();
 
-	public boolean setEntry(final DataEntry entry);
+	public boolean setEntry(DataEntry entry);
 
 	public DataModifier copy();
 

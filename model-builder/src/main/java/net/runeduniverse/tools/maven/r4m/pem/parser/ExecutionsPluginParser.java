@@ -64,8 +64,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 	@Override
 	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
 			final Plugin mvnPlugin) throws Exception {
-
-		PluginDescriptor mvnPluginDescriptor = null;
+		final PluginDescriptor mvnPluginDescriptor;
 
 		try {
 			mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);
@@ -80,22 +79,22 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		model.setVersion(ModelProperties.MODEL_VERSION);
 
 		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
-			Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);
+			final Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);
 			execution.setInherited(false);
 			execution.setDefaultActive(true);
 
 			if (mvnExecution.getPhase() != null) {
-				Lifecycle lifecycle = acquireLifecycle(execution, mvnExecution.getPhase());
+				final Lifecycle lifecycle = acquireLifecycle(execution, mvnExecution.getPhase());
 				if (lifecycle == null)
 					continue;
 				Phase phase = lifecycle.getPhase(mvnExecution.getPhase());
 				if (phase == null)
 					phase = new Phase(mvnExecution.getPhase());
 				for (String goalId : mvnExecution.getGoals()) {
-					MojoDescriptor mvnMojoDescriptor = mvnPluginDescriptor.getMojo(goalId);
+					final MojoDescriptor mvnMojoDescriptor = mvnPluginDescriptor.getMojo(goalId);
 					if (mvnMojoDescriptor == null)
 						continue;
-					Goal goal = createGoal(mvnPlugin, mvnMojoDescriptor);
+					final Goal goal = createGoal(mvnPlugin, mvnMojoDescriptor);
 					if (goal != null)
 						phase.addGoal(goal);
 				}
@@ -106,19 +105,19 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 				execution.putLifecycle(lifecycle);
 			} else
 				for (String goalId : mvnExecution.getGoals()) {
-					MojoDescriptor mvnMojoDescriptor = mvnPluginDescriptor.getMojo(goalId);
+					final MojoDescriptor mvnMojoDescriptor = mvnPluginDescriptor.getMojo(goalId);
 					if (mvnMojoDescriptor == null)
 						continue;
-					String phaseId = mvnMojoDescriptor.getPhase();
+					final String phaseId = mvnMojoDescriptor.getPhase();
 					if (isBlank(phaseId))
 						continue;
-					Lifecycle lifecycle = acquireLifecycle(execution, phaseId);
+					final Lifecycle lifecycle = acquireLifecycle(execution, phaseId);
 					if (lifecycle == null)
 						continue;
 					Phase phase = lifecycle.getPhase(phaseId);
 					if (phase == null)
 						phase = new Phase(phaseId);
-					Goal goal = createGoal(mvnPlugin, mvnMojoDescriptor);
+					final Goal goal = createGoal(mvnPlugin, mvnMojoDescriptor);
 					if (goal == null)
 						continue;
 					phase.addGoal(goal);
@@ -134,11 +133,11 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 	}
 
 	private Goal createGoal(final Plugin mvnPlugin, final MojoDescriptor mvnMojoDescriptor) {
-		Goal goal = new Goal(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal())
+		final Goal goal = new Goal(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal())
 				.addModes("default", "dev");
-		Fork fork = new Fork();
+		final Fork fork = new Fork();
 
-		String executeGoal = mvnMojoDescriptor.getExecuteGoal();
+		final String executeGoal = mvnMojoDescriptor.getExecuteGoal();
 		if (!isBlank(executeGoal)) {
 			// TODO maybe add this as a feature?
 			/*
@@ -149,13 +148,13 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 			 */
 		}
 
-		String executePhase = mvnMojoDescriptor.getExecutePhase();
+		final String executePhase = mvnMojoDescriptor.getExecutePhase();
 		if (!isBlank(executePhase)) {
 			List<TargetPhase> phases = new LinkedList<>();
 			fork.setPhases(phases);
 			phases.add(new TargetPhase(executePhase));
 		}
-		String executeLifecycle = mvnMojoDescriptor.getExecuteLifecycle();
+		final String executeLifecycle = mvnMojoDescriptor.getExecuteLifecycle();
 		if (!isBlank(executeLifecycle))
 			fork.setLifecycle(new TargetLifecycle(executeLifecycle));
 
@@ -175,7 +174,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 			}
 		if (id == null)
 			return null;
-		Lifecycle lifecycle = execution.getLifecycle(id);
+		final Lifecycle lifecycle = execution.getLifecycle(id);
 		if (lifecycle != null)
 			return lifecycle;
 		return new Lifecycle(id);

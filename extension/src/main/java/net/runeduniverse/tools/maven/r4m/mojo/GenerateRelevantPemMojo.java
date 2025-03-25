@@ -22,6 +22,7 @@ import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -35,7 +36,6 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -119,8 +119,8 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		cnf.selectPackagingProcedure(this.mvnProject.getPackaging());
 		cnf.compile(this.mvnSession);
 
-		Set<Execution> executions = new LinkedHashSet<>();
-		int sectorCnt = collectExecutions(executions, projectSector, cnf);
+		final Set<Execution> executions = new LinkedHashSet<>();
+		final int sectorCnt = collectExecutions(executions, projectSector, cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
@@ -134,11 +134,11 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		getLog().info(String.format("    reduced executions: %s", executions.size()));
 
-		ProjectExecutionModel model = new ProjectExecutionModel();
+		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		File xmlFile = new File(this.buildDir, "rel-pem.xml");
+		final File xmlFile = new File(this.buildDir, "rel-pem.xml");
 		buildDir.mkdirs();
 
 		try (OutputStream stream = new FileOutputStream(xmlFile, false)) {
@@ -157,13 +157,13 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final ExecutionArchiveSelectorConfig cnf) {
-		Data data = new Data();
+		final Data data = new Data();
 		collectExecutions(executions, sector, defaultRelevanceFilter(cnf), false, data);
 		return data.getDepth();
 	}
 
 	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final ExecutionFilter filter, final boolean onlyInherited, final Data data) {
+			final Predicate<Execution> filter, final boolean onlyInherited, final Data data) {
 		if (sector == null)
 			return;
 

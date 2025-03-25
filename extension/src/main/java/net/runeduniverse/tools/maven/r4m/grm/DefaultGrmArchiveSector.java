@@ -121,13 +121,9 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 
 			this.origins.put(data, grm);
 
-			Map<GoalRequirementSource, Set<MergeDataGroup>> keyedMap = map.get(key);
-			if (keyedMap == null)
-				map.put(key, keyedMap = new LinkedHashMap<>());
-
-			Set<MergeDataGroup> set = keyedMap.get(source);
-			if (set == null)
-				keyedMap.put(source, set = new LinkedHashSet<>());
+			final Map<GoalRequirementSource, Set<MergeDataGroup>> keyedMap = map.computeIfAbsent(key,
+					k -> new LinkedHashMap<>());
+			final Set<MergeDataGroup> set = keyedMap.computeIfAbsent(source, k -> new LinkedHashSet<>());
 
 			set.add(data);
 		}
@@ -210,11 +206,8 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 			for (MergeDataGroup mergeGroup : set) {
 				final GoalRequirementModel model = getModel(mergeGroup);
 				final Map<GoalRequirementSource, CompoundTree> map = model.isEffective() ? userMap : projectMap;
-
-				CompoundTree sourceTree = map.get(source);
-				if (sourceTree == null)
-					map.put(source,
-							sourceTree = new DefaultCompoundTree("source", source == null ? "< null >" : source.key()));
+				final CompoundTree sourceTree = map.computeIfAbsent(source,
+						k -> new DefaultCompoundTree("source", k == null ? "< null >" : k.key()));
 
 				sourceTree.append(ModelUtils.toRecord(mergeGroup));
 			}

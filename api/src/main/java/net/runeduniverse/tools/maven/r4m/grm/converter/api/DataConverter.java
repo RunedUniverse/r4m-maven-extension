@@ -23,14 +23,13 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 
 public interface DataConverter {
 
-	public GoalContainer convertContainer(final PlexusConfiguration cnf, final String defaultGroupId,
-			final String defaultArtifactId, final GoalRequirementSource defaultSource);
+	public GoalContainer convertContainer(PlexusConfiguration cnf, String defaultGroupId, String defaultArtifactId,
+			GoalRequirementSource defaultSource);
 
-	public DataEntry convertEntry(final PlexusConfiguration cnf);
+	public DataEntry convertEntry(PlexusConfiguration cnf);
 
-	public PlexusConfiguration convertContainer(final ConfigurationFactory<PlexusConfiguration> factory,
-			final GoalContainer container);
+	public PlexusConfiguration convertContainer(ConfigurationFactory<PlexusConfiguration> factory,
+			GoalContainer container);
 
-	public PlexusConfiguration convertEntry(final ConfigurationFactory<PlexusConfiguration> factory,
-			final DataEntry entry);
+	public PlexusConfiguration convertEntry(ConfigurationFactory<PlexusConfiguration> factory, DataEntry entry);
 }

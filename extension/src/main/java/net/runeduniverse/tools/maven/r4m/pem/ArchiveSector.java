@@ -21,13 +21,13 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -37,7 +37,7 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
 	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
-	protected String version;
+	protected final String version;
 
 	public ArchiveSector(final MavenProject mvnProject, final String version, final ArchiveSector parent) {
 		super(mvnProject, parent);
@@ -60,16 +60,16 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 	}
 
 	@Override
-	public Set<Execution> getExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
+	public Set<Execution> getExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
 		return collectEntries(filter, onlyInherited, false);
 	}
 
 	@Override
-	public Set<Execution> getEffectiveExecutions(final ExecutionFilter filter, final boolean onlyInherited) {
+	public Set<Execution> getEffectiveExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
 		return collectEntries(filter, onlyInherited, true);
 	}
 
-	protected Set<Execution> collectEntries(final ExecutionFilter filter, final boolean onlyInherited,
+	protected Set<Execution> collectEntries(final Predicate<Execution> filter, final boolean onlyInherited,
 			final boolean onlyEffective) {
 		final Set<Execution> executions = new LinkedHashSet<>();
 		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
@@ -83,7 +83,7 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 							.isEffective())
 						continue;
 					// apply filter & collect data
-					if (filter.apply(execution))
+					if (filter.test(execution))
 						executions.add(execution);
 				}
 		}
@@ -98,16 +98,9 @@ public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> im
 		for (Execution execution : pem.getExecutions()) {
 			this.executionOrigins.put(execution, pem);
 
-			Map<ExecutionSource, Set<Execution>> entry = this.executions.get(execution.getId());
-			if (entry == null) {
-				entry = new LinkedHashMap<>(3);
-				this.executions.put(execution.getId(), entry);
-			}
-			Set<Execution> col = entry.get(execution.getSource());
-			if (col == null) {
-				col = new HashSet<>();
-				entry.put(execution.getSource(), col);
-			}
+			final Map<ExecutionSource, Set<Execution>> entry = this.executions.computeIfAbsent(execution.getId(),
+					k -> new LinkedHashMap<>(3));
+			final Set<Execution> col = entry.computeIfAbsent(execution.getSource(), k -> new HashSet<>());
 			col.add(execution);
 		}
 	}

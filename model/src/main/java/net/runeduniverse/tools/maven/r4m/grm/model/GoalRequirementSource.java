@@ -98,11 +98,8 @@ public class GoalRequirementSource implements Keyed {
 
 		key = key.trim()
 				.toLowerCase();
-		final GoalRequirementSource source = GoalRequirementSource.KNOWN_SOURCES.get(key);
-		if (source == null)
-			return new GoalRequirementSource(key, defaultCombineMethod, priority);
-		else
-			return source;
+		return GoalRequirementSource.KNOWN_SOURCES.getOrDefault(key,
+				new GoalRequirementSource(key, defaultCombineMethod, priority));
 	}
 
 	public static GoalRequirementSource get(final String key) {

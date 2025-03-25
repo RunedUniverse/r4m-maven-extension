@@ -45,7 +45,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	private boolean dirty = true;
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveProject(MavenProject value) {
+	public ExecutionArchiveSelectorConfig selectActiveProject(final MavenProject value) {
 		this.dirty = true;
 		this.mvnProject = value;
 		return this;
@@ -55,14 +55,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	// packaging flags that set the type of how an artifact is packaged. So here we
 	// define it as packaging procedure.
 	@Override
-	public ExecutionArchiveSelectorConfig selectPackagingProcedure(String value) {
+	public ExecutionArchiveSelectorConfig selectPackagingProcedure(final String value) {
 		this.dirty = true;
 		this.packagingProcedure = value;
 		return this;
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveExecutions(String... values) {
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(final String... values) {
 		this.dirty = true;
 		for (String value : values)
 			if (!isBlank(value))
@@ -71,14 +71,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveExecutions(Collection<String> values) {
+	public ExecutionArchiveSelectorConfig selectActiveExecutions(final Collection<String> values) {
 		this.dirty = true;
 		this.activeExecutions.addAll(values);
 		return this;
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveProfiles(String... values) {
+	public ExecutionArchiveSelectorConfig selectActiveProfiles(final String... values) {
 		this.dirty = true;
 		for (String value : values)
 			if (!isBlank(value))
@@ -87,14 +87,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectActiveProfiles(Collection<String> values) {
+	public ExecutionArchiveSelectorConfig selectActiveProfiles(final Collection<String> values) {
 		this.dirty = true;
 		this.activeProfiles.addAll(values);
 		return this;
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectAllActiveProfiles(Collection<Profile> values) {
+	public ExecutionArchiveSelectorConfig selectAllActiveProfiles(final Collection<Profile> values) {
 		this.dirty = true;
 		for (Profile profile : values)
 			this.activeProfiles.add(profile.getId());
@@ -102,7 +102,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectProvidedProfiles(String... values) {
+	public ExecutionArchiveSelectorConfig selectProvidedProfiles(final String... values) {
 		this.dirty = true;
 		for (String value : values)
 			if (!isBlank(value))
@@ -111,14 +111,14 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectProvidedProfiles(Collection<String> values) {
+	public ExecutionArchiveSelectorConfig selectProvidedProfiles(final Collection<String> values) {
 		this.dirty = true;
 		this.providedProfiles.addAll(values);
 		return this;
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectAllProvidedProfiles(Collection<Profile> values) {
+	public ExecutionArchiveSelectorConfig selectAllProvidedProfiles(final Collection<Profile> values) {
 		this.dirty = true;
 		for (Profile profile : values)
 			this.providedProfiles.add(profile.getId());
@@ -126,7 +126,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectModes(String... values) {
+	public ExecutionArchiveSelectorConfig selectModes(final String... values) {
 		this.dirty = true;
 		for (String value : values)
 			if (!isBlank(value))
@@ -135,7 +135,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectModes(Collection<String> values) {
+	public ExecutionArchiveSelectorConfig selectModes(final Collection<String> values) {
 		this.dirty = true;
 		this.modes.addAll(values);
 		return this;
@@ -242,7 +242,7 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public void compile(MavenSession mvnSession) {
+	public void compile(final MavenSession mvnSession) {
 		if (this.mvnProject == null)
 			return;
 

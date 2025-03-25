@@ -28,17 +28,22 @@ public class DefaultRuntimeView implements RuntimeView {
 	protected final Set<String> providedProfileIds = new LinkedHashSet<>();
 	protected final Set<String> activeExecutionIds = new LinkedHashSet<>();
 
-	protected String lifecycleId;
-	protected String phaseId;
+	protected final String lifecycleId;
+	protected final String phaseId;
+
+	protected DefaultRuntimeView(final String lifecycleId, final String phaseId) {
+		this.lifecycleId = lifecycleId;
+		this.phaseId = phaseId;
+	}
 
 	protected DefaultRuntimeView() {
+		this(null, null);
 	}
 
 	public DefaultRuntimeView(final String lifecycleId, final String phaseId, final Set<String> modes,
 			final Set<String> activeProfileIds, final Set<String> inactiveProfileIds,
 			final Set<String> providedProfileIds, final Set<String> activeExecutionIds) {
-		this.lifecycleId = lifecycleId;
-		this.phaseId = phaseId;
+		this(lifecycleId, phaseId);
 		this.modes.addAll(modes);
 		this.activeProfileIds.addAll(activeProfileIds);
 		this.inactiveProfileIds.addAll(inactiveProfileIds);

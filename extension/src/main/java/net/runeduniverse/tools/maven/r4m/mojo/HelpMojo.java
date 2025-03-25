@@ -19,17 +19,12 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.supportsExtensionFeatures;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.warnExtensionFeatureState;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.getR4MVersionFromArtifact;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.asVersionTag;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * prints the help-page
@@ -51,7 +46,7 @@ public class HelpMojo extends AbstractMojo {
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		final String version = asVersionTag(getR4MVersionFromArtifact(getClass(), getLog()));
-		boolean supported = supportsExtensionFeatures(this.settings);
+		final boolean supported = supportsExtensionFeatures(this.settings);
 		if (!supported)
 			warnExtensionFeatureState(getLog());
 		getLog().info("");

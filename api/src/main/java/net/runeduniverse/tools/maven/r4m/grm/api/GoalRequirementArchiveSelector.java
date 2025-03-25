@@ -17,6 +17,6 @@ package net.runeduniverse.tools.maven.r4m.grm.api;
 
 public interface GoalRequirementArchiveSelector {
 
-	public GoalRequirementArchiveSelection compileSelection(final GoalRequirementArchiveSelectorConfig cnf);
+	public GoalRequirementArchiveSelection compileSelection(GoalRequirementArchiveSelectorConfig cnf);
 
 }

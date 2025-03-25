@@ -75,7 +75,7 @@ public class MergeDataGroup extends MatchDataGroup {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (!(obj instanceof MergeDataGroup) || !super.equals(obj))
 			return false;
 		final MergeDataGroup data = (MergeDataGroup) obj;

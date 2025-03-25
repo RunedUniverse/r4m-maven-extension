@@ -106,8 +106,8 @@ public class GenerateFullPemMojo extends AbstractMojo {
 		if (projectSector == null)
 			mojoFailureExtensionLoading(getLog());
 
-		Set<Execution> executions = new LinkedHashSet<>();
-		int sectorCnt = collectExecutions(executions, projectSector);
+		final Set<Execution> executions = new LinkedHashSet<>();
+		final int sectorCnt = collectExecutions(executions, projectSector);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
@@ -121,11 +121,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		getLog().info(String.format("    reduced executions: %s", executions.size()));
 
-		ProjectExecutionModel model = new ProjectExecutionModel();
+		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
 		model.addExecutions(executions);
 
-		File xmlFile = new File(this.buildDir, "full-pem.xml");
+		final File xmlFile = new File(this.buildDir, "full-pem.xml");
 		buildDir.mkdirs();
 
 		try (OutputStream stream = new FileOutputStream(xmlFile, false)) {

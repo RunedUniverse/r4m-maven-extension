@@ -19,9 +19,9 @@
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
-	https://api.runeduniverse.net/runes4tools/r4m-pem-v1_0_0.xsd">
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1_1_0.xsd">
 
-	<modelVersion>1.0.0</modelVersion>
+	<modelVersion>1.1.0</modelVersion>
 	<executions>
 
 		<execution source="plugin" id="default">
@@ -37,8 +37,8 @@
 									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 									<artifactId>r4m-maven-extension</artifactId>
 									<modes>
-										<default />
-										<dev />
+										<mode id="default" />
+										<mode id="dev" />
 									</modes>
 								</goal>
 							</goals>

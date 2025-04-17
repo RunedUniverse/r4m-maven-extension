@@ -13,29 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.trigger;
+package net.runeduniverse.tools.maven.r4m.pem.model;
+
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 public class ProfileTriggerMissing extends ProfileTrigger {
 
 	public static final String HINT = "missing-profile";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.ProfileTriggerMissing";
 
 	public ProfileTriggerMissing(final String profileId) {
 		super(profileId);
 	}
 
 	@Override
-	public String getHint() {
-		return HINT;
+	public int hashCode() {
+		return hash(type()) ^ hash(HINT) ^ hash(getProfileId());
 	}
 
 	@Override
-	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
-		return !config.getProvidedProfiles()
-				.contains(this.profileId);
+	public boolean equals(final Object obj) {
+		if (obj == this)
+			return true;
+		if (!(obj instanceof ProfileTriggerMissing))
+			return false;
+		final ProfileTriggerMissing trigger = (ProfileTriggerMissing) obj;
+		return objectEquals(getProfileId(), trigger.getProfileId());
+	}
+
+	@Override
+	public DataEntry copy() {
+		final ProfileTriggerMissing trigger = new ProfileTriggerMissing(getProfileId());
+		return trigger;
 	}
 
 	@Override
@@ -46,17 +59,4 @@ public class ProfileTriggerMissing extends ProfileTrigger {
 
 		return tree;
 	}
-
-	@Override
-	public boolean equals(final Object obj) {
-		if (obj == this)
-			return true;
-		if (!(obj instanceof ProfileTriggerMissing))
-			return false;
-		final ProfileTriggerMissing trigger = (ProfileTriggerMissing) obj;
-		if (getProfileId() == null)
-			return trigger.getProfileId() == null;
-		return getProfileId().equals(trigger.getProfileId());
-	}
-
 }

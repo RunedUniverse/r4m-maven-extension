@@ -36,9 +36,9 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
+import net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRestriction;
 
 @Component(role = ProjectExecutionModelPackagingParser.class, hint = PackagingParser.HINT)
 public class PackagingParser implements ProjectExecutionModelPackagingParser {

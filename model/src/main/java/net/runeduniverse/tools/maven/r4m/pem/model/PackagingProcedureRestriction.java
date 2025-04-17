@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.restrictions;
+package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
-public class PackagingProcedureRestriction implements ExecutionRestriction<ExecutionArchiveSelectorConfig> {
+public class PackagingProcedureRestriction implements ExecutionRestriction {
 
-	public static final String HINT = "packaging-procedure";
+	public static final String HINT = CONTEXT + '>' + "packaging-procedure";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction";
 
 	protected final String procedure;
 
@@ -37,21 +37,8 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 	}
 
 	@Override
-	public String getHint() {
-		return PackagingProcedureRestriction.HINT;
-	}
-
-	@Override
-	public Class<ExecutionArchiveSelectorConfig> getDataType() {
-		return ExecutionArchiveSelectorConfig.class;
-	}
-
-	@Override
-	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
-		if (this.procedure == null)
-			if (config.getPackagingProcedure() != null)
-				return false;
-		return this.procedure.equals(config.getPackagingProcedure());
+	public int hashCode() {
+		return hash(type()) ^ hash(HINT) ^ hash(getPackagingProcedure());
 	}
 
 	@Override
@@ -62,6 +49,12 @@ public class PackagingProcedureRestriction implements ExecutionRestriction<Execu
 			return false;
 		final PackagingProcedureRestriction restriction = (PackagingProcedureRestriction) obj;
 		return objectEquals(this.procedure, restriction.getPackagingProcedure());
+	}
+
+	@Override
+	public DataEntry copy() {
+		final PackagingProcedureRestriction restriction = new PackagingProcedureRestriction(getPackagingProcedure());
+		return restriction;
 	}
 
 	@Override

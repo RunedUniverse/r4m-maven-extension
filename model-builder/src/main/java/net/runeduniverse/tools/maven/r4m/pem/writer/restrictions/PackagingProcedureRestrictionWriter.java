@@ -20,13 +20,13 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRestriction;
+import net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction;
 
-@Component(role = ExecutionRestrictionWriter.class, hint = PackagingProcedureRestriction.HINT)
+@Component(role = ExecutionRestrictionWriter.class, hint = PackagingProcedureRestriction.CANONICAL_NAME)
 public class PackagingProcedureRestrictionWriter implements ExecutionRestrictionWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction<?> restriction) {
+	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction restriction) {
 		if (restriction == null || !(restriction instanceof PackagingProcedureRestriction))
 			return false;
 

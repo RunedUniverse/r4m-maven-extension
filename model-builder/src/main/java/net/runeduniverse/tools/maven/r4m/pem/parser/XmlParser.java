@@ -136,7 +136,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 				final ExecutionRestrictionParser parser = this.execRestrictionParser.get(name);
 				if (parser == null)
 					continue;
-				final ExecutionRestriction<?> restriction = parser.parse(triggerNode);
+				final ExecutionRestriction restriction = parser.parse(triggerNode);
 				if (restriction == null)
 					continue;
 				exec.addRestriction(restriction);
@@ -173,7 +173,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 					final ExecutionTriggerParser parser = this.execTriggerParser.get(name);
 					if (parser == null)
 						break;
-					final ExecutionTrigger<?> trigger = parser.parse(triggerNode);
+					final ExecutionTrigger trigger = parser.parse(triggerNode);
 					if (trigger == null)
 						break;
 					exec.addTrigger(trigger);
@@ -225,7 +225,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 			for (PlexusConfiguration phaseNode : phaseNodes) {
 				parsePhase(phases, phaseNode);
 			}
-			lifecycle.addPhases(phases);
+			lifecycle.putPhases(phases);
 		}
 		return true;
 	}
@@ -263,10 +263,6 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 	protected boolean parseGoal(final Collection<Goal> list, final PlexusConfiguration goalNode) {
 		if (goalNode == null)
-			return false;
-
-		final String id = goalNode.getAttribute("id");
-		if (isBlank(id))
 			return false;
 
 		final String groupId = goalNode.getChild("groupId")
@@ -357,7 +353,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 
 		final List<TargetPhase> phases = new LinkedList<>();
 		parseTargetPhases(phases, forkNode.getChild("phases", false));
-		fork.setPhases(phases);
+		fork.addPhases(phases);
 
 		final Set<TargetPhase> excludedPhases = new LinkedHashSet<>(0);
 		parseTargetPhases(excludedPhases, forkNode.getChild("excludedPhases", false));

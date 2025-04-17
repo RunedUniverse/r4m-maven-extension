@@ -17,17 +17,27 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class TargetPhase implements Recordable {
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
-	protected final Set<String> executions = new LinkedHashSet<>(0);
-	protected String id;
+public class TargetPhase implements DataEntry {
+
+	protected final Supplier<Set<String>> executionsSupplier;
+	protected final Set<String> executions;
+	protected final String id;
 
 	public TargetPhase(final String id) {
+		this(() -> new LinkedHashSet<>(0), id);
+	}
+
+	public TargetPhase(final Supplier<Set<String>> executionsSupplier, final String id) {
+		this.executionsSupplier = executionsSupplier;
+		this.executions = this.executionsSupplier.get();
 		this.id = id;
 	}
 
@@ -39,8 +49,17 @@ public class TargetPhase implements Recordable {
 		return this.executions;
 	}
 
+	public void addExecution(final String execution) {
+		this.executions.add(execution);
+	}
+
 	public void addExecutions(final Set<String> executions) {
 		this.executions.addAll(executions);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
 	}
 
 	@Override
@@ -52,11 +71,17 @@ public class TargetPhase implements Recordable {
 			return false;
 		final TargetPhase phase = (TargetPhase) obj;
 
-		if (!this.id.equals(phase.getId()) || !(this.executions.size() == phase.getExecutions()
-				.size() && this.executions.containsAll(phase.getExecutions())))
-			return false;
+		return objectEquals(this.id, phase.getId()) //
+				&& objectEquals(this.executions, phase.getExecutions());
+	}
 
-		return true;
+	@Override
+	public TargetPhase copy() {
+		final TargetPhase phase = new TargetPhase(this.executionsSupplier, getId());
+
+		phase.addExecutions(getExecutions());
+
+		return phase;
 	}
 
 	@Override
@@ -70,5 +95,4 @@ public class TargetPhase implements Recordable {
 
 		return tree;
 	}
-
 }

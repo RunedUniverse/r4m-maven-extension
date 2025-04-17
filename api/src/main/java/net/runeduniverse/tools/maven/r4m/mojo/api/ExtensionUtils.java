@@ -413,7 +413,7 @@ public interface ExtensionUtils {
 			return false;
 		// restrictions
 		if (checkRestrictions) {
-			final List<ExecutionRestriction<?>> execRestrictions = new LinkedList<>(exec.getRestrictions());
+			final List<ExecutionRestriction> execRestrictions = new LinkedList<>(exec.getRestrictions());
 			if (execRestrictions.size() != origExec.getRestrictions()
 					.size())
 				return false;

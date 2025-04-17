@@ -15,14 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
+public interface ExecutionRestriction extends DataEntry {
 
-public interface ExecutionRestriction<T> extends Recordable {
-
-	public String getHint();
-
-	public <D extends T> Class<D> getDataType();
-
-	public boolean isActive(T data);
+	public static final String CONTEXT = "restriction";
 
 }

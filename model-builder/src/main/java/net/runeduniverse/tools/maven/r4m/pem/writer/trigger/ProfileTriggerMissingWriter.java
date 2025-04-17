@@ -20,13 +20,13 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
-import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerMissing;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProfileTriggerMissing;
 
-@Component(role = ExecutionTriggerWriter.class, hint = ProfileTriggerMissing.HINT)
+@Component(role = ExecutionTriggerWriter.class, hint = ProfileTriggerMissing.CANONICAL_NAME)
 public class ProfileTriggerMissingWriter implements ExecutionTriggerWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger<?> trigger) {
+	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger trigger) {
 		if (trigger == null || !(trigger instanceof ProfileTriggerMissing))
 			return false;
 

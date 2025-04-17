@@ -20,14 +20,14 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction.MatchType;
+import net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction;
+import net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction.MatchType;
 
-@Component(role = ExecutionRestrictionWriter.class, hint = PropertyRestriction.HINT)
+@Component(role = ExecutionRestrictionWriter.class, hint = PropertyRestriction.CANONICAL_NAME)
 public class PropertyRestrictionWriter implements ExecutionRestrictionWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction<?> restriction) {
+	public boolean append(final PlexusConfiguration restrictionsNode, final ExecutionRestriction restriction) {
 		if (restriction == null || !(restriction instanceof PropertyRestriction))
 			return false;
 		final PropertyRestriction rest = (PropertyRestriction) restriction;

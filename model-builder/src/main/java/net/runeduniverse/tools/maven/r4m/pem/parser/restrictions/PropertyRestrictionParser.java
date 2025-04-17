@@ -18,11 +18,10 @@ package net.runeduniverse.tools.maven.r4m.pem.parser.restrictions;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PropertyRestriction.MatchType;
+import net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction;
+import net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction.MatchType;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
@@ -30,7 +29,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 public class PropertyRestrictionParser implements ExecutionRestrictionParser {
 
 	@Override
-	public ExecutionRestriction<ExecutionArchiveSelectorConfig> parse(final PlexusConfiguration node) {
+	public ExecutionRestriction parse(final PlexusConfiguration node) {
 		final String id = asId(node.getAttribute("id", null));
 		final boolean inverted = asBoolean(node.getAttribute("inverted", null), false);
 		final boolean exists = asBoolean(node.getAttribute("exists", null), true);

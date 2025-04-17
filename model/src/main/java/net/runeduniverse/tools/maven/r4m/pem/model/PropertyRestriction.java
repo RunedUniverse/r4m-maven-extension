@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.pem.restrictions;
-
-import java.util.Properties;
-import java.util.regex.Pattern;
+package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import net.runeduniverse.lib.utils.common.api.Keyed;
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
-import static net.runeduniverse.lib.utils.common.StringUtils.strEquals;
-import static net.runeduniverse.lib.utils.common.StringUtils.strEqualsIgnoreCase;
 
-public class PropertyRestriction implements ExecutionRestriction<ExecutionArchiveSelectorConfig> {
+public class PropertyRestriction implements ExecutionRestriction {
 
-	public static final String HINT = "property";
+	public static final String HINT = CONTEXT + '>' + "property";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction";
 
 	protected final String id;
 	protected final boolean inverted;
@@ -68,45 +63,8 @@ public class PropertyRestriction implements ExecutionRestriction<ExecutionArchiv
 	}
 
 	@Override
-	public String getHint() {
-		return PropertyRestriction.HINT;
-	}
-
-	@Override
-	public Class<ExecutionArchiveSelectorConfig> getDataType() {
-		return ExecutionArchiveSelectorConfig.class;
-	}
-
-	@Override
-	public boolean isActive(final ExecutionArchiveSelectorConfig config) {
-		final Properties properties = config.getProperties();
-		if (this.inverted)
-			return !_isActive(properties);
-		return _isActive(properties);
-	}
-
-	protected boolean _isActive(final Properties properties) {
-		final boolean exists = properties.containsKey(this.id);
-
-		if (this.exists == false) {
-			return exists == false;
-		}
-		if (exists == false)
-			return false;
-		if (this.value == null)
-			return true;
-
-		final String value = properties.getProperty(this.id);
-
-		switch (this.matchType) {
-		case EQUALS:
-			return strEquals(this.value, value);
-		case EQUALS_IGNORE_CASE:
-			return strEqualsIgnoreCase(this.value, value);
-		case REGEX:
-			return Pattern.matches(this.value, value);
-		}
-		return false;
+	public int hashCode() {
+		return hash(type()) ^ hash(HINT) ^ hash(getId());
 	}
 
 	@Override
@@ -120,6 +78,13 @@ public class PropertyRestriction implements ExecutionRestriction<ExecutionArchiv
 		return objectEquals(this.id, restriction.getId()) && objectEquals(this.inverted, restriction.getInverted())
 				&& objectEquals(this.exists, restriction.exists) && objectEquals(this.value, restriction.getValue())
 				&& objectEquals(this.matchType, restriction.getMatchType());
+	}
+
+	@Override
+	public DataEntry copy() {
+		final PropertyRestriction restriction = new PropertyRestriction(getId(), //
+				getInverted(), getExists(), getValue(), getMatchType());
+		return restriction;
 	}
 
 	@Override

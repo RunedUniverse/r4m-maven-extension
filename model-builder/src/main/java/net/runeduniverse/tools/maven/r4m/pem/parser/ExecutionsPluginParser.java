@@ -150,9 +150,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 
 		final String executePhase = mvnMojoDescriptor.getExecutePhase();
 		if (!isBlank(executePhase)) {
-			List<TargetPhase> phases = new LinkedList<>();
-			fork.setPhases(phases);
-			phases.add(new TargetPhase(executePhase));
+			fork.addPhase(new TargetPhase(executePhase));
 		}
 		final String executeLifecycle = mvnMojoDescriptor.getExecuteLifecycle();
 		if (!isBlank(executeLifecycle))

@@ -17,11 +17,12 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
-public class TargetLifecycle implements Recordable {
+public class TargetLifecycle implements DataEntry {
 
 	protected final String id;
 	protected String startPhase = null;
@@ -52,6 +53,11 @@ public class TargetLifecycle implements Recordable {
 	}
 
 	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
@@ -60,22 +66,19 @@ public class TargetLifecycle implements Recordable {
 			return false;
 		final TargetLifecycle lifecycle = (TargetLifecycle) obj;
 
-		if (!this.id.equals(lifecycle.getId()))
-			return false;
+		return objectEquals(this.id, lifecycle.getId()) //
+				&& objectEquals(this.startPhase, lifecycle.getStartPhase()) //
+				&& objectEquals(this.stopPhase, lifecycle.getStopPhase());
+	}
 
-		if (this.startPhase == null) {
-			if (lifecycle.getStartPhase() != null)
-				return false;
-		} else if (!this.startPhase.equals(lifecycle.getStartPhase()))
-			return false;
+	@Override
+	public TargetLifecycle copy() {
+		final TargetLifecycle lifecycle = new TargetLifecycle(getId());
 
-		if (this.stopPhase == null) {
-			if (lifecycle.getStopPhase() != null)
-				return false;
-		} else if (!this.stopPhase.equals(lifecycle.getStopPhase()))
-			return false;
+		lifecycle.setStartPhase(getStartPhase());
+		lifecycle.setStopPhase(getStopPhase());
 
-		return true;
+		return lifecycle;
 	}
 
 	@Override
@@ -92,5 +95,4 @@ public class TargetLifecycle implements Recordable {
 
 		return tree;
 	}
-
 }

@@ -20,19 +20,43 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Fork implements Recordable {
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
-	protected final Set<String> executions = new LinkedHashSet<>(0);
-	protected final List<TargetPhase> excludePhases = new LinkedList<>();
+public class Fork implements DataEntry {
+
+	public static final String HINT = "fork";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Fork";
+
+	protected final Supplier<Set<String>> executionsSupplier;
+	protected final Supplier<Set<TargetPhase>> excludePhasesSupplier;
+	protected final Supplier<List<TargetPhase>> phasesSupplier;
+
+	protected final Set<String> executions;
+	protected final Set<TargetPhase> excludePhases;
+	protected final List<TargetPhase> phases;
 
 	protected String mode = null;
 	protected TargetLifecycle lifecycle = null;
-	protected List<TargetPhase> phases = null;
+
+	public Fork() {
+		this(() -> new LinkedHashSet<>(0), () -> new LinkedHashSet<>(0), LinkedList::new);
+	}
+
+	public Fork(final Supplier<Set<String>> executionsSupplier, final Supplier<Set<TargetPhase>> excludePhasesSupplier,
+			final Supplier<List<TargetPhase>> phasesSupplier) {
+		this.executionsSupplier = executionsSupplier;
+		this.excludePhasesSupplier = excludePhasesSupplier;
+		this.phasesSupplier = phasesSupplier;
+		this.executions = this.executionsSupplier.get();
+		this.excludePhases = this.excludePhasesSupplier.get();
+		this.phases = this.phasesSupplier.get();
+	}
 
 	public TargetLifecycle getLifecycle() {
 		return this.lifecycle;
@@ -56,7 +80,7 @@ public class Fork implements Recordable {
 		return this.phases;
 	}
 
-	public List<TargetPhase> getExcludedPhases() {
+	public Set<TargetPhase> getExcludedPhases() {
 		return this.excludePhases;
 	}
 
@@ -77,19 +101,63 @@ public class Fork implements Recordable {
 		this.mode = value;
 	}
 
+	public void addExecution(final String execution) {
+		this.executions.add(execution);
+	}
+
 	public void addExecutions(final Collection<String> executions) {
 		this.executions.addAll(executions);
 	}
 
-	public void setPhases(final List<TargetPhase> phases) {
-		this.phases = phases;
+	public void clearExecutions() {
+		this.executions.clear();
+	}
+
+	public void addPhase(final TargetPhase phase) {
+		this.phases.add(phase);
+	}
+
+	public void addPhase2(final String phase) {
+		addPhase(new TargetPhase(phase));
+	}
+
+	public void addPhases(final List<TargetPhase> phases) {
+		this.phases.addAll(phases);
+	}
+
+	public void addPhases2(final List<String> phases) {
+		for (String phase : phases)
+			addPhase2(phase);
+	}
+
+	public void clearPhases() {
+		this.phases.clear();
+	}
+
+	public void addExcludedPhase(final TargetPhase excludedPhase) {
+		this.excludePhases.add(excludedPhase);
+	}
+
+	public void addExcludedPhase2(final String excludedPhase) {
+		addExcludedPhase(new TargetPhase(excludedPhase));
 	}
 
 	public void addExcludedPhases(final Collection<TargetPhase> excludedPhases) {
-		// check for uniquity by equals
-		for (TargetPhase phase : excludedPhases)
-			if (!this.excludePhases.contains(phase))
-				this.excludePhases.add(phase);
+		this.excludePhases.addAll(excludedPhases);
+	}
+
+	public void addExcludedPhases2(final Collection<String> excludedPhases) {
+		for (String phase : excludedPhases)
+			addExcludedPhase2(phase);
+	}
+
+	public void clearExcludedPhases() {
+		this.excludePhases.clear();
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type());
 	}
 
 	@Override
@@ -101,35 +169,36 @@ public class Fork implements Recordable {
 			return false;
 		final Fork fork = (Fork) obj;
 
-		if (this.mode == null) {
-			if (fork.getMode() != null)
-				return false;
-		} else if (!this.mode.equals(fork.getMode()))
-			return false;
-
-		if (this.lifecycle == null) {
-			if (fork.getLifecycle() != null)
-				return false;
-		} else if (!this.lifecycle.equals(fork.getLifecycle()))
-			return false;
-
 		if (!(this.executions.size() == fork.getExecutions()
 				.size() && this.executions.containsAll(fork.getExecutions())))
 			return false;
 
 		// Lists check using equals & also check the order of elements
-		if (this.phases == null) {
-			if (fork.getPhases() != null)
-				return false;
-		} else if (!this.phases.equals(fork.getPhases()))
+		if (!objectEquals(this.phases, fork.getPhases()))
 			return false;
 
-		// Lists check using equals through containsAll
 		if (!(this.excludePhases.size() == fork.getExcludedPhases()
 				.size() && this.excludePhases.containsAll(fork.getExcludedPhases())))
 			return false;
 
-		return super.equals(obj);
+		return objectEquals(this.mode, fork.getMode()) //
+				&& objectEquals(this.lifecycle, fork.getLifecycle()) //
+				&& super.equals(obj);
+	}
+
+	@Override
+	public DataEntry copy() {
+		final Fork fork = new Fork(this.executionsSupplier, this.excludePhasesSupplier, this.phasesSupplier);
+
+		fork.setLifecycle(getLifecycle().copy());
+		fork.setMode(getMode());
+		fork.addExecutions(getExecutions());
+		for (TargetPhase phase : getPhases())
+			fork.addPhase(phase.copy());
+		for (TargetPhase phase : getExcludedPhases())
+			fork.addExcludedPhase(phase.copy());
+
+		return fork;
 	}
 
 	@Override
@@ -165,5 +234,4 @@ public class Fork implements Recordable {
 
 		return tree;
 	}
-
 }

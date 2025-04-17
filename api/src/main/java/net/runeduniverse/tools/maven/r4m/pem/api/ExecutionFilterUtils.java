@@ -39,7 +39,8 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate<Execution>} for filtering Executions
 	 *         by relevance utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
+			final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
@@ -49,12 +50,11 @@ public interface ExecutionFilterUtils {
 			if (!execution.getRestrictions()
 					.isEmpty()) {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
-				for (ExecutionRestriction<ExecutionArchiveSelectorConfig> restriction : execution
-						.getRestrictions(ExecutionArchiveSelectorConfig.class)) {
-					Boolean state = map.get(restriction.getHint());
-					if (state != null && state)
+				for (ExecutionRestriction restriction : execution.getRestrictions()) {
+					final Boolean state = map.get(restriction.type());
+					if (state == true)
 						continue;
-					map.put(restriction.getHint(), restriction.isActive(cnf));
+					map.put(restriction.type(), restrictionEvaluator.isActive(cnf, restriction));
 				}
 				if (map.containsValue(false))
 					return false;
@@ -78,7 +78,8 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate<Execution>} for filtering for active
 	 *         Executions utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultActiveFilter(final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultActiveFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
+			final ExecutionTriggerEvaluator triggerEvaluator, final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
@@ -88,12 +89,11 @@ public interface ExecutionFilterUtils {
 			if (!execution.getRestrictions()
 					.isEmpty()) {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
-				for (ExecutionRestriction<ExecutionArchiveSelectorConfig> restriction : execution
-						.getRestrictions(ExecutionArchiveSelectorConfig.class)) {
-					Boolean state = map.get(restriction.getHint());
-					if (state != null && state)
+				for (ExecutionRestriction restriction : execution.getRestrictions()) {
+					final Boolean state = map.get(restriction.type());
+					if (state == true)
 						continue;
-					map.put(restriction.getHint(), restriction.isActive(cnf));
+					map.put(restriction.type(), restrictionEvaluator.isActive(cnf, restriction));
 				}
 				if (map.containsValue(false))
 					return false;
@@ -112,10 +112,10 @@ public interface ExecutionFilterUtils {
 					.contains(execution.getId()))
 				return true;
 			// any active trigger activates the execution
-			for (ExecutionTrigger<ExecutionArchiveSelectorConfig> trigger : execution
-					.getTrigger(ExecutionArchiveSelectorConfig.class))
-				if (trigger.isActive(cnf))
+			for (ExecutionTrigger trigger : execution.getTrigger()) {
+				if (triggerEvaluator.isActive(cnf, trigger))
 					return true;
+			}
 			return false;
 		};
 	}

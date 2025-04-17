@@ -35,6 +35,7 @@ import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -93,6 +94,10 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	 * @component
 	 */
 	private ExecutionArchiveSelectorConfigFactory cnfFactory;
+	/**
+	 * @component
+	 */
+	private ExecutionRestrictionEvaluator restrictionEvaluator;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -158,7 +163,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final ExecutionArchiveSelectorConfig cnf) {
 		final Data data = new Data();
-		collectExecutions(executions, sector, defaultRelevanceFilter(cnf), false, data);
+		collectExecutions(executions, sector, defaultRelevanceFilter(restrictionEvaluator, cnf), false, data);
 		return data.getDepth();
 	}
 

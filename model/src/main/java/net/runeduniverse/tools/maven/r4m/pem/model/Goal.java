@@ -18,14 +18,21 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Goal implements Recordable {
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
-	protected final Set<String> modes = new LinkedHashSet<>();
+public class Goal implements DataEntry {
+
+	public static final String HINT = "goal";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Goal";
+
+	protected final Supplier<Set<String>> modesSupplier;
+
+	protected final Set<String> modes;
 
 	protected String groupId;
 	protected String artifactId;
@@ -34,13 +41,27 @@ public class Goal implements Recordable {
 	protected Fork fork = null;
 
 	public Goal() {
+		this(null, null, null);
 	}
 
 	public Goal(final String mvnGoalKey) {
+		this(LinkedHashSet::new, mvnGoalKey);
+	}
+
+	public Goal(final Supplier<Set<String>> modesSupplier, final String mvnGoalKey) {
+		this.modesSupplier = modesSupplier;
+		this.modes = this.modesSupplier.get();
 		parseMvnGoalKey(mvnGoalKey);
 	}
 
 	public Goal(final String groupId, final String artifactId, final String goalId) {
+		this(LinkedHashSet::new, groupId, artifactId, goalId);
+	}
+
+	public Goal(final Supplier<Set<String>> modesSupplier, final String groupId, final String artifactId,
+			final String goalId) {
+		this.modesSupplier = modesSupplier;
+		this.modes = this.modesSupplier.get();
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.goalId = goalId;
@@ -131,38 +152,26 @@ public class Goal implements Recordable {
 			return false;
 		final Goal goal = (Goal) obj;
 
-		if (this.groupId == null) {
-			if (goal.getGroupId() != null)
-				return false;
-		} else if (!this.groupId.equals(goal.getGroupId()))
-			return false;
-
-		if (this.artifactId == null) {
-			if (goal.getArtifactId() != null)
-				return false;
-		} else if (!this.artifactId.equals(goal.getArtifactId()))
-			return false;
-
-		if (this.goalId == null) {
-			if (goal.getGoalId() != null)
-				return false;
-		} else if (!this.goalId.equals(goal.getGoalId()))
-			return false;
-
 		if (!(this.modes.size() == goal.getModes()
 				.size() && this.modes.containsAll(goal.getModes())))
 			return false;
 
-		if (this.optional == null) {
-			if (goal.getOptional() != null)
-				return false;
-		} else if (!this.optional.equals(goal.getOptional()))
-			return false;
+		return objectEquals(this.groupId, goal.getGroupId()) //
+				&& objectEquals(this.artifactId, goal.getArtifactId()) //
+				&& objectEquals(this.goalId, goal.getGoalId()) //
+				&& objectEquals(this.optional, goal.getOptional()) //
+				&& objectEquals(this.fork, goal.getFork());
+	}
 
-		if (this.fork != null)
-			return this.fork.equals(goal.getFork());
+	@Override
+	public Goal copy() {
+		final Goal goal = new Goal(this.modesSupplier, getGroupId(), getArtifactId(), getGoalId());
 
-		return true;
+		goal.setOptional(getOptional());
+		goal.addModes(getModes());
+		goal.setFork(getFork());
+
+		return goal;
 	}
 
 	@Override
@@ -183,5 +192,4 @@ public class Goal implements Recordable {
 
 		return tree;
 	}
-
 }

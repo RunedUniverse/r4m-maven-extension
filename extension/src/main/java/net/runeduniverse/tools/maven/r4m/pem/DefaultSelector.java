@@ -45,6 +45,8 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
@@ -76,6 +78,10 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	private MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
 	private ExecutionArchive archive;
+	@Requirement
+	private ExecutionRestrictionEvaluator restrictionEvaluator;
+	@Requirement
+	private ExecutionTriggerEvaluator triggerEvaluator;
 
 	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, final Goal goal) {
 		for (String mode : cnf.getModes())
@@ -211,7 +217,8 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSector slice) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, defaultActiveFilter(cnf), views, slice, false);
+		getExecutions(cnf, defaultActiveFilter(this.restrictionEvaluator, this.triggerEvaluator, cnf), views, slice,
+				false);
 		return views;
 	}
 

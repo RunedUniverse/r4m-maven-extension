@@ -20,13 +20,13 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
-import net.runeduniverse.tools.maven.r4m.pem.trigger.ProfileTriggerActive;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProfileTriggerActive;
 
-@Component(role = ExecutionTriggerWriter.class, hint = ProfileTriggerActive.HINT)
+@Component(role = ExecutionTriggerWriter.class, hint = ProfileTriggerActive.CANONICAL_NAME)
 public class ProfileTriggerActiveWriter implements ExecutionTriggerWriter {
 
 	@Override
-	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger<?> trigger) {
+	public boolean append(final PlexusConfiguration triggerNode, final ExecutionTrigger trigger) {
 		if (trigger == null || !(trigger instanceof ProfileTriggerActive))
 			return false;
 

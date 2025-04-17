@@ -15,23 +15,37 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Lifecycle implements Recordable {
+public class Lifecycle implements DataEntry {
 
-	protected final Map<String, Phase> phases = new LinkedHashMap<>();
+	public static final String HINT = "lifecycle";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle";
+
+	protected final Supplier<Map<String, Phase>> phasesSupplier;
+
+	protected final Map<String, Phase> phases;
 	protected String id;
 
 	public Lifecycle() {
+		this(LinkedHashMap::new, null);
 	}
 
 	public Lifecycle(final String id) {
+		this(LinkedHashMap::new, id);
+	}
+
+	public Lifecycle(final Supplier<Map<String, Phase>> phasesSupplier, final String id) {
+		this.phasesSupplier = phasesSupplier;
+		this.phases = this.phasesSupplier.get();
 		this.id = id;
 	}
 
@@ -43,6 +57,11 @@ public class Lifecycle implements Recordable {
 		return this.phases.get(phaseId);
 	}
 
+	public Phase computePhaseIfAbsent(final String phaseId,
+			final Function<? super String, ? extends Phase> mappingFunction) {
+		return this.phases.computeIfAbsent(phaseId, mappingFunction);
+	}
+
 	public Map<String, Phase> getPhases() {
 		return this.phases;
 	}
@@ -51,9 +70,18 @@ public class Lifecycle implements Recordable {
 		this.phases.put(phase.getId(), phase);
 	}
 
-	public void addPhases(final List<Phase> phases) {
+	public void putPhases(final Collection<Phase> phases) {
 		for (Phase phase : phases)
-			this.phases.put(phase.getId(), phase);
+			putPhase(phase);
+	}
+
+	@Override
+	public Lifecycle copy() {
+		final Lifecycle lifecycle = new Lifecycle(this.phasesSupplier, getId());
+
+		lifecycle.putPhases(getPhases().values());
+
+		return lifecycle;
 	}
 
 	@Override
@@ -67,5 +95,4 @@ public class Lifecycle implements Recordable {
 
 		return tree;
 	}
-
 }

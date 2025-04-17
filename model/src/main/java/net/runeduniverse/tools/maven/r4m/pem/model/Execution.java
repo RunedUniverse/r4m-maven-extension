@@ -32,12 +32,12 @@ public class Execution implements DataEntry {
 	public static final String HINT = "execution";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Execution";
 
-	protected final Supplier<Set<ExecutionRestriction<?>>> restrictionsSupplier;
-	protected final Supplier<Set<ExecutionTrigger<?>>> triggerSupplier;
+	protected final Supplier<Set<ExecutionRestriction>> restrictionsSupplier;
+	protected final Supplier<Set<ExecutionTrigger>> triggerSupplier;
 	protected final Supplier<Map<String, Lifecycle>> lifecyclesSupplier;
 
-	protected final Set<ExecutionRestriction<?>> restrictions;
-	protected final Set<ExecutionTrigger<?>> trigger;
+	protected final Set<ExecutionRestriction> restrictions;
+	protected final Set<ExecutionTrigger> trigger;
 	protected final Map<String, Lifecycle> lifecycles;
 
 	protected String id = null;
@@ -56,8 +56,8 @@ public class Execution implements DataEntry {
 		this(LinkedHashSet::new, LinkedHashSet::new, LinkedHashMap::new, id, source);
 	}
 
-	public Execution(final Supplier<Set<ExecutionRestriction<?>>> restrictionsSupplier,
-			final Supplier<Set<ExecutionTrigger<?>>> triggerSupplier,
+	public Execution(final Supplier<Set<ExecutionRestriction>> restrictionsSupplier,
+			final Supplier<Set<ExecutionTrigger>> triggerSupplier,
 			final Supplier<Map<String, Lifecycle>> lifecyclesSupplier, final String id, final ExecutionSource source) {
 		this.restrictionsSupplier = restrictionsSupplier;
 		this.triggerSupplier = triggerSupplier;
@@ -93,39 +93,19 @@ public class Execution implements DataEntry {
 		return this.activeNever;
 	}
 
-	public Set<ExecutionTrigger<?>> getTrigger() {
+	public Set<ExecutionTrigger> getTrigger() {
 		return this.trigger;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> Set<ExecutionTrigger<T>> getTrigger(final Class<T> dataType) {
-		final Set<ExecutionTrigger<T>> result = new LinkedHashSet<>();
-		for (ExecutionTrigger<?> trigger : this.trigger) {
-			if (dataType.isAssignableFrom(trigger.getDataType()))
-				result.add((ExecutionTrigger<T>) trigger);
-		}
-		return result;
-	}
-
-	public Set<ExecutionRestriction<?>> getRestrictions() {
+	public Set<ExecutionRestriction> getRestrictions() {
 		return this.restrictions;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> Set<ExecutionRestriction<T>> getRestrictions(final Class<T> dataType) {
-		final Set<ExecutionRestriction<T>> result = new LinkedHashSet<>();
-		for (ExecutionRestriction<?> restriction : this.restrictions) {
-			if (dataType.isAssignableFrom(restriction.getDataType()))
-				result.add((ExecutionRestriction<T>) restriction);
-		}
-		return result;
 	}
 
 	public Lifecycle getLifecycle(final String lifecycleId) {
 		return this.lifecycles.get(lifecycleId);
 	}
 
-	public Lifecycle computeIfAbsentLifecycle(final String lifecycleId,
+	public Lifecycle computeLifecycleIfAbsent(final String lifecycleId,
 			final Function<? super String, ? extends Lifecycle> mappingFunction) {
 		return this.lifecycles.computeIfAbsent(lifecycleId, mappingFunction);
 	}
@@ -150,25 +130,25 @@ public class Execution implements DataEntry {
 		this.activeNever = value;
 	}
 
-	public void addTrigger(final ExecutionTrigger<?> trigger) {
+	public void addTrigger(final ExecutionTrigger trigger) {
 		this.trigger.add(trigger);
 	}
 
-	public void addTrigger(final Collection<ExecutionTrigger<?>> values) {
-		for (ExecutionTrigger<?> value : values)
+	public void addTrigger(final Collection<ExecutionTrigger> values) {
+		for (ExecutionTrigger value : values)
 			addTrigger(value);
 	}
 
-	public void addRestriction(final ExecutionRestriction<?> value) {
-		for (ExecutionRestriction<?> restriction : this.restrictions) {
+	public void addRestriction(final ExecutionRestriction value) {
+		for (ExecutionRestriction restriction : this.restrictions) {
 			if (restriction != null && restriction.equals(value))
 				return;
 		}
 		this.restrictions.add(value);
 	}
 
-	public void addRestrictions(final Collection<ExecutionRestriction<?>> values) {
-		for (ExecutionRestriction<?> value : values)
+	public void addRestrictions(final Collection<ExecutionRestriction> values) {
+		for (ExecutionRestriction value : values)
 			addRestriction(value);
 	}
 
@@ -178,7 +158,7 @@ public class Execution implements DataEntry {
 
 	public void putLifecycles(final Collection<Lifecycle> lifecycles) {
 		for (Lifecycle lifecycle : lifecycles)
-			this.lifecycles.put(lifecycle.getId(), lifecycle);
+			putLifecycle(lifecycle);
 	}
 
 	@Override
@@ -235,5 +215,4 @@ public class Execution implements DataEntry {
 
 		return tree;
 	}
-
 }

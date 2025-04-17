@@ -21,6 +21,6 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 
 public interface ExecutionRestrictionParser {
 
-	public ExecutionRestriction<ExecutionArchiveSelectorConfig> parse(PlexusConfiguration node);
+	public ExecutionRestriction parse(PlexusConfiguration node);
 
 }

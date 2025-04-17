@@ -108,8 +108,9 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		if (!execution.getRestrictions()
 				.isEmpty()) {
 			PlexusConfiguration restrictionNodes = node.getChild("restrictions", true);
-			for (ExecutionRestriction<?> restriction : execution.getRestrictions()) {
-				ExecutionRestrictionWriter writer = this.restrictionWriter.get(restriction.getHint());
+			for (ExecutionRestriction restriction : execution.getRestrictions()) {
+				ExecutionRestrictionWriter writer = this.restrictionWriter.get(restriction.getClass()
+						.getCanonicalName());
 				if (writer != null)
 					writer.append(restrictionNodes, restriction);
 			}
@@ -122,8 +123,9 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 			triggerNodes.addChild("default", null);
 		if (execution.isNeverActive())
 			triggerNodes.addChild("never", null);
-		for (ExecutionTrigger<?> trigger : execution.getTrigger()) {
-			final ExecutionTriggerWriter writer = this.triggerWriter.get(trigger.getHint());
+		for (ExecutionTrigger trigger : execution.getTrigger()) {
+			final ExecutionTriggerWriter writer = this.triggerWriter.get(trigger.getClass()
+					.getCanonicalName());
 			if (writer != null)
 				writer.append(triggerNodes, trigger);
 		}

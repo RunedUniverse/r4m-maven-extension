@@ -18,17 +18,29 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Phase implements Recordable {
+public class Phase implements DataEntry {
 
-	protected final List<Goal> goals = new LinkedList<>();
+	public static final String HINT = "phase";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Phase";
+
+	protected final Supplier<List<Goal>> goalsSupplier;
+
+	protected final List<Goal> goals;
 	protected String id;
 
 	public Phase(final String id) {
+		this(LinkedList::new, id);
+	}
+
+	public Phase(final Supplier<List<Goal>> goalsSupplier, final String id) {
+		this.goalsSupplier = goalsSupplier;
+		this.goals = this.goalsSupplier.get();
 		this.id = id;
 	}
 
@@ -49,6 +61,15 @@ public class Phase implements Recordable {
 	}
 
 	@Override
+	public Phase copy() {
+		final Phase phase = new Phase(this.goalsSupplier, getId());
+
+		phase.addGoals(getGoals());
+
+		return phase;
+	}
+
+	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = new DefaultCompoundTree("Phase");
 
@@ -59,5 +80,4 @@ public class Phase implements Recordable {
 
 		return tree;
 	}
-
 }

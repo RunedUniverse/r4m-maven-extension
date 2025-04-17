@@ -15,24 +15,22 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.trigger;
 
+import org.codehaus.plexus.component.annotations.Component;
+
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerEvaluationHandler;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProfileTriggerProvided;
 
-public abstract class ProfileTrigger implements ExecutionTrigger<ExecutionArchiveSelectorConfig> {
-
-	protected final String profileId;
-
-	public ProfileTrigger(final String profileId) {
-		this.profileId = profileId;
-	}
-
-	public String getProfileId() {
-		return this.profileId;
-	}
+@Component(role = ExecutionTriggerEvaluationHandler.class, hint = ProfileTriggerProvided.CANONICAL_NAME)
+public class ProfileProvidedTriggerHandler implements ExecutionTriggerEvaluationHandler {
 
 	@Override
-	public Class<ExecutionArchiveSelectorConfig> getDataType() {
-		return ExecutionArchiveSelectorConfig.class;
+	public boolean isActive(ExecutionArchiveSelectorConfig config, ExecutionTrigger entry) {
+		if (!(entry instanceof ProfileTriggerProvided))
+			return false;
+		final ProfileTriggerProvided trigger = (ProfileTriggerProvided) entry;
+		return config.getProvidedProfiles()
+				.contains(trigger.getProfileId());
 	}
-
 }

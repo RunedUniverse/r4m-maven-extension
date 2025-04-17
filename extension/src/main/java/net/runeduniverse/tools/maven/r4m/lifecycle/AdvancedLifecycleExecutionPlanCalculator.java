@@ -620,11 +620,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				final String phaseId = mojoDescriptor.getExecutePhase();
 				if (isBlank(lifecycleId)) {
 					final Lifecycle lifecycle = this.defaultLifeCycles.get(phaseId);
-					final List<TargetPhase> phases = new LinkedList<>();
-					for (String phase : lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
-							.getPhaseSequence())
-						phases.add(new TargetPhase(phase));
-					fork.setPhases(phases);
+					fork.addPhases2(lifecycleTaskReqCalcDelegate.calculateTaskRequest(lifecycle, phaseId)
+							.getPhaseSequence());
 				} else {
 					/*
 					 * Forking of a lifecycle when the phaseId is null would be skipped during a

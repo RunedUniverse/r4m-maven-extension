@@ -15,17 +15,19 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
+import net.runeduniverse.lib.utils.maven.ext.indexer.APluginBoundRegistry;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
+import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 
-@Component(role = ExecutionArchiveSelectorConfigFactory.class, hint = "default", instantiationStrategy = "singleton")
-public class SelectorConfigFactory implements ExecutionArchiveSelectorConfigFactory {
+@Component(role = PluginExecutionRegistry.class, instantiationStrategy = "keep-alive")
+public class DefaultRegistry extends APluginBoundRegistry<PluginExecutionRegistrySector>
+		implements PluginExecutionRegistry {
 
 	@Override
-	public ExecutionArchiveSelectorConfig createEmptyConfig() {
-		return new SelectorConfig();
+	protected PluginExecutionRegistrySector _newSector(final PluginDescriptor mvnPluginDescriptor) {
+		return new DefaultRegistrySector();
 	}
-
 }

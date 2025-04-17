@@ -26,7 +26,7 @@ import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
-public class Goal implements GoalView {
+public class DefaultGoalView implements GoalView {
 
 	private final Set<String> modes = new LinkedHashSet<>();
 
@@ -38,7 +38,7 @@ public class Goal implements GoalView {
 	private Fork fork = null;
 	private MojoDescriptor descriptor = null;
 
-	public Goal(final String groupId, final String artifactId, final String goalId) {
+	public DefaultGoalView(final String groupId, final String artifactId, final String goalId) {
 		this.groupId = groupId;
 		this.artifactId = artifactId;
 		this.goalId = goalId;

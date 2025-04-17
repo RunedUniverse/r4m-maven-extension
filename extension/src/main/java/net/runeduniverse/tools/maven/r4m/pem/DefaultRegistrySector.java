@@ -28,7 +28,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public class RegistrySector implements PluginExecutionRegistrySector {
+public class DefaultRegistrySector implements PluginExecutionRegistrySector {
 
 	// save more infos???
 

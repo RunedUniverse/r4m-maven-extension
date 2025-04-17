@@ -31,7 +31,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-public class SelectorConfig implements ExecutionArchiveSelectorConfig {
+public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
@@ -231,8 +231,8 @@ public class SelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
-	public SelectorConfig clone() {
-		final SelectorConfig cnf = new SelectorConfig();
+	public DefaultSelectorConfig clone() {
+		final DefaultSelectorConfig cnf = new DefaultSelectorConfig();
 		cnf.selectActiveProject(this.mvnProject);
 		cnf.selectPackagingProcedure(this.packagingProcedure);
 		cnf.selectActiveProfiles(Collections.unmodifiableSet(this.activeProfiles));

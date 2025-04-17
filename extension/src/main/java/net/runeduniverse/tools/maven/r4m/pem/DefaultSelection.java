@@ -34,12 +34,12 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-public class Selection implements ExecutionArchiveSelection {
+public class DefaultSelection implements ExecutionArchiveSelection {
 
 	protected final ExecutionArchiveSelectorConfig selectorConfig;
 	protected final Set<ExecutionView> views;
 
-	public Selection(final ExecutionArchiveSelectorConfig selectorConfig, final Set<ExecutionView> views) {
+	public DefaultSelection(final ExecutionArchiveSelectorConfig selectorConfig, final Set<ExecutionView> views) {
 		this.selectorConfig = selectorConfig;
 		this.views = views;
 	}

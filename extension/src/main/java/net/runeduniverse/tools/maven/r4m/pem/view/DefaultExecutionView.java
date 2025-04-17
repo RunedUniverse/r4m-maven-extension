@@ -22,15 +22,15 @@ import java.util.function.Function;
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
-import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-public class Lifecycle implements LifecycleView {
+public class DefaultExecutionView implements ExecutionView {
 
-	private final Map<String, PhaseView> phases = new LinkedHashMap<>();
+	private final Map<String, LifecycleView> lifecycles = new LinkedHashMap<>();
 	private final String id;
 
-	public Lifecycle(final String id) {
+	public DefaultExecutionView(final String id) {
 		this.id = id;
 	}
 
@@ -40,34 +40,34 @@ public class Lifecycle implements LifecycleView {
 	}
 
 	@Override
-	public Map<String, PhaseView> getPhases() {
-		return this.phases;
+	public Map<String, LifecycleView> getLifecycles() {
+		return this.lifecycles;
 	}
 
 	@Override
-	public void put(final PhaseView phaseView) {
-		this.phases.put(phaseView.getId(), phaseView);
+	public void put(final LifecycleView view) {
+		this.lifecycles.put(view.getId(), view);
 	}
 
 	@Override
-	public PhaseView getPhase(final String phaseId) {
-		return this.phases.get(phaseId);
+	public LifecycleView getLifecycle(final String lifecycleId) {
+		return this.lifecycles.get(lifecycleId);
 	}
 
 	@Override
-	public PhaseView computePhaseIfAbsent(final String id,
-			final Function<String, ? extends PhaseView> mappingFunction) {
-		return this.phases.computeIfAbsent(id, mappingFunction);
+	public LifecycleView computeLifecycleIfAbsent(final String lifecycleId,
+			final Function<String, ? extends LifecycleView> mappingFunction) {
+		return this.lifecycles.computeIfAbsent(lifecycleId, mappingFunction);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new DefaultCompoundTree("LifecycleView");
+		final CompoundTree tree = new DefaultCompoundTree("ExecutionView");
 
 		tree.append("id", this.id);
 
-		for (Recordable phase : this.phases.values())
-			tree.append(phase.toRecord());
+		for (Recordable lifecycle : this.lifecycles.values())
+			tree.append(lifecycle.toRecord());
 
 		return tree;
 	}

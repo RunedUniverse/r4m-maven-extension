@@ -15,22 +15,22 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.view;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
-import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
-import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-public class Execution implements ExecutionView {
+public class DefaultPhaseView implements PhaseView {
 
-	private final Map<String, LifecycleView> lifecycles = new LinkedHashMap<>();
+	private final List<GoalView> goals = new LinkedList<>();
 	private final String id;
 
-	public Execution(final String id) {
+	public DefaultPhaseView(final String id) {
 		this.id = id;
 	}
 
@@ -40,34 +40,37 @@ public class Execution implements ExecutionView {
 	}
 
 	@Override
-	public Map<String, LifecycleView> getLifecycles() {
-		return this.lifecycles;
+	public List<GoalView> getGoals() {
+		return this.goals;
 	}
 
 	@Override
-	public void put(final LifecycleView view) {
-		this.lifecycles.put(view.getId(), view);
+	public void addGoal(final GoalView goal) {
+		if (goal == null)
+			return;
+		this.goals.add(goal);
 	}
 
 	@Override
-	public LifecycleView getLifecycle(final String lifecycleId) {
-		return this.lifecycles.get(lifecycleId);
+	public void removeGoal(final GoalView goal) {
+		this.goals.remove(goal);
 	}
 
 	@Override
-	public LifecycleView computeLifecycleIfAbsent(final String lifecycleId,
-			final Function<String, ? extends LifecycleView> mappingFunction) {
-		return this.lifecycles.computeIfAbsent(lifecycleId, mappingFunction);
+	public void addNewGoals(final Collection<GoalView> goals) {
+		for (GoalView goal : goals)
+			if (!this.goals.contains(goal))
+				addGoal(goal);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new DefaultCompoundTree("ExecutionView");
+		final CompoundTree tree = new DefaultCompoundTree("PhaseView");
 
 		tree.append("id", this.id);
 
-		for (Recordable lifecycle : this.lifecycles.values())
-			tree.append(lifecycle.toRecord());
+		for (Recordable goal : this.goals)
+			tree.append(goal.toRecord());
 
 		return tree;
 	}

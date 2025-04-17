@@ -15,22 +15,22 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.view;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
-import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
+import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-public class Phase implements PhaseView {
+public class DefaultLifecycleView implements LifecycleView {
 
-	private final List<GoalView> goals = new LinkedList<>();
+	private final Map<String, PhaseView> phases = new LinkedHashMap<>();
 	private final String id;
 
-	public Phase(final String id) {
+	public DefaultLifecycleView(final String id) {
 		this.id = id;
 	}
 
@@ -40,37 +40,34 @@ public class Phase implements PhaseView {
 	}
 
 	@Override
-	public List<GoalView> getGoals() {
-		return this.goals;
+	public Map<String, PhaseView> getPhases() {
+		return this.phases;
 	}
 
 	@Override
-	public void addGoal(final GoalView goal) {
-		if (goal == null)
-			return;
-		this.goals.add(goal);
+	public void put(final PhaseView phaseView) {
+		this.phases.put(phaseView.getId(), phaseView);
 	}
 
 	@Override
-	public void removeGoal(final GoalView goal) {
-		this.goals.remove(goal);
+	public PhaseView getPhase(final String phaseId) {
+		return this.phases.get(phaseId);
 	}
 
 	@Override
-	public void addNewGoals(final Collection<GoalView> goals) {
-		for (GoalView goal : goals)
-			if (!this.goals.contains(goal))
-				addGoal(goal);
+	public PhaseView computePhaseIfAbsent(final String id,
+			final Function<String, ? extends PhaseView> mappingFunction) {
+		return this.phases.computeIfAbsent(id, mappingFunction);
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		final CompoundTree tree = new DefaultCompoundTree("PhaseView");
+		final CompoundTree tree = new DefaultCompoundTree("LifecycleView");
 
 		tree.append("id", this.id);
 
-		for (Recordable goal : this.goals)
-			tree.append(goal.toRecord());
+		for (Recordable phase : this.phases.values())
+			tree.append(phase.toRecord());
 
 		return tree;
 	}

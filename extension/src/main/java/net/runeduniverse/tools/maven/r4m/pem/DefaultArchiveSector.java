@@ -32,14 +32,15 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public class ArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> implements ExecutionArchiveSector {
+public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> implements ExecutionArchiveSector {
 
 	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
 	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
 	protected final String version;
 
-	public ArchiveSector(final MavenProject mvnProject, final String version, final ArchiveSector parent) {
+	public DefaultArchiveSector(final MavenProject mvnProject, final String version,
+			final DefaultArchiveSector parent) {
 		super(mvnProject, parent);
 		this.version = version;
 	}

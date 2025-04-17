@@ -51,7 +51,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
-import net.runeduniverse.tools.maven.r4m.pem.view.ViewFactory;
+import net.runeduniverse.tools.maven.r4m.pem.view.DefaultPemViewFactory;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
@@ -60,7 +60,7 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilter;
 
 @Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
-public class Selector implements ExecutionArchiveSelector {
+public class DefaultSelector implements ExecutionArchiveSelector {
 
 	public static final String WARN_SKIPPING_UNKNOWN_GOAL = "skipping unknown goal » %s:%s:%s";
 
@@ -136,19 +136,19 @@ public class Selector implements ExecutionArchiveSelector {
 			final Map<ExecutionSource, ExecutionView> entry = map.computeIfAbsent(execution.getId(),
 					k -> new LinkedHashMap<>());
 			final ExecutionView executionView = entry.computeIfAbsent(execution.getSource(),
-					k -> ViewFactory.createExecution(execution.getId()));
+					k -> DefaultPemViewFactory.createExecution(execution.getId()));
 			for (Lifecycle lifecycle : execution.getLifecycles()
 					.values()) {
 				final LifecycleView lifecycleView = executionView.computeLifecycleIfAbsent(lifecycle.getId(),
-						k -> ViewFactory.createLifecycle(k));
+						k -> DefaultPemViewFactory.createLifecycle(k));
 				for (Phase phase : lifecycle.getPhases()
 						.values()) {
 					final PhaseView phaseView = lifecycleView.computePhaseIfAbsent(phase.getId(),
-							k -> ViewFactory.createPhase(k));
+							k -> DefaultPemViewFactory.createPhase(k));
 					for (Goal goal : phase.getGoals())
 						if (this.validateGoal(cnf, goal)) {
-							final GoalView goalView = ViewFactory.createGoal(goal.getGroupId(), goal.getArtifactId(),
-									goal.getGoalId());
+							final GoalView goalView = DefaultPemViewFactory.createGoal(goal.getGroupId(),
+									goal.getArtifactId(), goal.getGoalId());
 							goalView.addModes(goal.getModes());
 							goalView.setOptional(goal.getOptional() != null && goal.getOptional());
 							goalView.setFork(goal.getFork());
@@ -264,15 +264,16 @@ public class Selector implements ExecutionArchiveSelector {
 			return execution;
 
 		final ExecutionView workflowView = views.getOrDefault(ExecutionSource.WORKFLOW,
-				ViewFactory.createExecution(id));
+				DefaultPemViewFactory.createExecution(id));
 		final ExecutionView packagingView = views.getOrDefault(ExecutionSource.PACKAGING,
-				ViewFactory.createExecution(id));
+				DefaultPemViewFactory.createExecution(id));
 
 		execution = merge(cnf, packagingView, workflowView, true, false);
 
-		final ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN, ViewFactory.createExecution(id));
+		final ExecutionView pluginView = views.getOrDefault(ExecutionSource.PLUGIN,
+				DefaultPemViewFactory.createExecution(id));
 		final ExecutionView overrideView = views.getOrDefault(ExecutionSource.OVERRIDE,
-				ViewFactory.createExecution(id));
+				DefaultPemViewFactory.createExecution(id));
 
 		execution = merge(cnf, pluginView, execution, false, true);
 		execution = merge(cnf, execution, overrideView, true, false);
@@ -284,17 +285,17 @@ public class Selector implements ExecutionArchiveSelector {
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
 		final Set<ExecutionView> views = new LinkedHashSet<>();
 		if (selectorConfig.getActiveProject() == null)
-			return new Selection(selectorConfig.clone(), views);
+			return new DefaultSelection(selectorConfig.clone(), views);
 
 		final ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
 		if (sector == null)
-			return new Selection(selectorConfig.clone(), views);
+			return new DefaultSelection(selectorConfig.clone(), views);
 
 		selectorConfig.compile(this.mvnSession);
 		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, sector)
 				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
-		return new Selection(selectorConfig.clone(), views);
+		return new DefaultSelection(selectorConfig.clone(), views);
 	}
 
 }

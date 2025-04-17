@@ -23,11 +23,11 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 
 @Component(role = ExecutionArchive.class, instantiationStrategy = "keep-alive")
-public class Archive extends AProjectBoundArchive<ExecutionArchiveSector> implements ExecutionArchive {
+public class DefaultArchive extends AProjectBoundArchive<ExecutionArchiveSector> implements ExecutionArchive {
 
 	@Override
 	protected ExecutionArchiveSector _newSector(final MavenProject mvnProject) {
-		return new ArchiveSector(mvnProject, null, null);
+		return new DefaultArchiveSector(mvnProject, null, null);
 	}
 
 	@Override

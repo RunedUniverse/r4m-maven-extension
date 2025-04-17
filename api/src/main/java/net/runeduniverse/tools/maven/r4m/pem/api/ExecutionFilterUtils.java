@@ -26,7 +26,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 public interface ExecutionFilterUtils {
 
 	/**
-	 * Creates the default {@link ExecutionFilter} for filtering out all the
+	 * Creates the default {@link Predicate<Execution>} for filtering out all the
 	 * relevant Executions utilizing the provided
 	 * {@link ExecutionArchiveSelectorConfig}.
 	 *
@@ -36,8 +36,8 @@ public interface ExecutionFilterUtils {
 	 *
 	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
 	 *            the filter
-	 * @return an instance of {@link ExecutionFilter} for filtering Executions by
-	 *         relevance utilizing {@code cnf}
+	 * @return an instance of {@link Predicate<Execution>} for filtering Executions
+	 *         by relevance utilizing {@code cnf}
 	 */
 	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
@@ -64,8 +64,9 @@ public interface ExecutionFilterUtils {
 	}
 
 	/**
-	 * Creates the default {@link ExecutionFilter} for filtering out all the active
-	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
+	 * Creates the default {@link Predicate<Execution>} for filtering out all the
+	 * active Executions utilizing the provided
+	 * {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
 	 * Active are all Executions that are not permanently flagged as disabled,
@@ -74,7 +75,7 @@ public interface ExecutionFilterUtils {
 	 *
 	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
 	 *            the filter
-	 * @return an instance of {@link ExecutionFilter} for filtering for active
+	 * @return an instance of {@link Predicate<Execution>} for filtering for active
 	 *         Executions utilizing {@code cnf}
 	 */
 	public static Predicate<Execution> defaultActiveFilter(final ExecutionArchiveSelectorConfig cnf) {

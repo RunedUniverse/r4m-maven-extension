@@ -194,7 +194,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 			for (PlexusConfiguration lifecycleNode : lifecycleNodes) {
 				parseLifecycle(lifecycles, lifecycleNode);
 			}
-			exec.addLifecycles(lifecycles);
+			exec.putLifecycles(lifecycles);
 		}
 		return true;
 	}

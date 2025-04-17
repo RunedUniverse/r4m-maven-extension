@@ -18,8 +18,6 @@ package net.runeduniverse.tools.maven.r4m.grm.converter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -40,6 +38,8 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalData;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementCombineMethod;
 import net.runeduniverse.tools.maven.r4m.grm.model.MergeDataGroup;
 import net.runeduniverse.tools.maven.r4m.grm.model.OrDataGroup;
+
+import static net.runeduniverse.lib.utils.common.ReflectionUtils.supplyWithHandler;
 
 @Component(role = DataConverter.class, hint = "default")
 public class DefaultDataConverter implements DataConverter {
@@ -181,38 +181,8 @@ public class DefaultDataConverter implements DataConverter {
 		if (factory == null || entry == null)
 			return null;
 
-		final List<String> types = collectEntryTypes(entry.getClass());
-
-		for (String type : types) {
-			// find valid handler
-			final DataHandler handler = this.handler.get(type);
-			if (handler == null)
-				continue;
-			// check if the handler rejects the entry
-			final PlexusConfiguration cnf = handler.createConfiguration(factory, entry);
-			if (cnf != null)
-				return cnf;
-		}
-		return null;
-	}
-
-	protected List<String> collectEntryTypes(Class<?> clazz) {
-		final List<String> lst = new LinkedList<>();
-		// add class
-		lst.add(clazz.getCanonicalName());
-
-		for (int i = 0; i < MAX_TYPE_SEARCH_DEPTH; i++) {
-			if (clazz == Object.class)
-				return lst;
-			// add all interfaces
-			for (Class<?> ic : clazz.getInterfaces()) {
-				lst.add(ic.getCanonicalName());
-			}
-			// add superclass
-			clazz = clazz.getSuperclass();
-			lst.add(clazz.getCanonicalName());
-		}
-		return lst;
+		return supplyWithHandler(this.handler, entry, h -> h.createConfiguration(factory, entry),
+				MAX_TYPE_SEARCH_DEPTH);
 	}
 
 	protected PlexusConfiguration convertGoalData(final ConfigurationFactory<PlexusConfiguration> factory,

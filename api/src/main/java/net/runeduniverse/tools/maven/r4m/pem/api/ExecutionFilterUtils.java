@@ -26,18 +26,18 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
 public interface ExecutionFilterUtils {
 
 	/**
-	 * Creates the default {@link Predicate<Execution>} for filtering out all the
-	 * relevant Executions utilizing the provided
-	 * {@link ExecutionArchiveSelectorConfig}.
+	 * Creates the default {@link Predicate} for filtering out all the relevant
+	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
 	 * Relevant are all Executions that are not permanently flagged as disabled and
 	 * adhere to all restrictions.
 	 *
-	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
-	 *            the filter
-	 * @return an instance of {@link Predicate<Execution>} for filtering Executions
-	 *         by relevance utilizing {@code cnf}
+	 * @param restrictionEvaluator evaluates {@link ExecutionRestriction} instances
+	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
+	 *                             for filtering in the filter
+	 * @return an instance of {@link Predicate} for filtering Executions by
+	 *         relevance utilizing {@code cnf}
 	 */
 	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
 			final ExecutionArchiveSelectorConfig cnf) {
@@ -64,19 +64,20 @@ public interface ExecutionFilterUtils {
 	}
 
 	/**
-	 * Creates the default {@link Predicate<Execution>} for filtering out all the
-	 * active Executions utilizing the provided
-	 * {@link ExecutionArchiveSelectorConfig}.
+	 * Creates the default {@link Predicate} for filtering out all the active
+	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
 	 * Active are all Executions that are not permanently flagged as disabled,
 	 * adhere to all restrictions and are triggered by either a trigger or by direct
 	 * invocation.
 	 *
-	 * @param cnf the {@link ExecutionArchiveSelectorConfig} used for filtering in
-	 *            the filter
-	 * @return an instance of {@link Predicate<Execution>} for filtering for active
-	 *         Executions utilizing {@code cnf}
+	 * @param restrictionEvaluator evaluates {@link ExecutionRestriction} instances
+	 * @param triggerEvaluator     evaluates {@link ExecutionTrigger} instances
+	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
+	 *                             for filtering in the filter
+	 * @return an instance of {@link Predicate} for filtering for active Executions
+	 *         utilizing {@code cnf}
 	 */
 	public static Predicate<Execution> defaultActiveFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
 			final ExecutionTriggerEvaluator triggerEvaluator, final ExecutionArchiveSelectorConfig cnf) {

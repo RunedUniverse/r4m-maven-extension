@@ -24,6 +24,7 @@ import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 
 import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
 public class Goal implements DataEntry {
 
@@ -144,6 +145,11 @@ public class Goal implements DataEntry {
 	}
 
 	@Override
+	public int hashCode() {
+		return hash(HINT);
+	}
+
+	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
@@ -152,14 +158,11 @@ public class Goal implements DataEntry {
 			return false;
 		final Goal goal = (Goal) obj;
 
-		if (!(this.modes.size() == goal.getModes()
-				.size() && this.modes.containsAll(goal.getModes())))
-			return false;
-
 		return objectEquals(this.groupId, goal.getGroupId()) //
 				&& objectEquals(this.artifactId, goal.getArtifactId()) //
 				&& objectEquals(this.goalId, goal.getGoalId()) //
 				&& objectEquals(this.optional, goal.getOptional()) //
+				&& objectEquals(this.modes, goal.getModes()) //
 				&& objectEquals(this.fork, goal.getFork());
 	}
 

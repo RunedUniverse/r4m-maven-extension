@@ -32,13 +32,24 @@ public abstract class ADataFactory implements DataFactory {
 	}
 
 	protected DataEntry convertEntry(final String contextHint, final PlexusConfiguration cnf) {
-		return this.converter.convertEntry(null, cnf);
+		return this.converter.convertEntry(contextHint, cnf);
 	}
 
 	protected String asId(final String id) {
 		if (id == null)
 			return null;
 		return id.trim();
+	}
+
+	protected Boolean asBoolean(String value, final boolean defaultValue) {
+		if (value == null)
+			return defaultValue;
+		value = value.trim();
+		if ("true".equalsIgnoreCase(value))
+			return true;
+		if ("false".equalsIgnoreCase(value))
+			return false;
+		return defaultValue;
 	}
 
 	protected String getAttributeAsId(final PlexusConfiguration cnf, final String attributeName) {
@@ -54,6 +65,13 @@ public abstract class ADataFactory implements DataFactory {
 		return asId(cnf.getAttribute(attributeName, defaultValue));
 	}
 
+	protected Boolean getAttributeAsBoolean(final PlexusConfiguration cnf, final String attributeName,
+			final Boolean defaultValue) {
+		if (cnf == null)
+			return null;
+		return asBoolean(cnf.getAttribute(attributeName), defaultValue);
+	}
+
 	protected String getValueAsId(final PlexusConfiguration cnf) {
 		if (cnf == null)
 			return null;
@@ -64,5 +82,11 @@ public abstract class ADataFactory implements DataFactory {
 		if (cnf == null)
 			return null;
 		return asId(cnf.getValue(defaultValue));
+	}
+
+	protected Boolean getValueAsBoolean(final PlexusConfiguration cnf, final Boolean defaultValue) {
+		if (cnf == null)
+			return null;
+		return asBoolean(cnf.getValue(), defaultValue);
 	}
 }

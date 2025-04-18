@@ -24,7 +24,7 @@ import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
 public class PropertyRestriction implements ExecutionRestriction {
 
-	public static final String HINT = CONTEXT + '>' + "property";
+	public static final String HINT = "property";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.PropertyRestriction";
 
 	protected final String id;
@@ -64,7 +64,7 @@ public class PropertyRestriction implements ExecutionRestriction {
 
 	@Override
 	public int hashCode() {
-		return hash(type()) ^ hash(HINT) ^ hash(getId());
+		return hash(HINT) ^ hash(getId());
 	}
 
 	@Override
@@ -75,8 +75,10 @@ public class PropertyRestriction implements ExecutionRestriction {
 			return false;
 		final PropertyRestriction restriction = (PropertyRestriction) obj;
 
-		return objectEquals(this.id, restriction.getId()) && objectEquals(this.inverted, restriction.getInverted())
-				&& objectEquals(this.exists, restriction.exists) && objectEquals(this.value, restriction.getValue())
+		return objectEquals(this.id, restriction.getId()) //
+				&& objectEquals(this.inverted, restriction.getInverted()) //
+				&& objectEquals(this.exists, restriction.exists) //
+				&& objectEquals(this.value, restriction.getValue()) //
 				&& objectEquals(this.matchType, restriction.getMatchType());
 	}
 

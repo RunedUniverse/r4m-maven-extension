@@ -23,7 +23,7 @@ import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
 public class PackagingProcedureRestriction implements ExecutionRestriction {
 
-	public static final String HINT = CONTEXT + '>' + "packaging-procedure";
+	public static final String HINT = "packaging-procedure";
 	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction";
 
 	protected final String procedure;
@@ -38,7 +38,7 @@ public class PackagingProcedureRestriction implements ExecutionRestriction {
 
 	@Override
 	public int hashCode() {
-		return hash(type()) ^ hash(HINT) ^ hash(getPackagingProcedure());
+		return hash(HINT) ^ hash(getPackagingProcedure());
 	}
 
 	@Override

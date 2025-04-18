@@ -54,15 +54,10 @@ public class ExecutionDataFactory extends ADataFactory {
 	protected boolean parseInherited(final Execution exec, final PlexusConfiguration inheritedNode) {
 		if (inheritedNode == null)
 			return false;
-		final String value = getValueAsId(inheritedNode);
-		if (isBlank(value))
+		final Boolean inherited = getValueAsBoolean(inheritedNode, null);
+		if (inherited == null)
 			return false;
-		if (value.equalsIgnoreCase("true"))
-			exec.setInherited(true);
-		else if (value.equalsIgnoreCase("false"))
-			exec.setInherited(false);
-		else
-			return false;
+		exec.setInherited(inherited);
 		return true;
 	}
 
@@ -73,7 +68,7 @@ public class ExecutionDataFactory extends ADataFactory {
 		final PlexusConfiguration triggerNodes[] = nodeList.getChildren();
 		if (triggerNodes.length > 0) {
 			for (PlexusConfiguration triggerNode : triggerNodes) {
-				final DataEntry entry = convertEntry(triggerNode);
+				final DataEntry entry = convertEntry(ExecutionRestriction.CONTEXT, triggerNode);
 				if (entry instanceof ExecutionRestriction)
 					exec.addRestriction((ExecutionRestriction) entry);
 			}
@@ -106,7 +101,7 @@ public class ExecutionDataFactory extends ADataFactory {
 					break;
 
 				default:
-					final DataEntry entry = convertEntry(triggerNode);
+					final DataEntry entry = convertEntry(ExecutionTrigger.CONTEXT, triggerNode);
 					if (entry instanceof ExecutionTrigger)
 						exec.addTrigger((ExecutionTrigger) entry);
 					break;

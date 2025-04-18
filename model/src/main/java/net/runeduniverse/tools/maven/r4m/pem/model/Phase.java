@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -32,7 +35,7 @@ public class Phase implements DataEntry {
 	protected final Supplier<List<Goal>> goalsSupplier;
 
 	protected final List<Goal> goals;
-	protected String id;
+	protected final String id;
 
 	public Phase(final String id) {
 		this(LinkedList::new, id);
@@ -58,6 +61,24 @@ public class Phase implements DataEntry {
 
 	public void addGoals(final Collection<Goal> goals) {
 		this.goals.addAll(goals);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Phase))
+			return false;
+		final Phase phase = (Phase) obj;
+
+		return objectEquals(this.id, phase.getId()) //
+				&& objectEquals(this.goals, phase.getGoals());
 	}
 
 	@Override

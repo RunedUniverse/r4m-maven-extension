@@ -169,21 +169,12 @@ public class Fork implements DataEntry {
 			return false;
 		final Fork fork = (Fork) obj;
 
-		if (!(this.executions.size() == fork.getExecutions()
-				.size() && this.executions.containsAll(fork.getExecutions())))
-			return false;
-
 		// Lists check using equals & also check the order of elements
-		if (!objectEquals(this.phases, fork.getPhases()))
-			return false;
-
-		if (!(this.excludePhases.size() == fork.getExcludedPhases()
-				.size() && this.excludePhases.containsAll(fork.getExcludedPhases())))
-			return false;
-
 		return objectEquals(this.mode, fork.getMode()) //
+				&& objectEquals(this.executions, fork.getExecutions()) //
 				&& objectEquals(this.lifecycle, fork.getLifecycle()) //
-				&& super.equals(obj);
+				&& objectEquals(this.phases, fork.getPhases()) //
+				&& objectEquals(this.excludePhases, fork.getExcludedPhases());
 	}
 
 	@Override

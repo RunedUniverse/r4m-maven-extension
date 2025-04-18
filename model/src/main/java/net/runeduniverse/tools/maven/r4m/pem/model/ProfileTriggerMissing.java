@@ -32,7 +32,7 @@ public class ProfileTriggerMissing extends ProfileTrigger {
 
 	@Override
 	public int hashCode() {
-		return hash(type()) ^ hash(HINT) ^ hash(getProfileId());
+		return hash(HINT) ^ hash(getProfileId());
 	}
 
 	@Override

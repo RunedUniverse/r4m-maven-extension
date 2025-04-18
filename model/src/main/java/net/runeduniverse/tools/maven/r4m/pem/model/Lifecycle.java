@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,11 +36,7 @@ public class Lifecycle implements DataEntry {
 	protected final Supplier<Map<String, Phase>> phasesSupplier;
 
 	protected final Map<String, Phase> phases;
-	protected String id;
-
-	public Lifecycle() {
-		this(LinkedHashMap::new, null);
-	}
+	protected final String id;
 
 	public Lifecycle(final String id) {
 		this(LinkedHashMap::new, id);
@@ -73,6 +72,24 @@ public class Lifecycle implements DataEntry {
 	public void putPhases(final Collection<Phase> phases) {
 		for (Phase phase : phases)
 			putPhase(phase);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Lifecycle))
+			return false;
+		final Lifecycle lifecycle = (Lifecycle) obj;
+
+		return objectEquals(this.id, lifecycle.getId()) //
+				&& objectEquals(this.phases, lifecycle.getPhases());
 	}
 
 	@Override

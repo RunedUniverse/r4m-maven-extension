@@ -63,6 +63,30 @@ public abstract class ADataHandler implements DataHandler {
 		cnf.setAttribute(attributeName, asId(value));
 	}
 
+	protected void setOptionalAttributeAsId(final PlexusConfiguration node, final String name, final String value) {
+		setOptionalAttribute(node, name, asId(value));
+	}
+
+	protected void setOptionalAttribute(final PlexusConfiguration node, final String name, final String value) {
+		if (value == null)
+			return;
+		node.setAttribute(name, value);
+	}
+
+	protected void setOptionalAttributeSkipDefaultAsId(final PlexusConfiguration node, final String name,
+			final String value, final Object defaultValue) {
+		setOptionalAttributeSkipDefault(node, name, asId(value), defaultValue);
+	}
+
+	protected void setOptionalAttributeSkipDefault(final PlexusConfiguration node, final String name,
+			final Object value, final Object defaultValue) {
+		if (value == null)
+			return;
+		if (defaultValue != null && defaultValue.equals(value))
+			return;
+		node.setAttribute(name, value.toString());
+	}
+
 	protected void setValueAsId(final PlexusConfiguration cnf, final String value) {
 		cnf.setValue(asId(value));
 	}

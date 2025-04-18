@@ -15,6 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -40,17 +43,13 @@ public class Execution implements DataEntry {
 	protected final Set<ExecutionTrigger> trigger;
 	protected final Map<String, Lifecycle> lifecycles;
 
-	protected String id = null;
-	protected ExecutionSource source = null;
+	protected final String id;
+	protected final ExecutionSource source;
 
 	protected boolean inherited = true;
 	protected boolean activeAlways = false;
 	protected boolean activeDefault = false;
 	protected boolean activeNever = false;
-
-	public Execution() {
-		this(LinkedHashSet::new, LinkedHashSet::new, LinkedHashMap::new, null, null);
-	}
 
 	public Execution(final String id, final ExecutionSource source) {
 		this(LinkedHashSet::new, LinkedHashSet::new, LinkedHashMap::new, id, source);
@@ -93,12 +92,12 @@ public class Execution implements DataEntry {
 		return this.activeNever;
 	}
 
-	public Set<ExecutionTrigger> getTrigger() {
-		return this.trigger;
-	}
-
 	public Set<ExecutionRestriction> getRestrictions() {
 		return this.restrictions;
+	}
+
+	public Set<ExecutionTrigger> getTrigger() {
+		return this.trigger;
 	}
 
 	public Lifecycle getLifecycle(final String lifecycleId) {
@@ -130,15 +129,6 @@ public class Execution implements DataEntry {
 		this.activeNever = value;
 	}
 
-	public void addTrigger(final ExecutionTrigger trigger) {
-		this.trigger.add(trigger);
-	}
-
-	public void addTrigger(final Collection<ExecutionTrigger> values) {
-		for (ExecutionTrigger value : values)
-			addTrigger(value);
-	}
-
 	public void addRestriction(final ExecutionRestriction value) {
 		for (ExecutionRestriction restriction : this.restrictions) {
 			if (restriction != null && restriction.equals(value))
@@ -152,6 +142,15 @@ public class Execution implements DataEntry {
 			addRestriction(value);
 	}
 
+	public void addTrigger(final ExecutionTrigger trigger) {
+		this.trigger.add(trigger);
+	}
+
+	public void addTrigger(final Collection<ExecutionTrigger> values) {
+		for (ExecutionTrigger value : values)
+			addTrigger(value);
+	}
+
 	public void putLifecycle(final Lifecycle lifecycle) {
 		this.lifecycles.put(lifecycle.getId(), lifecycle);
 	}
@@ -159,6 +158,31 @@ public class Execution implements DataEntry {
 	public void putLifecycles(final Collection<Lifecycle> lifecycles) {
 		for (Lifecycle lifecycle : lifecycles)
 			putLifecycle(lifecycle);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId()) ^ hash(getSource());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Execution))
+			return false;
+		final Execution exec = (Execution) obj;
+
+		return objectEquals(this.id, exec.getId()) //
+				&& objectEquals(this.source, exec.getSource()) //
+				&& objectEquals(this.inherited, exec.isInherited()) //
+				&& objectEquals(this.activeAlways, exec.isAlwaysActive()) //
+				&& objectEquals(this.activeDefault, exec.isDefaultActive()) //
+				&& objectEquals(this.activeNever, exec.isNeverActive()) //
+				&& objectEquals(this.restrictions, exec.getRestrictions()) //
+				&& objectEquals(this.trigger, exec.getTrigger()) //
+				&& objectEquals(this.lifecycles, exec.getLifecycles());
 	}
 
 	@Override

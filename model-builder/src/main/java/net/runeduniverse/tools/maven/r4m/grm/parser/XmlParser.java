@@ -65,7 +65,7 @@ public class XmlParser implements GoalRequirementModelParser {
 		final PlexusConfiguration nodes[] = nodeList.getChildren("goal");
 		for (int i = 0; i < nodes.length; i++) {
 			model.addGoalContainer(
-					converter.convertContainer(nodes[i], defaultGroupId, defaultArtifactId, defaultSource));
+					this.converter.convertContainer(nodes[i], defaultGroupId, defaultArtifactId, defaultSource));
 		}
 		return true;
 	}

@@ -82,8 +82,9 @@ public class XmlWriter implements GoalRequirementModelWriter {
 		final PlexusConfiguration goalsNode = node.getChild("goals", true);
 		for (GoalContainer goal : grm.getGoalContainer()) {
 			final PlexusConfiguration goalNode = convert(goal);
-			if (goalNode != null)
-				goalsNode.addChild(goalNode);
+			if (goalNode == null)
+				continue;
+			goalsNode.addChild(goalNode);
 		}
 
 		return node;

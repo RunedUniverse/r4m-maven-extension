@@ -21,14 +21,7 @@ import java.nio.charset.Charset;
 
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
-import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
-import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 public interface ProjectExecutionModelWriter {
 
@@ -39,19 +32,5 @@ public interface ProjectExecutionModelWriter {
 	public void writeModel(OutputStream stream, ProjectExecutionModel pem, String charsetName) throws IOException;
 
 	public PlexusConfiguration convert(ProjectExecutionModel pem);
-
-	public PlexusConfiguration convert(Execution execution);
-
-	public PlexusConfiguration convert(Lifecycle lifecycle);
-
-	public PlexusConfiguration convert(Phase phase);
-
-	public PlexusConfiguration convert(Goal goal);
-
-	public PlexusConfiguration convert(Fork fork);
-
-	public PlexusConfiguration convert(TargetLifecycle targetLifecycle);
-
-	public PlexusConfiguration convert(TargetPhase targetPhase);
 
 }

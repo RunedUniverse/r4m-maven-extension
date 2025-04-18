@@ -18,37 +18,35 @@ package net.runeduniverse.tools.maven.r4m.pem.writer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Map;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionWriter;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerWriter;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
+import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
+import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
-import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
-import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
-import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelWriter.class, hint = "xml", instantiationStrategy = "singleton")
 public class XmlWriter implements ProjectExecutionModelWriter {
 
-	@Requirement(role = ExecutionRestrictionWriter.class)
-	private Map<String, ExecutionRestrictionWriter> restrictionWriter;
-	@Requirement(role = ExecutionTriggerWriter.class)
-	private Map<String, ExecutionTriggerWriter> triggerWriter;
+	protected final ConfigurationFactory<PlexusConfiguration> factory;
+
+	@Requirement
+	protected DataConverter converter;
+
+	public XmlWriter() {
+		this(XmlPlexusConfiguration::new);
+	}
+
+	public XmlWriter(final ConfigurationFactory<PlexusConfiguration> factory) {
+		this.factory = factory;
+	}
 
 	@Override
 	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem) throws IOException {
@@ -82,8 +80,12 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		node.addChild("modelVersion", version);
 
 		final PlexusConfiguration executionsNode = node.getChild("executions", true);
-		for (Execution exec : pem.getExecutions())
-			executionsNode.addChild(convert(exec));
+		for (Execution exec : pem.getExecutions()) {
+			final PlexusConfiguration execNode = this.converter.convertEntry(this.factory, exec);
+			if (node == null)
+				continue;
+			executionsNode.addChild(execNode);
+		}
 
 		return node;
 	}
@@ -94,172 +96,4 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 			return ModelProperties.MODEL_VERSION;
 		return version;
 	}
-
-	@Override
-	public PlexusConfiguration convert(final Execution execution) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("execution");
-		node.setAttribute("source", execution.getSource()
-				.key());
-		node.setAttribute("id", execution.getId());
-
-		if (!execution.isInherited())
-			node.addChild("inherited", "false");
-
-		if (!execution.getRestrictions()
-				.isEmpty()) {
-			PlexusConfiguration restrictionNodes = node.getChild("restrictions", true);
-			for (ExecutionRestriction restriction : execution.getRestrictions()) {
-				ExecutionRestrictionWriter writer = this.restrictionWriter.get(restriction.getClass()
-						.getCanonicalName());
-				if (writer != null)
-					writer.append(restrictionNodes, restriction);
-			}
-		}
-
-		final PlexusConfiguration triggerNodes = new XmlPlexusConfiguration("triggers");
-		if (execution.isAlwaysActive())
-			triggerNodes.addChild("always", null);
-		if (execution.isDefaultActive())
-			triggerNodes.addChild("default", null);
-		if (execution.isNeverActive())
-			triggerNodes.addChild("never", null);
-		for (ExecutionTrigger trigger : execution.getTrigger()) {
-			final ExecutionTriggerWriter writer = this.triggerWriter.get(trigger.getClass()
-					.getCanonicalName());
-			if (writer != null)
-				writer.append(triggerNodes, trigger);
-		}
-		if (0 < triggerNodes.getChildCount())
-			node.addChild(triggerNodes);
-
-		final PlexusConfiguration lifecycleNodes = node.getChild("lifecycles", true);
-		for (Lifecycle lifecycle : execution.getLifecycles()
-				.values())
-			lifecycleNodes.addChild(convert(lifecycle));
-
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final Lifecycle lifecycle) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
-		node.setAttribute("id", lifecycle.getId());
-
-		final PlexusConfiguration phaseNodes = node.getChild("phases", true);
-		for (Phase phase : lifecycle.getPhases()
-				.values())
-			phaseNodes.addChild(convert(phase));
-
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final Phase phase) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("phase");
-		node.setAttribute("id", phase.getId());
-
-		final PlexusConfiguration goalNodes = node.getChild("goals", true);
-		for (Goal goal : phase.getGoals())
-			goalNodes.addChild(convert(goal));
-
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final Goal goal) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("goal");
-		node.setAttribute("id", goal.getGoalId());
-		node.addChild("groupId", goal.getGroupId());
-		node.addChild("artifactId", goal.getArtifactId());
-
-		if (!goal.getModes()
-				.isEmpty()) {
-			final PlexusConfiguration modeNodes = node.getChild("modes", true);
-			for (String mode : goal.getModes()) {
-				if (isBlank(mode))
-					continue;
-				modeNodes.addChild(convertMode(mode));
-			}
-		}
-
-		if (goal.getOptional() != null)
-			node.setAttribute("optional", goal.getOptional()
-					.toString());
-
-		if (goal.hasFork())
-			node.addChild(convert(goal.getFork()));
-
-		return node;
-	}
-
-	protected PlexusConfiguration convertMode(final String id) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("mode");
-		node.setAttribute("id", id);
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final Fork fork) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("fork");
-
-		if (!fork.getExecutions()
-				.isEmpty()) {
-			final PlexusConfiguration executionNodes = node.getChild("executions", true);
-			for (String execution : fork.getExecutions())
-				executionNodes.getChild("execution", true)
-						.setAttribute("id", execution);
-		}
-
-		if (!isBlank(fork.getMode()))
-			node.addChild(convertMode(fork.getMode()));
-
-		if (fork.getPhases() != null && !fork.getPhases()
-				.isEmpty()) {
-			final PlexusConfiguration phaseNodes = node.getChild("phases", true);
-			for (TargetPhase phase : fork.getPhases())
-				phaseNodes.addChild(convert(phase));
-		}
-
-		if (!fork.getExcludedPhases()
-				.isEmpty()) {
-			final PlexusConfiguration excludedPhaseNodes = node.getChild("excludedPhases", true);
-			for (TargetPhase phase : fork.getExcludedPhases())
-				excludedPhaseNodes.addChild(convert(phase));
-		}
-
-		if (fork.getLifecycle() != null)
-			node.addChild(convert(fork.getLifecycle()));
-
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final TargetLifecycle targetLifecycle) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("lifecycle");
-		node.setAttribute("id", targetLifecycle.getId());
-
-		if (!isBlank(targetLifecycle.getStartPhase()))
-			node.addChild("startPhase", targetLifecycle.getStartPhase());
-		if (!isBlank(targetLifecycle.getStopPhase()))
-			node.addChild("stopPhase", targetLifecycle.getStopPhase());
-
-		return node;
-	}
-
-	@Override
-	public PlexusConfiguration convert(final TargetPhase targetPhase) {
-		final PlexusConfiguration node = new XmlPlexusConfiguration("phase");
-		node.setAttribute("id", targetPhase.getId());
-
-		if (!targetPhase.getExecutions()
-				.isEmpty()) {
-			final PlexusConfiguration executionNodes = node.getChild("executions", true);
-			for (String execution : targetPhase.getExecutions())
-				executionNodes.getChild("execution", true)
-						.setAttribute("id", execution);
-		}
-
-		return node;
-	}
-
 }

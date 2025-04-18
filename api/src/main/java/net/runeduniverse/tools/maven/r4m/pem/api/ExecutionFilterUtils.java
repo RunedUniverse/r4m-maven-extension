@@ -52,7 +52,7 @@ public interface ExecutionFilterUtils {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
 				for (ExecutionRestriction restriction : execution.getRestrictions()) {
 					final Boolean state = map.get(restriction.type());
-					if (state == true)
+					if (state != null && state)
 						continue;
 					map.put(restriction.type(), restrictionEvaluator.isActive(cnf, restriction));
 				}
@@ -92,7 +92,7 @@ public interface ExecutionFilterUtils {
 				final Map<String, Boolean> map = new LinkedHashMap<>();
 				for (ExecutionRestriction restriction : execution.getRestrictions()) {
 					final Boolean state = map.get(restriction.type());
-					if (state == true)
+					if (state != null && state)
 						continue;
 					map.put(restriction.type(), restrictionEvaluator.isActive(cnf, restriction));
 				}

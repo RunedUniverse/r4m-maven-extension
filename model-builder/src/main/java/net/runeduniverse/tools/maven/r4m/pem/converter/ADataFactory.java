@@ -41,7 +41,7 @@ public abstract class ADataFactory implements DataFactory {
 		return id.trim();
 	}
 
-	protected Boolean asBoolean(String value, final boolean defaultValue) {
+	protected Boolean asBoolean(String value, final Boolean defaultValue) {
 		if (value == null)
 			return defaultValue;
 		value = value.trim();

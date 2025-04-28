@@ -9,10 +9,15 @@ This is accomplished by providing a better way for defining maven executions and
 
 ## Features
 
-- Allows execution of entire `Lifecycles`/`Phases` with a specific `Execution` context
-- Allows execution of select `Phases` without implicitly executing all prerequisites
+- Allows running entire `Lifecycles`/`Phases` with a specific `Execution` context
+<br>ex: deploy with `Execution` context for CICD-Pipeline use `deploy@pipeline`
+<br>ex: if no `Execution` context is specified the default `Execution` context is used: `install` == `install@default`
+- Allows running select `Phases` without implicitly executing all prerequisites
+<br>ex: deploy (for example to a secondary repo) `[deploy]`
 - Allows exclusion of select `Phases` on execution
+<br>ex: install without testing: `]test[,install`
 - Provides `Modes` for selecting which set of `Goals` is executed per `Phase`
+<br>ex: install in development mode `dev/install` vs install in default mode `install` or `default/install`
 - Provides `help` Lifecycle
 - Provides Gui enhancements (can be disabled)
 - Plugin Configurations are inherited by per Plugin Execution Configurations (inside pom.xml)
@@ -33,16 +38,16 @@ This is accomplished by providing a better way for defining maven executions and
 - Provides `setup` goal to simplify installation into maven-project
 - Provides goals to dump the current configuration (in case you want to redefine everything, so you don't need to start from scratch)
 - Provides debug goals
-- Configurations (`pem.xml` & `pom.xml`) are loaded from all active plugins therefore Workflow Plugins can be used for easier project setup
+- Configurations (`pem.xml` & `grm.xml`) are loaded from all active plugins therefore Workflow Plugins can be used for easier project setup
   - RunedUniverse provides example Workflow Plugins for use with Jenkins-Plugins, Spring and normal Java Projects.
-- Provides Configuration options for Runes4Maven Features (see [Properties](Properties))
+- Provides Configuration options for Runes4Maven Features (see [Properties](#properties))
 - Built to be extendable by other Maven-Core-Extensions
 
 ## Installation
 Runes4Maven (r4m) can be installed in two major ways:
 
-### Maven Core Extension
-Runes4Maven (r4m) installed as maven core extension exposes r4m's full potential.
+### Maven Core-Extension
+Runes4Maven (r4m) installed as a Maven Core-Extensions exposes r4m's full potential.
 
 Core-Extensions are installed in the project by adding them in the `extensions.xml`. This has to be located in the `.mvn` folder which has to be in the root folder of your maven project per [maven definition](https://maven.apache.org/configure.html#mvn-extensions-xml-file).
 
@@ -71,7 +76,7 @@ mvn net.runeduniverse.tools.maven.r4m:r4m-maven-extension:setup
 ```
 
 
-### Maven Build Extension
+### Maven Build-Extension
 
 > [!CAUTION]
 > We received reports that on some maven versions past our min. supported version of `3.3.9` an essential class does not get provided to **Build Extensions** anymore, which leads to Maven crashing in it's entirety!
@@ -213,11 +218,11 @@ Every Execution defined in the PEM can have multiple triggers. Currently followi
 
 Every Execution defined in the PEM can have multiple restrictions, once a restriction type is defined at least one of those definitions has to be fulfilled. Currently following restriction is available - other core-extensions may define additional restrictions:
 
-`packaging-procedure`
+`packaging-procedure`, `property`
 
 Every Goal in the PEM has to have at least one mode. By default the modes `default` and `dev` are preconfigured. This can be changed inside the `pem.xml`.
 
-**What might I use modes for?** With modes you can have two seperate 'modes' of one execution, for example you can make it so that a formtting goal only runs in 'dev' mode and not during normal operation.
+**What might I use modes for?** With modes you can have two seperate 'modes' of one execution, for example you can make it so that a formatting goal only runs in 'dev' mode and not during normal operation.
 
 ---
 
@@ -243,4 +248,5 @@ Sadly this is not always the case therefore we need a way to declare an order. B
 ### Help Lifecycle [7]
 Runes4Maven (r4m) provides the help lifecycle. With this the cmd `mvn help` is finally viable. Runes4Maven does **not** crawl build-plugins to attach their help goals to the `help` lifecycle.
 
-But we recommend every build-plugin developer to attach their help goals to this lifecycle. In case the default maven way does not work for you, we recommend you to include a `pem.xml` file with the same syntax as the PEM in your jar under the path `META-INF/r4m/pem.xml` and set the execution 'source' field to `plugin`. You may of course also attach all your other goals to lifecycles in the same way.
+But we recommend every build-plugin developer to attach their help goals to this lifecycle. In case the default maven way does not work for you, we recommend you to include a `pem.xml` file with the same syntax as the PEM in your jar under the path `META-INF/r4m/pem.xml` and set the execution `source` field to `plugin`. You may of course also attach all your other goals to lifecycles in the same way.
+

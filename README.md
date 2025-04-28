@@ -1,7 +1,7 @@
 # Runes4Maven (r4m) Maven Extension
 
-[![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/Maven.svg?label=License)](LICENSE)
-[![Maven Central](https://img.shields.io/Maven-central/v/net.runeduniverse.tools.Maven.r4m/r4m-Maven-extension.svg?label=Maven%20Central)](https://search.Maven.org/search?q=g:%22net.runeduniverse.tools.Maven.r4m%22%20AND%20a:%22r4m-Maven-extension%22)
+[![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)](LICENSE)
+[![Maven Central](https://img.shields.io/maven-central/v/net.runeduniverse.tools.maven.r4m/r4m-maven-extension.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.runeduniverse.tools.maven.r4m%22%20AND%20a:%22r4m-maven-extension%22)
 
 Runes4Maven (r4m) Maven Extension enables you to specify how Maven builds your project!
 

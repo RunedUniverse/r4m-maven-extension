@@ -61,7 +61,7 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 	}
 
 	@Override
-	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveBeforeMatches() {
+	public Map<DataGroup, Set<MergeDataGroup>> getUserDefinedBeforeMatches() {
 		return collectEntries(this.matchBefore, true);
 	}
 
@@ -71,13 +71,13 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 	}
 
 	@Override
-	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveAfterMatches() {
+	public Map<DataGroup, Set<MergeDataGroup>> getUserDefinedAfterMatches() {
 		return collectEntries(this.matchAfter, true);
 	}
 
 	protected Map<DataGroup, Set<MergeDataGroup>> collectEntries(
 			final Map<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> matchMap,
-			final boolean onlyEffective) {
+			final boolean requireUserDefined) {
 		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
 		for (Entry<DataGroup, Map<GoalRequirementSource, Set<MergeDataGroup>>> entry : matchMap.entrySet()) {
 			final Set<MergeDataGroup> set = new LinkedHashSet<>();
@@ -85,8 +85,8 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 					.entrySet()) {
 				for (MergeDataGroup data : sourceEntry.getValue()) {
 					// check for user-defined flag
-					if (onlyEffective && !this.origins.get(data)
-							.isEffective())
+					if (requireUserDefined && !this.origins.get(data)
+							.isUserDefined())
 						continue;
 					// collect data
 					set.add(data);
@@ -205,7 +205,7 @@ public class DefaultGrmArchiveSector extends AProjectBoundEntry<GoalRequirementA
 
 			for (MergeDataGroup mergeGroup : set) {
 				final GoalRequirementModel model = getModel(mergeGroup);
-				final Map<GoalRequirementSource, CompoundTree> map = model.isEffective() ? userMap : projectMap;
+				final Map<GoalRequirementSource, CompoundTree> map = model.isUserDefined() ? userMap : projectMap;
 				final CompoundTree sourceTree = map.computeIfAbsent(source,
 						k -> new DefaultCompoundTree("source", k == null ? "< null >" : k.key()));
 

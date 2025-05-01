@@ -63,18 +63,18 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	// as long as no user-defined grm was found,
 	// any other grm is loaded from the plugins in the active project!
 	protected Map<DataGroup, Set<MergeDataGroup>> collectMatches(final GoalRequirementArchiveSector sector,
-			final MatchGetter getter, final MatchGetter effGetter) {
+			final MatchGetter getter, final MatchGetter userDefinedGetter) {
 		final Map<DataGroup, Set<MergeDataGroup>> map = new LinkedHashMap<>();
 		copyToMap(map, getter.get(sector));
 
-		Map<DataGroup, Set<MergeDataGroup>> userDefined = effGetter.get(sector);
+		Map<DataGroup, Set<MergeDataGroup>> userDefined = userDefinedGetter.get(sector);
 		// skip as the values are already included!
 		if (!userDefined.isEmpty())
 			return map;
 
 		for (GoalRequirementArchiveSector parent = sector.getParent(); userDefined.isEmpty()
 				&& parent != null; parent = parent.getParent()) {
-			userDefined = effGetter.get(parent);
+			userDefined = userDefinedGetter.get(parent);
 		}
 		if (!userDefined.isEmpty()) {
 			copyToMap(map, userDefined);
@@ -221,10 +221,10 @@ public class DefaultGrmArchiveSelector implements GoalRequirementArchiveSelector
 	protected void getChecks(final GoalRequirementArchiveSector sector, final RelationEntrySet<EntityView> set) {
 		final Map<DataGroup, Set<MergeDataGroup>> before = collectMatches(sector, //
 				GoalRequirementArchiveSector::getBeforeMatches, //
-				GoalRequirementArchiveSector::getEffectiveBeforeMatches);
+				GoalRequirementArchiveSector::getUserDefinedBeforeMatches);
 		final Map<DataGroup, Set<MergeDataGroup>> after = collectMatches(sector, //
 				GoalRequirementArchiveSector::getAfterMatches, //
-				GoalRequirementArchiveSector::getEffectiveAfterMatches);
+				GoalRequirementArchiveSector::getUserDefinedAfterMatches);
 
 		Map<DataGroup, Set<MergeDataGroup>> domBefore;
 		Map<DataGroup, Set<MergeDataGroup>> domAfter;

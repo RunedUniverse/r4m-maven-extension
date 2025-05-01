@@ -30,11 +30,11 @@ public interface GoalRequirementArchiveSector extends ProjectBoundEntry<GoalRequ
 
 	public Map<DataGroup, Set<MergeDataGroup>> getBeforeMatches();
 
-	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveBeforeMatches();
+	public Map<DataGroup, Set<MergeDataGroup>> getUserDefinedBeforeMatches();
 
 	public Map<DataGroup, Set<MergeDataGroup>> getAfterMatches();
 
-	public Map<DataGroup, Set<MergeDataGroup>> getEffectiveAfterMatches();
+	public Map<DataGroup, Set<MergeDataGroup>> getUserDefinedAfterMatches();
 
 	public void register(GoalRequirementModel grm);
 

@@ -146,11 +146,11 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 			for (Lifecycle lifecycle : execution.getLifecycles()
 					.values()) {
 				final LifecycleView lifecycleView = executionView.computeLifecycleIfAbsent(lifecycle.getId(),
-						k -> DefaultPemViewFactory.createLifecycle(k));
+						DefaultPemViewFactory::createLifecycle);
 				for (Phase phase : lifecycle.getPhases()
 						.values()) {
 					final PhaseView phaseView = lifecycleView.computePhaseIfAbsent(phase.getId(),
-							k -> DefaultPemViewFactory.createPhase(k));
+							DefaultPemViewFactory::createPhase);
 					for (Goal goal : phase.getGoals())
 						if (this.validateGoal(cnf, goal)) {
 							final GoalView goalView = DefaultPemViewFactory.createGoal(goal.getGroupId(),

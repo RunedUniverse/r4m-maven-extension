@@ -43,8 +43,24 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final Reader reader = new XmlStreamReader(input);
 		final PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
+		parseSuperPem(pem, cnf);
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
 		parseExecutions(pem, cnf.getChild("executions", false));
+	}
+
+	protected boolean parseSuperPem(final ProjectExecutionModel model, final PlexusConfiguration modelNode) {
+		if (modelNode == null)
+			return false;
+		String value = modelNode.getAttribute("super-pem");
+		if (value != null) {
+			value = value.trim();
+			if ("true".equalsIgnoreCase(value)) {
+				model.setEffective(true);
+				return true;
+			}
+		}
+		model.setEffective(false);
+		return true;
 	}
 
 	protected boolean parseModelVersion(final ProjectExecutionModel model, final PlexusConfiguration versionNode) {
@@ -53,7 +69,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final String value = versionNode.getValue();
 		if (isBlank(value))
 			return false;
-		model.setVersion(value);
+		model.setVersion(value.trim());
 		return true;
 	}
 

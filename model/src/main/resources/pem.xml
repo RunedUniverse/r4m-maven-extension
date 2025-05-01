@@ -21,7 +21,8 @@
 <project-execution-model
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem r4m-pem-v1_1_0.xsd">
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem r4m-pem-v1_1_0.xsd"
+	super-pem="true">
 
 	<modelVersion>1.1.0</modelVersion>
 	<executions>

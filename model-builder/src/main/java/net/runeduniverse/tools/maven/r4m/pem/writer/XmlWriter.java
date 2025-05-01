@@ -77,6 +77,8 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 		node.setAttribute("xsi:schemaLocation",
 				"https://api.runeduniverse.net/runes4tools/r4m-pem https://api.runeduniverse.net/runes4tools/r4m-pem-v"
 						+ version.replace('.', '_') + ".xsd");
+		if (pem.isEffective())
+			node.setAttribute("super-pem", "true");
 		node.addChild("modelVersion", version);
 
 		final PlexusConfiguration executionsNode = node.getChild("executions", true);

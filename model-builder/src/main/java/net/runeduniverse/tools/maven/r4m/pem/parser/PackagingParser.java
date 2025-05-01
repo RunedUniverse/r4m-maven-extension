@@ -93,24 +93,15 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 					continue;
 				}
 				final String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
-				Execution execution = executions.get(executionId);
-				if (execution == null) {
-					execution = new Execution(executionId, ExecutionSource.PACKAGING);
-					execution.setDefaultActive(true);
-					execution.setInherited(true);
-					execution.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
-					executions.put(execution.getId(), execution);
-				}
-				Lifecycle lifecycle = execution.getLifecycle(lifecycleId);
-				if (lifecycle == null) {
-					lifecycle = new Lifecycle(lifecycleId);
-					execution.putLifecycle(lifecycle);
-				}
-				Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
-				if (phase == null) {
-					phase = new Phase(phaseMappingEntry.getKey());
-					lifecycle.putPhase(phase);
-				}
+				final Execution execution = executions.computeIfAbsent(executionId, id -> {
+					final Execution exec = new Execution(id, ExecutionSource.PACKAGING);
+					exec.setDefaultActive(true);
+					exec.setInherited(true);
+					exec.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
+					return exec;
+				});
+				final Lifecycle lifecycle = execution.computeLifecycleIfAbsent(lifecycleId, Lifecycle::new);
+				final Phase phase = lifecycle.computePhaseIfAbsent(phaseMappingEntry.getKey(), Phase::new);
 
 				phase.addGoal(goal.addModes("default", "dev"));
 			}

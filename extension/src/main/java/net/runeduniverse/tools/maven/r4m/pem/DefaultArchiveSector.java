@@ -61,27 +61,36 @@ public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSec
 	}
 
 	@Override
-	public Set<Execution> getExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
-		return collectEntries(filter, onlyInherited, false);
+	public Set<Execution> getExecutions(final Predicate<Execution> filter, final boolean requireInherited) {
+		return collectEntries(filter, requireInherited, false, false);
 	}
 
 	@Override
-	public Set<Execution> getEffectiveExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
-		return collectEntries(filter, onlyInherited, true);
+	public Set<Execution> getEffectiveExecutions(final Predicate<Execution> filter, final boolean requireInherited) {
+		return collectEntries(filter, requireInherited, true, false);
 	}
 
-	protected Set<Execution> collectEntries(final Predicate<Execution> filter, final boolean onlyInherited,
-			final boolean onlyEffective) {
+	@Override
+	public Set<Execution> getUserDefinedExecutions(final Predicate<Execution> filter, final boolean requireInherited) {
+		return collectEntries(filter, requireInherited, false, true);
+	}
+
+	protected Set<Execution> collectEntries(final Predicate<Execution> filter, final boolean requireInherited,
+			final boolean requireEffective, final boolean requireUserDefined) {
 		final Set<Execution> executions = new LinkedHashSet<>();
 		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
 			for (Set<Execution> execCol : entry.values())
 				for (Execution execution : execCol) {
 					// check for inherited flag
-					if (onlyInherited && !execution.isInherited())
+					if (requireInherited && !execution.isInherited())
+						continue;
+					// check for effective flag
+					if (requireEffective && !this.executionOrigins.get(execution)
+							.isEffective())
 						continue;
 					// check for user-defined flag
-					if (onlyEffective && !this.executionOrigins.get(execution)
-							.isEffective())
+					if (requireEffective && !this.executionOrigins.get(execution)
+							.isUserDefined())
 						continue;
 					// apply filter & collect data
 					if (filter.test(execution))

@@ -32,6 +32,7 @@ public class ProjectExecutionModel implements Recordable {
 	protected Class<?> parserType = null;
 	protected String parserHint = null;
 	protected boolean effective = false;
+	protected boolean userDefined = false;
 
 	public ProjectExecutionModel() {
 		this.parserHint = null;
@@ -49,9 +50,13 @@ public class ProjectExecutionModel implements Recordable {
 		return this.parserHint;
 	}
 
-	// set when pem.xml is found in the project folder
 	public boolean isEffective() {
 		return this.effective;
+	}
+
+	// set when pem.xml is found in the project folder
+	public boolean isUserDefined() {
+		return this.userDefined;
 	}
 
 	public Set<Execution> getExecutions() {
@@ -69,6 +74,10 @@ public class ProjectExecutionModel implements Recordable {
 
 	public void setEffective(final boolean value) {
 		this.effective = value;
+	}
+
+	public void setUserDefined(final boolean value) {
+		this.userDefined = value;
 	}
 
 	public void addExecution(final Execution execution) {

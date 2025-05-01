@@ -225,8 +225,8 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	@SuppressWarnings("deprecation")
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final Predicate<Execution> filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
-			final boolean onlyInherited) {
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
+			final boolean requireInherited) {
+		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, requireInherited);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
@@ -234,9 +234,11 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 				effExecDetected = getExecutions(cnf, filter, baseViews, sector.getParent(), true);
 
 			if (!effExecDetected)
-				applicableExecutions = sector.getExecutions(filter, onlyInherited);
+				applicableExecutions = sector.getExecutions(filter, requireInherited);
 		} else
 			effExecDetected = true;
+
+		applicableExecutions.addAll(sector.getUserDefinedExecutions(filter, requireInherited));
 
 		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
 

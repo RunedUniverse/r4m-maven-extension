@@ -141,6 +141,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setEffective(true);
 		model.addExecutions(executions);
 
 		final File xmlFile = new File(this.buildDir, "rel-pem.xml");

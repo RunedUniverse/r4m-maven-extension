@@ -31,9 +31,11 @@ public interface ExecutionArchiveSector extends ProjectBoundEntry<ExecutionArchi
 
 	public Set<Execution> getExecutions();
 
-	public Set<Execution> getExecutions(Predicate<Execution> filter, boolean onlyInherited);
+	public Set<Execution> getExecutions(Predicate<Execution> filter, boolean requireInherited);
 
-	public Set<Execution> getEffectiveExecutions(Predicate<Execution> filter, boolean onlyInherited);
+	public Set<Execution> getEffectiveExecutions(Predicate<Execution> filter, boolean requireInherited);
+
+	public Set<Execution> getUserDefinedExecutions(Predicate<Execution> filter, boolean requireInherited);
 
 	public void register(ProjectExecutionModel pem);
 

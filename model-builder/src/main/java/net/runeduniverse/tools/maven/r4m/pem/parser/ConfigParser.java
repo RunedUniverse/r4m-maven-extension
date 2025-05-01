@@ -47,7 +47,7 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 	public ProjectExecutionModel parse(final MavenProject mvnProject) throws Exception {
 		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
 		final ProjectExecutionModel model = new ProjectExecutionModel();
-		model.setEffective(true);
+		model.setUserDefined(true);
 		model.setParser(ConfigParser.class, ConfigParser.HINT);
 
 		if (xmlFile.isFile()) {

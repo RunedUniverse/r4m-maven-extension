@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
-import net.runeduniverse.lib.utils.maven.ext.indexer.api.ProjectBoundEntry;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.api.ProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 

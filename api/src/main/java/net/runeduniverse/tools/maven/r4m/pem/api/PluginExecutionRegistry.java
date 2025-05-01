@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import net.runeduniverse.lib.utils.maven.ext.indexer.api.PluginBoundRegistry;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.api.PluginBoundRegistry;
 
 public interface PluginExecutionRegistry extends PluginBoundRegistry<PluginExecutionRegistrySector> {
 

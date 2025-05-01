@@ -25,7 +25,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import net.runeduniverse.lib.utils.maven.ext.api.ExtensionTool;
+import net.runeduniverse.lib.utils.maven3.ext.api.ExtensionTool;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;

@@ -15,8 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.api;
 
-import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
-import net.runeduniverse.lib.utils.maven.ext.config.api.PropertyStore;
+import net.runeduniverse.lib.utils.config.api.Property;
+import net.runeduniverse.lib.utils.config.api.PropertyStore;
 
 public interface Settings extends PropertyStore {
 

@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.grm;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -27,6 +25,8 @@ import java.util.Set;
 import net.runeduniverse.tools.maven.r4m.grm.api.PluginRequirementRegistrySector;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalContainer;
 import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class DefaultGrmRegistrySector implements PluginRequirementRegistrySector {
 

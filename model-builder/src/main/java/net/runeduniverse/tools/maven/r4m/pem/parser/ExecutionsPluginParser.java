@@ -17,7 +17,6 @@ package net.runeduniverse.tools.maven.r4m.pem.parser;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;

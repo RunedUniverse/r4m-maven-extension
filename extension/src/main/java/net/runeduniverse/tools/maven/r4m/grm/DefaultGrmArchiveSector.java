@@ -28,7 +28,7 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
-import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundEntry;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.grm.model.DataGroup;

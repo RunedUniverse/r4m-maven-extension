@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.pem;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.lib.utils.maven.ext.indexer.APluginBoundRegistry;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.APluginBoundRegistry;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 

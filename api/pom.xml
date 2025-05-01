@@ -109,11 +109,11 @@
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-maven-api</artifactId>
+			<artifactId>utils-maven3-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-maven-ext-api</artifactId>
+			<artifactId>utils-maven3-ext-api</artifactId>
 			<exclusions>
 				<!-- managed by sources -->
 				<exclusion>

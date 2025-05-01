@@ -15,7 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.api;
 
-import net.runeduniverse.lib.utils.maven.api.MavenProperties;
+import net.runeduniverse.lib.utils.maven3.api.MavenProperties;
 
 public interface Runes4MavenProperties {
 

@@ -22,7 +22,7 @@ import java.util.Set;
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.common.CollectionUtils;
-import net.runeduniverse.lib.utils.maven.ext.data.api.Extension;
+import net.runeduniverse.lib.utils.maven3.ext.data.api.Extension;
 
 public interface ExtensionPatchingEvent extends PatchingEvent {
 

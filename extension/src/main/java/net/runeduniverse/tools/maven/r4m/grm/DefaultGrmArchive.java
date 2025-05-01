@@ -18,7 +18,7 @@ package net.runeduniverse.tools.maven.r4m.grm;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.lib.utils.maven.ext.indexer.AProjectBoundArchive;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.AProjectBoundArchive;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSector;
 

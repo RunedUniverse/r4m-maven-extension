@@ -160,7 +160,7 @@
 		</dependency>
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
-			<artifactId>utils-maven-ext</artifactId>
+			<artifactId>utils-maven3-ext</artifactId>
 			<exclusions>
 				<!-- provided by maven-core -->
 				<exclusion>

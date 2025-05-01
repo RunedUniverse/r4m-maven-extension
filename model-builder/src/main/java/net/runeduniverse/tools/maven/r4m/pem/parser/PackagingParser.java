@@ -29,7 +29,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.lib.utils.maven.api.MavenProperties;
+import net.runeduniverse.lib.utils.maven3.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;

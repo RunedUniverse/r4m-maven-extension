@@ -27,7 +27,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
-import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
+import net.runeduniverse.lib.utils.config.api.Property;
 import net.runeduniverse.tools.maven.r4m.SettingsFactory;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 

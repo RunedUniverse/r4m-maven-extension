@@ -55,12 +55,12 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
-import net.runeduniverse.lib.utils.maven.ext.MvnCorePatcher;
-import net.runeduniverse.lib.utils.maven.ext.api.ExtensionIndex;
-import net.runeduniverse.lib.utils.maven.ext.data.api.Extension;
-import net.runeduniverse.lib.utils.maven.ext.data.api.ExtensionData;
-import net.runeduniverse.lib.utils.maven.ext.data.api.PluginData;
-import net.runeduniverse.lib.utils.maven.ext.eventspy.api.EventSpyDispatcherProxy;
+import net.runeduniverse.lib.utils.maven3.ext.MvnCorePatcher;
+import net.runeduniverse.lib.utils.maven3.ext.api.ExtensionIndex;
+import net.runeduniverse.lib.utils.maven3.ext.data.api.Extension;
+import net.runeduniverse.lib.utils.maven3.ext.data.api.ExtensionData;
+import net.runeduniverse.lib.utils.maven3.ext.data.api.PluginData;
+import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.api.Settings.LoadState;

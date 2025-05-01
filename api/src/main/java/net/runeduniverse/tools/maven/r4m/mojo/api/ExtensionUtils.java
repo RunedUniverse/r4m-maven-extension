@@ -34,7 +34,6 @@ import org.apache.maven.plugin.logging.Log;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 
-import net.runeduniverse.lib.utils.maven.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
@@ -83,7 +82,7 @@ public interface ExtensionUtils {
 		final Properties p = new Properties();
 		try (final InputStream stream = clazz.getClassLoader()
 				.getResourceAsStream(
-						String.format(MavenProperties.METAINF.MAVEN.TMP_POM_PROPERTIES, groupId, artifactId))) {
+						String.format(Runes4MavenProperties.METAINF.MAVEN.TMP_POM_PROPERTIES, groupId, artifactId))) {
 			if (stream != null) {
 				p.load(stream);
 			}

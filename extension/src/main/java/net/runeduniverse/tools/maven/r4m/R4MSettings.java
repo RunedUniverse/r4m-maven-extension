@@ -19,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.lib.utils.maven.ext.config.APropertyStore;
-import net.runeduniverse.lib.utils.maven.ext.config.api.Property;
+import net.runeduniverse.lib.utils.config.APropertyStore;
+import net.runeduniverse.lib.utils.config.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 @Component(role = Settings.class, instantiationStrategy = "keep-alive")

@@ -20,7 +20,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.lib.utils.maven.ext.config.ConfigBuilder;
+import net.runeduniverse.lib.utils.maven3.ext.config.ConfigBuilder;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalculatorDelegate;
 

@@ -80,13 +80,15 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 						+ version.replace('.', '_') + ".xsd");
 		node.addChild("modelVersion", version);
 
-		final PlexusConfiguration overridesNode = node.getChild("overrides", true);
+		final PlexusConfiguration overridesNode = new XmlPlexusConfiguration("overrides");
 		for (ModelOverride ovrr : pem.getOverrides()) {
 			final PlexusConfiguration ovrrNode = this.converter.convertEntry(this.factory, ovrr);
 			if (ovrrNode == null)
 				continue;
 			overridesNode.addChild(ovrrNode);
 		}
+		if (0 < overridesNode.getChildCount())
+			node.addChild(overridesNode);
 
 		final PlexusConfiguration executionsNode = node.getChild("executions", true);
 		for (Execution exec : pem.getExecutions()) {

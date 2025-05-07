@@ -22,9 +22,8 @@ import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
-import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 
-@Component(role = DataHandler.class, hint = ModelOverride.CONTEXT + '>' + DeclareSuperPemOverride.HINT)
+@Component(role = DataHandler.class, hint = DeclareSuperPemOverride.CANONICAL_NAME)
 public class DeclareSuperPemOverrideHandler extends ADataHandler {
 
 	@Override

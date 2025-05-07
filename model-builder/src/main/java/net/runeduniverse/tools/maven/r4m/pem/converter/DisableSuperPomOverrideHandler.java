@@ -22,9 +22,8 @@ import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.DisableSuperPomOverride;
-import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 
-@Component(role = DataHandler.class, hint = ModelOverride.CONTEXT + '>' + DisableSuperPomOverride.HINT)
+@Component(role = DataHandler.class, hint = DisableSuperPomOverride.CANONICAL_NAME)
 public class DisableSuperPomOverrideHandler extends ADataHandler {
 
 	@Override

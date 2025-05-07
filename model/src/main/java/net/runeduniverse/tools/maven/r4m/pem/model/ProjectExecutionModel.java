@@ -100,7 +100,7 @@ public class ProjectExecutionModel implements Recordable {
 		this.overrides.put(override.type(), override);
 	}
 
-	public void addOverride(final Collection<ModelOverride> overrides) {
+	public void addOverrides(final Collection<ModelOverride> overrides) {
 		if (overrides == null)
 			return;
 		for (ModelOverride override : overrides)
@@ -113,6 +113,19 @@ public class ProjectExecutionModel implements Recordable {
 
 	public void addExecutions(final Collection<Execution> executions) {
 		this.executions.addAll(executions);
+	}
+
+	public ProjectExecutionModel copy() {
+		final ProjectExecutionModel pem = new ProjectExecutionModel();
+
+		pem.setVersion(this.version);
+		pem.setParser(this.parserType, this.parserHint);
+		pem.setUserDefined(this.userDefined);
+
+		pem.addOverrides(this.overrides.values());
+		pem.addExecutions(this.executions);
+
+		return pem;
 	}
 
 	@Override

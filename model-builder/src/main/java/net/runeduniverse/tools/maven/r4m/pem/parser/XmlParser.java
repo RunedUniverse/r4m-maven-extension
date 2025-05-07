@@ -30,6 +30,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelParser.class, hint = "xml")
@@ -43,24 +44,9 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final Reader reader = new XmlStreamReader(input);
 		final PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
-		parseSuperPem(pem, cnf);
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
+		parseOverrides(pem, cnf.getChild("overrides", false));
 		parseExecutions(pem, cnf.getChild("executions", false));
-	}
-
-	protected boolean parseSuperPem(final ProjectExecutionModel model, final PlexusConfiguration modelNode) {
-		if (modelNode == null)
-			return false;
-		String value = modelNode.getAttribute("super-pem");
-		if (value != null) {
-			value = value.trim();
-			if ("true".equalsIgnoreCase(value)) {
-				model.setEffective(true);
-				return true;
-			}
-		}
-		model.setEffective(false);
-		return true;
 	}
 
 	protected boolean parseModelVersion(final ProjectExecutionModel model, final PlexusConfiguration versionNode) {
@@ -70,6 +56,21 @@ public class XmlParser implements ProjectExecutionModelParser {
 		if (isBlank(value))
 			return false;
 		model.setVersion(value.trim());
+		return true;
+	}
+
+	protected boolean parseOverrides(final ProjectExecutionModel model, final PlexusConfiguration nodeList) {
+		if (nodeList == null || nodeList.getChildCount() == 0)
+			return false;
+
+		final PlexusConfiguration ovrrNodes[] = nodeList.getChildren();
+		if (ovrrNodes.length > 0) {
+			for (PlexusConfiguration ovrrNode : ovrrNodes) {
+				final DataEntry entry = this.converter.convertEntry(ModelOverride.CONTEXT, ovrrNode);
+				if (entry instanceof ModelOverride)
+					model.addOverride((ModelOverride) entry);
+			}
+		}
 		return true;
 	}
 

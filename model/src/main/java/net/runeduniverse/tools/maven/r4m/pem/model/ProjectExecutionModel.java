@@ -17,7 +17,9 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
@@ -26,12 +28,12 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public class ProjectExecutionModel implements Recordable {
 
+	protected final Map<String, ModelOverride> overrides = new LinkedHashMap<>(0);
 	protected final Set<Execution> executions = new LinkedHashSet<>(0);
 
 	protected String version;
 	protected Class<?> parserType = null;
 	protected String parserHint = null;
-	protected boolean effective = false;
 	protected boolean userDefined = false;
 
 	public ProjectExecutionModel() {
@@ -51,12 +53,19 @@ public class ProjectExecutionModel implements Recordable {
 	}
 
 	public boolean isEffective() {
-		return this.effective;
+		final ModelOverride override = this.overrides.computeIfAbsent(DeclareSuperPemOverride.TYPE,
+				t -> new DeclareSuperPemOverride(false));
+		return override.isActive();
 	}
 
 	// set when pem.xml is found in the project folder
 	public boolean isUserDefined() {
 		return this.userDefined;
+	}
+
+	public Set<ModelOverride> getOverrides() {
+		final Set<ModelOverride> set = new LinkedHashSet<>(this.overrides.values());
+		return Collections.unmodifiableSet(set);
 	}
 
 	public Set<Execution> getExecutions() {
@@ -73,11 +82,26 @@ public class ProjectExecutionModel implements Recordable {
 	}
 
 	public void setEffective(final boolean value) {
-		this.effective = value;
+		final ModelOverride override = this.overrides.computeIfAbsent(DeclareSuperPemOverride.TYPE,
+				t -> new DeclareSuperPemOverride(false));
+		override.setActive(value);
 	}
 
 	public void setUserDefined(final boolean value) {
 		this.userDefined = value;
+	}
+
+	public void addOverride(final ModelOverride override) {
+		if (override == null)
+			return;
+		this.overrides.put(override.type(), override);
+	}
+
+	public void addOverride(final Collection<ModelOverride> overrides) {
+		if (overrides == null)
+			return;
+		for (ModelOverride override : overrides)
+			addOverride(override);
 	}
 
 	public void addExecution(final Execution execution) {
@@ -92,7 +116,9 @@ public class ProjectExecutionModel implements Recordable {
 	public CompoundTree toRecord() {
 		final CompoundTree tree = new DefaultCompoundTree("ProjectExecutionModel");
 
-		for (Recordable execution : executions)
+		for (Recordable override : this.overrides.values())
+			tree.append(override.toRecord());
+		for (Recordable execution : this.executions)
 			tree.append(execution.toRecord());
 
 		return tree;

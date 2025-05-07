@@ -63,9 +63,8 @@ public class ProjectExecutionModel implements Recordable {
 		return this.userDefined;
 	}
 
-	public Set<ModelOverride> getOverrides() {
-		final Set<ModelOverride> set = new LinkedHashSet<>(this.overrides.values());
-		return Collections.unmodifiableSet(set);
+	public Collection<ModelOverride> getOverrides() {
+		return Collections.unmodifiableCollection(this.overrides.values());
 	}
 
 	public Set<Execution> getExecutions() {

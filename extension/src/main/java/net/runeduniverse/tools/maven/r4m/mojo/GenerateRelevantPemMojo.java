@@ -169,23 +169,24 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	}
 
 	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final Predicate<Execution> filter, final boolean onlyInherited, final Data data) {
+			final Predicate<Execution> filter, final boolean requireInherited, final Data data) {
 		if (sector == null)
 			return;
 
 		data.incrementDepth();
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
+		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, requireInherited);
 
 		if (applicableExecutions.isEmpty()) {
 			if (sector.getParent() != null)
 				collectExecutions(executions, sector.getParent(), filter, true, data);
 
 			if (!data.isEffExecDetected())
-				applicableExecutions = sector.getExecutions(filter, onlyInherited);
+				applicableExecutions = sector.getExecutions(filter, requireInherited);
 		} else
 			data.setEffExecDetected(true);
 
 		executions.addAll(applicableExecutions);
+		executions.addAll(sector.getUserDefinedExecutions(filter, requireInherited));
 	}
 
 	private static class Data {

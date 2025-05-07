@@ -148,10 +148,10 @@ public class GenerateFullPemMojo extends AbstractMojo {
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final boolean onlyInherited) {
+			final boolean requireInherited) {
 		if (sector == null)
 			return 0;
-		executions.addAll(sector.getExecutions(e -> true, onlyInherited));
+		executions.addAll(sector.getExecutions(e -> true, requireInherited));
 		return collectExecutions(executions, sector.getParent(), true) + 1;
 	}
 

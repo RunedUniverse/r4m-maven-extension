@@ -52,7 +52,7 @@ public class PackagingProcedureRestriction implements ExecutionRestriction {
 	}
 
 	@Override
-	public DataEntry copy() {
+	public PackagingProcedureRestriction copy() {
 		final PackagingProcedureRestriction restriction = new PackagingProcedureRestriction(getPackagingProcedure());
 		return restriction;
 	}

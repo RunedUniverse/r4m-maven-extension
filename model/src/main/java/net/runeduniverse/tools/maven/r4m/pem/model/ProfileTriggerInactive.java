@@ -46,7 +46,7 @@ public class ProfileTriggerInactive extends ProfileTrigger {
 	}
 
 	@Override
-	public DataEntry copy() {
+	public ProfileTriggerInactive copy() {
 		final ProfileTriggerInactive trigger = new ProfileTriggerInactive(getProfileId());
 		return trigger;
 	}

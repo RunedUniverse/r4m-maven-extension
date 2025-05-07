@@ -83,7 +83,7 @@ public class PropertyRestriction implements ExecutionRestriction {
 	}
 
 	@Override
-	public DataEntry copy() {
+	public PropertyRestriction copy() {
 		final PropertyRestriction restriction = new PropertyRestriction(getId(), //
 				getInverted(), getExists(), getValue(), getMatchType());
 		return restriction;

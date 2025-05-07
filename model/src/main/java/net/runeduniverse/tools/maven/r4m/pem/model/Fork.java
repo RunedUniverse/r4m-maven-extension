@@ -178,7 +178,7 @@ public class Fork implements DataEntry {
 	}
 
 	@Override
-	public DataEntry copy() {
+	public Fork copy() {
 		final Fork fork = new Fork(this.executionsSupplier, this.excludePhasesSupplier, this.phasesSupplier);
 
 		fork.setLifecycle(getLifecycle().copy());

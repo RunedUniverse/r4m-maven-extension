@@ -67,6 +67,10 @@ public class ProjectExecutionModel implements Recordable {
 		return Collections.unmodifiableCollection(this.overrides.values());
 	}
 
+	public Map<String, ModelOverride> getOverridesAsMap() {
+		return Collections.unmodifiableMap(this.overrides);
+	}
+
 	public Set<Execution> getExecutions() {
 		return Collections.unmodifiableSet(this.executions);
 	}

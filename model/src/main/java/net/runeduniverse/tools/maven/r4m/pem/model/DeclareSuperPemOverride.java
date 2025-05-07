@@ -62,7 +62,7 @@ public class DeclareSuperPemOverride implements ModelOverride {
 		final DeclareSuperPemOverride override = (DeclareSuperPemOverride) obj;
 
 		return objectEquals(type(), override.type()) && //
-				objectEquals(isActive(), override.isActive());
+				objectEquals(this.active, override.isActive());
 	}
 
 	@Override

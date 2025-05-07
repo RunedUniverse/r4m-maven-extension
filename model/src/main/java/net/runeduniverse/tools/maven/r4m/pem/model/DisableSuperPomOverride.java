@@ -62,7 +62,7 @@ public class DisableSuperPomOverride implements ModelOverride {
 		final DisableSuperPomOverride override = (DisableSuperPomOverride) obj;
 
 		return objectEquals(type(), override.type()) && //
-				objectEquals(isActive(), override.isActive());
+				objectEquals(this.active, override.isActive());
 	}
 
 	@Override

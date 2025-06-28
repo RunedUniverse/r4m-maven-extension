@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -45,14 +45,18 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerEvaluator;
+import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.DefaultPemViewFactory;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
@@ -215,30 +219,39 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
-			final ExecutionArchiveSector slice) {
+			final ExecutionArchiveSectorSnapshot snapshot) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views, slice,
-				false);
+		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
+
+		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
+				snapshot, overrides, false);
 		return views;
 	}
 
 	@SuppressWarnings("deprecation")
-	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final Predicate<Execution> filter,
-			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
+	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
+			final ModelPredicate<ProjectExecutionModel, Execution> filter,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
+			final ExecutionArchiveSectorSnapshot snapshot, final Map<String, AtomicBoolean> overrides,
 			final boolean requireInherited) {
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, requireInherited);
+		snapshot.applyOverrides(overrides, //
+				ExecutionFilterUtils::requireSuperPemFilterSupplier, //
+				ExecutionFilterUtils::disableSuperPomFilterSupplier //
+		);
+
+		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
 		boolean effExecDetected = false;
 
 		if (applicableExecutions.isEmpty()) {
-			if (sector.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, sector.getParent(), true);
+			if (snapshot.getParent() != null)
+				effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
 
 			if (!effExecDetected)
-				applicableExecutions = sector.getExecutions(filter, requireInherited);
+				applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 		} else
 			effExecDetected = true;
 
-		applicableExecutions.addAll(sector.getUserDefinedExecutions(filter, requireInherited));
+		applicableExecutions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 
 		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
 
@@ -300,8 +313,9 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		if (sector == null)
 			return new DefaultSelection(selectorConfig.clone(), views);
 
+		final ExecutionArchiveSectorSnapshot snapshot = sector.snapshot();
 		selectorConfig.compile(this.mvnSession);
-		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, sector)
+		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, snapshot)
 				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
 		return new DefaultSelection(selectorConfig.clone(), views);

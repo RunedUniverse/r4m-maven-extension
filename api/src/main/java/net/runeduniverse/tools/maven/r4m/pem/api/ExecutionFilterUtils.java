@@ -33,7 +33,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 public interface ExecutionFilterUtils {
 
 	/**
-	 * Creates the default {@link Predicate} for filtering out all the relevant
+	 * Creates the default {@link ModelPredicate} for filtering out all the relevant
 	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
@@ -43,12 +43,12 @@ public interface ExecutionFilterUtils {
 	 * @param restrictionEvaluator evaluates {@link ExecutionRestriction} instances
 	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
 	 *                             for filtering in the filter
-	 * @return an instance of {@link Predicate} for filtering Executions by
+	 * @return an instance of {@link ModelPredicate} for filtering Executions by
 	 *         relevance utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultRelevanceFilterSupplier(
+	public static ModelPredicate<ProjectExecutionModel, Execution> defaultRelevanceFilterSupplier(
 			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionArchiveSelectorConfig cnf) {
-		return execution -> {
+		return (pem, execution) -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
 			if (execution.isNeverActive())
@@ -71,7 +71,7 @@ public interface ExecutionFilterUtils {
 	}
 
 	/**
-	 * Creates the default {@link Predicate} for filtering out all the active
+	 * Creates the default {@link ModelPredicate} for filtering out all the active
 	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
@@ -83,13 +83,13 @@ public interface ExecutionFilterUtils {
 	 * @param triggerEvaluator     evaluates {@link ExecutionTrigger} instances
 	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
 	 *                             for filtering in the filter
-	 * @return an instance of {@link Predicate} for filtering for active Executions
-	 *         utilizing {@code cnf}
+	 * @return an instance of {@link ModelPredicate} for filtering for active
+	 *         Executions utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultActiveFilterSupplier(
+	public static ModelPredicate<ProjectExecutionModel, Execution> defaultActiveFilterSupplier(
 			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionTriggerEvaluator triggerEvaluator,
 			final ExecutionArchiveSelectorConfig cnf) {
-		return execution -> {
+		return (pem, execution) -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
 			if (execution.isNeverActive())

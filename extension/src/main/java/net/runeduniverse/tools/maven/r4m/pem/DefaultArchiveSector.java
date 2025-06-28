@@ -21,8 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
-
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
@@ -30,7 +28,6 @@ import net.runeduniverse.lib.utils.maven3.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> implements ExecutionArchiveSector {

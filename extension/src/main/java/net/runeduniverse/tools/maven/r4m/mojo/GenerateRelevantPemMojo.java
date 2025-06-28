@@ -21,9 +21,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -35,8 +35,11 @@ import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
+import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -125,7 +128,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		cnf.compile(this.mvnSession);
 
 		final Set<Execution> executions = new LinkedHashSet<>();
-		final int sectorCnt = collectExecutions(executions, projectSector, cnf);
+		final int sectorCnt = collectExecutions(executions, projectSector.snapshot(), cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
@@ -161,32 +164,39 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
 			final ExecutionArchiveSelectorConfig cnf) {
 		final Data data = new Data();
-		collectExecutions(executions, sector, defaultRelevanceFilterSupplier(restrictionEvaluator, cnf), false, data);
+		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
+		collectExecutions(executions, snapshot, overrides, defaultRelevanceFilterSupplier(restrictionEvaluator, cnf),
+				false, data);
 		return data.getDepth();
 	}
 
-	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final Predicate<Execution> filter, final boolean requireInherited, final Data data) {
-		if (sector == null)
+	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
+			final Map<String, AtomicBoolean> overrides, final ModelPredicate<ProjectExecutionModel, Execution> filter,
+			final boolean requireInherited, final Data data) {
+		if (snapshot == null)
 			return;
+		snapshot.applyOverrides(overrides, //
+				ExecutionFilterUtils::requireSuperPemFilterSupplier, //
+				ExecutionFilterUtils::disableSuperPomFilterSupplier //
+		);
 
 		data.incrementDepth();
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, requireInherited);
+		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
 
 		if (applicableExecutions.isEmpty()) {
-			if (sector.getParent() != null)
-				collectExecutions(executions, sector.getParent(), filter, true, data);
+			if (snapshot.getParent() != null)
+				collectExecutions(executions, snapshot.getParent(), overrides, filter, true, data);
 
 			if (!data.isEffExecDetected())
-				applicableExecutions = sector.getExecutions(filter, requireInherited);
+				applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 		} else
 			data.setEffExecDetected(true);
 
 		executions.addAll(applicableExecutions);
-		executions.addAll(sector.getUserDefinedExecutions(filter, requireInherited));
+		executions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 	}
 
 	private static class Data {

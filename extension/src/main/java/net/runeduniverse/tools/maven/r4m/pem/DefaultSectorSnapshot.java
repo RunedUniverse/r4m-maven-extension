@@ -30,14 +30,13 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	protected final Map<ProjectExecutionModel, Set<Execution>> models = new LinkedHashMap<>();
-	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
+	protected final Map<String, Set<Execution>> executions = new LinkedHashMap<>();
 	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
 	protected final MavenProject mvnProject;
@@ -118,11 +117,6 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	@Override
-	public Set<Execution> getExecutions() {
-		return Collections.unmodifiableSet(this.executionOrigins.keySet());
-	}
-
-	@Override
 	public void addModel(final ProjectExecutionModel pem) {
 		if (pem == null)
 			return;
@@ -134,17 +128,14 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 			perModelSet.add(execution);
 			this.executionOrigins.put(execution, pem);
 
-			final Map<ExecutionSource, Set<Execution>> entry = this.executions.computeIfAbsent(execution.getId(),
-					k -> new LinkedHashMap<>());
-			final Set<Execution> col = entry.computeIfAbsent(execution.getSource(), k -> new HashSet<>());
+			final Set<Execution> col = this.executions.computeIfAbsent(execution.getId(), k -> new HashSet<>());
 			col.add(execution);
 		}
 	}
 
 	@Override
-	public ExecutionArchiveSectorSnapshot applyOverrides(
+	public ExecutionArchiveSectorSnapshot applyOverrides(final Map<String, AtomicBoolean> overrides,
 			final Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier) {
-		final Map<String, AtomicBoolean> overrides = collectOverridesAsBooleanMap();
 
 		if (filterSupplier == null)
 			return this;
@@ -158,22 +149,31 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	@Override
 	public ExecutionArchiveSectorSnapshot applyFilter(final ModelPredicate<ProjectExecutionModel, Execution> filter) {
-		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
-			for (Set<Execution> execCol : entry.values())
-				for (Iterator<Execution> i = execCol.iterator(); i.hasNext();) {
-					final Execution execution = (Execution) i.next();
-					// apply filter & remove unmatched
-					if (!filter.test(getModel(execution), execution)) {
-						i.remove();
-						final ProjectExecutionModel pem = this.executionOrigins.remove(execution);
-						if (pem != null) {
-							this.models.getOrDefault(pem, Collections.emptySet())
-									.remove(execution);
-						}
+		for (Set<Execution> execCol : this.executions.values()) {
+			for (Iterator<Execution> i = execCol.iterator(); i.hasNext();) {
+				final Execution execution = (Execution) i.next();
+				// apply filter & remove unmatched
+				if (!filter.test(getModel(execution), execution)) {
+					i.remove();
+					final ProjectExecutionModel pem = this.executionOrigins.remove(execution);
+					if (pem != null) {
+						this.models.getOrDefault(pem, Collections.emptySet())
+								.remove(execution);
 					}
 				}
+			}
 		}
 		return this;
+	}
+
+	@Override
+	public Set<Execution> getExecutions() {
+		return Collections.unmodifiableSet(this.executionOrigins.keySet());
+	}
+
+	@Override
+	public Set<Execution> getExecutions(final String id) {
+		return Collections.unmodifiableSet(this.executions.getOrDefault(id, Collections.emptySet()));
 	}
 
 	@Override

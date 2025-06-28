@@ -40,6 +40,8 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public Set<Execution> getExecutions();
 
+	public Set<Execution> getExecutions(String id);
+
 	public Set<Execution> getExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter);
 
 	public default Set<Execution> getExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter,
@@ -69,7 +71,7 @@ public interface ExecutionArchiveSectorSnapshot {
 	public void addModel(ProjectExecutionModel pem);
 
 	@SuppressWarnings("unchecked")
-	public ExecutionArchiveSectorSnapshot applyOverrides(
+	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,
 			Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier);
 
 	public ExecutionArchiveSectorSnapshot applyFilter(ModelPredicate<ProjectExecutionModel, Execution> filter);

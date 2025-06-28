@@ -15,13 +15,20 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
+import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
+import net.runeduniverse.tools.maven.r4m.pem.model.DisableSuperPomOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ExecutionFilterUtils {
 
@@ -39,7 +46,7 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate} for filtering Executions by
 	 *         relevance utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
+	public static Predicate<Execution> defaultRelevanceFilterSupplier(final ExecutionRestrictionEvaluator restrictionEvaluator,
 			final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
@@ -79,7 +86,7 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate} for filtering for active Executions
 	 *         utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultActiveFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
+	public static Predicate<Execution> defaultActiveFilterSupplier(final ExecutionRestrictionEvaluator restrictionEvaluator,
 			final ExecutionTriggerEvaluator triggerEvaluator, final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
@@ -119,6 +126,44 @@ public interface ExecutionFilterUtils {
 			}
 			return false;
 		};
+	}
+
+	public static boolean requireSuperPemFilter(final ProjectExecutionModel pem, final Execution e) {
+		if (pem == null)
+			return false;
+
+		final ModelOverride override = pem.getOverridesAsMap()
+				.get(DeclareSuperPemOverride.TYPE);
+		if (override == null || !override.isActive())
+			return false;
+		return true;
+	}
+
+	public static ModelPredicate<ProjectExecutionModel, Execution> requireSuperPemFilterSupplier(
+			final Map<String, AtomicBoolean> overrides) {
+		final AtomicBoolean value = overrides.get(DeclareSuperPemOverride.TYPE);
+		if (value == null || !value.get())
+			return (pem, e) -> true;
+
+		return ExecutionFilterUtils::requireSuperPemFilter;
+	}
+
+	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution e) {
+		if (pem == null)
+			return false;
+
+		if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType()))
+			return false;
+		return true;
+	}
+
+	public static ModelPredicate<ProjectExecutionModel, Execution> disableSuperPomFilterSupplier(
+			final Map<String, AtomicBoolean> overrides) {
+		final AtomicBoolean value = overrides.get(DisableSuperPomOverride.TYPE);
+		if (value == null || !value.get())
+			return (pem, e) -> true;
+
+		return ExecutionFilterUtils::disableSuperPomFilter;
 	}
 
 }

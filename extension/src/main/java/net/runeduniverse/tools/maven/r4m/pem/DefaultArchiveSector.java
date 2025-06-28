@@ -89,7 +89,7 @@ public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSec
 							.isEffective())
 						continue;
 					// check for user-defined flag
-					if (requireEffective && !this.executionOrigins.get(execution)
+					if (requireUserDefined && !this.executionOrigins.get(execution)
 							.isUserDefined())
 						continue;
 					// apply filter & collect data

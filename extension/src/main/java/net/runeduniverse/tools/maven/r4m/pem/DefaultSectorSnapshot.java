@@ -24,31 +24,26 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-
+import java.util.function.Function;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSnapshot;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
-import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
-import net.runeduniverse.tools.maven.r4m.pem.model.DisableSuperPomOverride;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
+import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
-
-public class DefaultSnapshot implements ExecutionArchiveSnapshot {
+public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	protected final Map<ProjectExecutionModel, Set<Execution>> models = new LinkedHashMap<>();
 	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
 	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
 	protected final MavenProject mvnProject;
-	protected final ExecutionArchiveSnapshot parent;
+	protected final ExecutionArchiveSectorSnapshot parent;
 
-	public DefaultSnapshot(final MavenProject mvnProject, final ExecutionArchiveSnapshot parent) {
+	public DefaultSectorSnapshot(final MavenProject mvnProject, final ExecutionArchiveSectorSnapshot parent) {
 		this.mvnProject = mvnProject;
 		this.parent = parent;
 	}
@@ -59,7 +54,7 @@ public class DefaultSnapshot implements ExecutionArchiveSnapshot {
 	}
 
 	@Override
-	public ExecutionArchiveSnapshot getParent() {
+	public ExecutionArchiveSectorSnapshot getParent() {
 		return this.parent;
 	}
 
@@ -71,8 +66,8 @@ public class DefaultSnapshot implements ExecutionArchiveSnapshot {
 	@Override
 	public Map<String, AtomicBoolean> getOverridesAsBooleanMap() {
 		final Map<String, AtomicBoolean> overrides = new LinkedHashMap<>(0);
+		// check all except the user-defined pems
 		for (ProjectExecutionModel pem : this.models.keySet()) {
-			// check all except the user-defined pems
 			for (Entry<String, ModelOverride> entry : pem.getOverridesAsMap()
 					.entrySet()) {
 				if (pem == null || pem.isUserDefined())
@@ -85,7 +80,9 @@ public class DefaultSnapshot implements ExecutionArchiveSnapshot {
 					continue;
 				active.set(true);
 			}
-			// check the user-defined pems
+		}
+		// check the user-defined pems
+		for (ProjectExecutionModel pem : this.models.keySet()) {
 			for (Entry<String, ModelOverride> entry : pem.getOverridesAsMap()
 					.entrySet()) {
 				if (pem == null || !pem.isUserDefined())
@@ -138,62 +135,35 @@ public class DefaultSnapshot implements ExecutionArchiveSnapshot {
 
 	protected void mergeOverrides(final Map<String, AtomicBoolean> base, final Map<String, AtomicBoolean> dominant) {
 		for (Entry<String, AtomicBoolean> entry : dominant.entrySet()) {
-			final AtomicBoolean domValue = entry.getValue();
 			final AtomicBoolean value = base.computeIfAbsent(entry.getKey(), k -> new AtomicBoolean());
+			final AtomicBoolean domValue = entry.getValue();
 			value.set(domValue.get());
 		}
 	}
 
 	@Override
-	public ExecutionArchiveSnapshot applyOverrides() {
+	public ExecutionArchiveSectorSnapshot applyOverrides(
+			final Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier) {
 		final Map<String, AtomicBoolean> overrides = collectOverridesAsBooleanMap();
 
-		applyFilter(overrideRequireSuperPemFilter(overrides));
-		applyFilter(overrideDisableSuperPomFilter(overrides));
+		if (filterSupplier == null)
+			return this;
+
+		for (Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>> supplier : filterSupplier) {
+			applyFilter(supplier.apply(overrides));
+		}
 
 		return this;
 	}
 
-	protected Predicate<Execution> overrideRequireSuperPemFilter(final Map<String, AtomicBoolean> overrides) {
-		final AtomicBoolean value = overrides.get(DeclareSuperPemOverride.TYPE);
-		if (value == null || !value.get())
-			return e -> true;
-
-		// build blacklist
-		final Set<Execution> blacklist = new LinkedHashSet<>();
-		for (ProjectExecutionModel pem : this.models.keySet()) {
-			if (pem.isUserDefined())
-				continue;
-			final ModelOverride override = pem.getOverridesAsMap()
-					.get(DeclareSuperPemOverride.TYPE);
-			if (override == null || !override.isActive())
-				blacklist.addAll(pem.getExecutions());
-		}
-		return e -> !blacklist.contains(e);
-	}
-
-	protected Predicate<Execution> overrideDisableSuperPomFilter(final Map<String, AtomicBoolean> overrides) {
-		final AtomicBoolean value = overrides.get(DisableSuperPomOverride.TYPE);
-		if (value == null || !value.get())
-			return e -> true;
-
-		// build blacklist
-		final Set<Execution> blacklist = new LinkedHashSet<>();
-		for (ProjectExecutionModel pem : this.models.keySet()) {
-			if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType()))
-				blacklist.addAll(pem.getExecutions());
-		}
-		return e -> !blacklist.contains(e);
-	}
-
 	@Override
-	public ExecutionArchiveSnapshot applyFilter(final Predicate<Execution> filter) {
+	public ExecutionArchiveSectorSnapshot applyFilter(final ModelPredicate<ProjectExecutionModel, Execution> filter) {
 		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
 			for (Set<Execution> execCol : entry.values())
 				for (Iterator<Execution> i = execCol.iterator(); i.hasNext();) {
 					final Execution execution = (Execution) i.next();
 					// apply filter & remove unmatched
-					if (!filter.test(execution)) {
+					if (!filter.test(getModel(execution), execution)) {
 						i.remove();
 						final ProjectExecutionModel pem = this.executionOrigins.remove(execution);
 						if (pem != null) {

@@ -46,7 +46,7 @@ import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireE
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilterSupplier;
 
 /**
  * generates the rel-pem.xml from all relevant executions
@@ -164,7 +164,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
 			final ExecutionArchiveSelectorConfig cnf) {
 		final Data data = new Data();
-		collectExecutions(executions, sector, defaultRelevanceFilter(restrictionEvaluator, cnf), false, data);
+		collectExecutions(executions, sector, defaultRelevanceFilterSupplier(restrictionEvaluator, cnf), false, data);
 		return data.getDepth();
 	}
 

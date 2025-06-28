@@ -59,7 +59,7 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilter;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilterSupplier;
 
 @Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
 public class DefaultSelector implements ExecutionArchiveSelector {
@@ -217,7 +217,7 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSector slice) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, defaultActiveFilter(this.restrictionEvaluator, this.triggerEvaluator, cnf), views, slice,
+		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views, slice,
 				false);
 		return views;
 	}

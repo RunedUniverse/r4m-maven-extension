@@ -18,6 +18,7 @@ package net.runeduniverse.tools.maven.r4m.pem.api;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import org.apache.maven.project.MavenProject;
@@ -25,11 +26,11 @@ import org.apache.maven.project.MavenProject;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public interface ExecutionArchiveSnapshot {
+public interface ExecutionArchiveSectorSnapshot {
 
 	public MavenProject getMvnProject();
 
-	public ExecutionArchiveSnapshot getParent();
+	public ExecutionArchiveSectorSnapshot getParent();
 
 	public ProjectExecutionModel getModel(Execution execution);
 
@@ -41,8 +42,14 @@ public interface ExecutionArchiveSnapshot {
 
 	public void addModel(MavenProject mvnProject, ProjectExecutionModel pem);
 
-	public ExecutionArchiveSnapshot applyOverrides();
+	@SuppressWarnings("unchecked")
+	public ExecutionArchiveSectorSnapshot applyOverrides(
+			Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier);
 
-	public ExecutionArchiveSnapshot applyFilter(Predicate<Execution> filter);
+	public ExecutionArchiveSectorSnapshot applyFilter(ModelPredicate<ProjectExecutionModel, Execution> filter);
+
+	public default ExecutionArchiveSectorSnapshot applyFilter(Predicate<Execution> filter) {
+		return applyFilter(ModelPredicate.wrap(filter));
+	}
 
 }

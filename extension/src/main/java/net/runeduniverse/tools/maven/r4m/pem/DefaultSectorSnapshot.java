@@ -109,14 +109,22 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 		return overrides;
 	}
 
+	protected void mergeOverrides(final Map<String, AtomicBoolean> base, final Map<String, AtomicBoolean> dominant) {
+		for (Entry<String, AtomicBoolean> entry : dominant.entrySet()) {
+			final AtomicBoolean value = base.computeIfAbsent(entry.getKey(), k -> new AtomicBoolean());
+			final AtomicBoolean domValue = entry.getValue();
+			value.set(domValue.get());
+		}
+	}
+
 	@Override
 	public Set<Execution> getExecutions() {
 		return Collections.unmodifiableSet(this.executionOrigins.keySet());
 	}
 
 	@Override
-	public void addModel(final MavenProject mvnProject, final ProjectExecutionModel pem) {
-		if (mvnProject == null || pem == null)
+	public void addModel(final ProjectExecutionModel pem) {
+		if (pem == null)
 			return;
 
 		final Set<Execution> perModelSet = this.models.computeIfAbsent(pem, k -> new LinkedHashSet<>(1));
@@ -130,14 +138,6 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 					k -> new LinkedHashMap<>());
 			final Set<Execution> col = entry.computeIfAbsent(execution.getSource(), k -> new HashSet<>());
 			col.add(execution);
-		}
-	}
-
-	protected void mergeOverrides(final Map<String, AtomicBoolean> base, final Map<String, AtomicBoolean> dominant) {
-		for (Entry<String, AtomicBoolean> entry : dominant.entrySet()) {
-			final AtomicBoolean value = base.computeIfAbsent(entry.getKey(), k -> new AtomicBoolean());
-			final AtomicBoolean domValue = entry.getValue();
-			value.set(domValue.get());
 		}
 	}
 
@@ -174,5 +174,23 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 				}
 		}
 		return this;
+	}
+
+	@Override
+	public Set<Execution> getExecutions(final ModelPredicate<ProjectExecutionModel, Execution> filter) {
+		final Set<Execution> executions = new LinkedHashSet<>();
+
+		if (filter == null) {
+			executions.addAll(this.executionOrigins.keySet());
+			return executions;
+		}
+
+		for (Entry<Execution, ProjectExecutionModel> entry : this.executionOrigins.entrySet()) {
+			// apply filter & collect data
+			final Execution execution = entry.getKey();
+			if (filter.test(entry.getValue(), execution))
+				executions.add(execution);
+		}
+		return executions;
 	}
 }

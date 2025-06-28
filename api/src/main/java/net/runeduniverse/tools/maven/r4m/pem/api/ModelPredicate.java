@@ -23,7 +23,7 @@ public interface ModelPredicate<M, T> {
 	 * @return {@code true} if the input argument matches the predicate, otherwise
 	 *         {@code false}
 	 */
-	boolean test(M m, T t);
+	public boolean test(M m, T t);
 
 	/**
 	 * Returns a composed predicate that represents a short-circuiting logical AND
@@ -38,12 +38,29 @@ public interface ModelPredicate<M, T> {
 	 *
 	 * @param other a predicate that will be logically-ANDed with this predicate
 	 * @return a composed predicate that represents the short-circuiting logical AND
-	 *         of this predicate and the {@code other} predicate
-	 * @throws NullPointerException if other is null
+	 *         of this predicate and the {@code other} predicate or this predicate
+	 *         if the {@code other} is null;
 	 */
-	default ModelPredicate<M, T> and(ModelPredicate<? super M, ? super T> other) {
-		Objects.requireNonNull(other);
+	public default ModelPredicate<M, T> and(ModelPredicate<? super M, ? super T> other) {
+		if (other == null)
+			return this;
 		return (m, t) -> test(m, t) && other.test(m, t);
+	}
+
+	@SafeVarargs
+	public static <M, T> ModelPredicate<M, T> and(ModelPredicate<? super M, ? super T>... predicates) {
+		Objects.requireNonNull(predicates);
+		ModelPredicate<M, T> p = null;
+		for (int i = 0; i < predicates.length; i++) {
+			@SuppressWarnings("unchecked")
+			final ModelPredicate<M, T> other = (ModelPredicate<M, T>) predicates[i];
+			if (other == null)
+				continue;
+			if (p == null)
+				p = other;
+			p = p.and(other);
+		}
+		return p;
 	}
 
 	/**
@@ -51,7 +68,7 @@ public interface ModelPredicate<M, T> {
 	 *
 	 * @return a predicate that represents the logical negation of this predicate
 	 */
-	default ModelPredicate<M, T> negate() {
+	public default ModelPredicate<M, T> negate() {
 		return (m, t) -> !test(m, t);
 	}
 
@@ -67,12 +84,29 @@ public interface ModelPredicate<M, T> {
 	 *
 	 * @param other a predicate that will be logically-ORed with this predicate
 	 * @return a composed predicate that represents the short-circuiting logical OR
-	 *         of this predicate and the {@code other} predicate
-	 * @throws NullPointerException if other is null
+	 *         of this predicate and the {@code other} predicate or this predicate
+	 *         if the {@code other} is null;
 	 */
-	default ModelPredicate<M, T> or(ModelPredicate<? super M, ? super T> other) {
-		Objects.requireNonNull(other);
+	public default ModelPredicate<M, T> or(ModelPredicate<? super M, ? super T> other) {
+		if (other == null)
+			return this;
 		return (m, t) -> test(m, t) || other.test(m, t);
+	}
+
+	@SafeVarargs
+	public static <M, T> ModelPredicate<M, T> or(ModelPredicate<? super M, ? super T>... predicates) {
+		Objects.requireNonNull(predicates);
+		ModelPredicate<M, T> p = null;
+		for (int i = 0; i < predicates.length; i++) {
+			@SuppressWarnings("unchecked")
+			final ModelPredicate<M, T> other = (ModelPredicate<M, T>) predicates[i];
+			if (other == null)
+				continue;
+			if (p == null)
+				p = other;
+			p = p.or(other);
+		}
+		return p;
 	}
 
 	/**
@@ -86,7 +120,7 @@ public interface ModelPredicate<M, T> {
 	 * @return a predicate that tests if two arguments are equal according to
 	 *         {@link Objects#equals(Object, Object)}
 	 */
-	static <M, T> ModelPredicate<M, T> isEqualModel(Object targetRef) {
+	public static <M, T> ModelPredicate<M, T> isEqualModel(Object targetRef) {
 		return (null == targetRef) ? (object, t) -> Objects.isNull(object) : (object, t) -> targetRef.equals(object);
 	}
 
@@ -101,7 +135,7 @@ public interface ModelPredicate<M, T> {
 	 * @return a predicate that tests if two arguments are equal according to
 	 *         {@link Objects#equals(Object, Object)}
 	 */
-	static <M, T> ModelPredicate<M, T> isEqual(Object targetRef) {
+	public static <M, T> ModelPredicate<M, T> isEqual(Object targetRef) {
 		return (null == targetRef) ? (m, object) -> Objects.isNull(object) : (m, object) -> targetRef.equals(object);
 	}
 
@@ -112,7 +146,7 @@ public interface ModelPredicate<M, T> {
 	 * @param <T> the type of arguments to the predicate
 	 * @return a model-predicate that wraps a simple predicate
 	 */
-	static <M, T> ModelPredicate<M, T> wrap(Predicate<T> predicate) {
+	public static <M, T> ModelPredicate<M, T> wrap(Predicate<T> predicate) {
 		return (m, t) -> predicate.test(t);
 	}
 

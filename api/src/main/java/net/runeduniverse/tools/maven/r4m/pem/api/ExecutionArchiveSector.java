@@ -16,8 +16,6 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import java.util.Set;
-import java.util.function.Predicate;
-
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.lib.utils.maven3.ext.indexer.api.ProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -31,12 +29,10 @@ public interface ExecutionArchiveSector extends ProjectBoundEntry<ExecutionArchi
 
 	public Set<Execution> getExecutions();
 
-	public Set<Execution> getExecutions(Predicate<Execution> filter, boolean requireInherited);
-
-	public Set<Execution> getEffectiveExecutions(Predicate<Execution> filter, boolean requireInherited);
-
-	public Set<Execution> getUserDefinedExecutions(Predicate<Execution> filter, boolean requireInherited);
+	public Set<Execution> getExecutions(String id);
 
 	public void register(ProjectExecutionModel pem);
+
+	public ExecutionArchiveSectorSnapshot snapshot();
 
 }

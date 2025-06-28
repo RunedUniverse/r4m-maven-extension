@@ -40,7 +40,33 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public Set<Execution> getExecutions();
 
-	public void addModel(MavenProject mvnProject, ProjectExecutionModel pem);
+	public Set<Execution> getExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter);
+
+	public default Set<Execution> getExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter,
+			boolean requireInherited) {
+		return getExecutions(ModelPredicate.and( //
+				requireInherited ? ExecutionFilterUtils::requireInheritedFilter : null, //
+				filter //
+		));
+	}
+
+	public default Set<Execution> getEffectiveExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter,
+			boolean requireInherited) {
+		return getExecutions( //
+				ModelPredicate.and(ExecutionFilterUtils::requireSuperPemFilter, filter), //
+				requireInherited //
+		);
+	}
+
+	public default Set<Execution> getUserDefinedExecutions(ModelPredicate<ProjectExecutionModel, Execution> filter,
+			boolean requireInherited) {
+		return getExecutions( //
+				ModelPredicate.and(ExecutionFilterUtils::requireUserDefinedFilter, filter), //
+				requireInherited //
+		);
+	}
+
+	public void addModel(ProjectExecutionModel pem);
 
 	@SuppressWarnings("unchecked")
 	public ExecutionArchiveSectorSnapshot applyOverrides(

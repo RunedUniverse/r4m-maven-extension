@@ -46,8 +46,8 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate} for filtering Executions by
 	 *         relevance utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultRelevanceFilterSupplier(final ExecutionRestrictionEvaluator restrictionEvaluator,
-			final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultRelevanceFilterSupplier(
+			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
@@ -86,8 +86,9 @@ public interface ExecutionFilterUtils {
 	 * @return an instance of {@link Predicate} for filtering for active Executions
 	 *         utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultActiveFilterSupplier(final ExecutionRestrictionEvaluator restrictionEvaluator,
-			final ExecutionTriggerEvaluator triggerEvaluator, final ExecutionArchiveSelectorConfig cnf) {
+	public static Predicate<Execution> defaultActiveFilterSupplier(
+			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionTriggerEvaluator triggerEvaluator,
+			final ExecutionArchiveSelectorConfig cnf) {
 		return execution -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
@@ -126,6 +127,14 @@ public interface ExecutionFilterUtils {
 			}
 			return false;
 		};
+	}
+
+	public static boolean requireInheritedFilter(final ProjectExecutionModel pem, Execution execution) {
+		return execution.isInherited();
+	}
+
+	public static boolean requireUserDefinedFilter(final ProjectExecutionModel pem, Execution execution) {
+		return pem != null && pem.isUserDefined();
 	}
 
 	public static boolean requireSuperPemFilter(final ProjectExecutionModel pem, final Execution e) {

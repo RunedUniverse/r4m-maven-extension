@@ -158,9 +158,9 @@ public interface ModelPredicate<M, T> {
 	/**
 	 * Returns a model-predicate that wraps a simple predicate.
 	 *
-	 * @param <M>          the type of the model the predicate belongs to
-	 * @param <T>          the type of arguments to the predicate
-	 * @param Predicate<T> predicate without dependence on a model
+	 * @param <M>       the type of the model the predicate belongs to
+	 * @param <T>       the type of arguments to the predicate
+	 * @param predicate the predicate without dependence on a model
 	 * @return a model-predicate that wraps a simple predicate
 	 */
 	public static <M, T> ModelPredicate<M, T> wrap(Predicate<T> predicate) {

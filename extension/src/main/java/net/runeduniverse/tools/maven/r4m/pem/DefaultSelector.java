@@ -45,10 +45,10 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
@@ -82,6 +82,8 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	private MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
 	private ExecutionArchive archive;
+	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
+	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 	@Requirement
 	private ExecutionRestrictionEvaluator restrictionEvaluator;
 	@Requirement
@@ -234,10 +236,7 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
 			final ExecutionArchiveSectorSnapshot snapshot, final Map<String, AtomicBoolean> overrides,
 			final boolean requireInherited) {
-		snapshot.applyOverrides(overrides, //
-				ExecutionFilterUtils::requireSuperPemFilterSupplier, //
-				ExecutionFilterUtils::disableSuperPomFilterSupplier //
-		);
+		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
 		boolean effExecDetected = false;

@@ -148,15 +148,6 @@ public interface ExecutionFilterUtils {
 		return true;
 	}
 
-	public static ModelPredicate<ProjectExecutionModel, Execution> requireSuperPemFilterSupplier(
-			final Map<String, AtomicBoolean> overrides) {
-		final AtomicBoolean value = overrides.get(DeclareSuperPemOverride.TYPE);
-		if (value == null || !value.get())
-			return (pem, e) -> true;
-
-		return ExecutionFilterUtils::requireSuperPemFilter;
-	}
-
 	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution e) {
 		if (pem == null)
 			return false;
@@ -164,15 +155,6 @@ public interface ExecutionFilterUtils {
 		if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType()))
 			return false;
 		return true;
-	}
-
-	public static ModelPredicate<ProjectExecutionModel, Execution> disableSuperPomFilterSupplier(
-			final Map<String, AtomicBoolean> overrides) {
-		final AtomicBoolean value = overrides.get(DisableSuperPomOverride.TYPE);
-		if (value == null || !value.get())
-			return (pem, e) -> true;
-
-		return ExecutionFilterUtils::disableSuperPomFilter;
 	}
 
 }

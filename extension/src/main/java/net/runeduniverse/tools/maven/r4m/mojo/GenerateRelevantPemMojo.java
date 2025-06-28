@@ -30,6 +30,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
@@ -38,6 +39,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigF
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
@@ -101,6 +103,11 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	 * @component
 	 */
 	private ExecutionRestrictionEvaluator restrictionEvaluator;
+
+	/**
+	 * @component
+	 */
+	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
@@ -178,10 +185,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 			final boolean requireInherited, final Data data) {
 		if (snapshot == null)
 			return;
-		snapshot.applyOverrides(overrides, //
-				ExecutionFilterUtils::requireSuperPemFilterSupplier, //
-				ExecutionFilterUtils::disableSuperPomFilterSupplier //
-		);
+		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		data.incrementDepth();
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);

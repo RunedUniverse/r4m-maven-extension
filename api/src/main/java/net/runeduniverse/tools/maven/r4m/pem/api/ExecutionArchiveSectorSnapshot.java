@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -73,6 +74,9 @@ public interface ExecutionArchiveSectorSnapshot {
 	@SuppressWarnings("unchecked")
 	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,
 			Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier);
+
+	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,
+			Collection<ProjectExecutionModelOverrideFilterSupplier> filterSupplier);
 
 	public ExecutionArchiveSectorSnapshot applyFilter(ModelPredicate<ProjectExecutionModel, Execution> filter);
 

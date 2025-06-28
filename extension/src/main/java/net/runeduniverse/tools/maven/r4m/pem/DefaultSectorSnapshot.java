@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,6 +30,7 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -136,14 +138,22 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	@Override
 	public ExecutionArchiveSectorSnapshot applyOverrides(final Map<String, AtomicBoolean> overrides,
 			final Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier) {
-
 		if (filterSupplier == null)
 			return this;
-
 		for (Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>> supplier : filterSupplier) {
 			applyFilter(supplier.apply(overrides));
 		}
+		return this;
+	}
 
+	@Override
+	public ExecutionArchiveSectorSnapshot applyOverrides(final Map<String, AtomicBoolean> overrides,
+			final Collection<ProjectExecutionModelOverrideFilterSupplier> filterSupplier) {
+		if (filterSupplier == null)
+			return this;
+		for (ProjectExecutionModelOverrideFilterSupplier supplier : filterSupplier) {
+			applyFilter(supplier.get(overrides));
+		}
 		return this;
 	}
 

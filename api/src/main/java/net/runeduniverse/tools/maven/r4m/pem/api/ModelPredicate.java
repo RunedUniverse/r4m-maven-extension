@@ -23,11 +23,12 @@ import java.util.function.Predicate;
  *
  * <p>
  * This is a <a href="package-summary.html">functional interface</a> whose
- * functional method is {@link #test(Object)}.
+ * functional method is {@link #test(Object, Object)}.
  *
  * @param <M> the type of the model the predicate belongs to
  * @param <T> the type of the input to the predicate
  */
+@FunctionalInterface
 public interface ModelPredicate<M, T> {
 
 	/**
@@ -157,8 +158,9 @@ public interface ModelPredicate<M, T> {
 	/**
 	 * Returns a model-predicate that wraps a simple predicate.
 	 *
-	 * @param <M> the type of the model the predicate belongs to
-	 * @param <T> the type of arguments to the predicate
+	 * @param <M>          the type of the model the predicate belongs to
+	 * @param <T>          the type of arguments to the predicate
+	 * @param Predicate<T> predicate without dependence on a model
 	 * @return a model-predicate that wraps a simple predicate
 	 */
 	public static <M, T> ModelPredicate<M, T> wrap(Predicate<T> predicate) {

@@ -106,12 +106,13 @@ public class PatchingEventSpy implements EventSpy {
 
 	private void printBox(final PatchingEvent event) {
 		if (event.getType() == Type.INFO_PATCHING_STARTED) {
-			this.log.info("------------------------------------------------------------------------\033[m");
+			this.log.info("\033[1m------------------------------------------------------------------------\033[m");
 			this.log.info("\033[1mRunes4Maven Extension: patching Maven\033[m");
 			this.log.info("");
 		}
-		if (event.getType() == Type.INFO_PATCHING_FINISHED)
-			this.log.info("");
+		if (event.getType() == Type.INFO_PATCHING_FINISHED) {
+			// nothing to do
+		}
 		if (event.getType() == Type.INFO_PATCHING_ABORTED)
 			this.log.error("\033[1;31mpatching aborted\u001B[0m", event.getException());
 	}

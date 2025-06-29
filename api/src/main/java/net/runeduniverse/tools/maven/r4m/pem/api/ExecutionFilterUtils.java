@@ -19,11 +19,7 @@ import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignabl
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-
 import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
-import net.runeduniverse.tools.maven.r4m.pem.model.DisableSuperPomOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;

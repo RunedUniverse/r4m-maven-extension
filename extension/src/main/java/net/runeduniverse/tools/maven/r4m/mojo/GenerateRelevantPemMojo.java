@@ -102,7 +102,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	private ExecutionRestrictionEvaluator restrictionEvaluator;
 
 	/**
-	 * @component
+	 * @component role="net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier"
 	 */
 	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 

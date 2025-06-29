@@ -35,6 +35,8 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public ProjectExecutionModel getModel(Execution execution);
 
+	public boolean hasModelWithEffectiveOverride();
+
 	public Map<String, AtomicBoolean> getOverridesAsBooleanMap();
 
 	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap();

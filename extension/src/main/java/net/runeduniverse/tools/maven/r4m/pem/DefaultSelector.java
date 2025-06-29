@@ -230,7 +230,6 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		return views;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ModelPredicate<ProjectExecutionModel, Execution> filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
@@ -239,20 +238,24 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
-		boolean effExecDetected = false;
+		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride();
 
-		if (applicableExecutions.isEmpty()) {
-			if (snapshot.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
-
-			if (!effExecDetected)
-				applicableExecutions = snapshot.getExecutions(filter, requireInherited);
-		} else
-			effExecDetected = true;
+		if (!effExecDetected && snapshot.getParent() != null)
+			effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
+		if (!effExecDetected)
+			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 
 		applicableExecutions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 
-		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
+		integrateExecutions(cnf, baseViews, applicableExecutions);
+
+		return effExecDetected;
+	}
+
+	@SuppressWarnings("deprecation")
+	protected void integrateExecutions(final ExecutionArchiveSelectorConfig cnf,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final Set<Execution> executions) {
+		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, executions);
 
 		for (String executionId : dominantViews.keySet()) {
 			final Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
@@ -273,8 +276,6 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 						merge(cnf, baseExecution, domExecution, ExecutionSource.OVERRIDE.equals(source), false));
 			}
 		}
-
-		return effExecDetected;
 	}
 
 	@SuppressWarnings("deprecation")

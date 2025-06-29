@@ -65,6 +65,15 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	@Override
+	public boolean hasModelWithEffectiveOverride() {
+		for (ProjectExecutionModel pem : this.models.keySet()) {
+			if (pem.isEffective())
+				return true;
+		}
+		return false;
+	}
+
+	@Override
 	public Map<String, AtomicBoolean> getOverridesAsBooleanMap() {
 		final Map<String, AtomicBoolean> overrides = new LinkedHashMap<>(0);
 		// check all except the user-defined pems

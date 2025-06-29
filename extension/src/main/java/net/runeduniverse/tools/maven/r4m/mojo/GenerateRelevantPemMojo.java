@@ -30,13 +30,10 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.component.annotations.Requirement;
-
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
@@ -189,15 +186,12 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		data.incrementDepth();
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
+		data.setEffExecDetected(snapshot.hasModelWithEffectiveOverride());
 
-		if (applicableExecutions.isEmpty()) {
-			if (snapshot.getParent() != null)
-				collectExecutions(executions, snapshot.getParent(), overrides, filter, true, data);
-
-			if (!data.isEffExecDetected())
-				applicableExecutions = snapshot.getExecutions(filter, requireInherited);
-		} else
-			data.setEffExecDetected(true);
+		if (!data.isEffExecDetected() && snapshot.getParent() != null)
+			collectExecutions(executions, snapshot.getParent(), overrides, filter, true, data);
+		if (!data.isEffExecDetected())
+			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 
 		executions.addAll(applicableExecutions);
 		executions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));

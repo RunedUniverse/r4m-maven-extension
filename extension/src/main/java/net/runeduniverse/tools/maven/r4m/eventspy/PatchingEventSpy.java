@@ -32,11 +32,11 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.lib.utils.maven3.ext.data.api.Extension;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
+import net.runeduniverse.tools.maven.r4m.event.api.ExtensionPatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.MavenPluginPatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.MessagePatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.PatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.PatchingEvent.Type;
 
 @Component(role = EventSpy.class, hint = PatchingEventSpy.HINT)
 public class PatchingEventSpy implements EventSpy {

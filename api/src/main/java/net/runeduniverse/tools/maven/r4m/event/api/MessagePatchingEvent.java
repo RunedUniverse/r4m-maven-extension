@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.eventspy.api;
+package net.runeduniverse.tools.maven.r4m.event.api;
 
 import java.util.Map;
 

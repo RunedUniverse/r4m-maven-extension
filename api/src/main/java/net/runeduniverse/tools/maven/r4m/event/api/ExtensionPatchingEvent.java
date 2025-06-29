@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.eventspy.api;
+package net.runeduniverse.tools.maven.r4m.event.api;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -35,7 +35,7 @@ public interface ExtensionPatchingEvent extends PatchingEvent {
 	}
 
 	public static ExtensionEvent createInfoEvent(final Type type, final Collection<MavenProject> projects,
-			Collection<Extension> extensions) {
+			final Collection<Extension> extensions) {
 		return new ExtensionEvent(type, null, projects, extensions);
 	}
 
@@ -44,7 +44,7 @@ public interface ExtensionPatchingEvent extends PatchingEvent {
 	}
 
 	public static ExtensionEvent createErrorEvent(final Type type, final Exception exception,
-			final Collection<MavenProject> projects, Collection<Extension> extensions) {
+			final Collection<MavenProject> projects, final Collection<Extension> extensions) {
 		return new ExtensionEvent(type, exception, projects, extensions);
 	}
 

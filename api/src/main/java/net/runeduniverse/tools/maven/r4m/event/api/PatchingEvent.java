@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.runeduniverse.tools.maven.r4m.eventspy.api;
+package net.runeduniverse.tools.maven.r4m.event.api;
 
 public interface PatchingEvent {
 
@@ -36,11 +36,11 @@ public interface PatchingEvent {
 
 	public Exception getException();
 
-	public static BasicEvent createInfoEvent(Type type) {
+	public static BasicEvent createInfoEvent(final Type type) {
 		return new BasicEvent(type, null);
 	}
 
-	public static BasicEvent createErrorEvent(Type type, Exception exception) {
+	public static BasicEvent createErrorEvent(final Type type, final Exception exception) {
 		return new BasicEvent(type, exception);
 	}
 

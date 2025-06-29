@@ -127,6 +127,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 			mojoFailureExtensionLoading(getLog());
 
 		final ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
+		cnf.selectTopLevelProject(this.mvnSession.getTopLevelProject());
 		cnf.selectActiveProject(this.mvnProject);
 		cnf.selectPackagingProcedure(this.mvnProject.getPackaging());
 		cnf.compile(this.mvnSession);

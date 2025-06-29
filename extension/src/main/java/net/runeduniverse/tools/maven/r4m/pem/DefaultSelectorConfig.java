@@ -33,6 +33,7 @@ import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 
+	private MavenProject topLevelMvnProject = null;
 	private MavenProject mvnProject = null;
 	private String packagingProcedure = null;
 	private final Properties properties = new Properties();
@@ -43,6 +44,13 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 
 	private final Set<String> inactiveProfiles = new LinkedHashSet<>();
 	private boolean dirty = true;
+
+	@Override
+	public ExecutionArchiveSelectorConfig selectTopLevelProject(MavenProject value) {
+		this.dirty = true;
+		this.topLevelMvnProject = value;
+		return this;
+	}
 
 	@Override
 	public ExecutionArchiveSelectorConfig selectActiveProject(final MavenProject value) {
@@ -142,6 +150,13 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
+	public ExecutionArchiveSelectorConfig clearTopLevelProject() {
+		this.dirty = true;
+		this.topLevelMvnProject = null;
+		return this;
+	}
+
+	@Override
 	public ExecutionArchiveSelectorConfig clearActiveProject() {
 		this.dirty = true;
 		this.mvnProject = null;
@@ -191,6 +206,11 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 	}
 
 	@Override
+	public MavenProject getTopLevelProject() {
+		return this.topLevelMvnProject;
+	}
+
+	@Override
 	public MavenProject getActiveProject() {
 		return this.mvnProject;
 	}
@@ -233,6 +253,7 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 	@Override
 	public DefaultSelectorConfig clone() {
 		final DefaultSelectorConfig cnf = new DefaultSelectorConfig();
+		cnf.selectTopLevelProject(this.topLevelMvnProject);
 		cnf.selectActiveProject(this.mvnProject);
 		cnf.selectPackagingProcedure(this.packagingProcedure);
 		cnf.selectActiveProfiles(Collections.unmodifiableSet(this.activeProfiles));
@@ -280,6 +301,12 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 
 		if (this.dirty)
 			tree.append("[WARNING]", "The SelectorConfig was not compiled prior to recording!");
+
+		if (this.topLevelMvnProject != null)
+			tree.append(new DefaultCompoundTree("Maven Project (top-level)")
+					.append("groupId", this.topLevelMvnProject.getGroupId())
+					.append("artifactId", this.topLevelMvnProject.getArtifactId())
+					.append("version", this.topLevelMvnProject.getVersion()));
 
 		if (this.mvnProject != null)
 			tree.append(new DefaultCompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())

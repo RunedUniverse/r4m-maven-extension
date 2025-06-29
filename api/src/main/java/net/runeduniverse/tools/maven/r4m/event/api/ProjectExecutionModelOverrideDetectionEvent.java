@@ -25,28 +25,37 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelOverrideDetectionEvent {
 
+	public MavenProject getTopLevelMvnProject();
+
 	public MavenProject getMvnProject();
 
 	public Map<String, AtomicBoolean> getOverrides();
 
 	public Set<ProjectExecutionModel> getModels();
 
-	public static BasicEvent createEvent(final MavenProject mvnProject, final Map<String, AtomicBoolean> overrides,
-			final Set<ProjectExecutionModel> models) {
-		return new BasicEvent(mvnProject, overrides, models);
+	public static BasicEvent createEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
+			final Map<String, AtomicBoolean> overrides, final Set<ProjectExecutionModel> models) {
+		return new BasicEvent(topLevelMvnProject, mvnProject, overrides, models);
 	}
 
 	public class BasicEvent implements ProjectExecutionModelOverrideDetectionEvent {
 
+		protected MavenProject topLevelMvnProject;
 		protected MavenProject mvnProject;
 		protected Map<String, AtomicBoolean> overrides;
 		protected Set<ProjectExecutionModel> models;
 
-		public BasicEvent(final MavenProject mvnProject, final Map<String, AtomicBoolean> overrides,
-				final Set<ProjectExecutionModel> models) {
+		public BasicEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
+				final Map<String, AtomicBoolean> overrides, final Set<ProjectExecutionModel> models) {
+			this.topLevelMvnProject = topLevelMvnProject;
 			this.mvnProject = mvnProject;
 			this.overrides = overrides;
 			this.models = models;
+		}
+
+		@Override
+		public MavenProject getTopLevelMvnProject() {
+			return this.topLevelMvnProject;
 		}
 
 		@Override

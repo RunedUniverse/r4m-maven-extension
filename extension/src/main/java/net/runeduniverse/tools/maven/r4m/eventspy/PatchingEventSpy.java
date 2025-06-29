@@ -276,4 +276,5 @@ public class PatchingEventSpy implements EventSpy {
 			return;
 		}
 	}
+
 }

@@ -40,7 +40,9 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
@@ -83,6 +85,8 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	private MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
 	private ExecutionArchive archive;
+	@Requirement
+	private EventSpyDispatcherProxy dispatcher;
 	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
 	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 	@Requirement
@@ -229,6 +233,9 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 
 		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
 				overrideModelIndex, snapshot, overrides, false);
+
+		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(cnf.getTopLevelProject(),
+				cnf.getActiveProject(), overrides, overrideModelIndex));
 		return views;
 	}
 

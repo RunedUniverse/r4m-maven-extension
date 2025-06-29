@@ -267,6 +267,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		final List<MojoExecution> mojoExecutions = new ArrayList<>();
 
 		final ExecutionArchiveSelectorConfig pemSelectorConfig = this.pemSelectorConfigFactory.createEmptyConfig()
+				.selectTopLevelProject(session.getTopLevelProject())
 				.selectActiveProject(project)
 				.selectAllActiveProfiles(project.getActiveProfiles())
 				.selectPackagingProcedure(project.getPackaging());
@@ -637,6 +638,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 					fork.setLifecycle(lifecycle);
 				}
 				selectorConfig = this.pemSelectorConfigFactory.createEmptyConfig()
+						.selectTopLevelProject(session.getTopLevelProject())
 						.selectActiveProject(project)
 						.selectPackagingProcedure(project.getPackaging())
 						.selectModes("default")
@@ -731,6 +733,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		final ExecutionArchiveSelectorConfig pemCnf = this.pemSelectorConfigFactory.createEmptyConfig();
 		final GoalRequirementArchiveSelectorConfig grmCnf = this.grmSelectorConfigFactory.createEmptyConfig();
 
+		// select top-level mvnProject
+		pemCnf.selectTopLevelProject(session.getTopLevelProject());
 		// select mvnProject
 		pemCnf.selectActiveProject(project);
 		grmCnf.selectActiveProject(project);
@@ -999,6 +1003,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		else
 			forkedExecution = new MojoExecutionAdapter(forkedMojoDescriptor, executionId,
 					this.pemSelectorConfigFactory.createEmptyConfig()
+							.selectTopLevelProject(session.getTopLevelProject())
 							.selectActiveProject(project)
 							.selectModes("default")
 							.selectPackagingProcedure(project.getPackaging())

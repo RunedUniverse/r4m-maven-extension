@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.scanner;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -57,14 +58,21 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 	@Override
 	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
+		final Path basedir = mvnProject.getBasedir()
+				.toPath();
 		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
 			final ProjectExecutionModel model = parser.parse(mvnProject);
 			if (model != null) {
 				this.pemArchive.getSector(mvnProject)
 						.register(model);
+
 				final ModelSource source = model.computeModelSourceIfAbsent(DefaultModelSource::new);
 				if (source.getProjectId() == null)
 					source.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId));
+
+				final Path file = source.getFile();
+				if (file != null)
+					source.setFile(basedir.resolve(file));
 			}
 		}
 		for (GoalRequirementModelConfigParser parser : this.grmConfigParser.values()) {

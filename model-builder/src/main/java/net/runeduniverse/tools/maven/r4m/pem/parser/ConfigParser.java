@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelConfigParser.class, hint = ConfigParser.HINT)
@@ -47,6 +49,9 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 	public ProjectExecutionModel parse(final MavenProject mvnProject) throws Exception {
 		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
 		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId))
+				.setFile(xmlFile.toPath()));
 		model.setUserDefined(true);
 		model.setParser(ConfigParser.class, ConfigParser.HINT);
 

@@ -41,6 +41,8 @@ import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistry;
 import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelPluginParser.class, hint = PluginParser.HINT)
@@ -82,6 +84,8 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return model;
 
 		model = parseModel(mvnPluginDescriptor);
+		model.setModelSource(new DefaultModelSource() //
+				.setArtifactId(ModelSource.id(mvnPlugin::getGroupId, mvnPlugin::getArtifactId)));
 		slice.includeModel(model);
 		return model;
 	}

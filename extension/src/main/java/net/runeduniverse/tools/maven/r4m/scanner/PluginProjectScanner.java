@@ -31,6 +31,8 @@ import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
 import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
@@ -74,14 +76,21 @@ public class PluginProjectScanner implements MavenProjectScanner {
 					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values()) {
 						final ProjectExecutionModel model = parser.parse(mvnProject.getRemotePluginRepositories(),
 								mvnSession.getRepositorySession(), mvnPlugin);
-						this.pemArchive.getSector(mvnProject)
-								.register(model);
+						if (model != null) {
+							this.pemArchive.getSector(mvnProject)
+									.register(model);
+							final ModelSource source = model.computeModelSourceIfAbsent(DefaultModelSource::new);
+							if (source.getProjectId() == null)
+								source.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId));
+						}
 					}
 					for (GoalRequirementModelPluginParser parser : this.grmPluginParser.values()) {
 						final GoalRequirementModel model = parser.parse(mvnProject.getRemotePluginRepositories(),
 								mvnSession.getRepositorySession(), mvnPlugin);
-						this.grmArchive.getSector(mvnProject)
-								.register(model);
+						if (model != null) {
+							this.grmArchive.getSector(mvnProject)
+									.register(model);
+						}
 					}
 				} catch (PluginResolutionException e) {
 					invalidPlugins.add(mvnPlugin);

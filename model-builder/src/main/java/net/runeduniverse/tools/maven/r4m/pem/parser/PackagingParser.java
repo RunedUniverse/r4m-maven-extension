@@ -31,11 +31,13 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.lib.utils.maven3.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -73,6 +75,9 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 		}
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setArtifactId(ModelSource.id("org.apache.maven", "maven-core"))
+				.setNote("< super-pom >"));
 		model.setParser(PackagingParser.class, PackagingParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 		model.addExecutions(effExecutions);

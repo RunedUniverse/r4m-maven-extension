@@ -15,8 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -36,6 +35,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
@@ -46,6 +46,8 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
+
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = ProjectExecutionModelPluginParser.class, hint = ExecutionsPluginParser.HINT)
 public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser {
@@ -73,6 +75,9 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		}
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setFile(Paths.get("pom.xml"))
+				.setNote("PEM derived from configured Executions"));
 		model.setParser(ExecutionsPluginParser.class, ExecutionsPluginParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 

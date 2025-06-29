@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
@@ -32,6 +33,7 @@ public class ProjectExecutionModel implements Recordable {
 	protected final Set<Execution> executions = new LinkedHashSet<>(0);
 
 	protected String version;
+	protected ModelSource source = null;
 	protected Class<?> parserType = null;
 	protected String parserHint = null;
 	protected boolean userDefined = false;
@@ -42,6 +44,19 @@ public class ProjectExecutionModel implements Recordable {
 
 	public String getVersion() {
 		return this.version;
+	}
+
+	public ModelSource getModelSource() {
+		return this.source;
+	}
+
+	public ModelSource computeModelSourceIfAbsent(final Supplier<ModelSource> supplier) {
+		if (this.source == null) {
+			if (supplier == null)
+				return null;
+			return this.source = supplier.get();
+		}
+		return this.source;
 	}
 
 	public Class<?> getParserType() {
@@ -77,6 +92,10 @@ public class ProjectExecutionModel implements Recordable {
 
 	public void setVersion(final String version) {
 		this.version = version;
+	}
+
+	public void setModelSource(final ModelSource source) {
+		this.source = source;
 	}
 
 	public void setParser(final Class<?> type, final String hint) {

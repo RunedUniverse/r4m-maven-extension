@@ -27,6 +27,8 @@ import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
@@ -50,8 +52,13 @@ public class PackagingProjectScanner implements MavenProjectScanner {
 			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
 		for (ProjectExecutionModelPackagingParser parser : this.pemPackagingParser.values()) {
 			final ProjectExecutionModel model = parser.parse();
+			if (model == null)
+				continue;
 			this.pemArchive.getSector(mvnProject)
 					.register(model);
+			final ModelSource source = model.computeModelSourceIfAbsent(DefaultModelSource::new);
+			if (source.getProjectId() == null)
+				source.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId));
 		}
 	}
 }

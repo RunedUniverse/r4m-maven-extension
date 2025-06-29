@@ -55,6 +55,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.DefaultPemViewFactory;
@@ -223,33 +224,58 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSectorSnapshot snapshot) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
+		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
 		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
 
 		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
-				snapshot, overrides, false);
+				overrideModelIndex, snapshot, overrides, false);
 		return views;
 	}
 
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ModelPredicate<ProjectExecutionModel, Execution> filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
-			final ExecutionArchiveSectorSnapshot snapshot, final Map<String, AtomicBoolean> overrides,
-			final boolean requireInherited) {
+			final Set<ProjectExecutionModel> overrideModelIndex, final ExecutionArchiveSectorSnapshot snapshot,
+			final Map<String, AtomicBoolean> overrides, final boolean requireInherited) {
 		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
 		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride();
 
 		if (!effExecDetected && snapshot.getParent() != null)
-			effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
+			effExecDetected = getExecutions(cnf, filter, baseViews, overrideModelIndex, snapshot.getParent(), overrides,
+					true);
 		if (!effExecDetected)
 			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 
 		applicableExecutions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 
+		for (Execution execution : applicableExecutions) {
+			final ProjectExecutionModel model = snapshot.getModel(execution);
+			if (checkActiveOverrides(overrides, model))
+				overrideModelIndex.add(model);
+		}
+
 		integrateExecutions(cnf, baseViews, applicableExecutions);
 
 		return effExecDetected;
+	}
+
+	public static boolean checkActiveOverrides(final Map<String, AtomicBoolean> overrides,
+			final ProjectExecutionModel model) {
+		if (overrides == null || overrides.isEmpty() || model == null)
+			return false;
+
+		for (Entry<String, ModelOverride> entry : model.getOverridesAsMap()
+				.entrySet()) {
+			final AtomicBoolean value = overrides.get(entry.getKey());
+			final ModelOverride override = entry.getValue();
+			if (value == null || override == null)
+				continue;
+			if (value.get() == override.isActive())
+				return true;
+		}
+		return false;
 	}
 
 	@SuppressWarnings("deprecation")

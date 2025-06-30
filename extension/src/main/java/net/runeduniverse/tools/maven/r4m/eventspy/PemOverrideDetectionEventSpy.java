@@ -128,14 +128,15 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 		logEntry(basedir, index.remove(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId)), "", "»");
 
+		final String prjGroupId = mvnProject.getGroupId();
 		for (Entry<String, Set<ProjectExecutionModel>> entry : index.entrySet()) {
 			String projectId = entry.getKey();
 			final int idx = projectId.indexOf(':');
 			// hide groupId
-			if (-1 < idx)
+			if (-1 < idx && prjGroupId != null && prjGroupId.equals(projectId.substring(0, idx)))
 				projectId = projectId.substring(idx + 1);
-			this.log.info(String.format("  » Project:  %s", projectId));
 
+			this.log.info(String.format("  » Project:  %s", projectId));
 			logEntry(basedir, entry.getValue(), "  ", "-");
 		}
 

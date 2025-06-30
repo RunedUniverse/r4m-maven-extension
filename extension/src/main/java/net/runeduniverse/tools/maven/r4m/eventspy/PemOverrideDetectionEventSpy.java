@@ -73,7 +73,6 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 			return;
 
 		// print header
-		this.log.info("");
 		this.log.info("\033[1mActive Overrides\033[m");
 
 		// log active overrides
@@ -100,8 +99,6 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 		// log matching models
 		if (models == null || models.isEmpty()) {
-			this.log.info("");
-			this.log.info("------------------------------------------------------------------------");
 			return;
 		}
 
@@ -130,7 +127,12 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 						.toPath();
 
 		for (Entry<String, Set<ProjectExecutionModel>> entry : index.entrySet()) {
-			final String projectId = entry.getKey();
+			String projectId = entry.getKey();
+			final int idx = projectId.indexOf(':');
+			// hide groupId
+			if (-1 < idx)
+				projectId = projectId.substring(idx + 1);
+
 			for (ProjectExecutionModel model : entry.getValue()) {
 				// All models declaring effective-pem status are flagged if they are not
 				// user-defined, as this is almost impossible to be discovered!
@@ -153,9 +155,6 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		if (0 < unknownModels) {
 			this.log.warn(String.format("\033[1m » %i models of unknown origin!\033[m", unknownModels));
 		}
-
-		this.log.info("");
-		this.log.info("------------------------------------------------------------------------");
 	}
 
 	private void logModel(final Consumer<String> logFnc, final Path basedir, final MavenProject activeMvnProject,

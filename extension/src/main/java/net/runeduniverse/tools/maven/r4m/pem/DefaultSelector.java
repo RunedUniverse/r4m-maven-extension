@@ -40,6 +40,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
@@ -228,41 +229,40 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ExecutionArchiveSectorSnapshot snapshot) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
 		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
 
 		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
-				overrideModelIndex, snapshot, overrides, false);
+				snapshot, overrides, false);
 
-		final Map<String, AtomicBoolean> overridesHinted = snapshot.collectOverridesAsBooleanMap2();
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overridesHinted = snapshot
+				.collectOverridesAsHintedBooleanMapWithModels();
+		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
+		overridesHinted.forEach((k, b, models) -> {
+			if (models == null)
+				return;
+			overrideModelIndex.addAll(models);
+		});
 		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(cnf.getTopLevelProject(),
-				cnf.getActiveProject(), overridesHinted, overrideModelIndex));
+				cnf.getActiveProject(), overridesHinted.toValueMap(), overrideModelIndex));
 		return views;
 	}
 
 	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
 			final ModelPredicate<ProjectExecutionModel, Execution> filter,
 			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
-			final Set<ProjectExecutionModel> overrideModelIndex, final ExecutionArchiveSectorSnapshot snapshot,
-			final Map<String, AtomicBoolean> overrides, final boolean requireInherited) {
+			final ExecutionArchiveSectorSnapshot snapshot, final Map<String, AtomicBoolean> overrides,
+			final boolean requireInherited) {
 		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
 		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride();
 
 		if (!effExecDetected && snapshot.getParent() != null)
-			effExecDetected = getExecutions(cnf, filter, baseViews, overrideModelIndex, snapshot.getParent(), overrides,
-					true);
+			effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
 		if (!effExecDetected)
 			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 
 		applicableExecutions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
-
-		for (Execution execution : applicableExecutions) {
-			final ProjectExecutionModel model = snapshot.getModel(execution);
-			if (checkActiveOverrides(overrides, model))
-				overrideModelIndex.add(model);
-		}
 
 		integrateExecutions(cnf, baseViews, applicableExecutions);
 

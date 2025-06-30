@@ -24,6 +24,7 @@ import java.util.function.Predicate;
 
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
@@ -42,28 +43,64 @@ public interface ExecutionArchiveSectorSnapshot {
 	 *
 	 * @return boolean map indexed by model types
 	 */
-	public Map<String, AtomicBoolean> getOverridesAsBooleanMap();
+	public default Map<String, AtomicBoolean> getOverridesAsBooleanMap() {
+		return getOverridesAsBooleanMapWithModels().toValueMap();
+	}
 
 	/**
 	 * Get active overrides as boolean values indexed by model hints.
 	 *
 	 * @return boolean map indexed by model hints
 	 */
-	public Map<String, AtomicBoolean> getOverridesAsBooleanMap2();
+	public default Map<String, AtomicBoolean> getOverridesAsHintedBooleanMap() {
+		return getOverridesAsHintedBooleanMapWithModels().toValueMap();
+	}
+
+	/**
+	 * Get active overrides as boolean values indexed by model types.
+	 *
+	 * @return boolean data-map indexed by model types with models
+	 */
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels();
+
+	/**
+	 * Get active overrides as boolean values indexed by model hints.
+	 *
+	 * @return boolean data-map indexed by model hints with models
+	 */
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsHintedBooleanMapWithModels();
 
 	/**
 	 * Collects all active overrides as boolean values indexed by model types.
 	 *
 	 * @return boolean map indexed by model types
 	 */
-	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap();
+	public default Map<String, AtomicBoolean> collectOverridesAsBooleanMap() {
+		return collectOverridesAsBooleanMapWithModels().toValueMap();
+	}
 
 	/**
 	 * Collects all active overrides as boolean values indexed by model hints.
 	 *
 	 * @return boolean map indexed by model hints
 	 */
-	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap2();
+	public default Map<String, AtomicBoolean> collectOverridesAsHintedBooleanMap() {
+		return collectOverridesAsHintedBooleanMapWithModels().toValueMap();
+	}
+
+	/**
+	 * Collects all active overrides as boolean values indexed by model hints.
+	 *
+	 * @return boolean data-map indexed by model hints with models
+	 */
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsBooleanMapWithModels();
+
+	/**
+	 * Collects all active overrides as boolean values indexed by model hints.
+	 *
+	 * @return boolean data-map indexed by model hints with models
+	 */
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsHintedBooleanMapWithModels();
 
 	public Set<Execution> getExecutions();
 

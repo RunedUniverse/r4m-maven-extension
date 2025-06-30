@@ -3,9 +3,9 @@
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License)](LICENSE)
 [![Maven Central](https://img.shields.io/maven-central/v/net.runeduniverse.tools.maven.r4m/r4m-maven-extension.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.runeduniverse.tools.maven.r4m%22%20AND%20a:%22r4m-maven-extension%22)
 
-Runes4Maven (r4m) Maven Extension enables you to specify how Maven builds your project!
+Runes4Maven (r4m) Maven Extension enables you to specify how maven builds your project!
 
-This is accomplished by providing a better way for defining Maven executions and<br> providing fine grained control over the execution of the Maven Lifecycle. 
+This is accomplished by providing a better way for defining maven executions and<br> providing fine grained control over the execution of the Maven Lifecycle. 
 
 ## Features
 
@@ -21,7 +21,7 @@ This is accomplished by providing a better way for defining Maven executions and
 - Provides `help` Lifecycle
 - Provides Gui enhancements (can be disabled)
 - Plugin Configurations are inherited by per Plugin Execution Configurations (inside pom.xml)
-- All configurations are stored outside the Maven pom to avoid bloat
+- All configurations are stored outside the maven pom to avoid bloat
   - Executions can be customized with the `pem.xml` file
   - The order of Goals inside a Phase can be customized with the `grm.xml` file
 - `Execution` contexts can be automatically triggered ...
@@ -35,7 +35,7 @@ This is accomplished by providing a better way for defining Maven executions and
   - "packaging procedures" (whatever is set as the `packaging` in `pom.xml`)
   - "properties" (allows matching by existance, `equals`, `equals-ignore-case`, `regex`; `invert` of the statement)
 - Provides logging of all loaded Maven-Extensions (and their states)
-- Provides `setup` goal to simplify installation into Maven-project
+- Provides `setup` goal to simplify installation into maven-project
 - Provides goals to dump the current configuration (in case you want to redefine everything, so you don't need to start from scratch)
 - Provides debug goals
 - Configurations (`pem.xml` & `grm.xml`) are loaded from all active plugins therefore Workflow Plugins can be used for easier project setup
@@ -49,13 +49,13 @@ Runes4Maven (r4m) can be installed in two major ways:
 ### Maven Core-Extension
 Runes4Maven (r4m) installed as a Maven Core-Extensions exposes r4m's full potential.
 
-Core-Extensions are installed in the project by adding them in the `extensions.xml`. This has to be located in the `.mvn` folder which has to be in the root folder of your Maven project per [Maven definition](https://Maven.apache.org/configure.html#mvn-extensions-xml-file).
+Core-Extensions are installed in the project by adding them in the `extensions.xml`. This has to be located in the `.mvn` folder which has to be in the root folder of your maven project per [maven definition](https://maven.apache.org/configure.html#mvn-extensions-xml-file).
 
 #### Automatic Install
-To automatically install the `r4m-Maven-extension`, execute the `setup` Maven goal in the project folder:
+To automatically install the `r4m-maven-extension`, execute the `setup` maven goal in the project folder:
 
 ```bash
-mvn net.runeduniverse.tools.Maven.r4m:r4m-Maven-extension:setup
+mvn net.runeduniverse.tools.maven.r4m:r4m-maven-extension:setup
 ```
 
 #### Manual Install
@@ -64,12 +64,12 @@ mvn net.runeduniverse.tools.Maven.r4m:r4m-Maven-extension:setup
 `.mvn/extensions.xml`
 
 ```xml
-<extensions xmlns="http://Maven.apache.org/EXTENSIONS/1.0.0"
+<extensions xmlns="http://maven.apache.org/EXTENSIONS/1.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://Maven.apache.org/EXTENSIONS/1.0.0 http://Maven.apache.org/xsd/core-extensions-1.0.0.xsd">
+    xsi:schemaLocation="http://maven.apache.org/EXTENSIONS/1.0.0 http://maven.apache.org/xsd/core-extensions-1.0.0.xsd">
     <extension>
-        <groupId>net.runeduniverse.tools.Maven.r4m</groupId>
-        <artifactId>r4m-Maven-extension</artifactId>
+        <groupId>net.runeduniverse.tools.maven.r4m</groupId>
+        <artifactId>r4m-maven-extension</artifactId>
         <version>1.1.0</version>
     </extension>
 </extensions>
@@ -88,7 +88,7 @@ some features may not be available in this mode and it will print a sizable warn
 
 To configure r4m as a build-extension, configure this extension as a plugin and set `<extensions>` flag to `true`.
 
-(see [Maven Guide Example for Build-Extensions](https://Maven.apache.org/guides/mini/guide-using-extensions.html#build-extension)).
+(see [Maven Guide Example for Build-Extensions](https://maven.apache.org/guides/mini/guide-using-extensions.html#build-extension)).
 
 
 ## Goals
@@ -100,7 +100,7 @@ Goal | Description
 `r4m:gen-full-pem` | Discovers all loaded Executions which influence the current project build lifecycles. Discovered Executions will be condensed as much as possible and written to the `full-pem.xml` file in the defined build directory.
 `r4m:gen-rel-pem` | Discovers all loaded Executions which are relevant to and influence the current project build lifecycles. Discovered Executions will be condensed as much as possible and written to the `rel-pem.xml` file in the defined build directory.
 `r4m:status` | Shows the status of all r4m features.
-`r4m:setup` | Configures the r4m-Maven-extension as a Core-Extension.
+`r4m:setup` | Configures the r4m-maven-extension as a Core-Extension.
 `r4m:help-debug` | Prints the debug help-page.<br>It lists debug goals & properties which can help trace unexpected problems.
 `r4m:debug-show-pem-archive` | Prints all registered PEMs.<br>The PEMs are logged as parsed, no selection has occurred!
 `r4m:debug-show-grm-archive` | Prints all registered GRMs.<br>The GRMs are logged as parsed, no selection has occurred!
@@ -111,13 +111,13 @@ Goal | Description
 
 Property | Default | Options | Description
 ---|---|---|---
-`r4m.active-profiles-inheritance` | `upstream` | `upstream`, `top-level`, `false` | This property defines whether active profiles are inherited when running single modules (defined via `-pl <module>`) inside a multi-module-Maven project. Since by default profiles activated via cli (`-P<profile>`) only apply to the top-level project.
+`r4m.active-profiles-inheritance` | `upstream` | `upstream`, `top-level`, `false` | This property defines whether active profiles are inherited when running single modules (defined via `-pl <module>`) inside a multi-module-maven project. Since by default profiles activated via cli (`-P<profile>`) only apply to the top-level project.
 `r4m.fancy-output` | `true` | `true`, `false` | Some help goals output "fancy" styled text which gets removed when logging. These goals will log in an alternate way when set to `false`.
-`r4m.generate-plugin-executions` | `true` | `true`, `false` | This property defines whether missing active executions can be auto-generated. For further information see [Issue #5](https://github.com/RunedUniverse/r4m-Maven-extension/issues/5#issuecomment-1618743363).
-`r4m.generate-plugin-executions-on-fork` | `true` | `true`, `false` | This property defines whether missing active executions can be auto-generated when forking. For further information see [Issue #5](https://github.com/RunedUniverse/r4m-Maven-extension/issues/5#issuecomment-1618743363).
+`r4m.generate-plugin-executions` | `true` | `true`, `false` | This property defines whether missing active executions can be auto-generated. For further information see [Issue #5](https://github.com/RunedUniverse/r4m-maven-extension/issues/5#issuecomment-1618743363).
+`r4m.generate-plugin-executions-on-fork` | `true` | `true`, `false` | This property defines whether missing active executions can be auto-generated when forking. For further information see [Issue #5](https://github.com/RunedUniverse/r4m-maven-extension/issues/5#issuecomment-1618743363).
 `r4m.lifecycle-task-request-calculator` | `sequential` | `declared`, `sequential` | This property defines how lifecycle-tasks without modifiers get interpreted. Option `declared`   -> `<phase>` => `[<phase>]` vs option `sequential` -> `<phase>` =>  `<phase>]`.
 `r4m.lifecycle-task-request-calculator-on-fork` | `sequential` | `declared`, `sequential` | This property defines how Maven default based goal forks, defining an `execute-phase`, get interpreted. Option `declared`   -> `<phase>` => `[<phase>]` vs option `sequential` -> `<phase>` =>  `<phase>]`.
-`r4m.missing-build-plugin-handler` | `warn` | `skip`, `warn`, `scan`, `download` | This property defines how active goals without an active plugin definition should get handled. In case you have a plugin which requires a secondary "missing/undefined" plugin you may set this property to `scan` or `download` but be warned this slows down operation significantly. Furthermore in case you have a Maven-plugin which has a secondary plugin bundled you can forceload the secondary plugin by setting this property to `scan` but again this slows down operation significantly and is **not** recommended. Please just define all required plugins!
+`r4m.missing-build-plugin-handler` | `warn` | `skip`, `warn`, `scan`, `download` | This property defines how active goals without an active plugin definition should get handled. In case you have a plugin which requires a secondary "missing/undefined" plugin you may set this property to `scan` or `download` but be warned this slows down operation significantly. Furthermore in case you have a maven-plugin which has a secondary plugin bundled you can forceload the secondary plugin by setting this property to `scan` but again this slows down operation significantly and is **not** recommended. Please just define all required plugins!
 `r4m.patch-mojo-on-fork` | `true` | `true`, `false` | This defines whether the mojos during fork can be rewritten. This 'fixes' the gui but may break other plugins which might rely on that variable downstream.
 `r4m.debug.dump-grm-entries-before-execution` | `reduced` | `all`, `reduced` | Defines the level of detail, when logging the grm-selection, pre task-execution in debug mode (`-X`).
 
@@ -194,9 +194,10 @@ Package the project with the custom defined modes 'my-mode' & 'my-test-mode' and
 ### Project Execution Model (PEM) [4-5]
 The Project Execution Model `pem.xml` can be used to override all inherited default executions and specify specific triggers, restrictions and modes for your specific usecase.
 We strongly recommend not to write the PEM from scratch but to generate the currently active configuration. This can be done by running `r4m:gen-full-pem` to generate to full PEM usually around 700-1000 lines (yes Maven does inject a ton of configuration), we recommend to generate only the relevant PEM for your usecase by running `r4m:gen-rel-pem`.
-Please keep in mind that the relevant PEM of the root project of a multi-module-Maven project only includes the config of the root project.
+Please keep in mind that the relevant PEM of the root project of a multi-module-maven project only includes the config of the root project.
 
 The `pem.xml` has the schema header shown below, allowing you to speed up writing it with an adequate IDE (Eclipse/Intellij).
+
 ```xml
 <project-execution-model
     xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"

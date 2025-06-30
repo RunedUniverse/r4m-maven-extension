@@ -140,7 +140,7 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		}
 
 		if (0 < unknownModels) {
-			this.log.warn(String.format("\033[1m » %i models of unknown origin!\033[m", unknownModels));
+			this.log.warn(String.format("\033[1m  » %i models of unknown origin!\033[m", unknownModels));
 		}
 	}
 
@@ -156,16 +156,15 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 			final boolean danger = model.isEffective() && !model.isUserDefined();
 
-			logModel(danger ? //
+			logModelSource(danger ? //
 					this.log::warn : this.log::info, //
-					offset, paraFlag, basedir, model //
+					offset, paraFlag, basedir, model.getModelSource() //
 			);
 		}
 	}
 
-	private void logModel(final Consumer<String> logFnc, final String offset, final String paraFlag, final Path basedir,
-			final ProjectExecutionModel model) {
-		final ModelSource source = model.getModelSource();
+	private void logModelSource(final Consumer<String> logFnc, final String offset, final String paraFlag,
+			final Path basedir, final ModelSource source) {
 		if (source == null)
 			return;
 		boolean start = true;

@@ -68,8 +68,9 @@ public class ProjectExecutionModel implements Recordable {
 	}
 
 	public boolean isEffective() {
-		final ModelOverride override = this.overrides.computeIfAbsent(DeclareSuperPemOverride.TYPE,
-				t -> new DeclareSuperPemOverride(false));
+		final ModelOverride override = this.overrides.get(DeclareSuperPemOverride.TYPE);
+		if (override == null)
+			return false;
 		return override.isActive();
 	}
 
@@ -103,7 +104,11 @@ public class ProjectExecutionModel implements Recordable {
 		this.parserHint = hint;
 	}
 
-	public void setEffective(final boolean value) {
+	public void setEffective(final Boolean value) {
+		if (value == null) {
+			this.overrides.remove(DeclareSuperPemOverride.TYPE);
+			return;
+		}
 		final ModelOverride override = this.overrides.computeIfAbsent(DeclareSuperPemOverride.TYPE,
 				t -> new DeclareSuperPemOverride(false));
 		override.setActive(value);

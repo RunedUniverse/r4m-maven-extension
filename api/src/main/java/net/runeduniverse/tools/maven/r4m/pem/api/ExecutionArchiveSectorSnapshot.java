@@ -37,9 +37,33 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public boolean hasModelWithEffectiveOverride();
 
+	/**
+	 * Get active overrides as boolean values indexed by model types.
+	 *
+	 * @return boolean map indexed by model types
+	 */
 	public Map<String, AtomicBoolean> getOverridesAsBooleanMap();
 
+	/**
+	 * Get active overrides as boolean values indexed by model hints.
+	 *
+	 * @return boolean map indexed by model hints
+	 */
+	public Map<String, AtomicBoolean> getOverridesAsBooleanMap2();
+
+	/**
+	 * Collects all active overrides as boolean values indexed by model types.
+	 *
+	 * @return boolean map indexed by model types
+	 */
 	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap();
+
+	/**
+	 * Collects all active overrides as boolean values indexed by model hints.
+	 *
+	 * @return boolean map indexed by model hints
+	 */
+	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap2();
 
 	public Set<Execution> getExecutions();
 

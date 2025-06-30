@@ -21,6 +21,8 @@ public interface ModelOverride extends DataEntry {
 
 	public String type();
 
+	public String hint();
+
 	public boolean isActive();
 
 	public void setActive(boolean active);

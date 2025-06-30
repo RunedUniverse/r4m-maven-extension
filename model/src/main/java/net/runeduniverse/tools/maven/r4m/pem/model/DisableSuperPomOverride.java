@@ -39,6 +39,11 @@ public class DisableSuperPomOverride implements ModelOverride {
 	}
 
 	@Override
+	public String hint() {
+		return HINT;
+	}
+
+	@Override
 	public boolean isActive() {
 		return this.active;
 	}

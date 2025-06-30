@@ -234,8 +234,9 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
 				overrideModelIndex, snapshot, overrides, false);
 
+		final Map<String, AtomicBoolean> overridesHinted = snapshot.collectOverridesAsBooleanMap2();
 		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(cnf.getTopLevelProject(),
-				cnf.getActiveProject(), overrides, overrideModelIndex));
+				cnf.getActiveProject(), overridesHinted, overrideModelIndex));
 		return views;
 	}
 

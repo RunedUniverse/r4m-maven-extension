@@ -51,7 +51,6 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 	@Override
 	public void onEvent(final Object eventObj) throws Exception {
-
 		if (!(eventObj instanceof ProjectExecutionModelOverrideDetectionEvent))
 			return;
 
@@ -132,7 +131,7 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 		for (Entry<String, Set<ProjectExecutionModel>> entry : index.entrySet()) {
 			final String projectId = entry.getKey();
-			for (ProjectExecutionModel model : models) {
+			for (ProjectExecutionModel model : entry.getValue()) {
 				// All models declaring effective-pem status are flagged if they are not
 				// user-defined, as this is almost impossible to be discovered!
 				// Furthermore declaring models as effective-pem is generally discouraged!

@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
@@ -75,6 +76,15 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	@Override
 	public Map<String, AtomicBoolean> getOverridesAsBooleanMap() {
+		return getOverridesAsBooleanMap(ModelOverride::type);
+	}
+
+	@Override
+	public Map<String, AtomicBoolean> getOverridesAsBooleanMap2() {
+		return getOverridesAsBooleanMap(ModelOverride::hint);
+	}
+
+	protected Map<String, AtomicBoolean> getOverridesAsBooleanMap(final Function<ModelOverride, String> keySupplier) {
 		final Map<String, AtomicBoolean> overrides = new LinkedHashMap<>(0);
 		// check all except the user-defined pems
 		for (ProjectExecutionModel pem : this.models.keySet()) {
@@ -85,7 +95,8 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 				final ModelOverride override = entry.getValue();
 				if (override == null)
 					continue;
-				final AtomicBoolean active = overrides.computeIfAbsent(entry.getKey(), k -> new AtomicBoolean());
+				final AtomicBoolean active = overrides.computeIfAbsent(keySupplier.apply(override),
+						k -> new AtomicBoolean());
 				if (active.get() || !override.isActive())
 					continue;
 				active.set(true);
@@ -100,7 +111,8 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 				final ModelOverride override = entry.getValue();
 				if (override == null)
 					continue;
-				final AtomicBoolean active = overrides.computeIfAbsent(entry.getKey(), k -> new AtomicBoolean());
+				final AtomicBoolean active = overrides.computeIfAbsent(keySupplier.apply(override),
+						k -> new AtomicBoolean());
 				active.set(override.isActive());
 			}
 		}
@@ -116,6 +128,18 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 			overrides = this.parent.collectOverridesAsBooleanMap();
 
 		mergeOverrides(overrides, getOverridesAsBooleanMap());
+		return overrides;
+	}
+
+	@Override
+	public Map<String, AtomicBoolean> collectOverridesAsBooleanMap2() {
+		final Map<String, AtomicBoolean> overrides;
+		if (this.parent == null)
+			overrides = new LinkedHashMap<>(0);
+		else
+			overrides = this.parent.collectOverridesAsBooleanMap2();
+
+		mergeOverrides(overrides, getOverridesAsBooleanMap2());
 		return overrides;
 	}
 

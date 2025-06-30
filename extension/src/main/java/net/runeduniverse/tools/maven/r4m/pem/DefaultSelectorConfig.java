@@ -309,7 +309,8 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 					.append("version", this.topLevelMvnProject.getVersion()));
 
 		if (this.mvnProject != null)
-			tree.append(new DefaultCompoundTree("Maven Project").append("groupId", this.mvnProject.getGroupId())
+			tree.append(new DefaultCompoundTree("Maven Project") //
+					.append("groupId", this.mvnProject.getGroupId())
 					.append("artifactId", this.mvnProject.getArtifactId())
 					.append("version", this.mvnProject.getVersion()));
 

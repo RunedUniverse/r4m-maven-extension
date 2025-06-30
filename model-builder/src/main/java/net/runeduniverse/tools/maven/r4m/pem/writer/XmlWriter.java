@@ -27,6 +27,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
@@ -79,10 +80,20 @@ public class XmlWriter implements ProjectExecutionModelWriter {
 						+ version.replace('.', '_') + ".xsd");
 		node.addChild("modelVersion", version);
 
+		final PlexusConfiguration overridesNode = new XmlPlexusConfiguration("overrides");
+		for (ModelOverride ovrr : pem.getOverrides()) {
+			final PlexusConfiguration ovrrNode = this.converter.convertEntry(this.factory, ovrr);
+			if (ovrrNode == null)
+				continue;
+			overridesNode.addChild(ovrrNode);
+		}
+		if (0 < overridesNode.getChildCount())
+			node.addChild(overridesNode);
+
 		final PlexusConfiguration executionsNode = node.getChild("executions", true);
 		for (Execution exec : pem.getExecutions()) {
 			final PlexusConfiguration execNode = this.converter.convertEntry(this.factory, exec);
-			if (node == null)
+			if (execNode == null)
 				continue;
 			executionsNode.addChild(execNode);
 		}

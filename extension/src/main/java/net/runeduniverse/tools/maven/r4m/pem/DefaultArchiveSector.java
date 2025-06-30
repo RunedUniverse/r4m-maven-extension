@@ -21,20 +21,19 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
-
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.maven3.ext.indexer.AProjectBoundEntry;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSector> implements ExecutionArchiveSector {
 
-	protected final Map<String, Map<ExecutionSource, Set<Execution>>> executions = new LinkedHashMap<>();
+	protected final Map<ProjectExecutionModel, Set<Execution>> models = new LinkedHashMap<>();
+	protected final Map<String, Set<Execution>> executions = new LinkedHashMap<>();
 	protected final Map<Execution, ProjectExecutionModel> executionOrigins = new LinkedHashMap<>();
 
 	protected final String version;
@@ -61,34 +60,8 @@ public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSec
 	}
 
 	@Override
-	public Set<Execution> getExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
-		return collectEntries(filter, onlyInherited, false);
-	}
-
-	@Override
-	public Set<Execution> getEffectiveExecutions(final Predicate<Execution> filter, final boolean onlyInherited) {
-		return collectEntries(filter, onlyInherited, true);
-	}
-
-	protected Set<Execution> collectEntries(final Predicate<Execution> filter, final boolean onlyInherited,
-			final boolean onlyEffective) {
-		final Set<Execution> executions = new LinkedHashSet<>();
-		for (Map<ExecutionSource, Set<Execution>> entry : this.executions.values()) {
-			for (Set<Execution> execCol : entry.values())
-				for (Execution execution : execCol) {
-					// check for inherited flag
-					if (onlyInherited && !execution.isInherited())
-						continue;
-					// check for user-defined flag
-					if (onlyEffective && !this.executionOrigins.get(execution)
-							.isEffective())
-						continue;
-					// apply filter & collect data
-					if (filter.test(execution))
-						executions.add(execution);
-				}
-		}
-		return executions;
+	public Set<Execution> getExecutions(final String id) {
+		return Collections.unmodifiableSet(this.executions.getOrDefault(id, Collections.emptySet()));
 	}
 
 	@Override
@@ -96,14 +69,26 @@ public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSec
 		if (pem == null)
 			return;
 
+		final Set<Execution> perModelSet = this.models.computeIfAbsent(pem, k -> new LinkedHashSet<>(1));
 		for (Execution execution : pem.getExecutions()) {
+			if (execution == null)
+				continue;
+			perModelSet.add(execution);
 			this.executionOrigins.put(execution, pem);
 
-			final Map<ExecutionSource, Set<Execution>> entry = this.executions.computeIfAbsent(execution.getId(),
-					k -> new LinkedHashMap<>(3));
-			final Set<Execution> col = entry.computeIfAbsent(execution.getSource(), k -> new HashSet<>());
+			final Set<Execution> col = this.executions.computeIfAbsent(execution.getId(), k -> new HashSet<>());
 			col.add(execution);
 		}
+	}
+
+	@Override
+	public ExecutionArchiveSectorSnapshot snapshot() {
+		final ExecutionArchiveSectorSnapshot snapshot = new DefaultSectorSnapshot(this.mvnProject,
+				this.parent == null ? null : this.parent.snapshot());
+		for (ProjectExecutionModel pem : this.models.keySet()) {
+			snapshot.addModel(pem);
+		}
+		return snapshot;
 	}
 
 	@Override
@@ -112,10 +97,9 @@ public class DefaultArchiveSector extends AProjectBoundEntry<ExecutionArchiveSec
 
 		tree.append("version", this.version);
 
-		for (Map<ExecutionSource, Set<Execution>> valuesBySource : this.executions.values())
-			for (Set<Execution> executions : valuesBySource.values())
-				for (Execution execution : executions)
-					tree.append(execution.toRecord());
+		for (Set<Execution> executions : this.executions.values())
+			for (Execution execution : executions)
+				tree.append(execution.toRecord());
 
 		return tree;
 	}

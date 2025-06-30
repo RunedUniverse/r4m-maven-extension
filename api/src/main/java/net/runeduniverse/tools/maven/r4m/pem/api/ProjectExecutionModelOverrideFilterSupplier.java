@@ -15,24 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import java.util.Set;
-import net.runeduniverse.lib.utils.logging.log.api.Recordable;
-import net.runeduniverse.lib.utils.maven3.ext.indexer.api.ProjectBoundEntry;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public interface ExecutionArchiveSector extends ProjectBoundEntry<ExecutionArchiveSector>, Recordable {
+public interface ProjectExecutionModelOverrideFilterSupplier {
 
-	public String getVersion();
-
-	public ProjectExecutionModel getModel(Execution execution);
-
-	public Set<Execution> getExecutions();
-
-	public Set<Execution> getExecutions(String id);
-
-	public void register(ProjectExecutionModel pem);
-
-	public ExecutionArchiveSectorSnapshot snapshot();
+	public ModelPredicate<ProjectExecutionModel, Execution> get(Map<String, AtomicBoolean> overrides);
 
 }

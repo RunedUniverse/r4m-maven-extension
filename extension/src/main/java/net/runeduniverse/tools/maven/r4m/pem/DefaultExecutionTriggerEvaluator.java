@@ -44,6 +44,6 @@ public class DefaultExecutionTriggerEvaluator implements ExecutionTriggerEvaluat
 				MAX_TYPE_SEARCH_DEPTH);
 
 		// result can be null!
-		return result == true;
+		return result == null ? false : result;
 	}
 }

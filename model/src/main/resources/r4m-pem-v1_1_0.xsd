@@ -26,12 +26,45 @@
 		<xs:all>
 			<xs:element name="modelVersion" type="AnyId"
 				default="1.1.0" />
+			<xs:element name="overrides" type="Overrides"
+				minOccurs="0" />
 			<xs:element name="executions">
 				<xs:complexType>
 					<xs:sequence>
 						<xs:element name="execution" type="Execution"
 							minOccurs="0" maxOccurs="unbounded" />
 					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="Overrides">
+		<xs:all>
+			<xs:element name="declare-super-pem" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						Declares this file as 'super-pem' which disables
+						all pem files, which do not declare 'super-pem' status themself.
+						The user-defined pem.xml file in the project folder can never be
+						excluded!
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="BooleanValue"
+						default="true" use="optional" />
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="disable-super-pom" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>
+						By disableing the 'super-pom' all default goal
+						declarations enforced by maven are disabled.
+					</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:attribute name="value" type="BooleanValue"
+						default="true" use="optional" />
 				</xs:complexType>
 			</xs:element>
 		</xs:all>

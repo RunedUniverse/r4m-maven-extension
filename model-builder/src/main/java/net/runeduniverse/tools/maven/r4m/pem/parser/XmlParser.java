@@ -30,6 +30,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataConverter;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelParser.class, hint = "xml")
@@ -44,6 +45,7 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final PlexusConfiguration cnf = new XmlPlexusConfiguration(Xpp3DomBuilder.build(reader));
 
 		parseModelVersion(pem, cnf.getChild("modelVersion", false));
+		parseOverrides(pem, cnf.getChild("overrides", false));
 		parseExecutions(pem, cnf.getChild("executions", false));
 	}
 
@@ -53,7 +55,22 @@ public class XmlParser implements ProjectExecutionModelParser {
 		final String value = versionNode.getValue();
 		if (isBlank(value))
 			return false;
-		model.setVersion(value);
+		model.setVersion(value.trim());
+		return true;
+	}
+
+	protected boolean parseOverrides(final ProjectExecutionModel model, final PlexusConfiguration nodeList) {
+		if (nodeList == null || nodeList.getChildCount() == 0)
+			return false;
+
+		final PlexusConfiguration ovrrNodes[] = nodeList.getChildren();
+		if (ovrrNodes.length > 0) {
+			for (PlexusConfiguration ovrrNode : ovrrNodes) {
+				final DataEntry entry = this.converter.convertEntry(ModelOverride.CONTEXT, ovrrNode);
+				if (entry instanceof ModelOverride)
+					model.addOverride((ModelOverride) entry);
+			}
+		}
 		return true;
 	}
 

@@ -46,7 +46,7 @@ public class ProfileTriggerActive extends ProfileTrigger {
 	}
 
 	@Override
-	public DataEntry copy() {
+	public ProfileTriggerActive copy() {
 		final ProfileTriggerActive trigger = new ProfileTriggerActive(getProfileId());
 		return trigger;
 	}

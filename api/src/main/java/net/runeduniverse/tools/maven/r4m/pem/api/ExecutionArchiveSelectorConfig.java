@@ -27,6 +27,8 @@ import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
+	public ExecutionArchiveSelectorConfig selectTopLevelProject(MavenProject value);
+
 	public ExecutionArchiveSelectorConfig selectActiveProject(MavenProject value);
 
 	/***
@@ -59,6 +61,8 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig selectModes(Collection<String> values);
 
+	public ExecutionArchiveSelectorConfig clearTopLevelProject();
+
 	public ExecutionArchiveSelectorConfig clearActiveProject();
 
 	public ExecutionArchiveSelectorConfig clearProperties();
@@ -72,6 +76,8 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 	public ExecutionArchiveSelectorConfig clearProvidedProfiles();
 
 	public ExecutionArchiveSelectorConfig clearModes();
+
+	public MavenProject getTopLevelProject();
 
 	public MavenProject getActiveProject();
 

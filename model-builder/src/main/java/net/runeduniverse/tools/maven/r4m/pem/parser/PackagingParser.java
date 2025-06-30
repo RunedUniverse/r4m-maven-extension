@@ -31,11 +31,13 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.lib.utils.maven3.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
@@ -73,6 +75,9 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 		}
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setArtifactId(ModelSource.id("org.apache.maven", "maven-core"))
+				.setNote("< super-pom >"));
 		model.setParser(PackagingParser.class, PackagingParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 		model.addExecutions(effExecutions);
@@ -93,24 +98,15 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 					continue;
 				}
 				final String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
-				Execution execution = executions.get(executionId);
-				if (execution == null) {
-					execution = new Execution(executionId, ExecutionSource.PACKAGING);
-					execution.setDefaultActive(true);
-					execution.setInherited(true);
-					execution.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
-					executions.put(execution.getId(), execution);
-				}
-				Lifecycle lifecycle = execution.getLifecycle(lifecycleId);
-				if (lifecycle == null) {
-					lifecycle = new Lifecycle(lifecycleId);
-					execution.putLifecycle(lifecycle);
-				}
-				Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
-				if (phase == null) {
-					phase = new Phase(phaseMappingEntry.getKey());
-					lifecycle.putPhase(phase);
-				}
+				final Execution execution = executions.computeIfAbsent(executionId, id -> {
+					final Execution exec = new Execution(id, ExecutionSource.PACKAGING);
+					exec.setDefaultActive(true);
+					exec.setInherited(true);
+					exec.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
+					return exec;
+				});
+				final Lifecycle lifecycle = execution.computeLifecycleIfAbsent(lifecycleId, Lifecycle::new);
+				final Phase phase = lifecycle.computePhaseIfAbsent(phaseMappingEntry.getKey(), Phase::new);
 
 				phase.addGoal(goal.addModes("default", "dev"));
 			}

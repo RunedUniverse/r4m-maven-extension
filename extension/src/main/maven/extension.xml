@@ -24,7 +24,7 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.SettingsFactory
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.event.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
 		</exportedPackage>
@@ -74,15 +74,17 @@
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.lib.utils.conditional.tool
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven
+		<exportedPackage>net.runeduniverse.lib.utils.maven3
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.api
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.config.api
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.data.api
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.config.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.maven.ext.indexer.api
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.data.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.indexer.api
 		</exportedPackage>
 	</exportedPackages>
 
@@ -110,13 +112,13 @@
 		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditional
 		</exportedArtifact>
-		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-api
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-api
 		</exportedArtifact>
-		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3
 		</exportedArtifact>
-		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-ext-api
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-ext-api
 		</exportedArtifact>
-		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven-ext
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-ext
 		</exportedArtifact>
 	</exportedArtifacts>
 

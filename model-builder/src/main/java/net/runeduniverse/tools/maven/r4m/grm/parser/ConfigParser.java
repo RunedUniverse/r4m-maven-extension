@@ -49,7 +49,7 @@ public class ConfigParser implements GoalRequirementModelConfigParser {
 		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.GOAL_REQUIREMENT_MODEL_FILE);
 
 		final GoalRequirementModel model = new GoalRequirementModel();
-		model.setEffective(true);
+		model.setUserDefined(true);
 
 		model.setParser(ConfigParser.class, ConfigParser.HINT);
 		model.setDefaultGroupId("org.apache.maven.plugins");

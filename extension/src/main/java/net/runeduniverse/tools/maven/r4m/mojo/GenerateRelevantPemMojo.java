@@ -19,10 +19,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -31,14 +37,19 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
+import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
@@ -46,7 +57,7 @@ import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.acquireE
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.mojoFailureExtensionLoading;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.reduce;
 import static net.runeduniverse.tools.maven.r4m.mojo.api.ExtensionUtils.replaceWithEquivalents;
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilter;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultRelevanceFilterSupplier;
 
 /**
  * generates the rel-pem.xml from all relevant executions
@@ -99,6 +110,11 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	 */
 	private ExecutionRestrictionEvaluator restrictionEvaluator;
 
+	/**
+	 * @component role="net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier"
+	 */
+	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (isBlank(this.encoding))
@@ -120,14 +136,20 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 			mojoFailureExtensionLoading(getLog());
 
 		final ExecutionArchiveSelectorConfig cnf = this.cnfFactory.createEmptyConfig();
+		cnf.selectTopLevelProject(this.mvnSession.getTopLevelProject());
 		cnf.selectActiveProject(this.mvnProject);
 		cnf.selectPackagingProcedure(this.mvnProject.getPackaging());
 		cnf.compile(this.mvnSession);
 
 		final Set<Execution> executions = new LinkedHashSet<>();
-		final int sectorCnt = collectExecutions(executions, projectSector, cnf);
+		final ExecutionArchiveSectorSnapshot snapshot = projectSector.snapshot();
+		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
+		final int sectorCnt = collectExecutions(executions, snapshot, overrides, cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
+
+		if (!overrides.isEmpty())
+			logOverrides(snapshot);
 
 		getLog().info("");
 		getLog().info("Discovered & Relevant");
@@ -141,6 +163,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setEffective(true);
 		model.addExecutions(executions);
 
 		final File xmlFile = new File(this.buildDir, "rel-pem.xml");
@@ -160,31 +183,159 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		getLog().info("");
 	}
 
-	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final ExecutionArchiveSelectorConfig cnf) {
+	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
+			final Map<String, AtomicBoolean> overrides, final ExecutionArchiveSelectorConfig cnf) {
 		final Data data = new Data();
-		collectExecutions(executions, sector, defaultRelevanceFilter(restrictionEvaluator, cnf), false, data);
+		collectExecutions(executions, snapshot, overrides, defaultRelevanceFilterSupplier(restrictionEvaluator, cnf),
+				false, data);
 		return data.getDepth();
 	}
 
-	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final Predicate<Execution> filter, final boolean onlyInherited, final Data data) {
-		if (sector == null)
+	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
+			final Map<String, AtomicBoolean> overrides, final ModelPredicate<ProjectExecutionModel, Execution> filter,
+			final boolean requireInherited, final Data data) {
+		if (snapshot == null)
 			return;
+		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		data.incrementDepth();
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
+		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
+		data.setEffExecDetected(snapshot.hasModelWithEffectiveOverride());
 
-		if (applicableExecutions.isEmpty()) {
-			if (sector.getParent() != null)
-				collectExecutions(executions, sector.getParent(), filter, true, data);
-
-			if (!data.isEffExecDetected())
-				applicableExecutions = sector.getExecutions(filter, onlyInherited);
-		} else
-			data.setEffExecDetected(true);
+		if (!data.isEffExecDetected() && snapshot.getParent() != null)
+			collectExecutions(executions, snapshot.getParent(), overrides, filter, true, data);
+		if (!data.isEffExecDetected())
+			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
 
 		executions.addAll(applicableExecutions);
+		executions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
+	}
+
+	private void logOverrides(final ExecutionArchiveSectorSnapshot snapshot) {
+		// check validity
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = snapshot
+				.collectOverridesAsHintedBooleanMapWithModels();
+		if (overrides == null || overrides.isEmpty())
+			return;
+
+		// print header
+		getLog().info("");
+		getLog().info("Active Overrides");
+
+		// log active overrides
+		int mxLen = 0;
+		for (String id : overrides.keySet()) {
+			int len = id == null ? 4 : id.length();
+			if (30 < len)
+				continue;
+			if (mxLen < len)
+				mxLen = len;
+		}
+		final String template = "  - %-" + mxLen + "s = %s";
+		final AtomicInteger unknownModels = new AtomicInteger(0);
+		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
+
+		overrides.forEach((id, boolValue, modelSet) -> {
+			final String value = boolValue == null ? null : Boolean.toString(boolValue.get());
+
+			if (id == null || value == null)
+				getLog().warn(String.format(template, id, value));
+			else
+				getLog().info(String.format(template, id, value));
+
+			if (modelSet == null)
+				return;
+			// group by projectId
+			for (ProjectExecutionModel model : modelSet) {
+				if (model == null)
+					continue;
+				final ModelSource source = model.getModelSource();
+				if (source == null) {
+					unknownModels.incrementAndGet();
+					continue;
+				}
+
+				index.computeIfAbsent(source.getProjectId(), k -> new LinkedHashSet<>())
+						.add(model);
+			}
+		});
+
+		// log matching models
+		if (index.isEmpty()) {
+			return;
+		}
+
+		getLog().info("from");
+
+		final MavenProject topLevelMvnProject = this.mvnSession.getTopLevelProject();
+		final Path basedir = topLevelMvnProject == null ? null
+				: topLevelMvnProject.getBasedir()
+						.toPath();
+
+		logEntry(basedir, index.remove(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId)), "", "»");
+
+		final String prjGroupId = mvnProject.getGroupId();
+		for (Entry<String, Set<ProjectExecutionModel>> entry : index.entrySet()) {
+			String projectId = entry.getKey();
+			final int idx = projectId.indexOf(':');
+			// hide groupId
+			if (-1 < idx && prjGroupId != null && prjGroupId.equals(projectId.substring(0, idx)))
+				projectId = projectId.substring(idx + 1);
+
+			getLog().info(String.format("  » Project:  %s", projectId));
+			logEntry(basedir, entry.getValue(), "  ", "-");
+		}
+
+		if (0 < unknownModels.get()) {
+			getLog().warn(String.format("  » %i models of unknown origin!", unknownModels.get()));
+		}
+	}
+
+	private void logEntry(final Path basedir, final Set<ProjectExecutionModel> modelSet, final String offset,
+			final String paraFlag) {
+		if (modelSet == null || modelSet.isEmpty())
+			return;
+
+		for (ProjectExecutionModel model : modelSet) {
+			// All models declaring effective-pem status are flagged if they are not
+			// user-defined, as this is almost impossible to be discovered!
+			// Furthermore declaring models as effective-pem is generally discouraged!
+
+			final boolean danger = model.isEffective() && !model.isUserDefined();
+
+			logModelSource(danger ? //
+					getLog()::warn : getLog()::info, //
+					offset, paraFlag, basedir, model.getModelSource() //
+			);
+		}
+	}
+
+	private void logModelSource(final Consumer<String> logFnc, final String offset, final String paraFlag,
+			final Path basedir, final ModelSource source) {
+		if (source == null)
+			return;
+		boolean start = true;
+
+		final String artifactId = source.getArtifactId();
+		if (!isBlank(artifactId)) {
+			logFnc.accept(String.format("  %s%s Artifact: %s", offset, start ? paraFlag : " ", artifactId));
+			start = false;
+		}
+
+		Path file = source.getFile();
+		if (file != null) {
+			if (basedir != null)
+				file = basedir.relativize(file);
+
+			logFnc.accept(String.format("  %s%s File:     %s", offset, start ? paraFlag : " ", file.toString()));
+			start = false;
+		}
+
+		final String note = source.getNote();
+		if (!isBlank(note)) {
+			logFnc.accept(String.format("  %s%s Note:     %s", offset, start ? paraFlag : " ", note));
+			start = false;
+		}
 	}
 
 	private static class Data {

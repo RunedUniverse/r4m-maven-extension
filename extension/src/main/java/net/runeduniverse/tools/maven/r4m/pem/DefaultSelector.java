@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -40,26 +40,34 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
+import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionTriggerEvaluator;
+import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.DefaultPemViewFactory;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 
-import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilter;
+import static net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils.defaultActiveFilterSupplier;
 
 @Component(role = ExecutionArchiveSelector.class, hint = "default", instantiationStrategy = "singleton")
 public class DefaultSelector implements ExecutionArchiveSelector {
@@ -78,6 +86,10 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	private MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
 	private ExecutionArchive archive;
+	@Requirement
+	private EventSpyDispatcherProxy dispatcher;
+	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
+	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 	@Requirement
 	private ExecutionRestrictionEvaluator restrictionEvaluator;
 	@Requirement
@@ -146,11 +158,11 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 			for (Lifecycle lifecycle : execution.getLifecycles()
 					.values()) {
 				final LifecycleView lifecycleView = executionView.computeLifecycleIfAbsent(lifecycle.getId(),
-						k -> DefaultPemViewFactory.createLifecycle(k));
+						DefaultPemViewFactory::createLifecycle);
 				for (Phase phase : lifecycle.getPhases()
 						.values()) {
 					final PhaseView phaseView = lifecycleView.computePhaseIfAbsent(phase.getId(),
-							k -> DefaultPemViewFactory.createPhase(k));
+							DefaultPemViewFactory::createPhase);
 					for (Goal goal : phase.getGoals())
 						if (this.validateGoal(cnf, goal)) {
 							final GoalView goalView = DefaultPemViewFactory.createGoal(goal.getGroupId(),
@@ -215,30 +227,69 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	}
 
 	protected Map<String, Map<ExecutionSource, ExecutionView>> getExecutions(final ExecutionArchiveSelectorConfig cnf,
-			final ExecutionArchiveSector slice) {
+			final ExecutionArchiveSectorSnapshot snapshot) {
 		final Map<String, Map<ExecutionSource, ExecutionView>> views = new LinkedHashMap<>();
-		getExecutions(cnf, defaultActiveFilter(this.restrictionEvaluator, this.triggerEvaluator, cnf), views, slice,
-				false);
+		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
+
+		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
+				snapshot, overrides, false);
+
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overridesHinted = snapshot
+				.collectOverridesAsHintedBooleanMapWithModels();
+		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
+		overridesHinted.forEach((k, b, models) -> {
+			if (models == null)
+				return;
+			overrideModelIndex.addAll(models);
+		});
+		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(cnf.getTopLevelProject(),
+				cnf.getActiveProject(), overridesHinted.toValueMap(), overrideModelIndex));
 		return views;
 	}
 
+	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf,
+			final ModelPredicate<ProjectExecutionModel, Execution> filter,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews,
+			final ExecutionArchiveSectorSnapshot snapshot, final Map<String, AtomicBoolean> overrides,
+			final boolean requireInherited) {
+		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
+
+		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
+		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride();
+
+		if (!effExecDetected && snapshot.getParent() != null)
+			effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
+		if (!effExecDetected)
+			applicableExecutions = snapshot.getExecutions(filter, requireInherited);
+
+		applicableExecutions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
+
+		integrateExecutions(cnf, baseViews, applicableExecutions);
+
+		return effExecDetected;
+	}
+
+	public static boolean checkActiveOverrides(final Map<String, AtomicBoolean> overrides,
+			final ProjectExecutionModel model) {
+		if (overrides == null || overrides.isEmpty() || model == null)
+			return false;
+
+		for (Entry<String, ModelOverride> entry : model.getOverridesAsMap()
+				.entrySet()) {
+			final AtomicBoolean value = overrides.get(entry.getKey());
+			final ModelOverride override = entry.getValue();
+			if (value == null || override == null)
+				continue;
+			if (value.get() == override.isActive())
+				return true;
+		}
+		return false;
+	}
+
 	@SuppressWarnings("deprecation")
-	protected boolean getExecutions(final ExecutionArchiveSelectorConfig cnf, final Predicate<Execution> filter,
-			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final ExecutionArchiveSector sector,
-			final boolean onlyInherited) {
-		Set<Execution> applicableExecutions = sector.getEffectiveExecutions(filter, onlyInherited);
-		boolean effExecDetected = false;
-
-		if (applicableExecutions.isEmpty()) {
-			if (sector.getParent() != null)
-				effExecDetected = getExecutions(cnf, filter, baseViews, sector.getParent(), true);
-
-			if (!effExecDetected)
-				applicableExecutions = sector.getExecutions(filter, onlyInherited);
-		} else
-			effExecDetected = true;
-
-		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, applicableExecutions);
+	protected void integrateExecutions(final ExecutionArchiveSelectorConfig cnf,
+			final Map<String, Map<ExecutionSource, ExecutionView>> baseViews, final Set<Execution> executions) {
+		final Map<String, Map<ExecutionSource, ExecutionView>> dominantViews = aggregate(cnf, executions);
 
 		for (String executionId : dominantViews.keySet()) {
 			final Map<ExecutionSource, ExecutionView> baseEntries = baseViews.get(executionId);
@@ -259,8 +310,6 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 						merge(cnf, baseExecution, domExecution, ExecutionSource.OVERRIDE.equals(source), false));
 			}
 		}
-
-		return effExecDetected;
 	}
 
 	@SuppressWarnings("deprecation")
@@ -298,8 +347,9 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		if (sector == null)
 			return new DefaultSelection(selectorConfig.clone(), views);
 
+		final ExecutionArchiveSectorSnapshot snapshot = sector.snapshot();
 		selectorConfig.compile(this.mvnSession);
-		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, sector)
+		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, snapshot)
 				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
 		return new DefaultSelection(selectorConfig.clone(), views);

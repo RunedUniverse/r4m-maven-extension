@@ -31,7 +31,7 @@ public class GoalRequirementModel implements Recordable {
 	protected String version = null;
 	protected Class<?> parserType = null;
 	protected String parserHint = null;
-	protected boolean effective = false;
+	protected boolean userDefined = false;
 	protected String defaultGroupId = null;
 	protected String defaultArtifactId = null;
 	protected GoalRequirementSource defaultSource = GoalRequirementSource.PLUGIN;
@@ -51,9 +51,9 @@ public class GoalRequirementModel implements Recordable {
 		return this.parserHint;
 	}
 
-	// set when pem.xml is found in the project folder
-	public boolean isEffective() {
-		return this.effective;
+	// set when grm.xml is found in the project folder
+	public boolean isUserDefined() {
+		return this.userDefined;
 	}
 
 	public String getDefaultGroupId() {
@@ -81,8 +81,8 @@ public class GoalRequirementModel implements Recordable {
 		this.parserHint = hint;
 	}
 
-	public void setEffective(final boolean value) {
-		this.effective = value;
+	public void setUserDefined(final boolean value) {
+		this.userDefined = value;
 	}
 
 	public void setDefaultGroupId(final String defaultGroupId) {
@@ -112,7 +112,7 @@ public class GoalRequirementModel implements Recordable {
 	public CompoundTree toRecord() {
 		final CompoundTree tree = new DefaultCompoundTree("GoalExecutionOrderModel");
 
-		tree.append("effective", "" + this.effective);
+		tree.append("userDefined", "" + this.userDefined);
 
 		for (Recordable selector : this.goals)
 			tree.append(selector.toRecord());

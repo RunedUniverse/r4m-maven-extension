@@ -123,6 +123,7 @@ public class GenerateFullPemMojo extends AbstractMojo {
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setVersion(Runes4MavenProperties.PROJECT_EXECUTION_MODEL_VERSION);
+		model.setEffective(true);
 		model.addExecutions(executions);
 
 		final File xmlFile = new File(this.buildDir, "full-pem.xml");
@@ -147,10 +148,11 @@ public class GenerateFullPemMojo extends AbstractMojo {
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSector sector,
-			final boolean onlyInherited) {
+			final boolean requireInherited) {
 		if (sector == null)
 			return 0;
-		executions.addAll(sector.getExecutions(e -> true, onlyInherited));
+		executions.addAll(sector.snapshot()
+				.getExecutions(null, requireInherited));
 		return collectExecutions(executions, sector.getParent(), true) + 1;
 	}
 

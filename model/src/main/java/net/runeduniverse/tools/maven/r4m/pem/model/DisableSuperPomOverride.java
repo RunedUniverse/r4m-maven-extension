@@ -21,44 +21,65 @@ import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
-public class PackagingProcedureRestriction implements ExecutionRestriction {
+public class DisableSuperPomOverride implements ModelOverride {
 
-	public static final String HINT = "packaging-procedure";
-	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction";
+	public static final String TYPE = "no-super-pom";
+	public static final String HINT = "disable-super-pom";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.DisableSuperPomOverride";
 
-	protected final String procedure;
+	protected boolean active;
 
-	public PackagingProcedureRestriction(final String packagingProcedure) {
-		this.procedure = packagingProcedure;
+	public DisableSuperPomOverride(final boolean active) {
+		this.active = active;
 	}
 
-	public String getPackagingProcedure() {
-		return this.procedure;
+	@Override
+	public String type() {
+		return TYPE;
+	}
+
+	@Override
+	public String hint() {
+		return HINT;
+	}
+
+	@Override
+	public boolean isActive() {
+		return this.active;
+	}
+
+	@Override
+	public void setActive(final boolean active) {
+		this.active = active;
 	}
 
 	@Override
 	public int hashCode() {
-		return hash(HINT) ^ hash(getPackagingProcedure());
+		return hash(HINT);
 	}
 
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
-		if (!(obj instanceof PackagingProcedureRestriction))
+		if (!(obj instanceof DisableSuperPomOverride))
 			return false;
-		final PackagingProcedureRestriction restriction = (PackagingProcedureRestriction) obj;
-		return objectEquals(this.procedure, restriction.getPackagingProcedure());
+		final DisableSuperPomOverride override = (DisableSuperPomOverride) obj;
+
+		return objectEquals(type(), override.type()) && //
+				objectEquals(this.active, override.isActive());
 	}
 
 	@Override
-	public PackagingProcedureRestriction copy() {
-		final PackagingProcedureRestriction restriction = new PackagingProcedureRestriction(getPackagingProcedure());
-		return restriction;
+	public DisableSuperPomOverride copy() {
+		final DisableSuperPomOverride override = new DisableSuperPomOverride(isActive());
+		return override;
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		return new DefaultCompoundTree("packaging-procedure", this.procedure);
+		final CompoundTree tree = new DefaultCompoundTree(HINT);
+		tree.append("active", Boolean.toString(this.active));
+		return tree;
 	}
 }

@@ -64,11 +64,11 @@ import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherPro
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.api.Settings.LoadState;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.ExtensionPatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.MavenPluginPatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.MessagePatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent;
-import net.runeduniverse.tools.maven.r4m.eventspy.api.PatchingEvent.Type;
+import net.runeduniverse.tools.maven.r4m.event.api.ExtensionPatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.MavenPluginPatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.MessagePatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.PatchingEvent;
+import net.runeduniverse.tools.maven.r4m.event.api.PatchingEvent.Type;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;

@@ -16,17 +16,25 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
-
+import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
+import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public interface ExecutionFilterUtils {
 
 	/**
-	 * Creates the default {@link Predicate} for filtering out all the relevant
+	 * Creates the default {@link ModelPredicate} for filtering out all the relevant
 	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
@@ -36,12 +44,12 @@ public interface ExecutionFilterUtils {
 	 * @param restrictionEvaluator evaluates {@link ExecutionRestriction} instances
 	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
 	 *                             for filtering in the filter
-	 * @return an instance of {@link Predicate} for filtering Executions by
+	 * @return an instance of {@link ModelPredicate} for filtering Executions by
 	 *         relevance utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultRelevanceFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
-			final ExecutionArchiveSelectorConfig cnf) {
-		return execution -> {
+	public static ModelPredicate<ProjectExecutionModel, Execution> defaultRelevanceFilterSupplier(
+			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionArchiveSelectorConfig cnf) {
+		return (pem, execution) -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
 			if (execution.isNeverActive())
@@ -64,7 +72,7 @@ public interface ExecutionFilterUtils {
 	}
 
 	/**
-	 * Creates the default {@link Predicate} for filtering out all the active
+	 * Creates the default {@link ModelPredicate} for filtering out all the active
 	 * Executions utilizing the provided {@link ExecutionArchiveSelectorConfig}.
 	 *
 	 * <p>
@@ -76,12 +84,13 @@ public interface ExecutionFilterUtils {
 	 * @param triggerEvaluator     evaluates {@link ExecutionTrigger} instances
 	 * @param cnf                  the {@link ExecutionArchiveSelectorConfig} used
 	 *                             for filtering in the filter
-	 * @return an instance of {@link Predicate} for filtering for active Executions
-	 *         utilizing {@code cnf}
+	 * @return an instance of {@link ModelPredicate} for filtering for active
+	 *         Executions utilizing {@code cnf}
 	 */
-	public static Predicate<Execution> defaultActiveFilter(final ExecutionRestrictionEvaluator restrictionEvaluator,
-			final ExecutionTriggerEvaluator triggerEvaluator, final ExecutionArchiveSelectorConfig cnf) {
-		return execution -> {
+	public static ModelPredicate<ProjectExecutionModel, Execution> defaultActiveFilterSupplier(
+			final ExecutionRestrictionEvaluator restrictionEvaluator, final ExecutionTriggerEvaluator triggerEvaluator,
+			final ExecutionArchiveSelectorConfig cnf) {
+		return (pem, execution) -> {
 			// the use of never-active flags is discouraged
 			// and included for debugging purposes
 			if (execution.isNeverActive())
@@ -119,6 +128,81 @@ public interface ExecutionFilterUtils {
 			}
 			return false;
 		};
+	}
+
+	public static boolean requireInheritedFilter(final ProjectExecutionModel pem, Execution execution) {
+		return execution.isInherited();
+	}
+
+	public static boolean requireUserDefinedFilter(final ProjectExecutionModel pem, Execution execution) {
+		return pem != null && pem.isUserDefined();
+	}
+
+	public static boolean requireSuperPemFilter(final ProjectExecutionModel pem, final Execution e) {
+		if (pem == null)
+			return false;
+
+		final ModelOverride override = pem.getOverridesAsMap()
+				.get(DeclareSuperPemOverride.TYPE);
+		if (override == null || !override.isActive())
+			return false;
+		return true;
+	}
+
+	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution exec) {
+		if (pem == null)
+			return false;
+
+		if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType())
+				&& "default".equals(pem.getParserHint()))
+			return false;
+
+		// later checks require the Execution
+		if (exec == null)
+			return true;
+		if (typeIsAssignable(ProjectExecutionModelPluginParser.class, pem.getParserType())
+				&& "plugin-execution".equals(pem.getParserHint())) {
+
+			final Map<String, Lifecycle> lifecycles = exec.getLifecycles();
+			final String execId = exec.getId();
+			// it has to start with 'default-'
+			if (execId == null || !execId.startsWith("default-") //
+					|| lifecycles == null)
+				return true;
+
+			// there must only be 1 goalId
+			String goalId = null;
+			for (Lifecycle lifecycle : lifecycles.values()) {
+				if (lifecycle == null)
+					continue;
+				final Map<String, Phase> phases = lifecycle.getPhases();
+				if (phases == null)
+					continue;
+				for (Phase phase : phases.values()) {
+					if (phase == null)
+						continue;
+					final List<Goal> goals = phase.getGoals();
+					for (Goal goal : goals) {
+						if (goal == null)
+							continue;
+						final String id = goal.getGoalId();
+						if (isBlank(id))
+							continue;
+						if (goalId != null)
+							return true;
+						goalId = id;
+					}
+				}
+			}
+			// goalId must not be null
+			if (goalId == null)
+				return true;
+
+			// executionId must be 'default-' + goalId
+			if (execId.equals("default-" + goalId))
+				return false;
+		}
+		return true;
 	}
 
 }

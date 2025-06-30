@@ -15,16 +15,21 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
-
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionTrigger;
+import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
+import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
+import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public interface ExecutionFilterUtils {
 
@@ -144,12 +149,59 @@ public interface ExecutionFilterUtils {
 		return true;
 	}
 
-	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution e) {
+	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution exec) {
 		if (pem == null)
 			return false;
 
-		if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType()))
+		if (typeIsAssignable(ProjectExecutionModelPackagingParser.class, pem.getParserType())
+				&& "default".equals(pem.getParserHint()))
 			return false;
+
+		// later checks require the Execution
+		if (exec == null)
+			return true;
+		if (typeIsAssignable(ProjectExecutionModelPluginParser.class, pem.getParserType())
+				&& "plugin-execution".equals(pem.getParserHint())) {
+
+			final Map<String, Lifecycle> lifecycles = exec.getLifecycles();
+			final String execId = exec.getId();
+			// it has to start with 'default-'
+			if (execId == null || !execId.startsWith("default-") //
+					|| lifecycles == null)
+				return true;
+
+			// there must only be 1 goalId
+			String goalId = null;
+			for (Lifecycle lifecycle : lifecycles.values()) {
+				if (lifecycle == null)
+					continue;
+				final Map<String, Phase> phases = lifecycle.getPhases();
+				if (phases == null)
+					continue;
+				for (Phase phase : phases.values()) {
+					if (phase == null)
+						continue;
+					final List<Goal> goals = phase.getGoals();
+					for (Goal goal : goals) {
+						if (goal == null)
+							continue;
+						final String id = goal.getGoalId();
+						if (isBlank(id))
+							continue;
+						if (goalId != null)
+							return true;
+						goalId = id;
+					}
+				}
+			}
+			// goalId must not be null
+			if (goalId == null)
+				return true;
+
+			// executionId must be 'default-' + goalId
+			if (execId.equals("default-" + goalId))
+				return false;
+		}
 		return true;
 	}
 

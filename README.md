@@ -212,6 +212,8 @@ The `pem.xml` has the schema header shown below, allowing you to speed up writin
 </project-execution-model>
 ```
 
+**Execution**
+
 Every Execution defined in the PEM can have multiple triggers. Currently following triggers are available - other core-extensions may define additional triggers:
 
 `always`, `never`, `default`, `on-call` (this is always active), `active-profile`, `inactive-profile`, `provided-profile`, `missing-profile`
@@ -221,9 +223,28 @@ Every Execution defined in the PEM can have multiple restrictions, once a restri
 
 `packaging-procedure`, `property`
 
+**Goal**
+
 Every Goal in the PEM has to have at least one mode. By default the modes `default` and `dev` are preconfigured. This can be changed inside the `pem.xml`.
 
 **What might I use modes for?** With modes you can have two seperate 'modes' of one execution, for example you can make it so that a formatting goal only runs in 'dev' mode and not during normal operation.
+
+**Override**
+
+Every PEM can optionally declare "Overrides". When a PEM declares an Override it changes which PEM's are included in processing.
+
+> [!TIP]
+> Overrides can be used to disable inheritance of PEM files!
+
+> [!WARNING]
+> We recommend against using Overrides in PEMs which are bundled in plugins!<br>
+> Runes4Maven will print a **Warning** when it discovers *dangerous* overrides like `declare-super-pem`,
+> as we consider the use of this features in this case to be very hard to debug!
+
+Override | Description | Important Information
+---|---|---
+`declare-super-pem` | Declares this file as 'super-pem' which disables all pem files, which do not declare 'super-pem' status themself. The user-defined pem.xml file in the project folder can never be excluded! | Once a PEM, declaring 'super-pem status', is discovered in a project the inheritance tree stopps at that (parent-)project! All PEMs further up the tree will be skipped!
+`disable-super-pom` | By disableing the 'super-pom' all default goal declarations enforced by maven are disabled. | 
 
 ---
 

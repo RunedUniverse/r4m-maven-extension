@@ -75,25 +75,25 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	public static final String WARN_SKIPPING_UNKNOWN_GOAL = "skipping unknown goal » %s:%s:%s";
 
 	@Requirement
-	private Logger log;
+	protected Logger log;
 	@Requirement
-	private Settings settings;
+	protected Settings settings;
 	@Requirement
-	private MavenSession mvnSession;
+	protected MavenSession mvnSession;
 	@Requirement
-	private MavenPluginManager pluginManager;
+	protected MavenPluginManager pluginManager;
 	@Requirement
-	private MojoDescriptorCreator mojoDescriptorCreator;
+	protected MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
-	private ExecutionArchive archive;
+	protected ExecutionArchive archive;
 	@Requirement
-	private EventSpyDispatcherProxy dispatcher;
+	protected EventSpyDispatcherProxy dispatcher;
 	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
-	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
+	protected Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 	@Requirement
-	private ExecutionRestrictionEvaluator restrictionEvaluator;
+	protected ExecutionRestrictionEvaluator restrictionEvaluator;
 	@Requirement
-	private ExecutionTriggerEvaluator triggerEvaluator;
+	protected ExecutionTriggerEvaluator triggerEvaluator;
 
 	protected boolean validateGoal(final ExecutionArchiveSelectorConfig cnf, final Goal goal) {
 		for (String mode : cnf.getModes())

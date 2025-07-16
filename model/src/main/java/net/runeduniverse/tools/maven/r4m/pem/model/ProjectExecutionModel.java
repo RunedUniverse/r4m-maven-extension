@@ -143,6 +143,7 @@ public class ProjectExecutionModel implements Recordable {
 		final ProjectExecutionModel pem = new ProjectExecutionModel();
 
 		pem.setVersion(this.version);
+		pem.setModelSource(this.source);
 		pem.setParser(this.parserType, this.parserHint);
 		pem.setUserDefined(this.userDefined);
 
@@ -155,6 +156,12 @@ public class ProjectExecutionModel implements Recordable {
 	@Override
 	public CompoundTree toRecord() {
 		final CompoundTree tree = new DefaultCompoundTree("ProjectExecutionModel");
+
+		tree.append("version", this.version);
+		tree.append(this.source.toRecord());
+		tree.append("parserType", this.parserType == null ? "null" : this.parserType.getCanonicalName());
+		tree.append("parserHint", this.parserHint);
+		tree.append("userDefined", Boolean.toString(this.userDefined));
 
 		for (Recordable override : this.overrides.values())
 			tree.append(override.toRecord());

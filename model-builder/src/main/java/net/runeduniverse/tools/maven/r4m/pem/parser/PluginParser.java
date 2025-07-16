@@ -42,6 +42,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.PluginExecutionRegistrySector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
@@ -74,19 +75,27 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 			return null;
 		}
 
-		PluginExecutionRegistrySector slice = this.registry.getSector(mvnPlugin.getGroupId(),
+		PluginExecutionRegistrySector sector = this.registry.getSector(mvnPlugin.getGroupId(),
 				mvnPlugin.getArtifactId());
-		if (slice == null)
-			slice = this.registry.createSector(mvnPluginDescriptor);
+		if (sector == null)
+			sector = this.registry.createSector(mvnPluginDescriptor);
 
-		ProjectExecutionModel model = slice.getModel(PluginParser.class, PluginParser.HINT);
-		if (model != null)
-			return model;
+		ProjectExecutionModel model = sector.getModel(PluginParser.class, PluginParser.HINT);
+		if (model == null) {
+			model = parseModel(mvnPluginDescriptor);
+			model.setModelSource(new DefaultModelSource() //
+					.setArtifactId(ModelSource.id(mvnPlugin::getGroupId, mvnPlugin::getArtifactId)));
+			sector.includeModel(model);
+		}
 
-		model = parseModel(mvnPluginDescriptor);
-		model.setModelSource(new DefaultModelSource() //
-				.setArtifactId(ModelSource.id(mvnPlugin::getGroupId, mvnPlugin::getArtifactId)));
-		slice.includeModel(model);
+		// if plugin is not inherited:
+		// 1. copy the model
+		// 2. disable inheritance
+		if (!mvnPlugin.isInherited()) {
+			model = model.copy();
+			model.setInherited(false);
+		}
+
 		return model;
 	}
 

@@ -200,7 +200,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		data.incrementDepth();
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
-		data.setEffExecDetected(snapshot.hasModelWithEffectiveOverride());
+		data.setEffExecDetected(snapshot.hasModelWithEffectiveOverride(requireInherited));
 
 		if (!data.isEffExecDetected() && snapshot.getParent() != null)
 			collectExecutions(executions, snapshot.getParent(), overrides, filter, true, data);

@@ -130,11 +130,12 @@ public interface ExecutionFilterUtils {
 		};
 	}
 
-	public static boolean requireInheritedFilter(final ProjectExecutionModel pem, Execution execution) {
-		return execution.isInherited();
+	public static boolean requireInheritedFilter(final ProjectExecutionModel pem, final Execution execution) {
+		return pem != null && pem.isInherited() //
+				&& execution != null && execution.isInherited();
 	}
 
-	public static boolean requireUserDefinedFilter(final ProjectExecutionModel pem, Execution execution) {
+	public static boolean requireUserDefinedFilter(final ProjectExecutionModel pem, final Execution execution) {
 		return pem != null && pem.isUserDefined();
 	}
 

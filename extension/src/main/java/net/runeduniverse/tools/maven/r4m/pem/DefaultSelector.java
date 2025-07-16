@@ -41,7 +41,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.lib.utils.common.DataHashMap;
+import net.runeduniverse.lib.utils.common.AbstractDataMap;
+import net.runeduniverse.lib.utils.common.HashDataMap;
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
@@ -244,7 +245,7 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
 
 		Set<Execution> applicableExecutions = snapshot.getEffectiveExecutions(filter, requireInherited);
-		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride();
+		boolean effExecDetected = snapshot.hasModelWithEffectiveOverride(requireInherited);
 
 		if (!effExecDetected && snapshot.getParent() != null)
 			effExecDetected = getExecutions(cnf, filter, baseViews, snapshot.getParent(), overrides, true);
@@ -330,11 +331,11 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
 		final Set<ExecutionView> views = new LinkedHashSet<>();
 		if (selectorConfig.getActiveProject() == null)
-			return new DefaultSelection(selectorConfig.clone(), new DataHashMap<>(), views);
+			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), views);
 
 		final ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
 		if (sector == null)
-			return new DefaultSelection(selectorConfig.clone(), new DataHashMap<>(), views);
+			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), views);
 
 		final ExecutionArchiveSectorSnapshot snapshot = sector.snapshot();
 		selectorConfig.compile(this.mvnSession);

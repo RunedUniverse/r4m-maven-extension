@@ -36,39 +36,45 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public ProjectExecutionModel getModel(Execution execution);
 
-	public boolean hasModelWithEffectiveOverride();
+	public boolean hasModelWithEffectiveOverride(boolean requireInherited);
 
 	/**
 	 * Get active overrides as boolean values indexed by model types.
 	 *
+	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean map indexed by model types
 	 */
-	public default Map<String, AtomicBoolean> getOverridesAsBooleanMap() {
-		return getOverridesAsBooleanMapWithModels().toValueMap();
+	public default Map<String, AtomicBoolean> getOverridesAsBooleanMap(boolean requireInherited) {
+		return getOverridesAsBooleanMapWithModels(requireInherited).toValueMap();
 	}
 
 	/**
 	 * Get active overrides as boolean values indexed by model hints.
 	 *
+	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean map indexed by model hints
 	 */
-	public default Map<String, AtomicBoolean> getOverridesAsHintedBooleanMap() {
-		return getOverridesAsHintedBooleanMapWithModels().toValueMap();
+	public default Map<String, AtomicBoolean> getOverridesAsHintedBooleanMap(boolean requireInherited) {
+		return getOverridesAsHintedBooleanMapWithModels(requireInherited).toValueMap();
 	}
 
 	/**
 	 * Get active overrides as boolean values indexed by model types.
 	 *
+	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean data-map indexed by model types with models
 	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels();
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels(
+			boolean requireInherited);
 
 	/**
 	 * Get active overrides as boolean values indexed by model hints.
 	 *
+	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean data-map indexed by model hints with models
 	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsHintedBooleanMapWithModels();
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsHintedBooleanMapWithModels(
+			boolean requireInherited);
 
 	/**
 	 * Collects all active overrides as boolean values indexed by model types.

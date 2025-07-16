@@ -37,6 +37,7 @@ public class ProjectExecutionModel implements Recordable {
 	protected Class<?> parserType = null;
 	protected String parserHint = null;
 	protected boolean userDefined = false;
+	protected boolean inherited = true;
 
 	public ProjectExecutionModel() {
 		this.parserHint = null;
@@ -65,6 +66,10 @@ public class ProjectExecutionModel implements Recordable {
 
 	public String getParserHint() {
 		return this.parserHint;
+	}
+
+	public boolean isInherited() {
+		return this.inherited;
 	}
 
 	public boolean isEffective() {
@@ -102,6 +107,10 @@ public class ProjectExecutionModel implements Recordable {
 	public void setParser(final Class<?> type, final String hint) {
 		this.parserType = type;
 		this.parserHint = hint;
+	}
+
+	public void setInherited(final boolean value) {
+		this.inherited = value;
 	}
 
 	public void setEffective(final Boolean value) {

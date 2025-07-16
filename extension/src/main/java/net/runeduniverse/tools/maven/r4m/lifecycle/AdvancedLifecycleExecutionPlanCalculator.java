@@ -72,7 +72,7 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
-import net.runeduniverse.lib.utils.common.LinkedDataHashMap;
+import net.runeduniverse.lib.utils.common.LinkedHashDataMap;
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
@@ -299,7 +299,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				this.settings.getLifecycleTaskRequestCalculator()
 						.getSelected());
 
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedDataHashMap<>();
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedHashDataMap<>();
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
 				final GoalTaskData data = (GoalTaskData) task;

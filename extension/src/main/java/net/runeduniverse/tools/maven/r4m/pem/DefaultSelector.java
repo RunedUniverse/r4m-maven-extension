@@ -36,12 +36,13 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.common.DataHashMap;
 import net.runeduniverse.lib.utils.common.api.DataMap;
-import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
@@ -86,8 +87,6 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	protected MojoDescriptorCreator mojoDescriptorCreator;
 	@Requirement
 	protected ExecutionArchive archive;
-	@Requirement
-	protected EventSpyDispatcherProxy dispatcher;
 	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
 	protected Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 	@Requirement
@@ -234,16 +233,6 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 		getExecutions(cnf, defaultActiveFilterSupplier(this.restrictionEvaluator, this.triggerEvaluator, cnf), views,
 				snapshot, overrides, false);
 
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overridesHinted = snapshot
-				.collectOverridesAsHintedBooleanMapWithModels();
-		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
-		overridesHinted.forEach((k, b, models) -> {
-			if (models == null)
-				return;
-			overrideModelIndex.addAll(models);
-		});
-		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(cnf.getTopLevelProject(),
-				cnf.getActiveProject(), overridesHinted.toValueMap(), overrideModelIndex));
 		return views;
 	}
 
@@ -341,18 +330,19 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
 		final Set<ExecutionView> views = new LinkedHashSet<>();
 		if (selectorConfig.getActiveProject() == null)
-			return new DefaultSelection(selectorConfig.clone(), views);
+			return new DefaultSelection(selectorConfig.clone(), new DataHashMap<>(), views);
 
 		final ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
 		if (sector == null)
-			return new DefaultSelection(selectorConfig.clone(), views);
+			return new DefaultSelection(selectorConfig.clone(), new DataHashMap<>(), views);
 
 		final ExecutionArchiveSectorSnapshot snapshot = sector.snapshot();
 		selectorConfig.compile(this.mvnSession);
 		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, snapshot)
 				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
-		return new DefaultSelection(selectorConfig.clone(), views);
+		return new DefaultSelection(selectorConfig.clone(), snapshot.collectOverridesAsHintedBooleanMapWithModels(),
+				views);
 	}
 
 }

@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -71,8 +72,12 @@ import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 
+import net.runeduniverse.lib.utils.common.LinkedDataHashMap;
+import net.runeduniverse.lib.utils.common.api.DataMap;
+import net.runeduniverse.lib.utils.maven3.ext.eventspy.api.EventSpyDispatcherProxy;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
+import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchiveSelectorConfig;
@@ -95,6 +100,7 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
@@ -111,6 +117,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 	@Requirement
 	protected Logger log;
+
+	@Requirement
+	protected EventSpyDispatcherProxy dispatcher;
 
 	@Requirement
 	protected Settings settings;
@@ -290,6 +299,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				this.settings.getLifecycleTaskRequestCalculator()
 						.getSelected());
 
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedDataHashMap<>();
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
 				final GoalTaskData data = (GoalTaskData) task;
@@ -312,8 +322,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				else
 					taskSelectorConfig.selectModes("default");
 
-				final ExecutionArchiveSelection selection = this.pemSelector
-						.compileSelection(taskSelectorConfig.selectActiveExecutions(taskData.getExecutions()));
+				taskSelectorConfig.selectActiveExecutions(taskData.getExecutions());
+
+				final ExecutionArchiveSelection selection = this.pemSelector.compileSelection(taskSelectorConfig);
+				mergeDetectedOverrides(overrides, selection.getOverrides());
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
 					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
 							project, request, selection);
@@ -327,6 +339,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						}
 				}
 			}
+
+		this.dispatcher.onEvent(convertDetectedOverridesToEvent(pemSelectorConfig.getTopLevelProject(),
+				pemSelectorConfig.getActiveProject(), overrides));
 		return mojoExecutions;
 	}
 
@@ -514,6 +529,39 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			if (groupId.equals(plugin.getGroupId()) && artifactId.equals(plugin.getArtifactId()))
 				return plugin;
 		return null;
+	}
+
+	protected void mergeDetectedOverrides(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> newOverrides) {
+		newOverrides.forEach((key, newValue, data) -> {
+			if (newValue == null || !newValue.get())
+				return;
+			final AtomicBoolean value = overrides.get(key);
+			if (value == null || !value.get()) {
+				overrides.putValue(key, newValue);
+				overrides.putData(key, data);
+			} else {
+				if (data == null)
+					return;
+				overrides.computeDataIfAbsent(key, k -> new LinkedHashSet<>())
+						.addAll(data);
+			}
+		});
+	}
+
+	protected ProjectExecutionModelOverrideDetectionEvent convertDetectedOverridesToEvent(
+			final MavenProject topLevelMvnProject, final MavenProject activeMvnProject,
+			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides) {
+		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
+
+		overrides.forEach((k, b, models) -> {
+			if (models == null)
+				return;
+			overrideModelIndex.addAll(models);
+		});
+
+		return ProjectExecutionModelOverrideDetectionEvent.createEvent(topLevelMvnProject, activeMvnProject,
+				overrides.toValueMap(), overrideModelIndex);
 	}
 
 	/**
@@ -1061,4 +1109,5 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 		return mojoExecutionConfigurator;
 	}
+
 }

@@ -19,9 +19,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
@@ -36,5 +39,7 @@ public interface ExecutionArchiveSelection extends Recordable {
 	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(Collection<String> phases);
 
 	public ExecutionArchiveSelectorConfig getSelectorConfig();
+
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides();
 
 }

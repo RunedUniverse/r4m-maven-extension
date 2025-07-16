@@ -23,12 +23,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
@@ -37,10 +40,14 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 public class DefaultSelection implements ExecutionArchiveSelection {
 
 	protected final ExecutionArchiveSelectorConfig selectorConfig;
+	protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides;
 	protected final Set<ExecutionView> views;
 
-	public DefaultSelection(final ExecutionArchiveSelectorConfig selectorConfig, final Set<ExecutionView> views) {
+	public DefaultSelection(final ExecutionArchiveSelectorConfig selectorConfig,
+			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+			final Set<ExecutionView> views) {
 		this.selectorConfig = selectorConfig;
+		this.overrides = overrides;
 		this.views = views;
 	}
 
@@ -126,6 +133,11 @@ public class DefaultSelection implements ExecutionArchiveSelection {
 	@Override
 	public ExecutionArchiveSelectorConfig getSelectorConfig() {
 		return this.selectorConfig;
+	}
+
+	@Override
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides() {
+		return this.overrides;
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public interface ModelSource extends Recordable {
 
 	public String getProjectId();
 
-	public String getArtifactId();
+	public String getPluginId();
 
 	public Path getFile();
 
@@ -34,7 +34,7 @@ public interface ModelSource extends Recordable {
 
 	public ModelSource setProjectId(String id);
 
-	public ModelSource setArtifactId(String id);
+	public ModelSource setPluginId(String id);
 
 	public ModelSource setFile(Path file);
 
@@ -48,9 +48,9 @@ public interface ModelSource extends Recordable {
 		if (project != null)
 			tree.append("project", project);
 
-		final String artifact = getArtifactId();
-		if (artifact != null)
-			tree.append("artifact", artifact);
+		final String plugin = getPluginId();
+		if (plugin != null)
+			tree.append("plugin", plugin);
 
 		final Path file = getFile();
 		if (file != null)

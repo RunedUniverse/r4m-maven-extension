@@ -84,7 +84,7 @@ public class PluginParser implements ProjectExecutionModelPluginParser {
 		if (model == null) {
 			model = parseModel(mvnPluginDescriptor);
 			model.setModelSource(new DefaultModelSource() //
-					.setArtifactId(ModelSource.id(mvnPlugin::getGroupId, mvnPlugin::getArtifactId)));
+					.setPluginId(ModelSource.id(mvnPlugin::getGroupId, mvnPlugin::getArtifactId)));
 			sector.includeModel(model);
 		}
 

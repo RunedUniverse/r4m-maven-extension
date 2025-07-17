@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -225,12 +226,22 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		// log active overrides
 		int mxLen = 0;
 		for (String id : overrides.keySet()) {
+			id = refMap.getOrDefault(id, id);
 			int len = id == null ? 4 : id.length();
 			if (30 < len)
 				continue;
 			if (mxLen < len)
 				mxLen = len;
 		}
+
+		// index all plugin artifacts in the project tree
+		final Map<String, String> artifactIndex = new LinkedHashMap<>();
+		for (MavenProject mvnPrj = mvnProject; mvnPrj != null; mvnPrj = mvnPrj.getParent()) {
+			final String id = ModelSource.id(mvnPrj::getGroupId, mvnPrj::getArtifactId);
+			for (Plugin plugin : mvnPrj.getBuildPlugins())
+				artifactIndex.computeIfAbsent(ModelSource.id(plugin::getGroupId, plugin::getArtifactId), k -> id);
+		}
+
 		final String template = "  - %-" + mxLen + "s = %s";
 		final AtomicInteger unknownModels = new AtomicInteger(0);
 		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
@@ -256,7 +267,8 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 					continue;
 				}
 
-				index.computeIfAbsent(source.getProjectId(), k -> new LinkedHashSet<>())
+				index.computeIfAbsent(artifactIndex.getOrDefault(source.getPluginId(), source.getProjectId()),
+						k -> new LinkedHashSet<>())
 						.add(model);
 			}
 		});
@@ -317,9 +329,9 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 			return;
 		boolean start = true;
 
-		final String artifactId = source.getArtifactId();
-		if (!isBlank(artifactId)) {
-			logFnc.accept(String.format("  %s%s Artifact: %s", offset, start ? paraFlag : " ", artifactId));
+		final String pluginId = source.getPluginId();
+		if (!isBlank(pluginId)) {
+			logFnc.accept(String.format("  %s%s Plugin: %s", offset, start ? paraFlag : " ", pluginId));
 			start = false;
 		}
 
@@ -328,13 +340,13 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 			if (basedir != null)
 				file = basedir.relativize(file);
 
-			logFnc.accept(String.format("  %s%s File:     %s", offset, start ? paraFlag : " ", file.toString()));
+			logFnc.accept(String.format("  %s%s File:   %s", offset, start ? paraFlag : " ", file.toString()));
 			start = false;
 		}
 
 		final String note = source.getNote();
 		if (!isBlank(note)) {
-			logFnc.accept(String.format("  %s%s Note:     %s", offset, start ? paraFlag : " ", note));
+			logFnc.accept(String.format("  %s%s Note:   %s", offset, start ? paraFlag : " ", note));
 			start = false;
 		}
 	}

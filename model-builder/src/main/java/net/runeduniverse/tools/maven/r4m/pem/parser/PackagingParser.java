@@ -76,7 +76,7 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setModelSource(new DefaultModelSource() //
-				.setArtifactId(ModelSource.id("org.apache.maven", "maven-core"))
+				.setPluginId(ModelSource.id("org.apache.maven", "maven-core"))
 				.setNote("< super-pom >"));
 		model.setParser(PackagingParser.class, PackagingParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);

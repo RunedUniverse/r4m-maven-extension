@@ -20,7 +20,7 @@ import java.nio.file.Path;
 public class DefaultModelSource implements ModelSource {
 
 	protected String projectId = null;
-	protected String artifactId = null;
+	protected String pluginId = null;
 	protected Path file = null;
 	protected String note = null;
 
@@ -33,8 +33,8 @@ public class DefaultModelSource implements ModelSource {
 	}
 
 	@Override
-	public String getArtifactId() {
-		return this.artifactId;
+	public String getPluginId() {
+		return this.pluginId;
 	}
 
 	@Override
@@ -54,8 +54,8 @@ public class DefaultModelSource implements ModelSource {
 	}
 
 	@Override
-	public ModelSource setArtifactId(final String id) {
-		this.artifactId = id;
+	public ModelSource setPluginId(final String id) {
+		this.pluginId = id;
 		return this;
 	}
 

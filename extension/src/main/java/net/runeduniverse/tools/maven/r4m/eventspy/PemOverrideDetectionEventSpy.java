@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
@@ -115,6 +116,14 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 		this.log.info("\033[1mfrom\033[m");
 
+		// index all plugin artifacts in the project tree
+		final Map<String, String> artifactIndex = new LinkedHashMap<>();
+		for (MavenProject mvnPrj = mvnProject; mvnPrj != null; mvnPrj = mvnPrj.getParent()) {
+			final String id = ModelSource.id(mvnPrj::getGroupId, mvnPrj::getArtifactId);
+			for (Plugin plugin : mvnPrj.getBuildPlugins())
+				artifactIndex.computeIfAbsent(ModelSource.id(plugin::getGroupId, plugin::getArtifactId), k -> id);
+		}
+
 		int unknownModels = 0;
 		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
 
@@ -128,7 +137,8 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 				continue;
 			}
 
-			index.computeIfAbsent(source.getProjectId(), k -> new LinkedHashSet<>())
+			index.computeIfAbsent(artifactIndex.getOrDefault(source.getPluginId(), source.getProjectId()),
+					k -> new LinkedHashSet<>())
 					.add(model);
 		}
 
@@ -181,9 +191,9 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 			return;
 		boolean start = true;
 
-		final String artifactId = source.getArtifactId();
+		final String artifactId = source.getPluginId();
 		if (!isBlank(artifactId)) {
-			logFnc.accept(String.format("  %s%s Artifact: %s", offset, start ? paraFlag : " ", artifactId));
+			logFnc.accept(String.format("  %s%s Plugin: %s", offset, start ? paraFlag : " ", artifactId));
 			start = false;
 		}
 
@@ -192,13 +202,13 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 			if (basedir != null)
 				file = basedir.relativize(file);
 
-			logFnc.accept(String.format("  %s%s File:     %s", offset, start ? paraFlag : " ", file.toString()));
+			logFnc.accept(String.format("  %s%s File:   %s", offset, start ? paraFlag : " ", file.toString()));
 			start = false;
 		}
 
 		final String note = source.getNote();
 		if (!isBlank(note)) {
-			logFnc.accept(String.format("  %s%s Note:     %s", offset, start ? paraFlag : " ", note));
+			logFnc.accept(String.format("  %s%s Note:   %s", offset, start ? paraFlag : " ", note));
 			start = false;
 		}
 	}

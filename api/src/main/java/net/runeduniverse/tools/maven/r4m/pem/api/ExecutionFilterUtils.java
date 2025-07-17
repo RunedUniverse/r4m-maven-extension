@@ -145,9 +145,7 @@ public interface ExecutionFilterUtils {
 
 		final ModelOverride override = pem.getOverridesAsMap()
 				.get(DeclareSuperPemOverride.TYPE);
-		if (override == null || !override.isActive())
-			return false;
-		return true;
+		return override != null && override.isActive();
 	}
 
 	public static boolean disableSuperPomFilter(final ProjectExecutionModel pem, final Execution exec) {

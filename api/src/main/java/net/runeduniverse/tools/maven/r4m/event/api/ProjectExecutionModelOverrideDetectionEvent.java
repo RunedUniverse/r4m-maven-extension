@@ -15,12 +15,14 @@
  */
 package net.runeduniverse.tools.maven.r4m.event.api;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.project.MavenProject;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelOverrideDetectionEvent {
@@ -29,28 +31,30 @@ public interface ProjectExecutionModelOverrideDetectionEvent {
 
 	public MavenProject getMvnProject();
 
-	public Map<String, AtomicBoolean> getOverrides();
+	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides();
 
-	public Set<ProjectExecutionModel> getModels();
+	public Map<String, String> getModelReference();
 
 	public static BasicEvent createEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
-			final Map<String, AtomicBoolean> overrides, final Set<ProjectExecutionModel> models) {
-		return new BasicEvent(topLevelMvnProject, mvnProject, overrides, models);
+			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+			final Map<String, String> modelReference) {
+		return new BasicEvent(topLevelMvnProject, mvnProject, overrides, modelReference);
 	}
 
 	public class BasicEvent implements ProjectExecutionModelOverrideDetectionEvent {
 
 		protected MavenProject topLevelMvnProject;
 		protected MavenProject mvnProject;
-		protected Map<String, AtomicBoolean> overrides;
-		protected Set<ProjectExecutionModel> models;
+		protected DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides;
+		protected Map<String, String> modelReference;
 
 		public BasicEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
-				final Map<String, AtomicBoolean> overrides, final Set<ProjectExecutionModel> models) {
+				final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+				final Map<String, String> modelReference) {
 			this.topLevelMvnProject = topLevelMvnProject;
 			this.mvnProject = mvnProject;
 			this.overrides = overrides;
-			this.models = models;
+			this.modelReference = modelReference;
 		}
 
 		@Override
@@ -64,13 +68,13 @@ public interface ProjectExecutionModelOverrideDetectionEvent {
 		}
 
 		@Override
-		public Map<String, AtomicBoolean> getOverrides() {
+		public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides() {
 			return this.overrides;
 		}
 
 		@Override
-		public Set<ProjectExecutionModel> getModels() {
-			return this.models;
+		public Map<String, String> getModelReference() {
+			return this.modelReference == null ? Collections.emptyMap() : this.modelReference;
 		}
 
 	}

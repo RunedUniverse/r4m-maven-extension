@@ -299,7 +299,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				this.settings.getLifecycleTaskRequestCalculator()
 						.getSelected());
 
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedHashDataMap<>();
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedHashDataMap<>(0);
+		final Map<String, String> overrideModelReference = new LinkedHashMap<>(0);
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
 				final GoalTaskData data = (GoalTaskData) task;
@@ -326,6 +327,7 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 				final ExecutionArchiveSelection selection = this.pemSelector.compileSelection(taskSelectorConfig);
 				mergeDetectedOverrides(overrides, selection.getOverrides());
+				overrideModelReference.putAll(selection.getOverrideModelReference());
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
 					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
 							project, request, selection);
@@ -339,9 +341,9 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						}
 				}
 			}
-
-		this.dispatcher.onEvent(convertDetectedOverridesToEvent(pemSelectorConfig.getTopLevelProject(),
-				pemSelectorConfig.getActiveProject(), overrides));
+		this.dispatcher
+				.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(pemSelectorConfig.getTopLevelProject(),
+						pemSelectorConfig.getActiveProject(), overrides, overrideModelReference));
 		return mojoExecutions;
 	}
 
@@ -547,21 +549,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						.addAll(data);
 			}
 		});
-	}
-
-	protected ProjectExecutionModelOverrideDetectionEvent convertDetectedOverridesToEvent(
-			final MavenProject topLevelMvnProject, final MavenProject activeMvnProject,
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides) {
-		final Set<ProjectExecutionModel> overrideModelIndex = new LinkedHashSet<>();
-
-		overrides.forEach((k, b, models) -> {
-			if (models == null)
-				return;
-			overrideModelIndex.addAll(models);
-		});
-
-		return ProjectExecutionModelOverrideDetectionEvent.createEvent(topLevelMvnProject, activeMvnProject,
-				overrides.toValueMap(), overrideModelIndex);
 	}
 
 	/**

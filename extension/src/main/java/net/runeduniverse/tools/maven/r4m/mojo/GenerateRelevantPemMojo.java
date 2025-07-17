@@ -143,13 +143,14 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		final Set<Execution> executions = new LinkedHashSet<>();
 		final ExecutionArchiveSectorSnapshot snapshot = projectSector.snapshot();
-		final Map<String, AtomicBoolean> overrides = snapshot.collectOverridesAsBooleanMap();
-		final int sectorCnt = collectExecutions(executions, snapshot, overrides, cnf);
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = snapshot
+				.collectOverridesAsBooleanMapWithModels();
+		final int sectorCnt = collectExecutions(executions, snapshot, overrides.toValueMap(), cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
 		if (!overrides.isEmpty())
-			logOverrides(snapshot);
+			logOverrides(overrides, snapshot.getOverrideModelReference());
 
 		getLog().info("");
 		getLog().info("Discovered & Relevant");
@@ -211,10 +212,9 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		executions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 	}
 
-	private void logOverrides(final ExecutionArchiveSectorSnapshot snapshot) {
+	private void logOverrides(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+			final Map<String, String> refMap) {
 		// check validity
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = snapshot
-				.collectOverridesAsHintedBooleanMapWithModels();
 		if (overrides == null || overrides.isEmpty())
 			return;
 
@@ -236,12 +236,13 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
 
 		overrides.forEach((id, boolValue, modelSet) -> {
+			final String key = refMap.getOrDefault(id, id);
 			final String value = boolValue == null ? null : Boolean.toString(boolValue.get());
 
-			if (id == null || value == null)
-				getLog().warn(String.format(template, id, value));
+			if (key == null || value == null)
+				getLog().warn(String.format(template, key, value));
 			else
-				getLog().info(String.format(template, id, value));
+				getLog().info(String.format(template, key, value));
 
 			if (modelSet == null)
 				return;

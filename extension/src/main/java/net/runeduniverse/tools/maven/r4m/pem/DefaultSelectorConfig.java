@@ -46,7 +46,7 @@ public class DefaultSelectorConfig implements ExecutionArchiveSelectorConfig {
 	private boolean dirty = true;
 
 	@Override
-	public ExecutionArchiveSelectorConfig selectTopLevelProject(MavenProject value) {
+	public ExecutionArchiveSelectorConfig selectTopLevelProject(final MavenProject value) {
 		this.dirty = true;
 		this.topLevelMvnProject = value;
 		return this;

@@ -49,31 +49,12 @@ public interface ExecutionArchiveSectorSnapshot {
 	}
 
 	/**
-	 * Get active overrides as boolean values indexed by model hints.
-	 *
-	 * @param requireInherited ensures all models to be inherited
-	 * @return boolean map indexed by model hints
-	 */
-	public default Map<String, AtomicBoolean> getOverridesAsHintedBooleanMap(boolean requireInherited) {
-		return getOverridesAsHintedBooleanMapWithModels(requireInherited).toValueMap();
-	}
-
-	/**
 	 * Get active overrides as boolean values indexed by model types.
 	 *
 	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean data-map indexed by model types with models
 	 */
 	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels(
-			boolean requireInherited);
-
-	/**
-	 * Get active overrides as boolean values indexed by model hints.
-	 *
-	 * @param requireInherited ensures all models to be inherited
-	 * @return boolean data-map indexed by model hints with models
-	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsHintedBooleanMapWithModels(
 			boolean requireInherited);
 
 	/**
@@ -88,25 +69,17 @@ public interface ExecutionArchiveSectorSnapshot {
 	/**
 	 * Collects all active overrides as boolean values indexed by model hints.
 	 *
-	 * @return boolean map indexed by model hints
-	 */
-	public default Map<String, AtomicBoolean> collectOverridesAsHintedBooleanMap() {
-		return collectOverridesAsHintedBooleanMapWithModels().toValueMap();
-	}
-
-	/**
-	 * Collects all active overrides as boolean values indexed by model hints.
-	 *
 	 * @return boolean data-map indexed by model hints with models
 	 */
 	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsBooleanMapWithModels();
 
 	/**
-	 * Collects all active overrides as boolean values indexed by model hints.
+	 * Returns the internal reference from the internal types of overrides to their
+	 * model based hints
 	 *
-	 * @return boolean data-map indexed by model hints with models
+	 * @return map mapping internal override types to model based hints
 	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsHintedBooleanMapWithModels();
+	public Map<String, String> getOverrideModelReference();
 
 	public Set<Execution> getExecutions();
 
@@ -138,7 +111,11 @@ public interface ExecutionArchiveSectorSnapshot {
 		);
 	}
 
+	public void flushCache();
+
 	public void addModel(ProjectExecutionModel pem);
+
+	public void addDownstreamSnapshot(ExecutionArchiveSectorSnapshot snapshot);
 
 	@SuppressWarnings("unchecked")
 	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,

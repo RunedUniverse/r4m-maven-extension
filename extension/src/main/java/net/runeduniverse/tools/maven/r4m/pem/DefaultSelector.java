@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.pem;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -36,16 +37,12 @@ import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.lib.utils.common.AbstractDataMap;
 import net.runeduniverse.lib.utils.common.HashDataMap;
-import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
-import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
@@ -270,7 +267,7 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 			final ModelOverride override = entry.getValue();
 			if (value == null || override == null)
 				continue;
-			if (value.get() == override.isActive())
+			if (value.get() && override.isActive())
 				return true;
 		}
 		return false;
@@ -331,19 +328,19 @@ public class DefaultSelector implements ExecutionArchiveSelector {
 	public ExecutionArchiveSelection compileSelection(final ExecutionArchiveSelectorConfig selectorConfig) {
 		final Set<ExecutionView> views = new LinkedHashSet<>();
 		if (selectorConfig.getActiveProject() == null)
-			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), views);
+			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), Collections.EMPTY_MAP, views);
 
 		final ExecutionArchiveSector sector = this.archive.getSector(selectorConfig.getActiveProject());
 		if (sector == null)
-			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), views);
+			return new DefaultSelection(selectorConfig.clone(), new HashDataMap<>(), Collections.EMPTY_MAP, views);
 
 		final ExecutionArchiveSectorSnapshot snapshot = sector.snapshot();
 		selectorConfig.compile(this.mvnSession);
 		for (Entry<String, Map<ExecutionSource, ExecutionView>> entry : getExecutions(selectorConfig, snapshot)
 				.entrySet())
 			views.add(reduce(selectorConfig, entry.getKey(), entry.getValue()));
-		return new DefaultSelection(selectorConfig.clone(), snapshot.collectOverridesAsHintedBooleanMapWithModels(),
-				views);
+		return new DefaultSelection(selectorConfig.clone(), snapshot.collectOverridesAsBooleanMapWithModels(),
+				snapshot.getOverrideModelReference(), views);
 	}
 
 }

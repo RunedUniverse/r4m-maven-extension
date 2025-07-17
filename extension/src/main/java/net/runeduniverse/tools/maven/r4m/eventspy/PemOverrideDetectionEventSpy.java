@@ -30,6 +30,7 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
@@ -66,11 +67,21 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 	private void handleModelLogging(final ProjectExecutionModelOverrideDetectionEvent event) {
 		// check validity
 		final MavenProject mvnProject = event.getMvnProject();
-		final Map<String, AtomicBoolean> overrides = event.getOverrides();
-		final Set<ProjectExecutionModel> models = event.getModels();
+		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overridesSrc = event.getOverrides();
+		final Map<String, String> modelReference = event.getModelReference();
 
-		if (mvnProject == null || overrides == null || overrides.isEmpty())
+		if (mvnProject == null || overridesSrc == null || overridesSrc.isEmpty())
 			return;
+
+		final Map<String, AtomicBoolean> overrides = new LinkedHashMap<>();
+		final Set<ProjectExecutionModel> modelsSet = new LinkedHashSet<>(0);
+
+		overridesSrc.forEach((k, b, models) -> {
+			overrides.put(modelReference.getOrDefault(k, k), b);
+			if (models == null)
+				return;
+			modelsSet.addAll(models);
+		});
 
 		// print header
 		this.log.info("\033[1mActive Overrides\033[m");
@@ -98,7 +109,7 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		}
 
 		// log matching models
-		if (models == null || models.isEmpty()) {
+		if (modelsSet == null || modelsSet.isEmpty()) {
 			return;
 		}
 
@@ -108,7 +119,7 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
 
 		// group by projectId
-		for (ProjectExecutionModel model : models) {
+		for (ProjectExecutionModel model : modelsSet) {
 			if (model == null)
 				continue;
 			final ModelSource source = model.getModelSource();

@@ -41,13 +41,15 @@ public class DefaultSelection implements ExecutionArchiveSelection {
 
 	protected final ExecutionArchiveSelectorConfig selectorConfig;
 	protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides;
+	protected final Map<String, String> overrideModelReference;
 	protected final Set<ExecutionView> views;
 
 	public DefaultSelection(final ExecutionArchiveSelectorConfig selectorConfig,
 			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
-			final Set<ExecutionView> views) {
+			final Map<String, String> overrideModelReference, final Set<ExecutionView> views) {
 		this.selectorConfig = selectorConfig;
 		this.overrides = overrides;
+		this.overrideModelReference = overrideModelReference;
 		this.views = views;
 	}
 
@@ -138,6 +140,11 @@ public class DefaultSelection implements ExecutionArchiveSelection {
 	@Override
 	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides() {
 		return this.overrides;
+	}
+
+	@Override
+	public Map<String, String> getOverrideModelReference() {
+		return this.overrideModelReference;
 	}
 
 	@Override

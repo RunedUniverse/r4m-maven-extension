@@ -42,4 +42,6 @@ public interface ExecutionArchiveSelection extends Recordable {
 
 	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides();
 
+	public Map<String, String> getOverrideModelReference();
+
 }

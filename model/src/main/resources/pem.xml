@@ -24,6 +24,12 @@
 	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem r4m-pem-v1_1_0.xsd">
 
 	<modelVersion>1.1.0</modelVersion>
+	<overrides>
+		<disable-project-pom>
+			<groupId>org.jenkins-ci.plugins</groupId>
+			<artifactId>plugin</artifactId>
+		</disable-project-pom>
+	</overrides>
 	<executions>
 
 		<execution id="default" source="override">

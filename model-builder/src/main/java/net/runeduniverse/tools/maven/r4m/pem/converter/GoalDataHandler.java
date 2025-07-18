@@ -15,17 +15,13 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.converter;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
-import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
-
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
-import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 @Component(role = DataHandler.class, hint = Goal.CANONICAL_NAME)
 public class GoalDataHandler extends ADataHandler {

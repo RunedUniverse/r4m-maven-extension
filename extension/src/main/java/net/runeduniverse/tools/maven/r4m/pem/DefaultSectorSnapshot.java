@@ -84,7 +84,7 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	@Override
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels(
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverridesAsBooleanMapWithData(
 			boolean requireInherited) {
 		Cache cache = this.cache;
 		if (cache == null) {
@@ -96,7 +96,7 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	@Override
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsBooleanMapWithModels() {
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> collectOverridesAsBooleanMapWithData() {
 		Cache cache = this.cache;
 		if (cache == null) {
 			synchronized (this.cacheLock) {
@@ -146,7 +146,7 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 			for (Entry<String, ModelOverride> entry : pem.getOverridesAsMap()
 					.entrySet()) {
 				final ModelOverride override = entry.getValue();
-				if (override == null || !override.isActive())
+				if (override == null || !override.validate() || !override.isActive())
 					continue;
 				cache.setOverride(override, pem);
 			}
@@ -162,10 +162,10 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	protected synchronized void cacheCollectUpstreamOverrides(final Cache cache) {
-		DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> domOverrides = cache.allOverrides;
+		DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> domOverrides = cache.allOverrides;
 		for (ExecutionArchiveSectorSnapshot parent = this.parent; parent != null; parent = parent.getParent()) {
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedHashDataMap<>();
-			parent.getOverridesAsBooleanMapWithModels(true)
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides = new LinkedHashDataMap<>();
+			parent.getOverridesAsBooleanMapWithData(true)
 					.forEach((k, v, d) -> overrides.put(k, v, d));
 			mergeOverrides(overrides, domOverrides);
 			cache.overrideModelReference.putAll(parent.getOverrideModelReference());
@@ -174,14 +174,17 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 		domOverrides.forEach((k, v, d) -> cache.collectedOverrides.put(k, v, d));
 	}
 
-	protected void mergeOverrides(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> base,
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> dominant) {
+	protected void mergeOverrides(final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> base,
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> dominant) {
 		dominant.forEach((key, domValue, domData) -> {
 			final AtomicBoolean value = base.computeIfAbsent(key, k -> new AtomicBoolean());
 			if (value.get() == domValue.get()) {
 				// if the value does not change, add the dom models to the old ones
-				base.computeDataIfAbsent(key, k -> new LinkedHashSet<>(0))
-						.addAll(domData);
+				final ExecutionArchiveSectorSnapshot.Data data = base.computeDataIfAbsent(key, k -> new Data());
+				data.getModelOverrides()
+						.addAll(domData.getModelOverrides());
+				data.getProjectExecutionModels()
+						.addAll(domData.getProjectExecutionModels());
 			} else {
 				// if the value changes, replace the models with the dom models
 				value.set(domValue.get());
@@ -225,18 +228,8 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 	}
 
 	@Override
-	public ExecutionArchiveSectorSnapshot applyOverrides(final Map<String, AtomicBoolean> overrides,
-			final Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier) {
-		if (filterSupplier == null)
-			return this;
-		for (Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>> supplier : filterSupplier) {
-			applyFilter(supplier.apply(overrides));
-		}
-		return this;
-	}
-
-	@Override
-	public ExecutionArchiveSectorSnapshot applyOverrides(final Map<String, AtomicBoolean> overrides,
+	public ExecutionArchiveSectorSnapshot applyOverrides(
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
 			final Collection<ProjectExecutionModelOverrideFilterSupplier> filterSupplier) {
 		if (filterSupplier == null)
 			return this;
@@ -248,6 +241,8 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	@Override
 	public ExecutionArchiveSectorSnapshot applyFilter(final ModelPredicate<ProjectExecutionModel, Execution> filter) {
+		if (filter == null)
+			return this;
 		for (Set<Execution> execCol : this.executions.values()) {
 			for (Iterator<Execution> i = execCol.iterator(); i.hasNext();) {
 				final Execution execution = i.next();
@@ -295,11 +290,11 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 
 	protected static class Cache {
 
-		protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> allOverrides = //
+		protected final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> allOverrides = //
 				new LinkedHashDataMap<>(0);
-		protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> inheritedOverrides = //
+		protected final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> inheritedOverrides = //
 				new LinkedHashDataMap<>(0);
-		protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectedOverrides = //
+		protected final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> collectedOverrides = //
 				new LinkedHashDataMap<>(0);
 		protected final Map<String, String> overrideModelReference = new LinkedHashMap<>(0);
 
@@ -316,15 +311,63 @@ public class DefaultSectorSnapshot implements ExecutionArchiveSectorSnapshot {
 				setOverride(this.inheritedOverrides, key, override, pem);
 		}
 
-		protected void setOverride(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+		protected void setOverride(final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
 				final String key, final ModelOverride override, final ProjectExecutionModel pem) {
 			final AtomicBoolean active = overrides.computeIfAbsent(key, k -> new AtomicBoolean());
-			final Set<ProjectExecutionModel> set = overrides.computeDataIfAbsent(key, k -> new LinkedHashSet<>(1));
+			final ExecutionArchiveSectorSnapshot.Data data = overrides.computeDataIfAbsent(key, k -> new Data());
+			// add override & pem to data
+			final Set<ModelOverride> overrideSet = data.getModelOverrides();
+			final Set<ProjectExecutionModel> pemSet = data.getProjectExecutionModels();
+			// set & clear if the value changes
 			if (active.get() != override.isActive()) {
 				active.set(override.isActive());
-				set.clear();
+				overrideSet.clear();
+				pemSet.clear();
 			}
-			set.add(pem);
+			overrideSet.add(override);
+			pemSet.add(pem);
 		}
+	}
+
+	protected static class Data implements ExecutionArchiveSectorSnapshot.Data {
+
+		protected final Set<ModelOverride> overrides = new LinkedHashSet<>(1);
+		protected final Set<ProjectExecutionModel> pems = new LinkedHashSet<>(1);
+
+		@Override
+		public Set<ModelOverride> getModelOverrides() {
+			return this.overrides;
+		}
+
+		@Override
+		public Set<ProjectExecutionModel> getProjectExecutionModels() {
+			return this.pems;
+		}
+
+		@Override
+		public Data copy() {
+			final Data data = new Data();
+			for (ModelOverride override : this.overrides)
+				data.overrides.add(override.copy());
+			for (ProjectExecutionModel pem : this.pems)
+				data.pems.add(pem.copy());
+			return data;
+		}
+
+		@Override
+		public Data merge(final ExecutionArchiveSectorSnapshot.Data data) {
+			final Set<ModelOverride> overrides = data.getModelOverrides();
+			if (overrides != null) {
+				for (ModelOverride override : overrides)
+					this.overrides.add(override);
+			}
+			final Set<ProjectExecutionModel> pems = data.getProjectExecutionModels();
+			if (pems != null) {
+				for (ProjectExecutionModel pem : pems)
+					this.pems.add(pem);
+			}
+			return this;
+		}
+
 	}
 }

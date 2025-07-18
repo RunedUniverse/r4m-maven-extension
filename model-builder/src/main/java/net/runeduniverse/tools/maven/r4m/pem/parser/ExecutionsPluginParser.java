@@ -82,6 +82,12 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		model.setVersion(ModelProperties.MODEL_VERSION);
 
 		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
+			if (mvnExecution.isInheritanceApplied()) {
+				// TODO consider using this option but than we need to additionally parse
+				// upstream non local projects!
+				// continue;
+			}
+
 			final Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);
 			execution.setInherited(false);
 			execution.setDefaultActive(true);

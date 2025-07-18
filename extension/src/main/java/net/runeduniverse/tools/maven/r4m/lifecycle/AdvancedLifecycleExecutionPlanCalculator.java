@@ -95,12 +95,12 @@ import net.runeduniverse.tools.maven.r4m.lifecycle.api.LifecycleTaskRequestCalcu
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskData;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.TaskParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
@@ -299,8 +299,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 				this.settings.getLifecycleTaskRequestCalculator()
 						.getSelected());
 
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = new LinkedHashDataMap<>(0);
-		final Map<String, String> overrideModelReference = new LinkedHashMap<>(0);
+		final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides = new LinkedHashDataMap<>(
+				0);
 		for (TaskData task : tasks)
 			if (task instanceof GoalTaskData) {
 				final GoalTaskData data = (GoalTaskData) task;
@@ -327,7 +327,6 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 
 				final ExecutionArchiveSelection selection = this.pemSelector.compileSelection(taskSelectorConfig);
 				mergeDetectedOverrides(overrides, selection.getOverrides());
-				overrideModelReference.putAll(selection.getOverrideModelReference());
 				for (LifecycleTaskRequest request : lifecycleTaskReqCalcDelegate.calculateTaskRequest(taskData)) {
 					final Map<String, List<MojoExecution>> phaseToMojoMapping = calculateLifecycleMappings(session,
 							project, request, selection);
@@ -341,9 +340,8 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 						}
 				}
 			}
-		this.dispatcher
-				.onEvent(ProjectExecutionModelOverrideDetectionEvent.createEvent(pemSelectorConfig.getTopLevelProject(),
-						pemSelectorConfig.getActiveProject(), overrides, overrideModelReference));
+		this.dispatcher.onEvent(ProjectExecutionModelOverrideDetectionEvent
+				.createEvent(pemSelectorConfig.getTopLevelProject(), pemSelectorConfig.getActiveProject(), overrides));
 		return mojoExecutions;
 	}
 
@@ -533,20 +531,21 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		return null;
 	}
 
-	protected void mergeDetectedOverrides(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> newOverrides) {
+	protected void mergeDetectedOverrides(
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> newOverrides) {
 		newOverrides.forEach((key, newValue, data) -> {
 			if (newValue == null || !newValue.get())
 				return;
 			final AtomicBoolean value = overrides.get(key);
 			if (value == null || !value.get()) {
-				overrides.putValue(key, newValue);
-				overrides.putData(key, data);
+				// set copies!
+				overrides.put(key, new AtomicBoolean(true), data.copy());
 			} else {
 				if (data == null)
 					return;
-				overrides.computeDataIfAbsent(key, k -> new LinkedHashSet<>())
-						.addAll(data);
+				overrides.computeDataIfPresent(key, (k, d) -> d.merge(data.copy()));
+				overrides.computeDataIfAbsent(key, k -> data.copy());
 			}
 		});
 	}

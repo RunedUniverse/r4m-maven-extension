@@ -24,7 +24,6 @@ import java.util.function.Consumer;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
@@ -40,8 +39,6 @@ public interface ExecutionArchiveSelection extends Recordable {
 
 	public ExecutionArchiveSelectorConfig getSelectorConfig();
 
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides();
-
-	public Map<String, String> getOverrideModelReference();
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverrides();
 
 }

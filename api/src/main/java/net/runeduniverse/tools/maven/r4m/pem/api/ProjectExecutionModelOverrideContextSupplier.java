@@ -15,15 +15,10 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 
-import net.runeduniverse.lib.utils.common.api.DataMap;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot.Data;
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+public interface ProjectExecutionModelOverrideContextSupplier {
 
-public interface ProjectExecutionModelOverrideFilterSupplier {
-
-	public ModelPredicate<ProjectExecutionModel, Execution> get(DataMap<String, AtomicBoolean, Data> overrides);
+	public String get(ModelOverride override);
 
 }

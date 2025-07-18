@@ -26,6 +26,7 @@ import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ExecutionArchiveSectorSnapshot {
@@ -45,7 +46,7 @@ public interface ExecutionArchiveSectorSnapshot {
 	 * @return boolean map indexed by model types
 	 */
 	public default Map<String, AtomicBoolean> getOverridesAsBooleanMap(boolean requireInherited) {
-		return getOverridesAsBooleanMapWithModels(requireInherited).toValueMap();
+		return getOverridesAsBooleanMapWithData(requireInherited).toValueMap();
 	}
 
 	/**
@@ -54,8 +55,7 @@ public interface ExecutionArchiveSectorSnapshot {
 	 * @param requireInherited ensures all models to be inherited
 	 * @return boolean data-map indexed by model types with models
 	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverridesAsBooleanMapWithModels(
-			boolean requireInherited);
+	public DataMap<String, AtomicBoolean, Data> getOverridesAsBooleanMapWithData(boolean requireInherited);
 
 	/**
 	 * Collects all active overrides as boolean values indexed by model types.
@@ -63,7 +63,7 @@ public interface ExecutionArchiveSectorSnapshot {
 	 * @return boolean map indexed by model types
 	 */
 	public default Map<String, AtomicBoolean> collectOverridesAsBooleanMap() {
-		return collectOverridesAsBooleanMapWithModels().toValueMap();
+		return collectOverridesAsBooleanMapWithData().toValueMap();
 	}
 
 	/**
@@ -71,7 +71,7 @@ public interface ExecutionArchiveSectorSnapshot {
 	 *
 	 * @return boolean data-map indexed by model hints with models
 	 */
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> collectOverridesAsBooleanMapWithModels();
+	public DataMap<String, AtomicBoolean, Data> collectOverridesAsBooleanMapWithData();
 
 	/**
 	 * Returns the internal reference from the internal types of overrides to their
@@ -117,17 +117,26 @@ public interface ExecutionArchiveSectorSnapshot {
 
 	public void addDownstreamSnapshot(ExecutionArchiveSectorSnapshot snapshot);
 
-	@SuppressWarnings("unchecked")
-	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,
-			Function<Map<String, AtomicBoolean>, ModelPredicate<ProjectExecutionModel, Execution>>... filterSupplier);
-
-	public ExecutionArchiveSectorSnapshot applyOverrides(Map<String, AtomicBoolean> overrides,
+	public ExecutionArchiveSectorSnapshot applyOverrides(
+			DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
 			Collection<ProjectExecutionModelOverrideFilterSupplier> filterSupplier);
 
 	public ExecutionArchiveSectorSnapshot applyFilter(ModelPredicate<ProjectExecutionModel, Execution> filter);
 
 	public default ExecutionArchiveSectorSnapshot applyFilter(Predicate<Execution> filter) {
 		return applyFilter(ModelPredicate.wrap(filter));
+	}
+
+	public static interface Data {
+
+		public Set<ModelOverride> getModelOverrides();
+
+		public Set<ProjectExecutionModel> getProjectExecutionModels();
+
+		public Data copy();
+
+		public Data merge(Data data);
+
 	}
 
 }

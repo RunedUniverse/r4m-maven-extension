@@ -16,6 +16,7 @@
 package net.runeduniverse.tools.maven.r4m.eventspy;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -34,6 +35,9 @@ import org.codehaus.plexus.logging.Logger;
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideContextSupplier;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
@@ -46,6 +50,9 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 	@Requirement
 	private Logger log;
+
+	@Requirement(role = ProjectExecutionModelOverrideContextSupplier.class)
+	protected Map<String, ProjectExecutionModelOverrideContextSupplier> overrideContextSupplier;
 
 	@Override
 	public void init(final Context context) throws Exception {
@@ -68,17 +75,19 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 	private void handleModelLogging(final ProjectExecutionModelOverrideDetectionEvent event) {
 		// check validity
 		final MavenProject mvnProject = event.getMvnProject();
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overridesSrc = event.getOverrides();
-		final Map<String, String> modelReference = event.getModelReference();
+		final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overridesSrc = event.getOverrides();
 
 		if (mvnProject == null || overridesSrc == null || overridesSrc.isEmpty())
 			return;
 
 		final Map<String, AtomicBoolean> overrides = new LinkedHashMap<>();
 		final Set<ProjectExecutionModel> modelsSet = new LinkedHashSet<>(0);
+		final Map<String, Set<String>> contextMap = new LinkedHashMap<>(0);
 
-		overridesSrc.forEach((k, b, models) -> {
-			overrides.put(modelReference.getOrDefault(k, k), b);
+		overridesSrc.forEach((k, b, data) -> {
+			for (String label : getLabel(contextMap, k, data.getModelOverrides()))
+				overrides.put(label, b);
+			final Set<ProjectExecutionModel> models = data.getProjectExecutionModels();
 			if (models == null)
 				return;
 			modelsSet.addAll(models);
@@ -103,10 +112,15 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 			final AtomicBoolean boolValue = entry.getValue();
 			final String value = boolValue == null ? null : Boolean.toString(boolValue.get());
 
-			if (id == null || value == null)
+			if (id == null || value == null) {
 				this.log.warn(String.format(template, id, value));
-			else
+				for (String context : contextMap.getOrDefault(id, Collections.emptySet()))
+					this.log.warn(String.format("      [ %s ]", context));
+			} else {
 				this.log.info(String.format(template, id, value));
+				for (String context : contextMap.getOrDefault(id, Collections.emptySet()))
+					this.log.info(String.format("      [ %s ]", context));
+			}
 		}
 
 		// log matching models
@@ -164,6 +178,30 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		if (0 < unknownModels) {
 			this.log.warn(String.format("\033[1m  » %i models of unknown origin!\033[m", unknownModels));
 		}
+	}
+
+	private Set<String> getLabel(final Map<String, Set<String>> contextMap, final String type,
+			final Set<ModelOverride> overrides) {
+		final Set<String> set = new LinkedHashSet<>(1);
+		final ProjectExecutionModelOverrideContextSupplier supplier = this.overrideContextSupplier.get(type);
+		if (overrides != null) {
+			for (ModelOverride override : overrides) {
+				if (override == null)
+					continue;
+				final String hint = override.hint();
+				set.add(hint);
+				if (supplier != null) {
+					final String context = supplier.get(override);
+					if (isBlank(context))
+						continue;
+					contextMap.computeIfAbsent(hint, k -> new LinkedHashSet<>(1))
+							.add(context);
+				}
+			}
+		}
+		if (set.isEmpty())
+			set.add(type);
+		return set;
 	}
 
 	private void logEntry(final Path basedir, final Set<ProjectExecutionModel> modelSet, final String offset,

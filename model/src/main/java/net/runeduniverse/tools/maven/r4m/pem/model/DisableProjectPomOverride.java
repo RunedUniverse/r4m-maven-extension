@@ -20,6 +20,7 @@ import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 
 import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
 public class DisableProjectPomOverride implements ModelOverride {
 
@@ -71,6 +72,11 @@ public class DisableProjectPomOverride implements ModelOverride {
 	@Override
 	public void setActive(final boolean active) {
 		this.active = active;
+	}
+
+	@Override
+	public boolean validate() {
+		return !(isBlank(getGroupId()) || isBlank(getArtifactId()));
 	}
 
 	@Override

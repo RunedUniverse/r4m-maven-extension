@@ -58,7 +58,7 @@
 			<xs:element name="disable-super-pom" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						By disableing the 'super-pom' all default goal
+						By disabling the 'super-pom' all default goal
 						declarations enforced by maven are disabled.
 					</xs:documentation>
 				</xs:annotation>
@@ -70,7 +70,7 @@
 			<xs:element name="disable-project-pom" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>
-						By disableing the project pom, the PEM derived
+						By disabling the project pom, the PEM derived
 						from the project's pom is disabled.
 					</xs:documentation>
 				</xs:annotation>

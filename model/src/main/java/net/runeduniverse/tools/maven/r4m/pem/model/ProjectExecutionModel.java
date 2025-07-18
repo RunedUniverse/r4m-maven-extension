@@ -27,6 +27,8 @@ import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+
 public class ProjectExecutionModel implements Recordable {
 
 	protected final Map<String, ModelOverride> overrides = new LinkedHashMap<>(0);
@@ -146,6 +148,30 @@ public class ProjectExecutionModel implements Recordable {
 
 	public void addExecutions(final Collection<Execution> executions) {
 		this.executions.addAll(executions);
+	}
+
+	@Override
+	public int hashCode() {
+		return 0;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof ProjectExecutionModel))
+			return false;
+		final ProjectExecutionModel other = (ProjectExecutionModel) obj;
+
+		return this.userDefined == other.userDefined //
+				&& this.inherited == other.inherited //
+				&& objectEquals(this.version, other.version) //
+				&& objectEquals(this.parserType, other.parserType) //
+				&& objectEquals(this.parserHint, other.parserHint) //
+				&& objectEquals(this.source, other.source) //
+				&& objectEquals(this.overrides, other.overrides) //
+				&& objectEquals(this.executions, other.executions);
 	}
 
 	public ProjectExecutionModel copy() {

@@ -17,6 +17,8 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import java.nio.file.Path;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+
 public class DefaultModelSource implements ModelSource {
 
 	protected String projectId = null;
@@ -69,5 +71,25 @@ public class DefaultModelSource implements ModelSource {
 	public ModelSource setNote(String note) {
 		this.note = note;
 		return this;
+	}
+
+	@Override
+	public int hashCode() {
+		return 0;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof ModelSource))
+			return false;
+		final ModelSource other = (ModelSource) obj;
+
+		return objectEquals(getProjectId(), other.getProjectId()) //
+				&& objectEquals(getPluginId(), other.getPluginId()) //
+				&& objectEquals(getFile(), other.getFile()) //
+				&& objectEquals(getNote(), other.getNote());
 	}
 }

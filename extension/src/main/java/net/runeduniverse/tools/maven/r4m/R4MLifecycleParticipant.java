@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -199,8 +200,16 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 			throws MavenExecutionException {
 
 		try {
-			for (MavenProject mvnProject : mvnSession.getAllProjects())
+			final List<MavenProject> allProjects = new LinkedList<>(mvnSession.getAllProjects());
+			for (ListIterator<MavenProject> i = allProjects.listIterator(); i.hasNext();) {
+				final MavenProject mvnProject = i.next();
 				scanProject(mvnSession, extPlugins.getOrDefault(mvnProject, Collections.emptySet()), mvnProject);
+				final MavenProject mvnParentProject = mvnProject.getParent();
+				if (mvnParentProject != null && !allProjects.contains(mvnParentProject)) {
+					i.add(mvnParentProject);
+					i.previous();
+				}
+			}
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
 		}

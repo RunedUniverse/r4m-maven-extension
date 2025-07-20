@@ -198,17 +198,23 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private boolean patchMaven(final MavenSession mvnSession, final boolean isCoreExt,
 			final Map<MavenProject, Set<Extension>> extensions, final Map<MavenProject, Set<Plugin>> extPlugins)
 			throws MavenExecutionException {
+		final LinkedList<MavenProject> allProjects = new LinkedList<>(mvnSession.getAllProjects());
+		for (ListIterator<MavenProject> i = allProjects.listIterator(); i.hasNext();) {
+			final MavenProject mvnProject = i.next();
+			if (mvnProject == null)
+				continue;
+			final MavenProject mvnParentProject = mvnProject.getParent();
+			if (mvnParentProject != null && !allProjects.contains(mvnParentProject)) {
+				i.add(mvnParentProject);
+				i.previous();
+			}
+		}
 
 		try {
-			final List<MavenProject> allProjects = new LinkedList<>(mvnSession.getAllProjects());
-			for (ListIterator<MavenProject> i = allProjects.listIterator(); i.hasNext();) {
+			// scan in reverse order -> parents first
+			for (Iterator<MavenProject> i = allProjects.descendingIterator(); i.hasNext();) {
 				final MavenProject mvnProject = i.next();
 				scanProject(mvnSession, extPlugins.getOrDefault(mvnProject, Collections.emptySet()), mvnProject);
-				final MavenProject mvnParentProject = mvnProject.getParent();
-				if (mvnParentProject != null && !allProjects.contains(mvnParentProject)) {
-					i.add(mvnParentProject);
-					i.previous();
-				}
 			}
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);

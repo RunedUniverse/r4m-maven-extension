@@ -18,19 +18,16 @@ package net.runeduniverse.tools.maven.r4m.pem.api;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.maven.model.Build;
 import org.apache.maven.model.Plugin;
-import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public interface ProjectExecutionModelPomParser {
+public interface ProjectExecutionModelCompatProjectParser {
 
 	public ProjectExecutionModel parse(Set<Plugin> invalidPlugins, List<RemoteRepository> repositories,
-			RepositorySystemSession session, MavenProject mvnProject, List<Profile> profiles, Build buildModel)
-			throws Exception;
+			RepositorySystemSession session, MavenProject mvnProject) throws Exception;
 
 }

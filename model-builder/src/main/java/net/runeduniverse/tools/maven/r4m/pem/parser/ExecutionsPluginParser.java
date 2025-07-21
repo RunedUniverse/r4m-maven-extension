@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.BuildBase;
+import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
@@ -41,7 +42,7 @@ import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPomParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelCompatProjectParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
@@ -56,8 +57,8 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ProjectExecutionModelPomParser.class, hint = ExecutionsPluginParser.HINT)
-public class ExecutionsPluginParser implements ProjectExecutionModelPomParser {
+@Component(role = ProjectExecutionModelCompatProjectParser.class, hint = ExecutionsPluginParser.HINT)
+public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjectParser {
 
 	public static final String HINT = "plugin-execution";
 	public static final String ERR_MSG_PLUGIN_DESCRIPTOR = "Failed to acquire org.apache.maven.plugin.descriptor.PluginDescriptor!";
@@ -71,8 +72,14 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPomParser {
 
 	@Override
 	public ProjectExecutionModel parse(final Set<Plugin> invalidPlugins, final List<RemoteRepository> repositories,
-			final RepositorySystemSession session, final MavenProject mvnProject, final List<Profile> profiles,
-			final Build buildModel) throws Exception {
+			final RepositorySystemSession session, final MavenProject mvnProject) throws Exception {
+		final Model originalModel = mvnProject.getOriginalModel();
+		if (originalModel == null)
+			return null;
+
+		final List<Profile> profiles = originalModel.getProfiles();
+		final Build buildModel = originalModel.getBuild();
+
 		System.out.println("--- " + mvnProject.getId());
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();

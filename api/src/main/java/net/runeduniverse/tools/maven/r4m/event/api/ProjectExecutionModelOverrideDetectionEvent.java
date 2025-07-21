@@ -15,15 +15,12 @@
  */
 package net.runeduniverse.tools.maven.r4m.event.api;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 
 public interface ProjectExecutionModelOverrideDetectionEvent {
 
@@ -31,30 +28,24 @@ public interface ProjectExecutionModelOverrideDetectionEvent {
 
 	public MavenProject getMvnProject();
 
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides();
-
-	public Map<String, String> getModelReference();
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverrides();
 
 	public static BasicEvent createEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
-			final Map<String, String> modelReference) {
-		return new BasicEvent(topLevelMvnProject, mvnProject, overrides, modelReference);
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides) {
+		return new BasicEvent(topLevelMvnProject, mvnProject, overrides);
 	}
 
 	public class BasicEvent implements ProjectExecutionModelOverrideDetectionEvent {
 
 		protected MavenProject topLevelMvnProject;
 		protected MavenProject mvnProject;
-		protected DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides;
-		protected Map<String, String> modelReference;
+		protected DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides;
 
 		public BasicEvent(final MavenProject topLevelMvnProject, final MavenProject mvnProject,
-				final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
-				final Map<String, String> modelReference) {
+				final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides) {
 			this.topLevelMvnProject = topLevelMvnProject;
 			this.mvnProject = mvnProject;
 			this.overrides = overrides;
-			this.modelReference = modelReference;
 		}
 
 		@Override
@@ -68,13 +59,8 @@ public interface ProjectExecutionModelOverrideDetectionEvent {
 		}
 
 		@Override
-		public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides() {
+		public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverrides() {
 			return this.overrides;
-		}
-
-		@Override
-		public Map<String, String> getModelReference() {
-			return this.modelReference == null ? Collections.emptyMap() : this.modelReference;
 		}
 
 	}

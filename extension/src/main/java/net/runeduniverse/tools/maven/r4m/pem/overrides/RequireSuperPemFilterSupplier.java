@@ -15,11 +15,12 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.overrides;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.codehaus.plexus.component.annotations.Component;
 
+import net.runeduniverse.lib.utils.common.api.DataMap;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionFilterUtils;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
@@ -27,14 +28,15 @@ import net.runeduniverse.tools.maven.r4m.pem.model.DeclareSuperPemOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-@Component(role = ProjectExecutionModelOverrideFilterSupplier.class, hint = DeclareSuperPemOverride.HINT)
+@Component(role = ProjectExecutionModelOverrideFilterSupplier.class, hint = DeclareSuperPemOverride.TYPE)
 public class RequireSuperPemFilterSupplier implements ProjectExecutionModelOverrideFilterSupplier {
 
 	@Override
-	public ModelPredicate<ProjectExecutionModel, Execution> get(final Map<String, AtomicBoolean> overrides) {
+	public ModelPredicate<ProjectExecutionModel, Execution> get(
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides) {
 		final AtomicBoolean value = overrides.get(DeclareSuperPemOverride.TYPE);
 		if (value == null || !value.get())
-			return (pem, e) -> true;
+			return null;
 
 		return ExecutionFilterUtils::requireSuperPemFilter;
 	}

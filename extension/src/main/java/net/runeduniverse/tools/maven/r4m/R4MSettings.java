@@ -31,10 +31,12 @@ public class R4MSettings extends APropertyStore implements Settings {
 	private Property<String> lifecycleTaskRequestCalculatorOnFork = null;
 	private Property<String> missingBuildPluginHandler = null;
 	private Property<String> activeProfilesInheritance = null;
+	private Property<String> showActiveOverrides = null;
 	private Property<Boolean> fancyOutput = null;
 	private Property<Boolean> patchMojoOnFork = null;
 	private Property<Boolean> generatePluginExecutions = null;
 	private Property<Boolean> generatePluginExecutionsOnFork = null;
+	private Property<Boolean> mavenBackwardsCompatible = null;
 	private Property<String> debugDumpGrmEntriesBeforeExecution = null;
 
 	public R4MSettings() {
@@ -69,6 +71,11 @@ public class R4MSettings extends APropertyStore implements Settings {
 	}
 
 	@Override
+	public Property<String> getShowActiveOverrides() {
+		return this.showActiveOverrides;
+	}
+
+	@Override
 	public Property<Boolean> getFancyOutput() {
 		return this.fancyOutput;
 	}
@@ -86,6 +93,11 @@ public class R4MSettings extends APropertyStore implements Settings {
 	@Override
 	public Property<Boolean> getGeneratePluginExecutionsOnFork() {
 		return this.generatePluginExecutionsOnFork;
+	}
+
+	@Override
+	public Property<Boolean> getMavenBackwardsCompatible() {
+		return this.mavenBackwardsCompatible;
 	}
 
 	@Override
@@ -124,6 +136,12 @@ public class R4MSettings extends APropertyStore implements Settings {
 	}
 
 	@Override
+	public void setShowActiveOverrides(final Property<String> value) {
+		this.showActiveOverrides = value;
+		super.redirectSetProperty(PROP_SHOW_ACTIVE_OVERRIDES, value);
+	}
+
+	@Override
 	public void setFancyOutput(final Property<Boolean> value) {
 		this.fancyOutput = value;
 		super.redirectSetProperty(PROP_FANCY_OUTPUT, value);
@@ -145,6 +163,12 @@ public class R4MSettings extends APropertyStore implements Settings {
 	public void setGeneratePluginExecutionsOnFork(final Property<Boolean> value) {
 		this.generatePluginExecutionsOnFork = value;
 		super.redirectSetProperty(PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK, value);
+	}
+
+	@Override
+	public void setMavenBackwardsCompatible(final Property<Boolean> value) {
+		this.mavenBackwardsCompatible = value;
+		super.redirectSetProperty(PROP_MAVEN_BACKWARDS_COMPATIBLE, value);
 	}
 
 	@Override
@@ -176,11 +200,17 @@ public class R4MSettings extends APropertyStore implements Settings {
 		case PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK:
 			tryCast(String.class, value, this::setLifecycleTaskRequestCalculatorOnFork);
 			break;
+		case PROP_MAVEN_BACKWARDS_COMPATIBLE:
+			tryCast(Boolean.class, value, this::setMavenBackwardsCompatible);
+			break;
 		case PROP_MISSING_BUILD_PLUGIN_HANDLER:
 			tryCast(String.class, value, this::setMissingBuildPluginHandler);
 			break;
 		case PROP_PATCH_MOJO_ON_FORK:
 			tryCast(Boolean.class, value, this::setPatchMojoOnFork);
+			break;
+		case PROP_SHOW_ACTIVE_OVERRIDES:
+			tryCast(String.class, value, this::setShowActiveOverrides);
 			break;
 		case PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION:
 			tryCast(String.class, value, this::setDebugDumpGrmEntriesBeforeExecution);

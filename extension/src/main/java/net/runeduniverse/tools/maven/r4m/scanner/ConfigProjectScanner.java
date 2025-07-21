@@ -15,6 +15,7 @@
  */
 package net.runeduniverse.tools.maven.r4m.scanner;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
@@ -58,8 +59,8 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 	@Override
 	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
 			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
-		final Path basedir = mvnProject.getBasedir()
-				.toPath();
+		final File origBasedir = mvnProject.getBasedir();
+		final Path basedir = origBasedir == null ? null : origBasedir.toPath();
 		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
 			final ProjectExecutionModel model = parser.parse(mvnProject);
 			if (model != null) {
@@ -72,7 +73,7 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 
 				final Path file = source.getFile();
 				if (file != null)
-					source.setFile(basedir.resolve(file));
+					source.setFile(basedir == null ? file : basedir.resolve(file));
 			}
 		}
 		for (GoalRequirementModelConfigParser parser : this.grmConfigParser.values()) {

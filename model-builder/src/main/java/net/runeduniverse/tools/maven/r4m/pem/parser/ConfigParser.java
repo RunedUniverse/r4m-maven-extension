@@ -47,6 +47,9 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 
 	@Override
 	public ProjectExecutionModel parse(final MavenProject mvnProject) throws Exception {
+		final File basedir = mvnProject.getBasedir();
+		if (basedir == null)
+			return null;
 		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setModelSource(new DefaultModelSource() //

@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -197,10 +198,24 @@ public class R4MLifecycleParticipant extends AbstractMavenLifecycleParticipant {
 	private boolean patchMaven(final MavenSession mvnSession, final boolean isCoreExt,
 			final Map<MavenProject, Set<Extension>> extensions, final Map<MavenProject, Set<Plugin>> extPlugins)
 			throws MavenExecutionException {
+		final LinkedList<MavenProject> allProjects = new LinkedList<>(mvnSession.getAllProjects());
+		for (ListIterator<MavenProject> i = allProjects.listIterator(); i.hasNext();) {
+			final MavenProject mvnProject = i.next();
+			if (mvnProject == null)
+				continue;
+			final MavenProject mvnParentProject = mvnProject.getParent();
+			if (mvnParentProject != null && !allProjects.contains(mvnParentProject)) {
+				i.add(mvnParentProject);
+				i.previous();
+			}
+		}
 
 		try {
-			for (MavenProject mvnProject : mvnSession.getAllProjects())
+			// scan in reverse order -> parents first
+			for (Iterator<MavenProject> i = allProjects.descendingIterator(); i.hasNext();) {
+				final MavenProject mvnProject = i.next();
 				scanProject(mvnSession, extPlugins.getOrDefault(mvnProject, Collections.emptySet()), mvnProject);
+			}
 		} catch (Exception e) {
 			throw new MavenExecutionException(ERR_FAILED_TO_LOAD_MODELS, e);
 		}

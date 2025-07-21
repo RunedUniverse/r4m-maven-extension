@@ -17,47 +17,27 @@ package net.runeduniverse.tools.maven.r4m.pem.converter;
 
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
+
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.ConfigurationFactory;
 import net.runeduniverse.tools.maven.r4m.pem.converter.api.DataHandler;
 import net.runeduniverse.tools.maven.r4m.pem.model.DataEntry;
-import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import net.runeduniverse.tools.maven.r4m.pem.model.DisableProjectPomOverride;
 
-@Component(role = DataHandler.class, hint = Goal.CANONICAL_NAME)
-public class GoalDataHandler extends ADataHandler {
+@Component(role = DataHandler.class, hint = DisableProjectPomOverride.CANONICAL_NAME)
+public class DisableProjectPomOverrideHandler extends ADataHandler {
 
 	@Override
 	protected PlexusConfiguration toConfig(final ConfigurationFactory<PlexusConfiguration> factory,
 			final DataEntry entry) {
-		if (!(entry instanceof Goal))
+		if (!(entry instanceof DisableProjectPomOverride))
 			return null;
 
-		final Goal data = (Goal) entry;
-		final PlexusConfiguration cnf = factory.create(Goal.HINT);
+		final DisableProjectPomOverride data = (DisableProjectPomOverride) entry;
+		final PlexusConfiguration cnf = factory.create(DisableProjectPomOverride.HINT);
 
-		setAttributeAsId(cnf, "id", data.getGoalId());
+		setOptionalAttributeSkipDefault(cnf, "value", data.isActive(), true);
 		cnf.addChild("groupId", asId(data.getGroupId()));
 		cnf.addChild("artifactId", asId(data.getArtifactId()));
-
-		if (!data.getModes()
-				.isEmpty()) {
-			final PlexusConfiguration modeNodes = cnf.getChild("modes", true);
-			for (String mode : data.getModes()) {
-				if (isBlank(mode))
-					continue;
-
-				final PlexusConfiguration node = factory.create("mode");
-				setAttributeAsId(node, "id", mode);
-				modeNodes.addChild(node);
-			}
-		}
-
-		if (data.getOptional() != null)
-			setAttributeAsId(cnf, "optional", data.getOptional()
-					.toString());
-
-		if (data.hasFork())
-			addConvertedEntry(cnf, factory, data.getFork());
 
 		return cnf;
 	}

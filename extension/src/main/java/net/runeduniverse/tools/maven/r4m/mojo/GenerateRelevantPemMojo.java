@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -37,6 +38,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.annotations.Requirement;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
@@ -45,11 +47,13 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfigFactory;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionRestrictionEvaluator;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideContextSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelWriter;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
@@ -116,6 +120,11 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	 */
 	private Set<ProjectExecutionModelOverrideFilterSupplier> overrideFilterSupplier;
 
+	/**
+	 * @component role="net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideContextSupplier"
+	 */
+	protected Map<String, ProjectExecutionModelOverrideContextSupplier> overrideContextSupplier;
+
 	@Override
 	public void execute() throws MojoExecutionException, MojoFailureException {
 		if (isBlank(this.encoding))
@@ -144,9 +153,9 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 
 		final Set<Execution> executions = new LinkedHashSet<>();
 		final ExecutionArchiveSectorSnapshot snapshot = projectSector.snapshot();
-		final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides = snapshot
-				.collectOverridesAsBooleanMapWithModels();
-		final int sectorCnt = collectExecutions(executions, snapshot, overrides.toValueMap(), cnf);
+		final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides = snapshot
+				.collectOverridesAsBooleanMapWithData();
+		final int sectorCnt = collectExecutions(executions, snapshot, overrides, cnf);
 		// clone! originals must not be modified!!!
 		replaceWithEquivalents(executions);
 
@@ -186,7 +195,8 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	}
 
 	private int collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
-			final Map<String, AtomicBoolean> overrides, final ExecutionArchiveSelectorConfig cnf) {
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
+			final ExecutionArchiveSelectorConfig cnf) {
 		final Data data = new Data();
 		collectExecutions(executions, snapshot, overrides, defaultRelevanceFilterSupplier(restrictionEvaluator, cnf),
 				false, data);
@@ -194,8 +204,9 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 	}
 
 	private void collectExecutions(final Set<Execution> executions, final ExecutionArchiveSectorSnapshot snapshot,
-			final Map<String, AtomicBoolean> overrides, final ModelPredicate<ProjectExecutionModel, Execution> filter,
-			final boolean requireInherited, final Data data) {
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
+			final ModelPredicate<ProjectExecutionModel, Execution> filter, final boolean requireInherited,
+			final Data data) {
 		if (snapshot == null)
 			return;
 		snapshot.applyOverrides(overrides, this.overrideFilterSupplier);
@@ -213,7 +224,7 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		executions.addAll(snapshot.getUserDefinedExecutions(filter, requireInherited));
 	}
 
-	private void logOverrides(final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
+	private void logOverrides(final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
 			final Map<String, String> refMap) {
 		// check validity
 		if (overrides == null || overrides.isEmpty())
@@ -223,16 +234,22 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		getLog().info("");
 		getLog().info("Active Overrides");
 
+		final Map<String, Set<String>> labelMap = new LinkedHashMap<>();
+		final Map<String, Set<String>> contextMap = new LinkedHashMap<>(0);
+
 		// log active overrides
-		int mxLen = 0;
-		for (String id : overrides.keySet()) {
-			id = refMap.getOrDefault(id, id);
-			int len = id == null ? 4 : id.length();
-			if (30 < len)
-				continue;
-			if (mxLen < len)
-				mxLen = len;
-		}
+		final AtomicInteger mxLen = new AtomicInteger(0);
+		overrides.forEach((k, v, d) -> {
+			final Set<String> labelSet = getLabel(contextMap, k, d.getModelOverrides());
+			labelMap.put(k, labelSet);
+			for (String label : labelSet) {
+				int len = label == null ? 4 : label.length();
+				if (30 < len)
+					continue;
+				if (mxLen.get() < len)
+					mxLen.set(len);
+			}
+		});
 
 		// index all plugin artifacts in the project tree
 		final Map<String, String> artifactIndex = new LinkedHashMap<>();
@@ -242,19 +259,25 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 				artifactIndex.computeIfAbsent(ModelSource.id(plugin::getGroupId, plugin::getArtifactId), k -> id);
 		}
 
-		final String template = "  - %-" + mxLen + "s = %s";
+		final String template = "  - %-" + mxLen.get() + "s = %s";
 		final AtomicInteger unknownModels = new AtomicInteger(0);
 		final Map<String, Set<ProjectExecutionModel>> index = new LinkedHashMap<>();
 
-		overrides.forEach((id, boolValue, modelSet) -> {
-			final String key = refMap.getOrDefault(id, id);
+		overrides.forEach((id, boolValue, data) -> {
 			final String value = boolValue == null ? null : Boolean.toString(boolValue.get());
+			for (String label : labelMap.get(id)) {
+				if (label == null || value == null) {
+					getLog().warn(String.format(template, label, value));
+					for (String context : contextMap.getOrDefault(id, Collections.emptySet()))
+						getLog().warn(String.format("      [ %s ]", context));
+				} else {
+					getLog().info(String.format(template, label, value));
+					for (String context : contextMap.getOrDefault(id, Collections.emptySet()))
+						getLog().info(String.format("      [ %s ]", context));
+				}
+			}
 
-			if (key == null || value == null)
-				getLog().warn(String.format(template, key, value));
-			else
-				getLog().info(String.format(template, key, value));
-
+			final Set<ProjectExecutionModel> modelSet = data.getProjectExecutionModels();
 			if (modelSet == null)
 				return;
 			// group by projectId
@@ -302,6 +325,30 @@ public class GenerateRelevantPemMojo extends AbstractMojo {
 		if (0 < unknownModels.get()) {
 			getLog().warn(String.format("  » %i models of unknown origin!", unknownModels.get()));
 		}
+	}
+
+	private Set<String> getLabel(final Map<String, Set<String>> contextMap, final String type,
+			final Set<ModelOverride> overrides) {
+		final Set<String> set = new LinkedHashSet<>(1);
+		final ProjectExecutionModelOverrideContextSupplier supplier = this.overrideContextSupplier.get(type);
+		if (overrides != null) {
+			for (ModelOverride override : overrides) {
+				if (override == null)
+					continue;
+				final String hint = override.hint();
+				set.add(hint);
+				if (supplier != null) {
+					final String context = supplier.get(override);
+					if (isBlank(context))
+						continue;
+					contextMap.computeIfAbsent(hint, k -> new LinkedHashSet<>(1))
+							.add(context);
+				}
+			}
+		}
+		if (set.isEmpty())
+			set.add(type);
+		return set;
 	}
 
 	private void logEntry(final Path basedir, final Set<ProjectExecutionModel> modelSet, final String offset,

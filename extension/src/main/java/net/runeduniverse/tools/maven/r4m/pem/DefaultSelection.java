@@ -29,9 +29,9 @@ import java.util.function.Consumer;
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
 import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelectorConfig;
-import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.LifecycleView;
@@ -40,16 +40,14 @@ import net.runeduniverse.tools.maven.r4m.pem.view.api.PhaseView;
 public class DefaultSelection implements ExecutionArchiveSelection {
 
 	protected final ExecutionArchiveSelectorConfig selectorConfig;
-	protected final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides;
-	protected final Map<String, String> overrideModelReference;
+	protected final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides;
 	protected final Set<ExecutionView> views;
 
 	public DefaultSelection(final ExecutionArchiveSelectorConfig selectorConfig,
-			final DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> overrides,
-			final Map<String, String> overrideModelReference, final Set<ExecutionView> views) {
+			final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overrides,
+			final Set<ExecutionView> views) {
 		this.selectorConfig = selectorConfig;
 		this.overrides = overrides;
-		this.overrideModelReference = overrideModelReference;
 		this.views = views;
 	}
 
@@ -138,13 +136,8 @@ public class DefaultSelection implements ExecutionArchiveSelection {
 	}
 
 	@Override
-	public DataMap<String, AtomicBoolean, Set<ProjectExecutionModel>> getOverrides() {
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverrides() {
 		return this.overrides;
-	}
-
-	@Override
-	public Map<String, String> getOverrideModelReference() {
-		return this.overrideModelReference;
 	}
 
 	@Override

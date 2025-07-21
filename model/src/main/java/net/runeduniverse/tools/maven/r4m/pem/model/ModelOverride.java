@@ -27,4 +27,10 @@ public interface ModelOverride extends DataEntry {
 
 	public void setActive(boolean active);
 
+	public default boolean validate() {
+		return true;
+	}
+
+	public ModelOverride copy();
+
 }

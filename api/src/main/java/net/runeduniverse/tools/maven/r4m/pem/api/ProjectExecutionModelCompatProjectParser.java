@@ -15,15 +15,19 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
+import java.util.Set;
 
-import net.runeduniverse.lib.utils.common.api.DataMap;
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot.Data;
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.RemoteRepository;
+
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
-public interface ProjectExecutionModelOverrideFilterSupplier {
+public interface ProjectExecutionModelCompatProjectParser {
 
-	public ModelPredicate<ProjectExecutionModel, Execution> get(DataMap<String, AtomicBoolean, Data> overrides);
+	public ProjectExecutionModel parse(Set<Plugin> invalidPlugins, List<RemoteRepository> repositories,
+			RepositorySystemSession session, MavenProject mvnProject) throws Exception;
 
 }

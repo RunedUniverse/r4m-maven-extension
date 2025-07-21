@@ -39,10 +39,12 @@ public class SettingsFactory {
 		builder.withDefaultProperty(Settings.PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK, "sequential");
 		builder.withDefaultProperty(Settings.PROP_MISSING_BUILD_PLUGIN_HANDLER, "warn");
 		builder.withDefaultProperty(Settings.PROP_ACTIVE_PROFILES_INHERITANCE, "upstream");
+		builder.withDefaultProperty(Settings.PROP_SHOW_ACTIVE_OVERRIDES, "reduced");
 		builder.withDefaultProperty(Settings.PROP_FANCY_OUTPUT, "true");
 		builder.withDefaultProperty(Settings.PROP_PATCH_MOJO_ON_FORK, "true");
 		builder.withDefaultProperty(Settings.PROP_GENERATE_PLUGIN_EXECUTIONS, "true");
 		builder.withDefaultProperty(Settings.PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK, "true");
+		builder.withDefaultProperty(Settings.PROP_MAVEN_BACKWARDS_COMPATIBLE, "true");
 		// debug
 		builder.withDefaultProperty(Settings.PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION, "reduced");
 
@@ -58,10 +60,12 @@ public class SettingsFactory {
 				LifecycleTaskRequestCalculatorDelegate.class);
 		builder.parseTextProperty(Settings.PROP_MISSING_BUILD_PLUGIN_HANDLER, "skip", "warn", "scan", "download");
 		builder.parseTextProperty(Settings.PROP_ACTIVE_PROFILES_INHERITANCE, "upstream", "top-level", "false");
+		builder.parseTextProperty(Settings.PROP_SHOW_ACTIVE_OVERRIDES, "all", "reduced", "false");
 		builder.parseBooleanProperty(Settings.PROP_FANCY_OUTPUT);
 		builder.parseBooleanProperty(Settings.PROP_PATCH_MOJO_ON_FORK);
 		builder.parseBooleanProperty(Settings.PROP_GENERATE_PLUGIN_EXECUTIONS);
 		builder.parseBooleanProperty(Settings.PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK);
+		builder.parseBooleanProperty(Settings.PROP_MAVEN_BACKWARDS_COMPATIBLE);
 
 		// debug
 		builder.parseTextProperty(Settings.PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION, "all", "reduced");

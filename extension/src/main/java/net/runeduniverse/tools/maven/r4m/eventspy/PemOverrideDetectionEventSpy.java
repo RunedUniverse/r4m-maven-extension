@@ -34,6 +34,7 @@ import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.event.api.ProjectExecutionModelOverrideDetectionEvent;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideContextSupplier;
@@ -50,6 +51,8 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 
 	@Requirement
 	private Logger log;
+	@Requirement
+	private Settings settings;
 
 	@Requirement(role = ProjectExecutionModelOverrideContextSupplier.class)
 	protected Map<String, ProjectExecutionModelOverrideContextSupplier> overrideContextSupplier;
@@ -73,6 +76,11 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 	}
 
 	private void handleModelLogging(final ProjectExecutionModelOverrideDetectionEvent event) {
+		final String setting = this.settings.getShowActiveOverrides()
+				.getSelected();
+		if ("false".equals(setting))
+			return;
+
 		// check validity
 		final MavenProject mvnProject = event.getMvnProject();
 		final DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> overridesSrc = event.getOverrides();
@@ -124,9 +132,8 @@ public class PemOverrideDetectionEventSpy implements EventSpy {
 		}
 
 		// log matching models
-		if (modelsSet == null || modelsSet.isEmpty()) {
+		if ("reduced".equals(setting) || modelsSet == null || modelsSet.isEmpty())
 			return;
-		}
 
 		this.log.info("\033[1mfrom\033[m");
 

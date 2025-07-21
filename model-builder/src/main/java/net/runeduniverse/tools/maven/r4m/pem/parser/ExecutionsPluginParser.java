@@ -49,6 +49,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
 import net.runeduniverse.lib.utils.common.api.DataMap;
+import net.runeduniverse.tools.maven.r4m.api.Settings;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSector;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
@@ -81,7 +82,9 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 	@Requirement
 	protected MavenPluginManager manager;
 	@Requirement(role = org.apache.maven.lifecycle.Lifecycle.class)
-	private Map<String, org.apache.maven.lifecycle.Lifecycle> mvnLifecycles;
+	protected Map<String, org.apache.maven.lifecycle.Lifecycle> mvnLifecycles;
+	@Requirement
+	protected Settings settings;
 	@Requirement
 	protected ExecutionArchive archive;
 	@Requirement(role = ProjectExecutionModelOverrideFilterSupplier.class)
@@ -91,6 +94,10 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 	public ProjectExecutionModel parse(final Set<Plugin> invalidPlugins, final List<RemoteRepository> repositories,
 			final RepositorySystemSession session, final MavenProject mvnProject) throws Exception {
 		if (mvnProject == null)
+			return null;
+		// if maven backwards compat-mode is disabled, return null
+		if (!this.settings.getMavenBackwardsCompatible()
+				.getSelected())
 			return null;
 
 		// optain active overrides
@@ -238,7 +245,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return pem;
 	}
 
-	private Set<ModelPredicate<ProjectExecutionModel, Execution>> getOverrideFilter(final MavenProject mvnProject) {
+	protected Set<ModelPredicate<ProjectExecutionModel, Execution>> getOverrideFilter(final MavenProject mvnProject) {
 		final Set<ModelPredicate<ProjectExecutionModel, Execution>> set = new LinkedHashSet<>();
 		final ExecutionArchiveSector sector = this.archive.getSector(mvnProject);
 		if (sector == null)
@@ -257,7 +264,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return set;
 	}
 
-	private Map<String, Map<String, Execution>> aggregateExecutions(final Set<Plugin> invalidPlugins,
+	protected Map<String, Map<String, Execution>> aggregateExecutions(final Set<Plugin> invalidPlugins,
 			final List<RemoteRepository> repositories, final RepositorySystemSession session,
 			final Set<ModelPredicate<ProjectExecutionModel, Execution>> filterSet, final MavenProject rootMvnProject,
 			final Function<MavenProject, Collection<Plugin>> pluginsSupplier) {
@@ -309,7 +316,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return domMap;
 	}
 
-	private ProjectExecutionModel createPem(final MavenProject mvnProject) {
+	protected ProjectExecutionModel createPem(final MavenProject mvnProject) {
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setModelSource(new DefaultModelSource() //
 				.setFile(Paths.get("pom.xml"))
@@ -321,7 +328,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return model;
 	}
 
-	private Map<String, Map<String, Execution>> indexPlugins(final Set<Plugin> invalidPlugins,
+	protected Map<String, Map<String, Execution>> indexPlugins(final Set<Plugin> invalidPlugins,
 			final List<RemoteRepository> repositories, final RepositorySystemSession session,
 			final MavenProject rootMvnProject, final MavenProject mvnProject, final ProjectExecutionModel pem,
 			final Function<MavenProject, Collection<Plugin>> pluginsSupplier) {
@@ -347,8 +354,8 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return pluginIndex;
 	}
 
-	private Map<String, Execution> convert(final ProjectExecutionModel pem, final PluginDescriptor mvnPluginDescriptor,
-			final Plugin mvnPlugin) {
+	protected Map<String, Execution> convert(final ProjectExecutionModel pem,
+			final PluginDescriptor mvnPluginDescriptor, final Plugin mvnPlugin) {
 		final Map<String, Execution> executions = new LinkedHashMap<>();
 		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
 			final Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);
@@ -402,7 +409,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return executions;
 	}
 
-	private Plugin resolvePlugin(final MavenProject mvnProject, final Plugin plugin) {
+	protected Plugin resolvePlugin(final MavenProject mvnProject, final Plugin plugin) {
 		if (plugin == null)
 			return null;
 
@@ -442,7 +449,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return plugin;
 	}
 
-	private boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
+	protected boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
 		if (mvnPlugin == null)
 			return false;
 
@@ -454,7 +461,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return true;
 	}
 
-	private Goal createGoal(final Plugin mvnPlugin, final MojoDescriptor mvnMojoDescriptor) {
+	protected Goal createGoal(final Plugin mvnPlugin, final MojoDescriptor mvnMojoDescriptor) {
 		final Goal goal = new Goal(mvnPlugin.getGroupId(), mvnPlugin.getArtifactId(), mvnMojoDescriptor.getGoal())
 				.addModes("default", "dev");
 		final Fork fork = new Fork();
@@ -483,7 +490,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		return goal;
 	}
 
-	private Lifecycle acquireLifecycle(final Execution execution, final String phase) {
+	protected Lifecycle acquireLifecycle(final Execution execution, final String phase) {
 		String id = null;
 		for (Entry<String, org.apache.maven.lifecycle.Lifecycle> entry : this.mvnLifecycles.entrySet())
 			if (entry.getValue()

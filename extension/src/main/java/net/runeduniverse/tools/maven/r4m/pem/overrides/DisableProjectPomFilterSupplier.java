@@ -15,8 +15,6 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.overrides;
 
-import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -30,10 +28,11 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFi
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.DisableProjectPomOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
+
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.typeIsAssignable;
 
 @Component(role = ProjectExecutionModelOverrideFilterSupplier.class, hint = DisableProjectPomOverride.TYPE)
 public class DisableProjectPomFilterSupplier implements ProjectExecutionModelOverrideFilterSupplier {
@@ -67,13 +66,12 @@ public class DisableProjectPomFilterSupplier implements ProjectExecutionModelOve
 			return null;
 
 		return (pem, exec) -> {
-			if (pem == null || exec == null)
+			if (pem == null)
 				return false;
 			final ModelSource source = pem.getModelSource();
 			if (source == null //
 					|| !typeIsAssignable(ProjectExecutionModelPluginParser.class, pem.getParserType())
-					|| !"plugin-execution".equals(pem.getParserHint())
-					|| !ExecutionSource.OVERRIDE.equals(exec.getSource()))
+					|| !"plugin-execution".equals(pem.getParserHint()))
 				return true;
 			return !ids.contains(source.getProjectId());
 		};

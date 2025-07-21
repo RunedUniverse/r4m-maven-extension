@@ -24,8 +24,8 @@ import org.codehaus.plexus.component.annotations.Component;
 import net.runeduniverse.lib.utils.common.api.DataMap;
 import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSectorSnapshot;
 import net.runeduniverse.tools.maven.r4m.pem.api.ModelPredicate;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelCompatProjectParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelOverrideFilterSupplier;
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.DisableProjectPomOverride;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelOverride;
@@ -70,7 +70,7 @@ public class DisableProjectPomFilterSupplier implements ProjectExecutionModelOve
 				return false;
 			final ModelSource source = pem.getModelSource();
 			if (source == null //
-					|| !typeIsAssignable(ProjectExecutionModelPluginParser.class, pem.getParserType())
+					|| !typeIsAssignable(ProjectExecutionModelCompatProjectParser.class, pem.getParserType())
 					|| !"plugin-execution".equals(pem.getParserHint()))
 				return true;
 			return !ids.contains(source.getProjectId());

@@ -117,8 +117,10 @@ Property | Default | Options | Description
 `r4m.generate-plugin-executions-on-fork` | `true` | `true`, `false` | This property defines whether missing active executions can be auto-generated when forking. For further information see [Issue #5](https://github.com/RunedUniverse/r4m-maven-extension/issues/5#issuecomment-1618743363).
 `r4m.lifecycle-task-request-calculator` | `sequential` | `declared`, `sequential` | This property defines how lifecycle-tasks without modifiers get interpreted. Option `declared`   -> `<phase>` => `[<phase>]` vs option `sequential` -> `<phase>` =>  `<phase>]`.
 `r4m.lifecycle-task-request-calculator-on-fork` | `sequential` | `declared`, `sequential` | This property defines how Maven default based goal forks, defining an `execute-phase`, get interpreted. Option `declared`   -> `<phase>` => `[<phase>]` vs option `sequential` -> `<phase>` =>  `<phase>]`.
+`r4m.maven-backwards-compatible` | `true` | `true`, `false` | This property defines whether PEM execution overrides should be extracted from the project 'pom.xml'.
 `r4m.missing-build-plugin-handler` | `warn` | `skip`, `warn`, `scan`, `download` | This property defines how active goals without an active plugin definition should get handled. In case you have a plugin which requires a secondary "missing/undefined" plugin you may set this property to `scan` or `download` but be warned this slows down operation significantly. Furthermore in case you have a maven-plugin which has a secondary plugin bundled you can forceload the secondary plugin by setting this property to `scan` but again this slows down operation significantly and is **not** recommended. Please just define all required plugins!
 `r4m.patch-mojo-on-fork` | `true` | `true`, `false` | This defines whether the mojos during fork can be rewritten. This 'fixes' the gui but may break other plugins which might rely on that variable downstream.
+`r4m.show-active-overrides` | `reduced` | `all`, `reduced`, `false` | This defines how much information about the active overrides should be logged.
 `r4m.debug.dump-grm-entries-before-execution` | `reduced` | `all`, `reduced` | Defines the level of detail, when logging the grm-selection, pre task-execution in debug mode (`-X`).
 
 
@@ -239,12 +241,13 @@ Every PEM can optionally declare "Overrides". When a PEM declares an Override it
 > [!WARNING]
 > We recommend against using Overrides in PEMs which are bundled in plugins!<br>
 > Runes4Maven will print a **Warning** when it discovers *dangerous* overrides like `declare-super-pem`,
-> as we consider the use of this features in this case to be very hard to debug!
+> as we consider the use of this feature in this case to be very hard to debug!
 
 Override | Description | Important Information
 ---|---|---
 `declare-super-pem` | Declares this file as 'super-pem' which disables all pem files, which do not declare 'super-pem' status themself. The user-defined pem.xml file in the project folder can never be excluded! | Once a PEM, declaring 'super-pem status', is discovered in a project the inheritance tree stopps at that (parent-)project! All PEMs further up the tree will be skipped!
 `disable-super-pom` | By disableing the 'super-pom' all default goal declarations enforced by maven are disabled. | 
+`disable-project-pom` | Disables the PEM execution overrides parsed from the pom.xml file of the specified project. | 
 
 ---
 

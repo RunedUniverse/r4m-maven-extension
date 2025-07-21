@@ -16,25 +16,32 @@
 package net.runeduniverse.tools.maven.r4m.pem.parser;
 
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Map.Entry;
-
+import org.apache.maven.model.Build;
+import org.apache.maven.model.BuildBase;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.InvalidPluginDescriptorException;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPomParser;
 import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
@@ -49,8 +56,8 @@ import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
 
-@Component(role = ProjectExecutionModelPluginParser.class, hint = ExecutionsPluginParser.HINT)
-public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser {
+@Component(role = ProjectExecutionModelPomParser.class, hint = ExecutionsPluginParser.HINT)
+public class ExecutionsPluginParser implements ProjectExecutionModelPomParser {
 
 	public static final String HINT = "plugin-execution";
 	public static final String ERR_MSG_PLUGIN_DESCRIPTOR = "Failed to acquire org.apache.maven.plugin.descriptor.PluginDescriptor!";
@@ -63,16 +70,10 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 	private Map<String, org.apache.maven.lifecycle.Lifecycle> mvnLifecycles;
 
 	@Override
-	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			final Plugin mvnPlugin) throws Exception {
-		final PluginDescriptor mvnPluginDescriptor;
-
-		try {
-			mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);
-		} catch (PluginResolutionException | PluginDescriptorParsingException | InvalidPluginDescriptorException e) {
-			this.log.error(ERR_MSG_PLUGIN_DESCRIPTOR, e);
-			return null;
-		}
+	public ProjectExecutionModel parse(final Set<Plugin> invalidPlugins, final List<RemoteRepository> repositories,
+			final RepositorySystemSession session, final MavenProject mvnProject, final List<Profile> profiles,
+			final Build buildModel) throws Exception {
+		System.out.println("--- " + mvnProject.getId());
 
 		final ProjectExecutionModel model = new ProjectExecutionModel();
 		model.setModelSource(new DefaultModelSource() //
@@ -81,16 +82,103 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 		model.setParser(ExecutionsPluginParser.class, ExecutionsPluginParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 
-		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
-			if (mvnExecution.isInheritanceApplied()) {
-				// TODO consider using this option but than we need to additionally parse
-				// upstream non local projects!
-				// continue;
-			}
+		final Map<String, Map<String, Execution>> managedPluginIndex = new LinkedHashMap<>();
+		final Map<String, Map<String, Execution>> pluginIndex = new LinkedHashMap<>();
 
+		if (buildModel != null) {
+			final PluginManagement pluginManagement = buildModel.getPluginManagement();
+			if (pluginManagement != null) {
+				indexPlugins(invalidPlugins, repositories, session, mvnProject, managedPluginIndex,
+						pluginManagement.getPlugins());
+			}
+			indexPlugins(invalidPlugins, repositories, session, mvnProject, pluginIndex, buildModel.getPlugins());
+		}
+
+		final Map<String, Profile> profileMap = new LinkedHashMap<>();
+		for (Profile profile : profiles) {
+			if (profile == null)
+				continue;
+			profileMap.put(profile.getId(), profile);
+		}
+
+		final List<Profile> activeProfiles = mvnProject.getActiveProfiles();
+		if (activeProfiles != null) {
+			for (Profile activeProfile : activeProfiles) {
+				if (activeProfile == null)
+					continue;
+				final Profile profile = profileMap.get(activeProfile.getId());
+				if (profile == null)
+					continue;
+				final BuildBase build = profile.getBuild();
+				if (build == null)
+					continue;
+
+				final PluginManagement pluginManagement = build.getPluginManagement();
+				if (pluginManagement != null) {
+					indexPlugins(invalidPlugins, repositories, session, mvnProject, managedPluginIndex,
+							pluginManagement.getPlugins());
+				}
+				indexPlugins(invalidPlugins, repositories, session, mvnProject, pluginIndex, build.getPlugins());
+			}
+		}
+
+		// TODO archive managedPluginIndex & pluginIndex at this point!
+
+		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
+			final Map<String, Execution> managedMap = managedPluginIndex.remove(mvnPlugin.getKey());
+			final Map<String, Execution> map = pluginIndex.get(mvnPlugin.getKey());
+
+			if (map != null) {
+				for (Entry<String, Execution> entry : map.entrySet()) {
+					if (managedMap != null)
+						managedMap.remove(entry.getKey());
+					final Execution execution = entry.getValue();
+					execution.setAlwaysActive(true);
+					model.addExecution(execution);
+				}
+			}
+			if (managedMap != null) {
+				for (Execution execution : managedMap.values()) {
+					execution.setAlwaysActive(true);
+					model.addExecution(execution);
+				}
+			}
+		}
+
+		for (Map<String, Execution> map : managedPluginIndex.values()) {
+			model.addExecutions(map.values());
+		}
+
+		return model;
+	}
+
+	private void indexPlugins(final Set<Plugin> invalidPlugins, final List<RemoteRepository> repositories,
+			final RepositorySystemSession session, final MavenProject mvnProject,
+			final Map<String, Map<String, Execution>> pluginIndex, final Collection<Plugin> plugins) {
+		for (Plugin mvnPlugin : plugins) {
+			mvnPlugin = resolvePlugin(mvnProject, mvnPlugin);
+			if (!isValid(invalidPlugins, mvnPlugin))
+				continue;
+
+			final PluginDescriptor mvnPluginDescriptor;
+			try {
+				mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);
+			} catch (PluginResolutionException | PluginDescriptorParsingException
+					| InvalidPluginDescriptorException e) {
+				this.log.error(ERR_MSG_PLUGIN_DESCRIPTOR, e);
+				continue;
+			}
+			pluginIndex.put(mvnPlugin.getKey(), convert(mvnPluginDescriptor, mvnPlugin));
+		}
+	}
+
+	private Map<String, Execution> convert(final PluginDescriptor mvnPluginDescriptor, final Plugin mvnPlugin) {
+		System.out.println(mvnPlugin.getId());
+
+		final Map<String, Execution> executions = new LinkedHashMap<>();
+		for (PluginExecution mvnExecution : mvnPlugin.getExecutions()) {
 			final Execution execution = new Execution(mvnExecution.getId(), ExecutionSource.OVERRIDE);
-			execution.setInherited(false);
-			execution.setDefaultActive(true);
+			execution.setInherited(mvnExecution.isInherited());
 
 			if (mvnExecution.getPhase() != null) {
 				final Lifecycle lifecycle = acquireLifecycle(execution, mvnExecution.getPhase());
@@ -130,11 +218,66 @@ public class ExecutionsPluginParser implements ProjectExecutionModelPluginParser
 					execution.putLifecycle(lifecycle);
 				}
 
-			if (!execution.getLifecycles()
+			if (execution.getLifecycles()
 					.isEmpty())
-				model.addExecution(execution);
+				continue;
+
+			System.out.println("  exec: " + execution.getId());
+			executions.put(execution.getId(), execution);
 		}
-		return model;
+		return executions;
+	}
+
+	private Plugin resolvePlugin(final MavenProject mvnProject, final Plugin plugin) {
+		if (plugin == null)
+			return null;
+
+		final Plugin clone;
+		try {
+			clone = plugin.clone();
+		} catch (RuntimeException e) {
+			log.error("Failed to clone Plugin!", e);
+			return plugin;
+		}
+
+		// dont trust the currently set version!
+		String version = null;
+		final String key = plugin.getKey();
+		Plugin ref = mvnProject.getPlugin(key);
+		if (ref != null) {
+			version = ref.getVersion();
+			if (!isBlank(version)) {
+				clone.setVersion(version);
+				return clone;
+			}
+		}
+
+		final PluginManagement pluginMgmtModel = mvnProject.getPluginManagement();
+		if (pluginMgmtModel == null)
+			return plugin;
+		ref = pluginMgmtModel.getPluginsAsMap()
+				.get(key);
+		if (ref != null) {
+			version = ref.getVersion();
+			if (!isBlank(version)) {
+				clone.setVersion(version);
+				return clone;
+			}
+		}
+
+		return plugin;
+	}
+
+	private boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
+		if (mvnPlugin == null)
+			return false;
+
+		if (mvnPlugin.getVersion() == null) {
+			invalidPlugins.add(mvnPlugin);
+			return false;
+		}
+
+		return true;
 	}
 
 	private Goal createGoal(final Plugin mvnPlugin, final MojoDescriptor mvnMojoDescriptor) {

@@ -49,7 +49,7 @@ Runes4Maven (r4m) can be installed in two major ways:
 ### Maven Core-Extension
 Runes4Maven (r4m) installed as a Maven Core-Extensions exposes r4m's full potential.
 
-Core-Extensions are installed in the project by adding them in the `extensions.xml`. This has to be located in the `.mvn` folder which has to be in the root folder of your maven project per [maven definition](https://maven.apache.org/configure.html#mvn-extensions-xml-file).
+Core-Extensions are installed in the project by adding them in the `extensions.xml`. This file has to be in the `.mvn` folder which has to be located in the root folder of your maven project, as per [maven definition](https://maven.apache.org/configure.html#mvn-extensions-xml-file).
 
 #### Automatic Install
 To automatically install the `r4m-maven-extension`, execute the `setup` maven goal in the project folder:
@@ -59,7 +59,7 @@ mvn net.runeduniverse.tools.maven.r4m:r4m-maven-extension:setup
 ```
 
 #### Manual Install
-> just place following file in the `.mvn` folder your projects root directory!
+> just place following file in the `.mvn` folder located in your project's root directory!
 
 `.mvn/extensions.xml`
 

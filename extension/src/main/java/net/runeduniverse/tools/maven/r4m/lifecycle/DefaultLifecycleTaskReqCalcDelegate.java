@@ -49,32 +49,34 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 	protected Entry parseEntry(String phase) {
 		final Entry entry = new Entry(false, false, true);
-		int markerIdx = -1;
 		boolean flagged = false;
 
+		// marker before the phase
 		if (phase.indexOf('[') == 0) {
-			flagged = true;
 			entry.setAfter(true);
-			phase = phase.substring(1);
-		}
-		if (phase.indexOf(']') == 0) {
 			flagged = true;
+			phase = phase.substring(1);
+		} else if (phase.indexOf(']') == 0) {
 			entry.setBefore(true);
 			entry.setInclude(false);
+			flagged = true;
 			phase = phase.substring(1);
 		}
 
-		markerIdx = phase.indexOf(']');
-		if (markerIdx == phase.length() - 1) {
+		// marker after the phase
+		final int markerIdx = phase.length() - 1;
+		if (phase.indexOf(']') == markerIdx) {
+			if (!flagged)
+				entry.setBefore(true);
+			entry.setInclude(true);
+			entry.setAfter(false);
 			flagged = true;
-			entry.setBefore(true);
 			phase = phase.substring(0, markerIdx);
-		}
-		markerIdx = phase.indexOf('[');
-		if (markerIdx == phase.length() - 1) {
-			flagged = true;
+		} else if (phase.indexOf('[') == markerIdx) {
+			if (!flagged)
+				entry.setInclude(false);
 			entry.setAfter(true);
-			entry.setInclude(false);
+			flagged = true;
 			phase = phase.substring(0, markerIdx);
 		}
 		entry.setPhase(phase);
@@ -223,11 +225,11 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 
 	protected class Entry {
 
-		String phase;
-		Lifecycle lifecycle;
-		boolean before;
-		boolean after;
-		boolean include;
+		protected String phase;
+		protected Lifecycle lifecycle;
+		protected boolean before;
+		protected boolean after;
+		protected boolean include;
 
 		public Entry() {
 			this(null, null);
@@ -270,23 +272,23 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 			return this.include;
 		}
 
-		public void setPhase(String phase) {
+		public void setPhase(final String phase) {
 			this.phase = phase;
 		}
 
-		public void setLifecycle(Lifecycle lifecycle) {
+		public void setLifecycle(final Lifecycle lifecycle) {
 			this.lifecycle = lifecycle;
 		}
 
-		public void setBefore(boolean before) {
+		public void setBefore(final boolean before) {
 			this.before = before;
 		}
 
-		public void setAfter(boolean after) {
+		public void setAfter(final boolean after) {
 			this.after = after;
 		}
 
-		public void setInclude(boolean include) {
+		public void setInclude(final boolean include) {
 			this.include = include;
 		}
 	}

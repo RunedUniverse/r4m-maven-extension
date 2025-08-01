@@ -39,7 +39,7 @@ This is accomplished by providing a better way for defining maven executions and
 - Provides goals to dump the current configuration (in case you want to redefine everything, so you don't need to start from scratch)
 - Provides debug goals
 - Configurations (`pem.xml` & `grm.xml`) are loaded from all active plugins therefore Workflow Plugins can be used for easier project setup
-  - RunedUniverse provides example Workflow Plugins for use with Jenkins-Plugins, Spring and normal Java Projects.
+  - RunedUniverse provides example Workflow Plugins for use with [Jenkins-Plugins](https://github.com/RunedUniverse/maven-jenkins-workflow), [Spring Projects](https://github.com/RunedUniverse/maven-spring-workflow) and normal Java Projects.
 - Provides Configuration options for Runes4Maven Features (see [Properties](#properties))
 - Built to be extendable by other Maven Core-Extensions
 

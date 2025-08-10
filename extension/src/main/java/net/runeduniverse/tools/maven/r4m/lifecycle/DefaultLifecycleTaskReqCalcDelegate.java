@@ -142,20 +142,12 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 		short stage = 0;
 		for (String phase : lifecycle.getPhases()) {
 			if (phase.equals(startPhaseId)) {
-				stage = 1;
-				if (includeStartPhase)
-					sequence.add(phase);
-				if (phase.equals(endPhaseId)) {
-					stage = 2;
-					if (!includeStartPhase && includeEndPhase)
-						sequence.add(phase);
-				}
-				continue;
+				if (phase.equals(endPhaseId))
+					stage = 3;
+				else
+					stage = 1;
 			} else if (phase.equals(endPhaseId)) {
-				stage = 2;
-				if (includeEndPhase)
-					sequence.add(phase);
-				continue;
+				stage = 3;
 			}
 			switch (stage) {
 			case 0:
@@ -163,15 +155,27 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 					sequence.add(phase);
 				break;
 			case 1:
+				if (includeStartPhase)
+					sequence.add(phase);
+				stage = 2;
+				break;
+			case 2:
 				if (between)
 					sequence.add(phase);
-			case 2:
-			default:
+				break;
+			case 3:
+				if (includeEndPhase)
+					sequence.add(phase);
+				stage = 4;
+				break;
+			case 4:
 				if (after)
 					sequence.add(phase);
+			default:
 				break;
 			}
 		}
+
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}
 
@@ -202,25 +206,49 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 		}
 
 		// calculate TaskRequest's
+		boolean inSequence = false;
 		for (ListIterator<Entry> i = entries.listIterator(); i.hasNext();) {
 			final Entry startEntry = i.next();
-			final Entry endEntry = i.hasNext() ? i.next() : null;
+			final Entry endEntry;
+			final boolean hasNext;
+			if (i.hasNext()) {
+				endEntry = i.next();
+				hasNext = i.hasNext();
+				i.previous();
+			} else {
+				endEntry = null;
+				hasNext = false;
+			}
 			final Lifecycle lifecycle = startEntry.getLifecycle();
-			if (endEntry == null) {
+
+			// check for end of sequence
+			if (endEntry == null || !equalsLifecycle(lifecycle, endEntry.getLifecycle())) {
 				requests.add(calculateTaskRequest(lifecycle, startEntry.getPhase(), startEntry.getPhase(),
-						startEntry.getBefore(), startEntry.getInclude(), false, false, startEntry.getAfter()));
+						startEntry.getBefore(), false, false, startEntry.getInclude(), startEntry.getAfter()));
+				inSequence = false;
 				break;
 			}
-			if (!lifecycle.equals(endEntry.getLifecycle())) {
-				i.previous();
-				continue;
-			}
+
+			// handle sequence start if not in sequence
 			requests.add(calculateTaskRequest(lifecycle, startEntry.getPhase(), endEntry.getPhase(),
-					startEntry.getBefore(), startEntry.getInclude(), startEntry.getAfter() || endEntry.getBefore(),
-					endEntry.getInclude(), endEntry.getAfter()));
+					inSequence ? false : startEntry.getBefore(), startEntry.getInclude(),
+					startEntry.getAfter() || endEntry.getBefore(), endEntry.getInclude(),
+					hasNext ? false : endEntry.getAfter()));
+
+			if (!hasNext)
+				return requests;
+			inSequence = true;
 		}
 
 		return requests;
+	}
+
+	protected boolean equalsLifecycle(final Lifecycle a, final Lifecycle b) {
+		if (a == b)
+			return true;
+		if (a == null || b == null)
+			return false;
+		return a.equals(b);
 	}
 
 	protected class Entry {
@@ -230,6 +258,12 @@ public abstract class DefaultLifecycleTaskReqCalcDelegate implements LifecycleTa
 		protected boolean before;
 		protected boolean after;
 		protected boolean include;
+
+		@Override
+		public String toString() {
+			return String.format("%s>%s (b: %b, i: %b, a: %b)", lifecycle == null ? "?" : lifecycle.getId(), phase,
+					before, include, after);
+		}
 
 		public Entry() {
 			this(null, null);

@@ -45,7 +45,7 @@ def installArtifact(mod) {
 	}
 }
 
-node {
+node( label: 'linux' ) {
 	withModules {
 		tool(name: 'maven-latest', type: 'maven')
 
@@ -81,12 +81,18 @@ node {
 			sshagent (credentials: ['RunedUniverse-Jenkins']) {
 				perModule(failFast: true) {
 					def mod = getModule();
-					mod.activate(
-						!mod.hasTag('skip') && sh(
-								returnStdout: true,
-								script: "git-check-version-tag ${ mod.id() } ${ mod.relPathFrom('r4m-parent') }"
-							) == '1'
-					);
+					// check skip flag
+					def active = !mod.hasTag('skip');
+					// if not skipped -> check if this version already exists!
+					if(active) {
+						def version = evalValue('project.version', mod.relPathFrom('r4m-parent'))
+						active = sh(
+								label: "check if git tag \"${ mod.id() }/v${ version }\" exists",
+								returnStatus: true,
+								script: "git ls-remote --tags --exit-code origin refs/tags/${ mod.id() }/v${ version } &>/dev/null"
+							) != 0
+					}
+					mod.activate( active );
 				}
 			}
 		}

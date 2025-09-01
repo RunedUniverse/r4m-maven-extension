@@ -17,10 +17,10 @@ def installArtifact(mod) {
 		sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
 	} finally {
 		def baseName="${ artifactId }-${ version }"
-		// create spec .pom in target/ path
-		sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 		// archive artifacts
 		dir(path: "${ mod.path() }/target") {
+			// create spec .pom in target/ path
+			sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 			sh 'ls -l'
 			archiveArtifacts artifacts: "${ baseName }.pom", fingerprint: true
 			if(mod.hasTag('pack-jar')) {

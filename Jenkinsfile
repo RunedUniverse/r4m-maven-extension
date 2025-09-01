@@ -247,12 +247,19 @@ node( label: 'linux' ) {
 					skipStage()
 					return
 				}
-				def groupId = evalValue('project.groupId', mod.relPathFrom('r4m-parent'))
-				def artifactId = evalValue('project.artifactId', mod.relPathFrom('r4m-parent'))
-				def version = evalValue('project.version', mod.relPathFrom('r4m-parent'))
 				sshagent (credentials: ['RunedUniverse-Jenkins']) {
-					sh "git tag -a ${ mod.id() }/v${ version } -f -m '[artifact] ${ groupId }:${ artifactId }:${ version }'"
-					sh "git push origin ${ mod.id() }/v${ version }"
+					perModule {
+						def mod = getModule();
+						if(!mod.active()) {
+							skipStage()
+							return
+						}
+						def groupId = evalValue('project.groupId', mod.relPathFrom('r4m-parent'))
+						def artifactId = evalValue('project.artifactId', mod.relPathFrom('r4m-parent'))
+						def version = evalValue('project.version', mod.relPathFrom('r4m-parent'))
+						sh "git tag -a ${ mod.id() }/v${ version } -f -m '[artifact] ${ groupId }:${ artifactId }:${ version }'"
+						sh "git push origin ${ mod.id() }/v${ version }"
+					}
 				}
 			}
 		}

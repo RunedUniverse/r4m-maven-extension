@@ -22,10 +22,5 @@
 
 	<localRepository>${env.WORKSPACE}/.mvn/repo</localRepository>
 
-	<activeProfiles>
-		<!-- provides configuration for maven-gpg-plugin -->
-		<activeProfile>gpg-signature-software</activeProfile>
-	</activeProfiles>
-
 </settings>
 

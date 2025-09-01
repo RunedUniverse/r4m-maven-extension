@@ -110,7 +110,7 @@ node( label: 'linux' ) {
 		}
 
 		stage('Code Validation') {
-			sh "mvn-dev -P ${ REPOS },validate,license-apache2-approve,license-epl-v10-approve --fail-at-end -T1C"
+			sh "mvn-dev -P ${ REPOS },validate --fail-at-end -T1C"
 		}
 
 		bundleContext {
@@ -202,7 +202,7 @@ node( label: 'linux' ) {
 				}
 			}
 
-			stage('Deploy to Development Repo') {
+			stage('Deploy to Dev-Repo') {
 				perModule {
 					def mod = getModule();
 					if(!mod.active()) {

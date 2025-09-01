@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 @Component(role = ProjectExecutionModelConfigParser.class, hint = ConfigParser.HINT)
@@ -40,19 +42,24 @@ public class ConfigParser implements ProjectExecutionModelConfigParser {
 
 	@Requirement
 	protected Logger log;
-	@Requirement
+	@Requirement(hint = "xml")
 	protected ProjectExecutionModelParser parser;
 
 	@Override
-	public ProjectExecutionModel parse(MavenProject mvnProject) throws Exception {
+	public ProjectExecutionModel parse(final MavenProject mvnProject) throws Exception {
+		final File basedir = mvnProject.getBasedir();
+		if (basedir == null)
+			return null;
+		final File xmlFile = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId))
+				.setFile(xmlFile.toPath()));
+		model.setUserDefined(true);
+		model.setParser(ConfigParser.class, ConfigParser.HINT);
 
-		File executionXml = new File(mvnProject.getBasedir(), Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE);
-
-		ProjectExecutionModel model = new ProjectExecutionModel(ConfigParser.class, ConfigParser.HINT);
-		model.setEffective(true);
-
-		if (executionXml.isFile()) {
-			try (InputStream is = new BufferedInputStream(new FileInputStream(executionXml))) {
+		if (xmlFile.isFile()) {
+			try (InputStream is = new BufferedInputStream(new FileInputStream(xmlFile))) {
 				this.parser.parseModel(model, is);
 			} catch (IOException | XmlPullParserException e) {
 				this.log.error(String.format(ERR_MSG_PARSE_PEM, Runes4MavenProperties.PROJECT_EXECUTION_MODEL_FILE,

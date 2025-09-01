@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.scanner;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -26,8 +28,14 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPluginParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = MavenProjectScanner.class, hint = PluginProjectScanner.HINT)
@@ -37,18 +45,24 @@ public class PluginProjectScanner implements MavenProjectScanner {
 
 	@Requirement(role = ProjectExecutionModelPluginParser.class)
 	private Map<String, ProjectExecutionModelPluginParser> pemPluginParser;
+	@Requirement(role = GoalRequirementModelPluginParser.class)
+	private Map<String, GoalRequirementModelPluginParser> grmPluginParser;
+	@Requirement
+	private ExecutionArchive pemArchive;
+	@Requirement
+	private GoalRequirementArchive grmArchive;
 
 	@Override
 	public int getPriority() {
 		return 0;
 	}
 
-	private boolean isIdentifiable(final Set<Plugin> unidentifiablePlugins, Plugin mvnPlugin) {
-		if (unidentifiablePlugins.contains(mvnPlugin))
+	private boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
+		if (mvnPlugin == null || invalidPlugins.contains(mvnPlugin))
 			return false;
 
 		if (mvnPlugin.getVersion() == null) {
-			unidentifiablePlugins.add(mvnPlugin);
+			invalidPlugins.add(mvnPlugin);
 			return false;
 		}
 
@@ -56,17 +70,40 @@ public class PluginProjectScanner implements MavenProjectScanner {
 	}
 
 	@Override
-	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
-			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
-		for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values())
-			for (Plugin mvnPlugin : mvnProject.getBuildPlugins())
-				if (isIdentifiable(unidentifiablePlugins, mvnPlugin))
-					try {
-						projectSlice.register(parser.parse(mvnProject.getRemotePluginRepositories(),
-								mvnSession.getRepositorySession(), mvnPlugin));
-					} catch (PluginResolutionException e) {
-						unidentifiablePlugins.add(mvnPlugin);
-					}
-	}
+	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
+			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
+		final File origBasedir = mvnProject.getBasedir();
+		final Path basedir = origBasedir == null ? null : origBasedir.toPath();
+		for (Plugin mvnPlugin : mvnProject.getBuildPlugins()) {
+			if (isValid(invalidPlugins, mvnPlugin))
+				try {
+					for (ProjectExecutionModelPluginParser parser : this.pemPluginParser.values()) {
+						final ProjectExecutionModel model = parser.parse(mvnProject.getRemotePluginRepositories(),
+								mvnSession.getRepositorySession(), mvnPlugin);
+						if (model != null) {
+							this.pemArchive.getSector(mvnProject)
+									.register(model);
 
+							final ModelSource source = model.computeModelSourceIfAbsent(DefaultModelSource::new);
+							if (source.getProjectId() == null)
+								source.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId));
+
+							final Path file = source.getFile();
+							if (file != null)
+								source.setFile(basedir == null ? file : basedir.resolve(file));
+						}
+					}
+					for (GoalRequirementModelPluginParser parser : this.grmPluginParser.values()) {
+						final GoalRequirementModel model = parser.parse(mvnProject.getRemotePluginRepositories(),
+								mvnSession.getRepositorySession(), mvnPlugin);
+						if (model != null) {
+							this.grmArchive.getSector(mvnProject)
+									.register(model);
+						}
+					}
+				} catch (PluginResolutionException e) {
+					invalidPlugins.add(mvnPlugin);
+				}
+		}
+	}
 }

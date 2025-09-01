@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,39 +21,16 @@ import java.nio.charset.Charset;
 
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 
-import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
-import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
-import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
-import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
-import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetLifecycle;
-import net.runeduniverse.tools.maven.r4m.pem.model.TargetPhase;
 
 public interface ProjectExecutionModelWriter {
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem) throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem) throws IOException;
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final Charset charset)
-			throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, Charset charset) throws IOException;
 
-	public void writeModel(final OutputStream stream, final ProjectExecutionModel pem, final String charsetName)
-			throws IOException;
+	public void writeModel(OutputStream stream, ProjectExecutionModel pem, String charsetName) throws IOException;
 
-	public PlexusConfiguration convert(final ProjectExecutionModel pem);
-
-	public PlexusConfiguration convert(final Execution execution);
-
-	public PlexusConfiguration convert(final Lifecycle lifecycle);
-
-	public PlexusConfiguration convert(final Phase phase);
-
-	public PlexusConfiguration convert(final Goal goal);
-
-	public PlexusConfiguration convert(final Fork fork);
-
-	public PlexusConfiguration convert(final TargetLifecycle targetLifecycle);
-
-	public PlexusConfiguration convert(final TargetPhase targetPhase);
+	public PlexusConfiguration convert(ProjectExecutionModel pem);
 
 }

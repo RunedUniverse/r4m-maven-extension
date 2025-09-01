@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,30 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class ExecutionSource {
+import net.runeduniverse.lib.utils.common.api.Keyed;
+
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.keyedEquals;
+import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+
+/*
+ * merge-procedure of sources
+ *
+ * 1. EFFECTIVE beats all other definitions if it exists!
+ * 2. $pem = WORKFLOW merges with PACKAGING by replacing all lifecycles which are also defined in PACKAGING
+ * 3. $pem = $pem merges with PLUGIN by replacing all goals which are also defined in PLUGIN
+ * 4. $pem = OVERRIDE merges with $pem by replacing all lifecycles which are also defined in $pem
+ */
+public class ExecutionSource implements Keyed {
 
 	@Deprecated
 	public static final Map<String, ExecutionSource> KNOWN_SOURCES = new LinkedHashMap<>(4);
 
 	public static final ExecutionSource OVERRIDE = new ExecutionSource("override");
+	public static final ExecutionSource WORKFLOW = new ExecutionSource("workflow");
 	public static final ExecutionSource PACKAGING = new ExecutionSource("packaging");
 	public static final ExecutionSource PLUGIN = new ExecutionSource("plugin");
 	@Deprecated
@@ -33,21 +46,24 @@ public class ExecutionSource {
 
 	private final String key;
 
-	protected ExecutionSource(String key) {
+	protected ExecutionSource(final String key) {
 		this.key = key;
 		ExecutionSource.KNOWN_SOURCES.put(key, this);
 	}
 
+	@Override
 	public String key() {
 		return this.key;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof ExecutionSource))
-			return false;
+	public int hashCode() {
+		return hash(this.key);
+	}
 
-		return this.key.equals(((ExecutionSource) obj).key());
+	@Override
+	public boolean equals(final Object obj) {
+		return keyedEquals(ExecutionSource.class, this, obj);
 	}
 
 	@Override
@@ -59,11 +75,8 @@ public class ExecutionSource {
 		if (isBlank(key))
 			return null;
 
-		ExecutionSource source = ExecutionSource.KNOWN_SOURCES.get(key);
-		if (source == null)
-			return new ExecutionSource(key);
-		else
-			return source;
+		key = key.trim()
+				.toLowerCase();
+		return ExecutionSource.KNOWN_SOURCES.getOrDefault(key, new ExecutionSource(key));
 	}
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 package net.runeduniverse.tools.maven.r4m.pem.view.api;
 
 import java.util.Map;
+import java.util.function.Function;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface LifecycleView extends Recordable {
 
@@ -28,5 +29,7 @@ public interface LifecycleView extends Recordable {
 	public void put(PhaseView phaseView);
 
 	public PhaseView getPhase(String id);
+
+	public PhaseView computePhaseIfAbsent(String id, Function<String, ? extends PhaseView> mappingFunction);
 
 }

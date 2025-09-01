@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,36 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+
+import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Lifecycle implements Recordable {
+public class Lifecycle implements DataEntry {
 
-	private String id;
-	private Map<String, Phase> phases = new LinkedHashMap<>();
+	public static final String HINT = "lifecycle";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle";
 
-	public Lifecycle() {
-	}
+	protected final Supplier<Map<String, Phase>> phasesSupplier;
+
+	protected final Map<String, Phase> phases;
+	protected final String id;
 
 	public Lifecycle(final String id) {
+		this(LinkedHashMap::new, id);
+	}
+
+	public Lifecycle(final Supplier<Map<String, Phase>> phasesSupplier, final String id) {
+		this.phasesSupplier = phasesSupplier;
+		this.phases = this.phasesSupplier.get();
 		this.id = id;
 	}
 
@@ -38,26 +52,58 @@ public class Lifecycle implements Recordable {
 		return this.id;
 	}
 
-	public Phase getPhase(String phaseId) {
+	public Phase getPhase(final String phaseId) {
 		return this.phases.get(phaseId);
+	}
+
+	public Phase computePhaseIfAbsent(final String phaseId,
+			final Function<? super String, ? extends Phase> mappingFunction) {
+		return this.phases.computeIfAbsent(phaseId, mappingFunction);
 	}
 
 	public Map<String, Phase> getPhases() {
 		return this.phases;
 	}
 
-	public void putPhase(Phase phase) {
+	public void putPhase(final Phase phase) {
 		this.phases.put(phase.getId(), phase);
 	}
 
-	public void addPhases(List<Phase> phases) {
+	public void putPhases(final Collection<Phase> phases) {
 		for (Phase phase : phases)
-			this.phases.put(phase.getId(), phase);
+			putPhase(phase);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Lifecycle))
+			return false;
+		final Lifecycle lifecycle = (Lifecycle) obj;
+
+		return objectEquals(this.id, lifecycle.getId()) //
+				&& objectEquals(this.phases, lifecycle.getPhases());
+	}
+
+	@Override
+	public Lifecycle copy() {
+		final Lifecycle lifecycle = new Lifecycle(this.phasesSupplier, getId());
+
+		lifecycle.putPhases(getPhases().values());
+
+		return lifecycle;
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Lifecycle");
+		final CompoundTree tree = new DefaultCompoundTree("Lifecycle");
 
 		tree.append("id", this.id);
 
@@ -66,5 +112,4 @@ public class Lifecycle implements Recordable {
 
 		return tree;
 	}
-
 }

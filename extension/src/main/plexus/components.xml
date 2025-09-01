@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,30 +15,21 @@
     limitations under the License.
 
 -->
+<!-- <phases> <phase>validate</phase> <phase>initialize</phase> <phase>generate-sources</phase> 
+	<phase>process-sources</phase> <phase>generate-resources</phase> <phase>process-resources</phase> 
+	<phase>compile</phase> <phase>process-classes</phase> <phase>generate-test-sources</phase> 
+	<phase>process-test-sources</phase> <phase>generate-test-resources</phase> 
+	<phase>process-test-resources</phase> <phase>test-compile</phase> <phase>process-test-classes</phase> 
+	<phase>test</phase> <phase>prepare-package</phase> <phase>package</phase> 
+	<phase>pre-integration-test</phase> <phase>integration-test</phase> <phase>post-integration-test</phase> 
+	<phase>verify</phase> <phase>install</phase> <phase>deploy</phase> </phases> -->
+
+<!-- Looks kile Core-Extensions don't respect this configuration therefore 
+	the Lifecycle is added as Code! -->
+<!-- <component> <role>org.apache.maven.lifecycle.Lifecycle</role> <implementation>org.apache.maven.lifecycle.Lifecycle</implementation> 
+	<role-hint>help</role-hint> <configuration> <id>help</id> <phases> <phase>help</phase> 
+	</phases> </configuration> </component> -->
 <component-set>
 	<components>
-
-		<!-- DEFAULT :: LIFECYCLE -->
-		<!-- <phases> <phase>validate</phase> <phase>initialize</phase> <phase>generate-sources</phase> 
-			<phase>process-sources</phase> <phase>generate-resources</phase> <phase>process-resources</phase> 
-			<phase>compile</phase> <phase>process-classes</phase> <phase>generate-test-sources</phase> 
-			<phase>process-test-sources</phase> <phase>generate-test-resources</phase> 
-			<phase>process-test-resources</phase> <phase>test-compile</phase> <phase>process-test-classes</phase> 
-			<phase>test</phase> <phase>prepare-package</phase> <phase>package</phase> 
-			<phase>pre-integration-test</phase> <phase>integration-test</phase> <phase>post-integration-test</phase> 
-			<phase>verify</phase> <phase>install</phase> <phase>deploy</phase> </phases> -->
-
-		<component>
-			<role>org.apache.maven.lifecycle.Lifecycle</role>
-			<implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
-			<role-hint>help</role-hint>
-			<configuration>
-				<id>help</id>
-				<phases>
-					<phase>help</phase>
-				</phases>
-			</configuration>
-		</component>
-
 	</components>
 </component-set>

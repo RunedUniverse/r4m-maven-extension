@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,10 @@ import org.apache.maven.lifecycle.LifecyclePhaseNotFoundException;
  */
 public interface LifecycleTaskRequestCalculatorDelegate {
 
-	public List<LifecycleTaskRequest> calculateTaskRequest(final LifecycleTaskData taskData)
+	public List<LifecycleTaskRequest> calculateTaskRequest(LifecycleTaskData taskData)
 			throws LifecyclePhaseNotFoundException;
 
-	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
+	public LifecycleTaskRequest calculateTaskRequest(Lifecycle lifecycle, String phaseId)
 			throws LifecyclePhaseNotFoundException;
 
 }

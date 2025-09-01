@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSelection;
  */
 public interface AdvancedLifecycleMappingDelegate {
 
-	public Map<String, List<MojoExecution>> calculateLifecycleMappings(final MavenSession mvnSession,
-			final MavenProject mvnProject, final Lifecycle lifecycle, final String lifecyclePhase,
-			final ExecutionArchiveSelection selection) throws PluginNotFoundException, PluginResolutionException,
-			PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException;
+	public Map<String, List<MojoExecution>> calculateLifecycleMappings(MavenSession mvnSession, MavenProject mvnProject,
+			Lifecycle lifecycle, String lifecyclePhase, ExecutionArchiveSelection selection)
+			throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
+			MojoNotFoundException, InvalidPluginDescriptorException;
 
 }

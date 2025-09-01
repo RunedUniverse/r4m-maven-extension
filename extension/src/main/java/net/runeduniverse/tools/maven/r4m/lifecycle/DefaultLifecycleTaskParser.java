@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ public class DefaultLifecycleTaskParser implements TaskParser {
 	public LifecycleTaskData parse(final Object taskObject) {
 		if (!(taskObject instanceof LifecycleTask))
 			return null;
-		LifecycleTask lifecycleTask = (LifecycleTask) taskObject;
+		final LifecycleTask lifecycleTask = (LifecycleTask) taskObject;
 		String task = lifecycleTask.getLifecyclePhase();
 		String mode = "";
 

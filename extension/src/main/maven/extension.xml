@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -19,28 +19,72 @@
 <extension>
 
 	<exportedPackages>
-		<!-- r4m-maven-extension -->
+		<!-- r4m-maven-extension : api -->
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.eventspy.api
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.SettingsFactory
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.event.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.check.converter.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.converter.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.parser.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.view.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.writer.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.lifecycle.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojo
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojos.api
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.mojo.api
 		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.api
 		</exportedPackage>
-		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
-		</exportedPackage>
 		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.view.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.scanner.api
+		</exportedPackage>
+
+		<!-- r4m-maven-extension : model -->
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.grm.model
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.tools.maven.r4m.pem.model
 		</exportedPackage>
 
 		<!-- runeduniverse-utils -->
-		<exportedPackage>net.runeduniverse.lib.utils.common</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.logging</exportedPackage>
-		<exportedPackage>net.runeduniverse.lib.utils.logging.logs
+		<exportedPackage>net.runeduniverse.lib.utils.common
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.common.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging.log
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.logging.log.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditional
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditional.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.conditional.tool
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.config.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.data.api
+		</exportedPackage>
+		<exportedPackage>net.runeduniverse.lib.utils.maven3.ext.indexer.api
 		</exportedPackage>
 	</exportedPackages>
 
@@ -56,9 +100,25 @@
 		</exportedArtifact>
 
 		<!-- runeduniverse-utils -->
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-common-api
+		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-common
 		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging-api
+		</exportedArtifact>
 		<exportedArtifact>net.runeduniverse.lib.utils:utils-logging
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditional-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-conditional
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-ext-api
+		</exportedArtifact>
+		<exportedArtifact>net.runeduniverse.lib.utils:utils-maven3-ext
 		</exportedArtifact>
 	</exportedArtifacts>
 

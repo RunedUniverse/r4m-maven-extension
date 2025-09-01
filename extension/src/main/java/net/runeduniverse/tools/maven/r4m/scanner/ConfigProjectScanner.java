@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.scanner;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +27,14 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
+import net.runeduniverse.tools.maven.r4m.grm.api.GoalRequirementArchive;
+import net.runeduniverse.tools.maven.r4m.grm.model.GoalRequirementModel;
+import net.runeduniverse.tools.maven.r4m.grm.parser.api.GoalRequirementModelConfigParser;
+import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchive;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelConfigParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 import net.runeduniverse.tools.maven.r4m.scanner.api.MavenProjectScanner;
 
 @Component(role = MavenProjectScanner.class, hint = ConfigProjectScanner.HINT)
@@ -36,6 +44,12 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 
 	@Requirement(role = ProjectExecutionModelConfigParser.class)
 	private Map<String, ProjectExecutionModelConfigParser> pemConfigParser;
+	@Requirement(role = GoalRequirementModelConfigParser.class)
+	private Map<String, GoalRequirementModelConfigParser> grmConfigParser;
+	@Requirement
+	private ExecutionArchive pemArchive;
+	@Requirement
+	private GoalRequirementArchive grmArchive;
 
 	@Override
 	public int getPriority() {
@@ -43,10 +57,29 @@ public class ConfigProjectScanner implements MavenProjectScanner {
 	}
 
 	@Override
-	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, final Set<Plugin> unidentifiablePlugins,
-			MavenProject mvnProject, ExecutionArchiveSlice projectSlice) throws Exception {
-		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values())
-			projectSlice.register(parser.parse(mvnProject));
-	}
+	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
+			final Set<Plugin> invalidPlugins, final MavenProject mvnProject) throws Exception {
+		final File origBasedir = mvnProject.getBasedir();
+		final Path basedir = origBasedir == null ? null : origBasedir.toPath();
+		for (ProjectExecutionModelConfigParser parser : this.pemConfigParser.values()) {
+			final ProjectExecutionModel model = parser.parse(mvnProject);
+			if (model != null) {
+				this.pemArchive.getSector(mvnProject)
+						.register(model);
 
+				final ModelSource source = model.computeModelSourceIfAbsent(DefaultModelSource::new);
+				if (source.getProjectId() == null)
+					source.setProjectId(ModelSource.id(mvnProject::getGroupId, mvnProject::getArtifactId));
+
+				final Path file = source.getFile();
+				if (file != null)
+					source.setFile(basedir == null ? file : basedir.resolve(file));
+			}
+		}
+		for (GoalRequirementModelConfigParser parser : this.grmConfigParser.values()) {
+			final GoalRequirementModel model = parser.parse(mvnProject);
+			this.grmArchive.getSector(mvnProject)
+					.register(model);
+		}
+	}
 }

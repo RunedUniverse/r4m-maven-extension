@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,24 @@
  */
 package net.runeduniverse.tools.maven.r4m.api;
 
-import java.util.Collection;
+import net.runeduniverse.lib.utils.config.api.Property;
+import net.runeduniverse.lib.utils.config.api.PropertyStore;
 
-public interface Settings {
+public interface Settings extends PropertyStore {
 
-	public Collection<Property<?>> getAllProperties();
+	public static final String PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR = "r4m.lifecycle-task-request-calculator";
+	public static final String PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK = "r4m.lifecycle-task-request-calculator-on-fork";
+	public static final String PROP_MISSING_BUILD_PLUGIN_HANDLER = "r4m.missing-build-plugin-handler";
+	public static final String PROP_ACTIVE_PROFILES_INHERITANCE = "r4m.active-profiles-inheritance";
+	public static final String PROP_SHOW_ACTIVE_OVERRIDES = "r4m.show-active-overrides";
+	public static final String PROP_FANCY_OUTPUT = "r4m.fancy-output";
+	public static final String PROP_PATCH_MOJO_ON_FORK = "r4m.patch-mojo-on-fork";
+	public static final String PROP_GENERATE_PLUGIN_EXECUTIONS = "r4m.generate-plugin-executions";
+	public static final String PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK = "r4m.generate-plugin-executions-on-fork";
+	public static final String PROP_MAVEN_BACKWARDS_COMPATIBLE = "r4m.maven-backwards-compatible";
+	public static final String PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION = "r4m.debug.dump-grm-entries-before-execution";
 
-	public void selectDefaults();
-
-	public Property<?> getProperty(String id);
-
-	public void setProperty(Property<?> value);
-
-	public void removeProperty(String id);
+	public LoadState getLoadState();
 
 	public Property<String> getLifecycleTaskRequestCalculator();
 
@@ -37,6 +42,8 @@ public interface Settings {
 
 	public Property<String> getActiveProfilesInheritance();
 
+	public Property<String> getShowActiveOverrides();
+
 	public Property<Boolean> getFancyOutput();
 
 	public Property<Boolean> getPatchMojoOnFork();
@@ -44,6 +51,12 @@ public interface Settings {
 	public Property<Boolean> getGeneratePluginExecutions();
 
 	public Property<Boolean> getGeneratePluginExecutionsOnFork();
+
+	public Property<Boolean> getMavenBackwardsCompatible();
+
+	public Property<String> getDebugDumpGrmEntriesBeforeExecution();
+
+	public void setLoadState(LoadState state);
 
 	public void setLifecycleTaskRequestCalculator(Property<String> value);
 
@@ -53,6 +66,8 @@ public interface Settings {
 
 	public void setActiveProfilesInheritance(Property<String> value);
 
+	public void setShowActiveOverrides(Property<String> value);
+
 	public void setFancyOutput(Property<Boolean> value);
 
 	public void setPatchMojoOnFork(Property<Boolean> value);
@@ -61,4 +76,11 @@ public interface Settings {
 
 	public void setGeneratePluginExecutionsOnFork(Property<Boolean> value);
 
+	public void setMavenBackwardsCompatible(Property<Boolean> value);
+
+	public void setDebugDumpGrmEntriesBeforeExecution(Property<String> value);
+
+	public static enum LoadState {
+		SYSTEM_EXTENSION, CORE_EXTENSION, BUILD_EXTENSION, PLUGIN
+	}
 }

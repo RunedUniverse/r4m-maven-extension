@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,82 +15,40 @@
  */
 package net.runeduniverse.tools.maven.r4m;
 
-import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.codehaus.plexus.component.annotations.Component;
 
-import net.runeduniverse.tools.maven.r4m.api.Property;
+import net.runeduniverse.lib.utils.config.APropertyStore;
+import net.runeduniverse.lib.utils.config.api.Property;
 import net.runeduniverse.tools.maven.r4m.api.Settings;
 
 @Component(role = Settings.class, instantiationStrategy = "keep-alive")
-public class R4MSettings implements Settings {
+public class R4MSettings extends APropertyStore implements Settings {
 
-	private final Map<String, Property<?>> properties = new LinkedHashMap<>();
-
+	private LoadState loadState = LoadState.PLUGIN;
 	private Property<String> lifecycleTaskRequestCalculator = null;
 	private Property<String> lifecycleTaskRequestCalculatorOnFork = null;
 	private Property<String> missingBuildPluginHandler = null;
 	private Property<String> activeProfilesInheritance = null;
+	private Property<String> showActiveOverrides = null;
 	private Property<Boolean> fancyOutput = null;
 	private Property<Boolean> patchMojoOnFork = null;
 	private Property<Boolean> generatePluginExecutions = null;
 	private Property<Boolean> generatePluginExecutionsOnFork = null;
+	private Property<Boolean> mavenBackwardsCompatible = null;
+	private Property<String> debugDumpGrmEntriesBeforeExecution = null;
 
-	@Override
-	public Collection<Property<?>> getAllProperties() {
-		synchronized (this.properties) {
-			return Collections.unmodifiableCollection(this.properties.values());
-		}
-	}
-
-	@Override
-	public void selectDefaults() {
-		synchronized (this.properties) {
-			for (Property<?> property : this.properties.values())
-				selectDefault(property);
-		}
-	}
-
-	public <T> void selectDefault(Property<T> property) {
-		if (property == null)
-			return;
-		if (property.getSelected() == null)
-			property.setSelected(property.getDefault());
-	}
-
-	@Override
-	public Property<?> getProperty(String id) {
-		synchronized (this.properties) {
-			return this.properties.get(id);
-		}
-	}
-
-	@Override
-	public void setProperty(Property<?> value) {
-		if (value == null || isBlank(value.getId()))
-			return;
-		if (!redirectSetProperty(value))
-			synchronized (this.properties) {
-				this.properties.put(value.getId(), value);
-			}
-	}
-
-	@Override
-	public void removeProperty(String id) {
-		if (isBlank(id))
-			return;
-		if (!redirectRemoveProperty(id))
-			synchronized (this.properties) {
-				this.properties.remove(id);
-			}
+	public R4MSettings() {
+		super(new ConcurrentHashMap<>());
 	}
 
 	//////////////////////////////////////////////////////////////////////////
+
+	@Override
+	public LoadState getLoadState() {
+		return this.loadState;
+	}
 
 	@Override
 	public Property<String> getLifecycleTaskRequestCalculator() {
@@ -113,6 +71,11 @@ public class R4MSettings implements Settings {
 	}
 
 	@Override
+	public Property<String> getShowActiveOverrides() {
+		return this.showActiveOverrides;
+	}
+
+	@Override
 	public Property<Boolean> getFancyOutput() {
 		return this.fancyOutput;
 	}
@@ -132,157 +95,126 @@ public class R4MSettings implements Settings {
 		return this.generatePluginExecutionsOnFork;
 	}
 
-	//////////////////////////////////////////////////////////////////////////
-
 	@Override
-	public void setLifecycleTaskRequestCalculator(Property<String> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.lifecycleTaskRequestCalculator);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.lifecycleTaskRequestCalculator = value;
-		}
+	public Property<Boolean> getMavenBackwardsCompatible() {
+		return this.mavenBackwardsCompatible;
 	}
 
 	@Override
-	public void setLifecycleTaskRequestCalculatorOnFork(Property<String> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.lifecycleTaskRequestCalculatorOnFork);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.lifecycleTaskRequestCalculatorOnFork = value;
-		}
-
-	}
-
-	@Override
-	public void setMissingBuildPluginHandler(Property<String> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.missingBuildPluginHandler);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.missingBuildPluginHandler = value;
-		}
-	}
-
-	@Override
-	public void setActiveProfilesInheritance(Property<String> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.activeProfilesInheritance);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.activeProfilesInheritance = value;
-		}
-	}
-
-	@Override
-	public void setFancyOutput(Property<Boolean> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.fancyOutput);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.fancyOutput = value;
-		}
-	}
-
-	@Override
-	public void setPatchMojoOnFork(Property<Boolean> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.patchMojoOnFork);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.patchMojoOnFork = value;
-		}
-	}
-
-	@Override
-	public void setGeneratePluginExecutions(Property<Boolean> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.generatePluginExecutions);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.generatePluginExecutions = value;
-		}
-	}
-
-	@Override
-	public void setGeneratePluginExecutionsOnFork(Property<Boolean> value) {
-		synchronized (this.properties) {
-			this.properties.values()
-					.remove(this.generatePluginExecutionsOnFork);
-			if (value != null)
-				this.properties.put(value.getId(), value);
-			this.generatePluginExecutionsOnFork = value;
-		}
+	public Property<String> getDebugDumpGrmEntriesBeforeExecution() {
+		return this.debugDumpGrmEntriesBeforeExecution;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
 
-	protected boolean redirectSetProperty(Property<?> value) {
+	public void setLoadState(final LoadState state) {
+		this.loadState = state;
+	}
+
+	@Override
+	public void setLifecycleTaskRequestCalculator(final Property<String> value) {
+		this.lifecycleTaskRequestCalculator = value;
+		super.redirectSetProperty(PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR, value);
+	}
+
+	@Override
+	public void setLifecycleTaskRequestCalculatorOnFork(final Property<String> value) {
+		this.lifecycleTaskRequestCalculatorOnFork = value;
+		super.redirectSetProperty(PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK, value);
+	}
+
+	@Override
+	public void setMissingBuildPluginHandler(final Property<String> value) {
+		this.missingBuildPluginHandler = value;
+		super.redirectSetProperty(PROP_MISSING_BUILD_PLUGIN_HANDLER, value);
+	}
+
+	@Override
+	public void setActiveProfilesInheritance(final Property<String> value) {
+		this.activeProfilesInheritance = value;
+		super.redirectSetProperty(PROP_ACTIVE_PROFILES_INHERITANCE, value);
+	}
+
+	@Override
+	public void setShowActiveOverrides(final Property<String> value) {
+		this.showActiveOverrides = value;
+		super.redirectSetProperty(PROP_SHOW_ACTIVE_OVERRIDES, value);
+	}
+
+	@Override
+	public void setFancyOutput(final Property<Boolean> value) {
+		this.fancyOutput = value;
+		super.redirectSetProperty(PROP_FANCY_OUTPUT, value);
+	}
+
+	@Override
+	public void setPatchMojoOnFork(final Property<Boolean> value) {
+		this.patchMojoOnFork = value;
+		super.redirectSetProperty(PROP_PATCH_MOJO_ON_FORK, value);
+	}
+
+	@Override
+	public void setGeneratePluginExecutions(final Property<Boolean> value) {
+		this.generatePluginExecutions = value;
+		super.redirectSetProperty(PROP_GENERATE_PLUGIN_EXECUTIONS, value);
+	}
+
+	@Override
+	public void setGeneratePluginExecutionsOnFork(final Property<Boolean> value) {
+		this.generatePluginExecutionsOnFork = value;
+		super.redirectSetProperty(PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK, value);
+	}
+
+	@Override
+	public void setMavenBackwardsCompatible(final Property<Boolean> value) {
+		this.mavenBackwardsCompatible = value;
+		super.redirectSetProperty(PROP_MAVEN_BACKWARDS_COMPATIBLE, value);
+	}
+
+	@Override
+	public void setDebugDumpGrmEntriesBeforeExecution(final Property<String> value) {
+		this.debugDumpGrmEntriesBeforeExecution = value;
+		super.redirectSetProperty(PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION, value);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+
+	@Override
+	protected void redirectSetProperty(final String id, final Property<?> value) {
 		switch (value.getId()) {
-		case "r4m.active-profiles-inheritance":
-			setActiveProfilesInheritance((Property<String>) value);
-			return true;
-		case "r4m.fancy-output":
-			setFancyOutput((Property<Boolean>) value);
-			return true;
-		case "r4m.generate-plugin-executions":
-			setGeneratePluginExecutions((Property<Boolean>) value);
-			return true;
-		case "r4m.generate-plugin-executions-on-fork":
-			setGeneratePluginExecutionsOnFork((Property<Boolean>) value);
-			return true;
-		case "r4m.lifecycle-task-request-calculator":
-			setLifecycleTaskRequestCalculator((Property<String>) value);
-			return true;
-		case "r4m.lifecycle-task-request-calculator-on-fork":
-			setLifecycleTaskRequestCalculatorOnFork((Property<String>) value);
-			return true;
-		case "r4m.missing-build-plugin-handler":
-			setMissingBuildPluginHandler((Property<String>) value);
-			return true;
-		case "r4m.patch-mojo-on-fork":
-			setPatchMojoOnFork((Property<Boolean>) value);
-			return true;
+		case PROP_ACTIVE_PROFILES_INHERITANCE:
+			tryCast(String.class, value, this::setActiveProfilesInheritance);
+			break;
+		case PROP_FANCY_OUTPUT:
+			tryCast(Boolean.class, value, this::setFancyOutput);
+			break;
+		case PROP_GENERATE_PLUGIN_EXECUTIONS:
+			tryCast(Boolean.class, value, this::setGeneratePluginExecutions);
+			break;
+		case PROP_GENERATE_PLUGIN_EXECUTIONS_ON_FORK:
+			tryCast(Boolean.class, value, this::setGeneratePluginExecutionsOnFork);
+			break;
+		case PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR:
+			tryCast(String.class, value, this::setLifecycleTaskRequestCalculator);
+			break;
+		case PROP_LIFECYCLE_TASK_REQUEST_CALCULATOR_ON_FORK:
+			tryCast(String.class, value, this::setLifecycleTaskRequestCalculatorOnFork);
+			break;
+		case PROP_MAVEN_BACKWARDS_COMPATIBLE:
+			tryCast(Boolean.class, value, this::setMavenBackwardsCompatible);
+			break;
+		case PROP_MISSING_BUILD_PLUGIN_HANDLER:
+			tryCast(String.class, value, this::setMissingBuildPluginHandler);
+			break;
+		case PROP_PATCH_MOJO_ON_FORK:
+			tryCast(Boolean.class, value, this::setPatchMojoOnFork);
+			break;
+		case PROP_SHOW_ACTIVE_OVERRIDES:
+			tryCast(String.class, value, this::setShowActiveOverrides);
+			break;
+		case PROP_DEBUG_DUMP_GRM_ENTRIES_BEFORE_EXECUTION:
+			tryCast(String.class, value, this::setDebugDumpGrmEntriesBeforeExecution);
+			break;
 		}
-		return false;
 	}
-
-	protected boolean redirectRemoveProperty(String id) {
-		switch (id) {
-		case "r4m.active-profiles-inheritance":
-			setActiveProfilesInheritance(null);
-			return true;
-		case "r4m.fancy-output":
-			setFancyOutput(null);
-			return true;
-		case "r4m.generate-plugin-executions":
-			setGeneratePluginExecutions(null);
-			return true;
-		case "r4m.generate-plugin-executions-on-fork":
-			setGeneratePluginExecutionsOnFork(null);
-			return true;
-		case "r4m.lifecycle-task-request-calculator":
-			setLifecycleTaskRequestCalculator(null);
-			return true;
-		case "r4m.lifecycle-task-request-calculator-on-fork":
-			setLifecycleTaskRequestCalculatorOnFork(null);
-			return true;
-		case "r4m.missing-build-plugin-handler":
-			setMissingBuildPluginHandler(null);
-			return true;
-		case "r4m.patch-mojo-on-fork":
-			setPatchMojoOnFork(null);
-			return true;
-		}
-		return false;
-	}
-
 }

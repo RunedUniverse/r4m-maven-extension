@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>r4m-maven-extension</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>1.1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Runes4Maven Extension</name>
@@ -38,10 +38,11 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>1</artifact-version>
-		<sources-version>1</sources-version>
+		<artifact-release>1</artifact-release>
+		<sources-version>0</sources-version>
+		<sources-release>1</sources-release>
 		<api-version>0</api-version>
-		<model-version>0</model-version>
+		<model-version>1.1.0</model-version>
 		<model-builder-version>0</model-builder-version>
 	</properties>
 
@@ -75,9 +76,11 @@
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 		<connection>
-			scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
 		<developerConnection>
-			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -98,7 +101,7 @@
 		<dependency>
 			<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 			<artifactId>r4m-model</artifactId>
-			<version>${major-version}.${minor-version}.${model-version}</version>
+			<version>${model-version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -138,6 +141,36 @@
 		<dependency>
 			<groupId>net.runeduniverse.lib.utils</groupId>
 			<artifactId>utils-logging</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-plexus</artifactId>
+			<exclusions>
+				<!-- provided by maven-core -->
+				<exclusion>
+					<groupId>org.codehaus.plexus</groupId>
+					<artifactId>plexus-classworlds</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.sisu</groupId>
+					<artifactId>org.eclipse.sisu.plexus</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-maven3-ext</artifactId>
+			<exclusions>
+				<!-- provided by maven-core -->
+				<exclusion>
+					<groupId>org.apache.maven</groupId>
+					<artifactId>maven-core</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>net.runeduniverse.lib.utils</groupId>
+			<artifactId>utils-conditional</artifactId>
 		</dependency>
 
 		<!-- COMPILER -->
@@ -186,6 +219,36 @@
 				</plugins>
 			</build>
 		</profile>
+		<!-- DEVELOPMENT -->
+		<profile>
+			<id>dev-install</id>
+			<build>
+				<plugins>
+					<plugin>
+						<!-- package all resources for easier testing-->
+						<!--
+							-Dmaven.ext.class.path=r4m-ext-1.1.0.jar
+						-->
+						<artifactId>maven-assembly-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<appendAssemblyId>false</appendAssemblyId>
+							<finalName>r4m-ext-${project.version}</finalName>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 
 	<build>
@@ -213,6 +276,20 @@
 				<artifactId>maven-plugin-plugin</artifactId>
 				<configuration>
 					<goalPrefix>r4m</goalPrefix>
+					<requiredJavaVersion>${java-target-version}</requiredJavaVersion>
+					<requiredMavenVersion>${maven-version-min}</requiredMavenVersion>
+					<!--
+						========================================================== -->
+					<!-- we have to use the javadoc notation because the           -->
+					<!-- annotations uses static enums, which for example          -->
+					<!-- restrict forking other non-default lifecyles!             -->
+					<!--
+						https://maven.apache.org/plugin-tools/maven-plugin-tools-java/index.html -->
+					<!--
+						========================================================== -->
+					<extractors>
+						<extractor>java-javadoc</extractor>
+					</extractors>
 				</configuration>
 			</plugin>
 			<plugin>

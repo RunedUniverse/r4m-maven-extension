@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
 
 public interface ProjectExecutionModelPluginParser {
 
-	public ProjectExecutionModel parse(final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			final Plugin mvnPlugin) throws Exception;
+	public ProjectExecutionModel parse(List<RemoteRepository> repositories, RepositorySystemSession session,
+			Plugin mvnPlugin) throws Exception;
 
 }

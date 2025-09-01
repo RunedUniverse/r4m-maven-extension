@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,28 +19,26 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.common.api.DataMap;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.ExecutionView;
 import net.runeduniverse.tools.maven.r4m.pem.view.api.GoalView;
 
 public interface ExecutionArchiveSelection extends Recordable {
 
-	public void modify(Modification mod);
+	public void modify(Consumer<Set<ExecutionView>> mod);
 
 	public Map<ExecutionView, List<GoalView>> selectPhase(String phase);
 
 	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(String... phases);
 
-	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(final Collection<String> phases);
+	public Map<String, Map<ExecutionView, List<GoalView>>> selectPhases(Collection<String> phases);
 
 	public ExecutionArchiveSelectorConfig getSelectorConfig();
 
-	@FunctionalInterface
-	public interface Modification {
-
-		public void modify(final Set<ExecutionView> views);
-
-	}
+	public DataMap<String, AtomicBoolean, ExecutionArchiveSectorSnapshot.Data> getOverrides();
 
 }

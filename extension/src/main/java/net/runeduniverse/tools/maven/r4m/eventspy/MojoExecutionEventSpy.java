@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,16 +37,16 @@ public class MojoExecutionEventSpy implements EventSpy {
 	private Logger log;
 
 	@Override
-	public void init(Context context) throws Exception {
+	public void init(final Context context) throws Exception {
 	}
 
 	@Override
-	public void onEvent(Object eventObj) throws Exception {
+	public void onEvent(final Object eventObj) throws Exception {
 
 		if (!(eventObj instanceof ExecutionEvent))
 			return;
 
-		ExecutionEvent event = (ExecutionEvent) eventObj;
+		final ExecutionEvent event = (ExecutionEvent) eventObj;
 
 		switch (event.getType()) {
 		case ForkStarted:
@@ -61,11 +61,11 @@ public class MojoExecutionEventSpy implements EventSpy {
 	public void close() throws Exception {
 	}
 
-	private void handleForkStarted(ExecutionEvent event) {
+	private void handleForkStarted(final ExecutionEvent event) {
 		if (!(event.getMojoExecution() instanceof MojoExecutionData))
 			return;
 		final MojoExecution mojoExec = event.getMojoExecution();
-		MojoExecutionData data = (MojoExecutionData) event.getMojoExecution();
+		final MojoExecutionData data = (MojoExecutionData) event.getMojoExecution();
 
 		if (data.getLifecycleOverlayOrigin() != null)
 			infoConfigurationOverrideApplied(mojoExec, data.getFork(), data.getLifecycleOverlayOrigin());
@@ -74,8 +74,7 @@ public class MojoExecutionEventSpy implements EventSpy {
 	private void infoConfigurationOverrideApplied(final MojoExecution mojoExec, final Fork fork,
 			final PluginDescriptor overlay) {
 		this.log.info("");
-		this.log.info(String.format("\033[1m Injected Configuration-Override into forked lifecycle\033[m",
-				Runes4MavenProperties.PREFIX_ID));
+		this.log.info(String.format("\033[1m Injected Configuration-Override into forked lifecycle\033[m"));
 		this.log.info(String.format("\033[1m   provided by\033[0m %s:%s:%s", overlay.getGroupId(),
 				overlay.getArtifactId(), overlay.getVersion()));
 	}

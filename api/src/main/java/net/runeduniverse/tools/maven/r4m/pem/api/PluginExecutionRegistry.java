@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,8 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.api.PluginBoundRegistry;
 
-public interface PluginExecutionRegistry {
-
-	PluginExecutionRegistrySlice createSlice(PluginDescriptor mvnPluginDescriptor);
-
-	boolean hasSlice(String prefix);
-
-	boolean hasSlice(String groupId, String artifactId);
-
-	PluginExecutionRegistrySlice getSlice(String prefix);
-
-	PluginExecutionRegistrySlice getSlice(String groupId, String artifactId);
+public interface PluginExecutionRegistry extends PluginBoundRegistry<PluginExecutionRegistrySector> {
 
 }

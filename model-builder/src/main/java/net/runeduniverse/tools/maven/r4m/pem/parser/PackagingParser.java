@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,16 +29,18 @@ import org.codehaus.plexus.component.annotations.Component;
 import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
-import net.runeduniverse.tools.maven.r4m.api.MavenProperties;
+import net.runeduniverse.lib.utils.maven3.api.MavenProperties;
 import net.runeduniverse.tools.maven.r4m.pem.api.ProjectExecutionModelPackagingParser;
+import net.runeduniverse.tools.maven.r4m.pem.model.DefaultModelSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Execution;
 import net.runeduniverse.tools.maven.r4m.pem.model.ExecutionSource;
 import net.runeduniverse.tools.maven.r4m.pem.model.Goal;
 import net.runeduniverse.tools.maven.r4m.pem.model.Lifecycle;
 import net.runeduniverse.tools.maven.r4m.pem.model.ModelProperties;
+import net.runeduniverse.tools.maven.r4m.pem.model.ModelSource;
+import net.runeduniverse.tools.maven.r4m.pem.model.PackagingProcedureRestriction;
 import net.runeduniverse.tools.maven.r4m.pem.model.Phase;
 import net.runeduniverse.tools.maven.r4m.pem.model.ProjectExecutionModel;
-import net.runeduniverse.tools.maven.r4m.pem.restrictions.PackagingProcedureRestriction;
 
 @Component(role = ProjectExecutionModelPackagingParser.class, hint = PackagingParser.HINT)
 public class PackagingParser implements ProjectExecutionModelPackagingParser {
@@ -54,11 +56,11 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 	@Override
 	public ProjectExecutionModel parse() {
-		Set<Execution> effExecutions = new LinkedHashSet<>();
+		final Set<Execution> effExecutions = new LinkedHashSet<>();
 
 		for (Entry<String, LifecycleMapping> lifecycleMappingEntry : this.mappings.entrySet()) {
-			Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
-			Map<String, Execution> executions = new LinkedHashMap<>();
+			final Set<String> allLifecycleIds = new HashSet<>(this.defaultLifecycles.keySet());
+			final Map<String, Execution> executions = new LinkedHashMap<>();
 			for (org.apache.maven.lifecycle.mapping.Lifecycle lifecycleMapping : lifecycleMappingEntry.getValue()
 					.getLifecycles()
 					.values()) {
@@ -72,7 +74,11 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 			effExecutions.addAll(executions.values());
 		}
 
-		ProjectExecutionModel model = new ProjectExecutionModel(PackagingParser.class, PackagingParser.HINT);
+		final ProjectExecutionModel model = new ProjectExecutionModel();
+		model.setModelSource(new DefaultModelSource() //
+				.setPluginId(ModelSource.id("org.apache.maven", "maven-core"))
+				.setNote("< super-pom >"));
+		model.setParser(PackagingParser.class, PackagingParser.HINT);
 		model.setVersion(ModelProperties.MODEL_VERSION);
 		model.addExecutions(effExecutions);
 		return model;
@@ -86,30 +92,21 @@ public class PackagingParser implements ProjectExecutionModelPackagingParser {
 
 			for (LifecycleMojo mojoMapping : phaseMappingEntry.getValue()
 					.getMojos()) {
-				Goal goal = new Goal();
+				final Goal goal = new Goal();
 				if (!goal.parseMvnGoalKey(mojoMapping.getGoal())) {
 					// invalid goal!
 					continue;
 				}
-				String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
-				Execution execution = executions.get(executionId);
-				if (execution == null) {
-					execution = new Execution(executionId, ExecutionSource.PACKAGING);
-					execution.setDefaultActive(true);
-					execution.setInherited(true);
-					execution.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
-					executions.put(execution.getId(), execution);
-				}
-				Lifecycle lifecycle = execution.getLifecycle(lifecycleId);
-				if (lifecycle == null) {
-					lifecycle = new Lifecycle(lifecycleId);
-					execution.putLifecycle(lifecycle);
-				}
-				Phase phase = lifecycle.getPhase(phaseMappingEntry.getKey());
-				if (phase == null) {
-					phase = new Phase(phaseMappingEntry.getKey());
-					lifecycle.putPhase(phase);
-				}
+				final String executionId = String.join("-", MavenProperties.DEFAULT_EXECUTION_PREFIX, goal.getGoalId());
+				final Execution execution = executions.computeIfAbsent(executionId, id -> {
+					final Execution exec = new Execution(id, ExecutionSource.PACKAGING);
+					exec.setDefaultActive(true);
+					exec.setInherited(true);
+					exec.addRestriction(new PackagingProcedureRestriction(packagingProcedure));
+					return exec;
+				});
+				final Lifecycle lifecycle = execution.computeLifecycleIfAbsent(lifecycleId, Lifecycle::new);
+				final Phase phase = lifecycle.computePhaseIfAbsent(phaseMappingEntry.getKey(), Phase::new);
 
 				phase.addGoal(goal.addModes("default", "dev"));
 			}

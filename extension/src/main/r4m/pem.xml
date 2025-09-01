@@ -1,0 +1,52 @@
+<!--
+
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<project-execution-model
+	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="https://api.runeduniverse.net/runes4tools/r4m-pem 
+	https://api.runeduniverse.net/runes4tools/r4m-pem-v1_1_0.xsd">
+
+	<modelVersion>1.1.0</modelVersion>
+	<executions>
+
+		<execution source="plugin" id="default">
+			<triggers>
+				<default />
+			</triggers>
+			<lifecycles>
+				<lifecycle id="help">
+					<phases>
+						<phase id="help">
+							<goals>
+								<goal id="help">
+									<groupId>net.runeduniverse.tools.maven.r4m</groupId>
+									<artifactId>r4m-maven-extension</artifactId>
+									<modes>
+										<mode id="default" />
+										<mode id="dev" />
+									</modes>
+								</goal>
+							</goals>
+						</phase>
+					</phases>
+				</lifecycle>
+			</lifecycles>
+		</execution>
+
+	</executions>
+</project-execution-model>

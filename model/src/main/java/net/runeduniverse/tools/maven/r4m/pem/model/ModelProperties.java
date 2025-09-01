@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,6 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 public interface ModelProperties {
 
-	public static String MODEL_VERSION = "1.0.0";
+	public static String MODEL_VERSION = "1.1.0";
 
 }

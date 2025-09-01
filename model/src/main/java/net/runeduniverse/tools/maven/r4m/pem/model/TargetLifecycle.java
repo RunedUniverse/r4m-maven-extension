@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +15,20 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+
 import static net.runeduniverse.lib.utils.common.StringUtils.isBlank;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+public class TargetLifecycle implements DataEntry {
 
-public class TargetLifecycle implements Recordable {
+	protected final String id;
+	protected String startPhase = null;
+	protected String stopPhase = null;
 
-	private String id;
-	private String startPhase = null;
-	private String stopPhase = null;
-
-	public TargetLifecycle(String id) {
+	public TargetLifecycle(final String id) {
 		this.id = id;
 	}
 
@@ -42,44 +44,46 @@ public class TargetLifecycle implements Recordable {
 		return this.stopPhase;
 	}
 
-	public void setStartPhase(String value) {
+	public void setStartPhase(final String value) {
 		this.startPhase = value;
 	}
 
-	public void setStopPhase(String value) {
+	public void setStopPhase(final String value) {
 		this.stopPhase = value;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof TargetLifecycle))
 			return false;
-		TargetLifecycle lifecycle = (TargetLifecycle) obj;
+		final TargetLifecycle lifecycle = (TargetLifecycle) obj;
 
-		if (!this.id.equals(lifecycle.getId()))
-			return false;
+		return objectEquals(this.id, lifecycle.getId()) //
+				&& objectEquals(this.startPhase, lifecycle.getStartPhase()) //
+				&& objectEquals(this.stopPhase, lifecycle.getStopPhase());
+	}
 
-		if (this.startPhase == null) {
-			if (lifecycle.getStartPhase() != null)
-				return false;
-		} else if (!this.startPhase.equals(lifecycle.getStartPhase()))
-			return false;
+	@Override
+	public TargetLifecycle copy() {
+		final TargetLifecycle lifecycle = new TargetLifecycle(getId());
 
-		if (this.stopPhase == null) {
-			if (lifecycle.getStopPhase() != null)
-				return false;
-		} else if (!this.stopPhase.equals(lifecycle.getStopPhase()))
-			return false;
+		lifecycle.setStartPhase(getStartPhase());
+		lifecycle.setStopPhase(getStopPhase());
 
-		return true;
+		return lifecycle;
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Target Lifecycle");
+		final CompoundTree tree = new DefaultCompoundTree("Target Lifecycle");
 
 		tree.append("id", this.id);
 
@@ -91,5 +95,4 @@ public class TargetLifecycle implements Recordable {
 
 		return tree;
 	}
-
 }

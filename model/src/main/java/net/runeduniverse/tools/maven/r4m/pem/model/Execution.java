@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +15,55 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.model;
 
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
-public class Execution implements Recordable {
+public class Execution implements DataEntry {
 
-	private String id = null;
-	private ExecutionSource source = null;
+	public static final String HINT = "execution";
+	public static final String CANONICAL_NAME = "net.runeduniverse.tools.maven.r4m.pem.model.Execution";
 
-	private final Set<ExecutionRestriction<?>> restrictions = new LinkedHashSet<>();
-	private final Set<ExecutionTrigger<?>> trigger = new LinkedHashSet<>();
-	private boolean inherited = true;
-	private boolean activeAlways = false;
-	private boolean activeDefault = false;
-	private boolean activeNever = false;
+	protected final Supplier<Set<ExecutionRestriction>> restrictionsSupplier;
+	protected final Supplier<Set<ExecutionTrigger>> triggerSupplier;
+	protected final Supplier<Map<String, Lifecycle>> lifecyclesSupplier;
 
-	private final Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
+	protected final Set<ExecutionRestriction> restrictions;
+	protected final Set<ExecutionTrigger> trigger;
+	protected final Map<String, Lifecycle> lifecycles;
 
-	public Execution() {
-	}
+	protected final String id;
+	protected final ExecutionSource source;
+
+	protected boolean inherited = true;
+	protected boolean activeAlways = false;
+	protected boolean activeDefault = false;
+	protected boolean activeNever = false;
 
 	public Execution(final String id, final ExecutionSource source) {
+		this(LinkedHashSet::new, LinkedHashSet::new, LinkedHashMap::new, id, source);
+	}
+
+	public Execution(final Supplier<Set<ExecutionRestriction>> restrictionsSupplier,
+			final Supplier<Set<ExecutionTrigger>> triggerSupplier,
+			final Supplier<Map<String, Lifecycle>> lifecyclesSupplier, final String id, final ExecutionSource source) {
+		this.restrictionsSupplier = restrictionsSupplier;
+		this.triggerSupplier = triggerSupplier;
+		this.lifecyclesSupplier = lifecyclesSupplier;
+		this.restrictions = this.restrictionsSupplier.get();
+		this.trigger = this.triggerSupplier.get();
+		this.lifecycles = this.lifecyclesSupplier.get();
 		this.id = id;
 		this.source = source;
 	}
@@ -52,19 +74,6 @@ public class Execution implements Recordable {
 
 	public ExecutionSource getSource() {
 		return this.source;
-	}
-
-	public Set<ExecutionTrigger<?>> getTrigger() {
-		return this.trigger;
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> Set<ExecutionTrigger<T>> getTrigger(Class<T> dataType) {
-		Set<ExecutionTrigger<T>> result = new LinkedHashSet<>();
-		for (ExecutionTrigger<?> trigger : this.trigger)
-			if (dataType.isAssignableFrom(trigger.getDataType()))
-				result.add((ExecutionTrigger<T>) trigger);
-		return result;
 	}
 
 	public boolean isInherited() {
@@ -83,110 +92,146 @@ public class Execution implements Recordable {
 		return this.activeNever;
 	}
 
-	public Set<ExecutionRestriction<?>> getRestrictions() {
+	public Set<ExecutionRestriction> getRestrictions() {
 		return this.restrictions;
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> Set<ExecutionRestriction<T>> getRestrictions(Class<T> dataType) {
-		Set<ExecutionRestriction<T>> result = new LinkedHashSet<>();
-		for (ExecutionRestriction<?> restriction : this.restrictions)
-			if (dataType.isAssignableFrom(restriction.getDataType()))
-				result.add((ExecutionRestriction<T>) restriction);
-		return result;
+	public Set<ExecutionTrigger> getTrigger() {
+		return this.trigger;
 	}
 
-	public Lifecycle getLifecycle(String lifecycleId) {
+	public Lifecycle getLifecycle(final String lifecycleId) {
 		return this.lifecycles.get(lifecycleId);
+	}
+
+	public Lifecycle computeLifecycleIfAbsent(final String lifecycleId,
+			final Function<? super String, ? extends Lifecycle> mappingFunction) {
+		return this.lifecycles.computeIfAbsent(lifecycleId, mappingFunction);
 	}
 
 	public Map<String, Lifecycle> getLifecycles() {
 		return this.lifecycles;
 	}
 
-	public void setInherited(boolean value) {
+	public void setInherited(final boolean value) {
 		this.inherited = value;
 	}
 
-	public void setAlwaysActive(boolean value) {
+	public void setAlwaysActive(final boolean value) {
 		this.activeAlways = value;
 	}
 
-	public void setDefaultActive(boolean value) {
+	public void setDefaultActive(final boolean value) {
 		this.activeDefault = value;
 	}
 
-	public void setNeverActive(boolean value) {
+	public void setNeverActive(final boolean value) {
 		this.activeNever = value;
 	}
 
-	public void addTrigger(ExecutionTrigger<?> trigger) {
-		this.trigger.add(trigger);
-	}
-
-	public void addRestriction(ExecutionRestriction<?> value) {
-		for (ExecutionRestriction<?> restriction : this.restrictions)
+	public void addRestriction(final ExecutionRestriction value) {
+		for (ExecutionRestriction restriction : this.restrictions) {
 			if (restriction != null && restriction.equals(value))
 				return;
+		}
 		this.restrictions.add(value);
 	}
 
-	public void addRestrictions(Collection<ExecutionRestriction<?>> values) {
-		for (ExecutionRestriction<?> value : values)
+	public void addRestrictions(final Collection<ExecutionRestriction> values) {
+		for (ExecutionRestriction value : values)
 			addRestriction(value);
 	}
 
-	public void putLifecycle(Lifecycle lifecycle) {
+	public void addTrigger(final ExecutionTrigger trigger) {
+		this.trigger.add(trigger);
+	}
+
+	public void addTrigger(final Collection<ExecutionTrigger> values) {
+		for (ExecutionTrigger value : values)
+			addTrigger(value);
+	}
+
+	public void putLifecycle(final Lifecycle lifecycle) {
 		this.lifecycles.put(lifecycle.getId(), lifecycle);
 	}
 
-	public void addLifecycles(Collection<Lifecycle> lifecycles) {
+	public void putLifecycles(final Collection<Lifecycle> lifecycles) {
 		for (Lifecycle lifecycle : lifecycles)
-			this.lifecycles.put(lifecycle.getId(), lifecycle);
+			putLifecycle(lifecycle);
+	}
+
+	@Override
+	public int hashCode() {
+		return hash(type()) ^ hash(getId()) ^ hash(getSource());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj)
+			return true;
+
+		if (!(obj instanceof Execution))
+			return false;
+		final Execution exec = (Execution) obj;
+
+		return objectEquals(this.id, exec.getId()) //
+				&& objectEquals(this.source, exec.getSource()) //
+				&& objectEquals(this.inherited, exec.isInherited()) //
+				&& objectEquals(this.activeAlways, exec.isAlwaysActive()) //
+				&& objectEquals(this.activeDefault, exec.isDefaultActive()) //
+				&& objectEquals(this.activeNever, exec.isNeverActive()) //
+				&& objectEquals(this.restrictions, exec.getRestrictions()) //
+				&& objectEquals(this.trigger, exec.getTrigger()) //
+				&& objectEquals(this.lifecycles, exec.getLifecycles());
+	}
+
+	@Override
+	public Execution copy() {
+		final Execution exec = new Execution(this.restrictionsSupplier, this.triggerSupplier, this.lifecyclesSupplier,
+				this.id, this.source);
+
+		exec.setInherited(isInherited());
+		exec.setAlwaysActive(isAlwaysActive());
+		exec.setDefaultActive(isDefaultActive());
+		exec.setNeverActive(isNeverActive());
+
+		exec.addTrigger(getTrigger());
+		exec.addRestrictions(getRestrictions());
+		exec.putLifecycles(getLifecycles().values());
+
+		return exec;
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Execution");
+		final CompoundTree tree = new DefaultCompoundTree("Execution");
 
 		tree.append("id", this.id);
 		tree.append("source", this.source.key());
 		tree.append("inherited", Boolean.toString(this.inherited));
 
-		CompoundTree restrictionsTree = new CompoundTree("Restrictions");
-		boolean restrictionsExist = false;
+		final CompoundTree restrictionsTree = new DefaultCompoundTree("Restrictions");
 
 		if (!this.restrictions.isEmpty()) {
-			restrictionsExist = true;
 			for (Recordable restriction : this.restrictions)
 				restrictionsTree.append(restriction.toRecord());
-		}
-
-		if (restrictionsExist)
 			tree.append(restrictionsTree);
+		}
 
-		CompoundTree triggerTree = new CompoundTree("Trigger");
-		boolean triggerExist = false;
+		final CompoundTree triggerTree = new DefaultCompoundTree("Trigger");
 
-		if (this.activeAlways) {
+		if (this.activeAlways)
 			triggerTree.append("always-active", "true");
-			triggerExist = true;
-		}
-		if (this.activeDefault) {
+		if (this.activeDefault)
 			triggerTree.append("default-active", "true");
-			triggerExist = true;
-		}
-		if (this.activeNever) {
+		if (this.activeNever)
 			triggerTree.append("never-active", "true");
-			triggerExist = true;
-		}
 		if (!this.trigger.isEmpty()) {
-			triggerExist = true;
 			for (Recordable trigger : this.trigger)
 				triggerTree.append(trigger.toRecord());
 		}
 
-		if (triggerExist)
+		if (triggerTree.hasContent())
 			tree.append(triggerTree);
 
 		for (Recordable lifecycle : this.lifecycles.values())
@@ -194,5 +239,4 @@ public class Execution implements Recordable {
 
 		return tree;
 	}
-
 }

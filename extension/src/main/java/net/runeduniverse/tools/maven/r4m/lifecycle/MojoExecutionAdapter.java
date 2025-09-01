@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,31 +32,32 @@ public class MojoExecutionAdapter extends MojoExecution implements MojoExecution
 	private Fork fork = null;
 	private PluginDescriptor lifecycleOverlayOrigin = null;
 
-	public MojoExecutionAdapter(Plugin plugin, String goal, String executionId,
+	public MojoExecutionAdapter(final Plugin plugin, final String goal, final String executionId,
 			ExecutionArchiveSelectorConfig selectorConfig) {
 		super(plugin, goal, executionId);
 		this.selectorConfig = selectorConfig;
 	}
 
-	public MojoExecutionAdapter(MojoDescriptor mojoDescriptor, ExecutionArchiveSelectorConfig selectorConfig) {
+	public MojoExecutionAdapter(final MojoDescriptor mojoDescriptor,
+			final ExecutionArchiveSelectorConfig selectorConfig) {
 		super(mojoDescriptor);
 		this.selectorConfig = selectorConfig;
 	}
 
-	public MojoExecutionAdapter(MojoDescriptor mojoDescriptor, String executionId, Source source,
-			ExecutionArchiveSelectorConfig selectorConfig) {
+	public MojoExecutionAdapter(final MojoDescriptor mojoDescriptor, final String executionId, final Source source,
+			final ExecutionArchiveSelectorConfig selectorConfig) {
 		super(mojoDescriptor, executionId, source);
 		this.selectorConfig = selectorConfig;
 	}
 
-	public MojoExecutionAdapter(MojoDescriptor mojoDescriptor, String executionId,
-			ExecutionArchiveSelectorConfig selectorConfig) {
+	public MojoExecutionAdapter(final MojoDescriptor mojoDescriptor, final String executionId,
+			final ExecutionArchiveSelectorConfig selectorConfig) {
 		super(mojoDescriptor, executionId);
 		this.selectorConfig = selectorConfig;
 	}
 
-	public MojoExecutionAdapter(MojoDescriptor mojoDescriptor, Xpp3Dom configuration,
-			ExecutionArchiveSelectorConfig selectorConfig) {
+	public MojoExecutionAdapter(final MojoDescriptor mojoDescriptor, final Xpp3Dom configuration,
+			final ExecutionArchiveSelectorConfig selectorConfig) {
 		super(mojoDescriptor, configuration);
 		this.selectorConfig = selectorConfig;
 	}

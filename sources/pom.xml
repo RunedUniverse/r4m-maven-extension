@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -23,11 +23,11 @@
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>1.0.0</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>r4m-bom-sources</artifactId>
-	<version>${major-version}.${minor-version}.${artifact-version}</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Bill of Sources</name>
@@ -38,14 +38,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<artifact-version>1</artifact-version>
 		<maven-version>3.8.4</maven-version>
 		<!-- ARTIFACT VERSIONS -->
-		<runeduniverse-utils-common-version>1.0.1</runeduniverse-utils-common-version>
-		<runeduniverse-utils-logging-version>1.0.2</runeduniverse-utils-logging-version>
 		<plexus-utils-version>3.3.0</plexus-utils-version>
 		<apache-commons-lang3-version>3.8.1</apache-commons-lang3-version>
-		<!-- ARTIFACT VERSIONS - TESTING -->
+		<apache-commons-io-version>2.6</apache-commons-io-version>
+		<!-- ARTIFACT VERSIONS - BOMs -->
+		<runeduniverse-utils-bom-version>2.0.0</runeduniverse-utils-bom-version>
 	</properties>
 
 
@@ -76,6 +75,20 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
+		<connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
+		<developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
+	</scm>
+	<issueManagement>
+		<system>GitHub Issues</system>
+		<url>https://github.com/RunedUniverse/r4m-maven-extension/issues</url>
+	</issueManagement>
+
 	<dependencyManagement>
 		<dependencies>
 			<!-- Maven Core -->
@@ -98,14 +111,17 @@
 				<version>${apache-commons-lang3-version}</version>
 			</dependency>
 			<dependency>
-				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-common</artifactId>
-				<version>${runeduniverse-utils-common-version}</version>
+				<groupId>commons-io</groupId>
+				<artifactId>commons-io</artifactId>
+				<version>${apache-commons-io-version}</version>
 			</dependency>
+
 			<dependency>
 				<groupId>net.runeduniverse.lib.utils</groupId>
-				<artifactId>utils-logging</artifactId>
-				<version>${runeduniverse-utils-logging-version}</version>
+				<artifactId>utils-bom</artifactId>
+				<version>${runeduniverse-utils-bom-version}</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 
 			<!-- COMPILER -->
@@ -118,15 +134,4 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
-
-	<profiles>
-		<profile>
-			<id>deploy</id>
-			<build>
-				<defaultGoal>
-					org.apache.maven.plugins:maven-deploy-plugin:deploy
-				</defaultGoal>
-			</build>
-		</profile>
-	</profiles>
 </project>

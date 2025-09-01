@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,60 +32,15 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 	public static final String HINT = "sequential";
 
 	@Override
-	protected List<Entry> splitEntries(String task) throws LifecyclePhaseNotFoundException {
-		List<Entry> entries = new LinkedList<>();
-		int markerIdx = -1;
-		Entry entry = null;
-		String phase = null;
-		boolean flagged = false;
-
-		while (task != null) {
-			flagged = false;
-			entry = new Entry(false, false, true);
-			if (task.indexOf('[') == 0) {
-				flagged = true;
-				entry.setAfter(true);
-				task = task.substring(1);
-			}
-			if (task.indexOf(']') == 0) {
-				flagged = true;
-				entry.setBefore(true);
-				entry.setInclude(false);
-				task = task.substring(1);
-			}
-
-			int splitIdx = task.indexOf(',');
-			if (0 < splitIdx) {
-				task = task.substring(splitIdx + 1);
-				phase = task.substring(0, splitIdx);
-			} else {
-				phase = task;
-				task = null;
-			}
-
-			markerIdx = phase.indexOf('[');
-			if (markerIdx == phase.length() - 1) {
-				flagged = true;
-				entry.setAfter(true);
-				entry.setInclude(false);
-				phase = phase.substring(0, markerIdx);
-			}
-			markerIdx = phase.indexOf(']');
-			if (markerIdx == phase.length() - 1 || !flagged) {
-				entry.setBefore(true);
-				phase = phase.substring(0, markerIdx);
-			}
-			entry.setLifecycle(selectLifecycle(phase));
-			entry.setPhase(phase);
-			entries.add(entry);
-		}
-		return entries;
+	protected void modifyEntry(final Entry entry, final boolean plain) {
+		if (plain)
+			entry.setBefore(true);
 	}
 
 	@Override
 	public LifecycleTaskRequest calculateTaskRequest(final Lifecycle lifecycle, final String phaseId)
 			throws LifecyclePhaseNotFoundException {
-		List<String> sequence = new LinkedList<>();
+		final List<String> sequence = new LinkedList<>();
 		for (String phase : lifecycle.getPhases()) {
 			sequence.add(phase);
 			if (phase.equals(phaseId))
@@ -93,5 +48,4 @@ public class SequentialLifecycleTaskReqCalcDelegate extends DefaultLifecycleTask
 		}
 		return new DefaultLifecycleTaskRequest(lifecycle, sequence);
 	}
-
 }

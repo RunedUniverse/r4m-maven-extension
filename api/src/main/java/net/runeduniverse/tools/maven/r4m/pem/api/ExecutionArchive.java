@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,9 @@
  */
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
-import org.apache.maven.project.MavenProject;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
+import net.runeduniverse.lib.utils.maven3.ext.indexer.api.ProjectBoundRegistry;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
-
-public interface ExecutionArchive extends Recordable {
-
-	public ExecutionArchiveSlice createSlice(final MavenProject mvnProject);
-
-	public ExecutionArchiveSlice getSlice(final MavenProject mvnProject);
+public interface ExecutionArchive extends ProjectBoundRegistry<ExecutionArchiveSector>, Recordable {
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,18 @@
 package net.runeduniverse.tools.maven.r4m.pem.api;
 
 import java.util.Collection;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Profile;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.api.Recordable;
 
 public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
+
+	public ExecutionArchiveSelectorConfig selectTopLevelProject(MavenProject value);
 
 	public ExecutionArchiveSelectorConfig selectActiveProject(MavenProject value);
 
@@ -58,7 +61,11 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig selectModes(Collection<String> values);
 
+	public ExecutionArchiveSelectorConfig clearTopLevelProject();
+
 	public ExecutionArchiveSelectorConfig clearActiveProject();
+
+	public ExecutionArchiveSelectorConfig clearProperties();
 
 	public ExecutionArchiveSelectorConfig clearPackagingProcedure();
 
@@ -70,7 +77,11 @@ public interface ExecutionArchiveSelectorConfig extends Recordable, Cloneable {
 
 	public ExecutionArchiveSelectorConfig clearModes();
 
+	public MavenProject getTopLevelProject();
+
 	public MavenProject getActiveProject();
+
+	public Properties getProperties();
 
 	public String getPackagingProcedure();
 

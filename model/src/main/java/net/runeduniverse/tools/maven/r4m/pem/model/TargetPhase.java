@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,27 @@ package net.runeduniverse.tools.maven.r4m.pem.model;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Supplier;
 
-import net.runeduniverse.lib.utils.logging.logs.CompoundTree;
-import net.runeduniverse.lib.utils.logging.logs.Recordable;
+import net.runeduniverse.lib.utils.logging.log.DefaultCompoundTree;
+import net.runeduniverse.lib.utils.logging.log.api.CompoundTree;
 
-public class TargetPhase implements Recordable {
+import static net.runeduniverse.lib.utils.common.ComparisonUtils.objectEquals;
+import static net.runeduniverse.lib.utils.common.HashUtils.hash;
 
-	private String id;
-	private final Set<String> executions = new LinkedHashSet<>(0);
+public class TargetPhase implements DataEntry {
 
-	public TargetPhase(String id) {
+	protected final Supplier<Set<String>> executionsSupplier;
+	protected final Set<String> executions;
+	protected final String id;
+
+	public TargetPhase(final String id) {
+		this(() -> new LinkedHashSet<>(0), id);
+	}
+
+	public TargetPhase(final Supplier<Set<String>> executionsSupplier, final String id) {
+		this.executionsSupplier = executionsSupplier;
+		this.executions = this.executionsSupplier.get();
 		this.id = id;
 	}
 
@@ -38,29 +49,44 @@ public class TargetPhase implements Recordable {
 		return this.executions;
 	}
 
-	public void addExecutions(Set<String> executions) {
+	public void addExecution(final String execution) {
+		this.executions.add(execution);
+	}
+
+	public void addExecutions(final Set<String> executions) {
 		this.executions.addAll(executions);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public int hashCode() {
+		return hash(type()) ^ hash(getId());
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
 		if (this == obj)
 			return true;
 
 		if (!(obj instanceof TargetPhase))
 			return false;
-		TargetPhase phase = (TargetPhase) obj;
+		final TargetPhase phase = (TargetPhase) obj;
 
-		if (!this.id.equals(phase.getId()) || !(this.executions.size() == phase.getExecutions()
-				.size() && this.executions.containsAll(phase.getExecutions())))
-			return false;
+		return objectEquals(this.id, phase.getId()) //
+				&& objectEquals(this.executions, phase.getExecutions());
+	}
 
-		return true;
+	@Override
+	public TargetPhase copy() {
+		final TargetPhase phase = new TargetPhase(this.executionsSupplier, getId());
+
+		phase.addExecutions(getExecutions());
+
+		return phase;
 	}
 
 	@Override
 	public CompoundTree toRecord() {
-		CompoundTree tree = new CompoundTree("Target Phase");
+		final CompoundTree tree = new DefaultCompoundTree("Target Phase");
 
 		tree.append("id", this.id);
 
@@ -69,5 +95,4 @@ public class TargetPhase implements Recordable {
 
 		return tree;
 	}
-
 }

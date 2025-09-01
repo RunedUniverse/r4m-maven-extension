@@ -1,6 +1,6 @@
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
@@ -69,9 +69,11 @@
 	<scm>
 		<url>https://github.com/RunedUniverse/r4m-maven-extension</url>
 		<connection>
-			scm:git:http://github.com/RunedUniverse/r4m-maven-extension.git</connection>
+			scm:git:https://github.com/RunedUniverse/r4m-maven-extension.git
+		</connection>
 		<developerConnection>
-			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git</developerConnection>
+			scm:git:git@github.com:RunedUniverse/r4m-maven-extension.git
+		</developerConnection>
 	</scm>
 	<issueManagement>
 		<system>GitHub Issues</system>
@@ -85,31 +87,40 @@
 		<root-dir>${basedir}</root-dir>
 		<!-- VERSIONS -->
 		<major-version>1</major-version>
-		<minor-version>0</minor-version>
-		<artifact-version>0</artifact-version>
+		<minor-version>1</minor-version>
+		<patch-version>X</patch-version>
 		<!-- ARTIFACT VERSIONS -->
 		<maven-version-min>3.3.9</maven-version-min>
 		<!-- ARTIFACT VERSIONS - COMPILER -->
-		<maven-plugin-plugin-version>3.6.4</maven-plugin-plugin-version>
+		<maven-plugin-plugin-version>3.15.1</maven-plugin-plugin-version>
 		<plexus-component-version>1.7.1</plexus-component-version>
-		<plugin-maven-clean-version>3.1.0</plugin-maven-clean-version>
-		<plugin-maven-toolchains-version>3.1.0</plugin-maven-toolchains-version>
-		<plugin-maven-resources-version>3.2.0</plugin-maven-resources-version>
-		<plugin-maven-compiler-version>3.8.0</plugin-maven-compiler-version>
-		<plugin-maven-jar-version>3.0.2</plugin-maven-jar-version>
-		<plugin-maven-source-version>3.2.1</plugin-maven-source-version>
-		<plugin-maven-javadoc-version>3.2.0</plugin-maven-javadoc-version>
-		<plugin-maven-install-version>3.0.0-M1</plugin-maven-install-version>
-		<plugin-revelc-formatter-version>2.23.0</plugin-revelc-formatter-version>
-		<plugin-mycila-license-version>4.2.rc1</plugin-mycila-license-version>
-		<plugin-maven-gpg-version>3.0.1</plugin-maven-gpg-version>
-		<plugin-mojohaus-build-helper-version>3.2.0</plugin-mojohaus-build-helper-version>
-		<plugin-maven-deploy-version>3.0.0-M2</plugin-maven-deploy-version>
+		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
+		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
+		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>
+		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
+		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
+		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
+		<plugin-maven-javadoc-version>3.11.2</plugin-maven-javadoc-version>
+		<plugin-maven-install-version>3.1.4</plugin-maven-install-version>
+		<plugin-revelc-formatter-version>2.25.0</plugin-revelc-formatter-version>
+		<plugin-mycila-license-version>4.6</plugin-mycila-license-version>
+		<!-- ARTIFACT VERSIONS - PACKAGER -->
+		<plugin-maven-dependency-version>3.8.1</plugin-maven-dependency-version>
+		<plugin-dentrassi-rpm-version>1.13.0</plugin-dentrassi-rpm-version>
 	</properties>
 
 	<profiles>
 		<profile>
 			<id>dev-install</id>
+			<repositories>
+				<!-- dev-repo contains: development builds -->
+				<repository>
+					<id>runeduniverse-development</id>
+					<url>
+						https://nexus.runeduniverse.net/repository/maven-development/
+					</url>
+				</repository>
+			</repositories>
 			<build>
 				<defaultGoal>clean formatter:format license:format install</defaultGoal>
 			</build>
@@ -159,122 +170,6 @@
 							</execution>
 						</executions>
 					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>deploy</id>
-			<build>
-				<defaultGoal>
-					org.apache.maven.plugins:maven-jar-plugin:jar
-					org.apache.maven.plugins:maven-deploy-plugin:deploy
-				</defaultGoal>
-			</build>
-		</profile>
-		<profile>
-			<id>deploy-signed</id>
-			<build>
-				<defaultGoal>
-					org.apache.maven.plugins:maven-jar-plugin:jar
-					org.codehaus.mojo:build-helper-maven-plugin:attach-artifact
-					org.apache.maven.plugins:maven-deploy-plugin:deploy
-				</defaultGoal>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<goals>
-									<goal>attach-artifact</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<artifacts>
-								<!-- gpg signatures -->
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}.pom.asc</file>
-									<type>pom.asc</type>
-								</artifact>
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}.jar.asc</file>
-									<type>jar.asc</type>
-								</artifact>
-								<!-- javadoc -->
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}-javadoc.jar</file>
-									<type>jar</type>
-									<classifier>javadoc</classifier>
-								</artifact>
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}-javadoc.jar.asc</file>
-									<type>jar.asc</type>
-									<classifier>javadoc</classifier>
-								</artifact>
-								<!-- sources -->
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}-sources.jar</file>
-									<type>jar</type>
-									<classifier>sources</classifier>
-								</artifact>
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}-sources.jar.asc</file>
-									<type>jar.asc</type>
-									<classifier>sources</classifier>
-								</artifact>
-							</artifacts>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>deploy-pom-signed</id>
-			<build>
-				<defaultGoal>
-					org.codehaus.mojo:build-helper-maven-plugin:attach-artifact
-					org.apache.maven.plugins:maven-deploy-plugin:deploy
-				</defaultGoal>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>build-helper-maven-plugin</artifactId>
-						<configuration>
-							<artifacts>
-								<!-- gpg signature -->
-								<artifact>
-									<file>
-										${project.build.directory}/${project.build.finalName}.pom.asc</file>
-									<type>pom.asc</type>
-								</artifact>
-							</artifacts>
-						</configuration>
-						<executions>
-							<execution>
-								<goals>
-									<goal>attach-artifact</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -299,37 +194,6 @@
 						https://nexus.runeduniverse.net/repository/maven-development/</url>
 				</repository>
 			</repositories>
-		</profile>
-		<!-- DISTRIBUTION REPOSITORIES -->
-		<profile>
-			<id>dist-repo-releases</id>
-			<distributionManagement>
-				<repository>
-					<id>runeduniverse-releases</id>
-					<url>
-						https://nexus.runeduniverse.net/repository/maven-releases/</url>
-				</repository>
-			</distributionManagement>
-		</profile>
-		<profile>
-			<id>dist-repo-development</id>
-			<distributionManagement>
-				<repository>
-					<id>runeduniverse-development</id>
-					<url>
-						https://nexus.runeduniverse.net/repository/maven-development/</url>
-				</repository>
-			</distributionManagement>
-		</profile>
-		<profile>
-			<id>dist-repo-maven-central</id>
-			<distributionManagement>
-				<repository>
-					<id>central-nexus</id>
-					<url>
-						https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
-			</distributionManagement>
 		</profile>
 		<!-- LICENSES -->
 		<profile>
@@ -466,7 +330,7 @@
 					<version>${plugin-mycila-license-version}</version>
 					<configuration>
 						<properties>
-							<year>2024</year>
+							<year>2025</year>
 							<owner>VenaNocta</owner>
 							<email>venanocta@gmail.com</email>
 						</properties>
@@ -478,7 +342,6 @@
 								<header>${root-dir}/src/license/header.txt</header>
 								<excludes>
 									<exclude>**/.mvn/repo/**</exclude>
-									<exclude>**/resources/**</exclude>
 									<exclude>**/license/**</exclude>
 									<exclude>**/target/**</exclude>
 								</excludes>
@@ -521,23 +384,18 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>${plugin-maven-gpg-version}</version>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>${plugin-maven-dependency-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>de.dentrassi.maven</groupId>
+					<artifactId>rpm</artifactId>
+					<version>${plugin-dentrassi-rpm-version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>${plugin-maven-install-version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>${plugin-mojohaus-build-helper-version}</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>${plugin-maven-deploy-version}</version>
 				</plugin>
 			</plugins>
 		</pluginManagement>

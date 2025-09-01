@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@
 			<version>openjdk-1.8.0</version>
 		</provides>
 		<configuration>
-			<jdkHome>/etc/alternatives/java_sdk_1.8.0_openjdk</jdkHome>
+			<jdkHome>/usr/lib/jvm/java-1.8.0-openjdk</jdkHome>
 		</configuration>
 	</toolchain>
 	<toolchain>
@@ -34,7 +34,7 @@
 			<version>openjdk-11</version>
 		</provides>
 		<configuration>
-			<jdkHome>/etc/alternatives/java_sdk_11_openjdk</jdkHome>
+			<jdkHome>/usr/lib/jvm/java-11-openjdk</jdkHome>
 		</configuration>
 	</toolchain>
 	<toolchain>
@@ -43,7 +43,8 @@
 			<version>openjdk-17</version>
 		</provides>
 		<configuration>
-			<jdkHome>/etc/alternatives/java_sdk_17_openjdk</jdkHome>
+			<jdkHome>/usr/lib/jvm/java-17-openjdk</jdkHome>
 		</configuration>
 	</toolchain>
 </toolchains>
+

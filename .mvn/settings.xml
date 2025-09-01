@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright © 2024 VenaNocta (venanocta@gmail.com)
+    Copyright © 2025 VenaNocta (venanocta@gmail.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,11 +21,6 @@
 	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
 
 	<localRepository>${env.WORKSPACE}/.mvn/repo</localRepository>
-
-	<activeProfiles>
-		<!-- provides configuration for maven-gpg-plugin -->
-		<activeProfile>gpg-signature-software</activeProfile>
-	</activeProfiles>
 
 </settings>
 

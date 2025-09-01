@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,26 +22,23 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 
-import net.runeduniverse.tools.maven.r4m.pem.api.ExecutionArchiveSlice;
-
 /**
  * Required for scanning maven projects to extract pem configurations.
  */
 public interface MavenProjectScanner extends Comparable<MavenProjectScanner> {
 
 	@Override
-	public default int compareTo(MavenProjectScanner o) {
-		if (getPriority() == o.getPriority())
+	public default int compareTo(final MavenProjectScanner o) {
+		if (this == o)
 			return 0;
-		if (getPriority() < o.getPriority())
-			return -1;
-		return 1;
+		if (o == null)
+			return 1;
+		return Integer.compare(getPriority(), o.getPriority());
 	}
 
 	public int getPriority();
 
-	public void scan(final MavenSession mvnSession, final Collection<Plugin> extPlugins,
-			final Set<Plugin> unidentifiablePlugins, final MavenProject mvnProject,
-			final ExecutionArchiveSlice projectSlice) throws Exception;
+	public void scan(MavenSession mvnSession, Collection<Plugin> extPlugins, Set<Plugin> invalidPlugins,
+			MavenProject mvnProject) throws Exception;
 
 }

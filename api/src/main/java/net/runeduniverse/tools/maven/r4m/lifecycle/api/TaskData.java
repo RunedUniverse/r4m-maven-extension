@@ -1,5 +1,5 @@
 /*
- * Copyright © 2024 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2025 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ public interface TaskData {
 
 	public String[] getModes();
 
-	public default String getPrimaryExecutionOrDefault(String other) {
+	public default String getPrimaryExecutionOrDefault(final String other) {
 		final String[] e = getExecutions();
 		if (e == null)
 			return other;

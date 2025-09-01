@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-api</artifactId>
-	<version>${major-version}.${minor-version}.${patch-version}</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>Runes4Maven API</name>
@@ -38,7 +38,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- ARTIFACT VERSIONS -->
-		<patch-version>0</patch-version>
 		<sources-version>0</sources-version>
 		<model-version>1.1.0</model-version>
 	</properties>

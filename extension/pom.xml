@@ -27,7 +27,7 @@
 	</parent>
 
 	<artifactId>r4m-maven-extension</artifactId>
-	<version>${major-version}.${minor-version}.${patch-version}</version>
+	<version>1.1.0</version>
 	<packaging>maven-plugin</packaging>
 
 	<name>Runes4Maven Extension</name>
@@ -38,7 +38,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<root-dir>..</root-dir>
 		<!-- VERSIONS -->
-		<patch-version>0</patch-version>
 		<artifact-release>1</artifact-release>
 		<sources-version>0</sources-version>
 		<sources-release>1</sources-release>

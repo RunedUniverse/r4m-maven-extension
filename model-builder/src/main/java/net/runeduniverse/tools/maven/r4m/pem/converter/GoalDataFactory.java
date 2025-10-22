@@ -42,8 +42,7 @@ public class GoalDataFactory extends ADataFactory {
 		if (isBlank(groupId) || isBlank(artifactId) || isBlank(goalId))
 			return null;
 
-		final String optionalValue = getAttributeAsId(cnf, "optional");
-		final Boolean optional = isBlank(optionalValue) ? null : Boolean.parseBoolean(optionalValue);
+		final Boolean optional = getAttributeAsBoolean(cnf, "optional", null);
 
 		final Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 

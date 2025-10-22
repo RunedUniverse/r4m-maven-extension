@@ -275,8 +275,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 			final ProjectExecutionModel pem = createPem(mvnProject);
 			// baseMap = executions of mvnProject (parent)
 			final Map<String, Map<String, Execution>> baseMap = //
-					indexPlugins(invalidPlugins, repositories, session, rootMvnProject, mvnProject, pem,
-							pluginsSupplier);
+					indexPlugins(invalidPlugins, repositories, session, mvnProject, pem, pluginsSupplier);
 			// filter the baseMap
 			for (Entry<String, Map<String, Execution>> pluginEntry : baseMap.entrySet()) {
 				for (Iterator<Entry<String, Execution>> i = //
@@ -330,17 +329,16 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 
 	protected Map<String, Map<String, Execution>> indexPlugins(final Set<Plugin> invalidPlugins,
 			final List<RemoteRepository> repositories, final RepositorySystemSession session,
-			final MavenProject rootMvnProject, final MavenProject mvnProject, final ProjectExecutionModel pem,
+			final MavenProject mvnProject, final ProjectExecutionModel pem,
 			final Function<MavenProject, Collection<Plugin>> pluginsSupplier) {
 		final Map<String, Map<String, Execution>> pluginIndex = new LinkedHashMap<>();
 		final Collection<Plugin> plugins = pluginsSupplier.apply(mvnProject);
 		if (plugins == null)
 			return pluginIndex;
 		for (Plugin mvnPlugin : plugins) {
-			mvnPlugin = resolvePlugin(rootMvnProject, mvnPlugin);
+			mvnPlugin = resolvePlugin(mvnProject, mvnPlugin);
 			if (!isValid(invalidPlugins, mvnPlugin))
 				continue;
-
 			final PluginDescriptor mvnPluginDescriptor;
 			try {
 				mvnPluginDescriptor = this.manager.getPluginDescriptor(mvnPlugin, repositories, session);
@@ -417,7 +415,7 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 		try {
 			clone = plugin.clone();
 		} catch (RuntimeException e) {
-			log.error("Failed to clone Plugin!", e);
+			this.log.debug("Failed to clone Plugin!", e);
 			return plugin;
 		}
 
@@ -445,15 +443,14 @@ public class ExecutionsPluginParser implements ProjectExecutionModelCompatProjec
 				return clone;
 			}
 		}
-
-		return plugin;
+		return clone;
 	}
 
 	protected boolean isValid(final Set<Plugin> invalidPlugins, final Plugin mvnPlugin) {
 		if (mvnPlugin == null)
 			return false;
 
-		if (mvnPlugin.getVersion() == null) {
+		if (isBlank(mvnPlugin.getVersion())) {
 			invalidPlugins.add(mvnPlugin);
 			return false;
 		}

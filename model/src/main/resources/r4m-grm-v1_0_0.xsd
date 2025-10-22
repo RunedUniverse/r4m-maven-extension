@@ -1,4 +1,4 @@
-<?xml version="1.1"?>
+<?xml version="1.0"?>
 <!--
 
     Copyright © 2025 VenaNocta (venanocta@gmail.com)
@@ -27,15 +27,15 @@
 		<xs:all>
 			<xs:element name="modelVersion" type="xs:string"
 				default="1.0.0" />
-			<xs:element name="goals">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="goal" type="Goal" minOccurs="0"
-							maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="goals" type="Goals" />
 		</xs:all>
+	</xs:complexType>
+
+	<xs:complexType name="Goals">
+		<xs:sequence>
+			<xs:element name="goal" type="Goal" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="Goal">

@@ -21,6 +21,7 @@
 	targetNamespace="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	xmlns="https://api.runeduniverse.net/runes4tools/r4m-pem"
 	elementFormDefault="qualified">
+
 	<xs:element name="project-execution-model" type="Model" />
 	<xs:complexType name="Model">
 		<xs:all>
@@ -28,14 +29,7 @@
 				default="1.1.0" />
 			<xs:element name="overrides" type="Overrides"
 				minOccurs="0" />
-			<xs:element name="executions">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="execution" type="Execution"
-							minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="executions" type="Executions" />
 		</xs:all>
 	</xs:complexType>
 
@@ -86,6 +80,13 @@
 		</xs:all>
 	</xs:complexType>
 
+	<xs:complexType name="Executions">
+		<xs:sequence>
+			<xs:element name="execution" type="Execution"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="Execution">
 		<xs:all>
 			<xs:element name="inherited" type="BooleanValue"
@@ -101,14 +102,8 @@
 				type="ExecutionRestrictions" minOccurs="0" />
 			<xs:element name="triggers" type="ExecutionTriggers"
 				minOccurs="0" />
-			<xs:element name="lifecycles" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="lifecycle" type="Lifecycle"
-							minOccurs="0" maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="lifecycles" type="Lifecycles"
+				minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="ExecutionId" use="required" />
 		<xs:attribute name="source" use="required">
@@ -291,54 +286,61 @@
 		<xs:attribute name="id" type="AnyId" use="required" />
 	</xs:complexType>
 
+	<xs:complexType name="Lifecycles">
+		<xs:sequence>
+			<xs:element name="lifecycle" type="Lifecycle"
+				minOccurs="0" maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="Lifecycle">
 		<xs:all>
-			<xs:element name="phases" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="phase" type="Phase" minOccurs="0"
-							maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="phases" type="Phases" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="LifecycleId" use="required" />
 	</xs:complexType>
 
+	<xs:complexType name="Phases">
+		<xs:sequence>
+			<xs:element name="phase" type="Phase" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="Phase">
 		<xs:all>
-			<xs:element name="goals" minOccurs="0">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:element name="goal" type="Goal" minOccurs="0"
-							maxOccurs="unbounded" />
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="goals" type="Goals" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="PhaseId" use="required" />
+	</xs:complexType>
+
+	<xs:complexType name="Goals">
+		<xs:sequence>
+			<xs:element name="goal" type="Goal" minOccurs="0"
+				maxOccurs="unbounded" />
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="Goal">
 		<xs:all>
 			<xs:element name="groupId" type="ArtifactGroupId" />
 			<xs:element name="artifactId" type="AnyId" />
-			<xs:element name="modes">
-				<xs:complexType>
-					<xs:sequence>
-						<xs:choice minOccurs="1" maxOccurs="unbounded">
-							<xs:element name="mode" type="Mode" />
-							<xs:any namespace="##other" />
-						</xs:choice>
-					</xs:sequence>
-				</xs:complexType>
-			</xs:element>
+			<xs:element name="modes" type="Modes" />
 			<xs:element name="fork" type="Fork" minOccurs="0" />
 		</xs:all>
 		<xs:attribute name="id" type="AnyId" use="required" />
 		<xs:attribute name="optional" type="BooleanValue"
 			use="optional" default="true">
 		</xs:attribute>
+	</xs:complexType>
+
+	<xs:complexType name="Modes">
+		<xs:sequence>
+			<xs:choice minOccurs="1" maxOccurs="unbounded">
+				<xs:element name="mode" type="Mode" />
+				<xs:any namespace="##other" />
+			</xs:choice>
+		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="Mode">
@@ -429,8 +431,8 @@
 				maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:all>
-						<xs:element name="executions" minOccurs="0"
-							type="TargetExecutions">
+						<xs:element name="executions" type="TargetExecutions"
+							minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>
 									Defined Executions will only be activated in
@@ -452,8 +454,8 @@
 				maxOccurs="unbounded">
 				<xs:complexType>
 					<xs:all>
-						<xs:element name="executions" minOccurs="0"
-							type="TargetExecutions">
+						<xs:element name="executions" type="TargetExecutions"
+							minOccurs="0">
 							<xs:annotation>
 								<xs:documentation>
 									Defined Executions will be removed from

@@ -1,5 +1,5 @@
 /*
- * Copyright © 2025 VenaNocta (venanocta@gmail.com)
+ * Copyright © 2026 VenaNocta (venanocta@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,8 +42,7 @@ public class GoalDataFactory extends ADataFactory {
 		if (isBlank(groupId) || isBlank(artifactId) || isBlank(goalId))
 			return null;
 
-		final String optionalValue = getAttributeAsId(cnf, "optional");
-		final Boolean optional = isBlank(optionalValue) ? null : Boolean.parseBoolean(optionalValue);
+		final Boolean optional = getAttributeAsBoolean(cnf, "optional", null);
 
 		final Goal goal = new Goal(groupId, artifactId, goalId).setOptional(optional);
 

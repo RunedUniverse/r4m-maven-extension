@@ -82,9 +82,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<root-dir>${basedir}</root-dir>
+		<!-- sources -->
+		<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
 		<java-source-version>1.8</java-source-version>
 		<java-target-version>${java-source-version}</java-target-version>
-		<root-dir>${basedir}</root-dir>
 		<!-- VERSIONS -->
 		<major-version>1</major-version>
 		<minor-version>1</minor-version>
@@ -114,14 +116,14 @@
 		<profile>
 			<id>toolchain-openjdk-1-8-0</id>
 			<properties>
-				<jdk-toolchain-source-version>openjdk-1.8.0</jdk-toolchain-source-version>
+				<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
 			</properties>
 		</profile>
 		<!-- DEV-INSTALL -->
 		<profile>
 			<id>dev-install</id>
 			<properties>
-				<jdk-toolchain-source-version>openjdk-1.8.0</jdk-toolchain-source-version>
+				<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
 			</properties>
 			<repositories>
 				<!-- dev-repo contains: development builds -->
@@ -151,13 +153,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-toolchains-plugin</artifactId>
-						<configuration>
-							<toolchains>
-								<jdk>
-									<version>${toolchain-jdk-source-version}</version>
-								</jdk>
-							</toolchains>
-						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -313,7 +308,7 @@
 					<configuration>
 						<toolchains>
 							<jdk>
-								<version>openjdk-1.8.0</version>
+								<version>${toolchain-jdk-source-version}</version>
 							</jdk>
 						</toolchains>
 					</configuration>

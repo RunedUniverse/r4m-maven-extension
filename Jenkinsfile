@@ -22,10 +22,10 @@ def installArtifact(mod, parent = null) {
 		sh "mvn-dev -P ${ REPOS },${ getToolchainId(mod) },install -pl=${ relPath }"
 	} finally {
 		def baseName = "${ artifactId }-${ version }"
-		// create spec .pom in target/ path
-		sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 		// archive artifacts
 		dir(path: "${ mod.path() }/target") {
+			// create spec .pom in target/ path
+			sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 			sh 'ls -l'
 			archiveArtifacts artifacts: "${ baseName }.pom", fingerprint: true
 			if(mod.hasTag('pack-jar')) {

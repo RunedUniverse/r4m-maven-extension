@@ -110,6 +110,15 @@
 	</properties>
 
 	<profiles>
+		<!-- TOOLCHAINS -->
+		<profile>
+			<id>toolchain-openjdk-1-8-0</id>
+			<properties>
+				<jdk-toolchain-source-version>openjdk-1.8.0</jdk-toolchain-source-version>
+				<jdk-toolchain-test-version>openjdk-1.8.0</jdk-toolchain-test-version>
+			</properties>
+		</profile>
+		<!-- DEV-INSTALL -->
 		<profile>
 			<id>dev-install</id>
 			<repositories>
@@ -180,7 +189,8 @@
 				<repository>
 					<id>runeduniverse-releases</id>
 					<url>
-						https://nexus.runeduniverse.net/repository/maven-releases/</url>
+						https://nexus.runeduniverse.net/repository/maven-releases/
+					</url>
 				</repository>
 			</repositories>
 		</profile>
@@ -191,7 +201,8 @@
 				<repository>
 					<id>runeduniverse-development</id>
 					<url>
-						https://nexus.runeduniverse.net/repository/maven-development/</url>
+						https://nexus.runeduniverse.net/repository/maven-development/
+					</url>
 				</repository>
 			</repositories>
 		</profile>

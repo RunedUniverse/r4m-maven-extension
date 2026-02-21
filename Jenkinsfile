@@ -1,6 +1,6 @@
 def evalValue(expression, path) {
 	return sh( returnStdout: true,
-		script: "mvn org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=${ expression } -q -DforceStdout -pl=${ path } | tail -1")
+		script: "mvn-dev -P ${ env.REPOS } org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=${ expression } -q -DforceStdout -pl=${ path } | tail -1")
 }
 
 def installArtifact(mod) {

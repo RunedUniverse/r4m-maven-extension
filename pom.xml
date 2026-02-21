@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
@@ -154,7 +154,7 @@
 						<configuration>
 							<toolchains>
 								<jdk>
-								<version>${toolchain-jdk-source-version}</version>
+									<version>${toolchain-jdk-source-version}</version>
 								</jdk>
 							</toolchains>
 						</configuration>

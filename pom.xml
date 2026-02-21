@@ -115,12 +115,14 @@
 			<id>toolchain-openjdk-1-8-0</id>
 			<properties>
 				<jdk-toolchain-source-version>openjdk-1.8.0</jdk-toolchain-source-version>
-				<jdk-toolchain-test-version>openjdk-1.8.0</jdk-toolchain-test-version>
 			</properties>
 		</profile>
 		<!-- DEV-INSTALL -->
 		<profile>
 			<id>dev-install</id>
+			<properties>
+				<jdk-toolchain-source-version>openjdk-1.8.0</jdk-toolchain-source-version>
+			</properties>
 			<repositories>
 				<!-- dev-repo contains: development builds -->
 				<repository>
@@ -152,7 +154,7 @@
 						<configuration>
 							<toolchains>
 								<jdk>
-									<version>openjdk-1.8.0</version>
+								<version>${toolchain-jdk-source-version}</version>
 								</jdk>
 							</toolchains>
 						</configuration>
@@ -382,6 +384,16 @@
 						<source>${java-source-version}</source>
 						<target>${java-target-version}</target>
 					</configuration>
+					<executions>
+						<execution>
+							<id>source-compile</id>
+							<configuration>
+								<jdkToolchain>
+									<version>${toolchain-jdk-source-version}</version>
+								</jdkToolchain>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>

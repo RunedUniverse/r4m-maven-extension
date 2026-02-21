@@ -3,24 +3,29 @@ def evalValue(expression, path) {
 		script: "mvn-dev -P ${ env.REPOS } org.apache.maven.plugins:maven-help-plugin:evaluate -Dexpression=${ expression } -q -DforceStdout -pl=${ path } | tail -1")
 }
 
-def installArtifact(mod) {
+def getToolchainId(mod) {
+	return 'toolchain-openjdk-1-8-0';
+}
+
+def installArtifact(mod, parent = null) {
 	if(!mod.active()) {
 		skipStage()
 		return
 	}
+	def relPath = (parent == null ? '.' : mod.relPathFrom(parent))
 	// get module metadata
-	def groupId = evalValue('project.groupId', mod.relPathFrom('r4m-parent'))
-	def artifactId = evalValue('project.artifactId', mod.relPathFrom('r4m-parent'))
-	def version = evalValue('project.version', mod.relPathFrom('r4m-parent'))
+	def groupId = evalValue('project.groupId', relPath)
+	def artifactId = evalValue('project.artifactId', relPath)
+	def version = evalValue('project.version', relPath)
 	echo "Building: ${ groupId }:${ artifactId }:${ version }"
 	try {
-		sh "mvn-dev -P ${ REPOS },toolchain-openjdk-1-8-0,install -pl=${ mod.relPathFrom('r4m-parent') }"
+		sh "mvn-dev -P ${ REPOS },${ getToolchainId(mod) },install -pl=${ relPath }"
 	} finally {
-		def baseName="${ artifactId }-${ version }"
+		def baseName = "${ artifactId }-${ version }"
+		// create spec .pom in target/ path
+		sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 		// archive artifacts
 		dir(path: "${ mod.path() }/target") {
-			// create spec .pom in target/ path
-			sh "cp -T '${ mod.path() }/pom.xml' '${ mod.path() }/target/${ baseName }.pom'"
 			sh 'ls -l'
 			archiveArtifacts artifacts: "${ baseName }.pom", fingerprint: true
 			if(mod.hasTag('pack-jar')) {
@@ -69,13 +74,14 @@ node( label: 'linux' ) {
 			sh "mkdir -p ${ RESULT_PATH }"
 			sh "mkdir -p ${ ARCHIVE_PATH }"
 			
-			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'pack-pom', 'parent'     ]
-			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'pack-pom', 'src', 'bom' ]
-			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar', 'src'        ]
-			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar', 'src'        ]
-			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar', 'src'        ]
-			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar'               ]
+			addModule id: 'r4m-parent',         path: '.',                  name: 'R4M Parent',                tags: [ 'parent'      ]
+			addModule id: 'r4m-sources',        path: 'sources',            name: 'R4M Bill of Sources',       tags: [ 'sbom', 'src' ]
+			addModule id: 'r4m-model',          path: 'model',              name: 'R4M Model',                 tags: [ 'pack-jar', 'jdk-1.8.0', 'src' ]
+			addModule id: 'r4m-api',            path: 'api',                name: 'R4M API',                   tags: [ 'pack-jar', 'jdk-1.8.0', 'src' ]
+			addModule id: 'r4m-model-builder',  path: 'model-builder',      name: 'R4M Model Builder',         tags: [ 'pack-jar', 'jdk-1.8.0', 'src' ]
+			addModule id: 'r4m-extension',      path: 'extension',          name: 'R4M Extension',             tags: [ 'pack-jar', 'jdk-1.8.0'        ]
 		}
+		def parentMod = getModule(id: 'r4m-parent');
 
 		stage('Init Modules') {
 			sshagent (credentials: ['RunedUniverse-Jenkins']) {
@@ -101,12 +107,18 @@ node( label: 'linux' ) {
 		}
 
 		stage('Update Maven Repo') {
-			if(checkAllModules(match: 'all', active: false)) {
-				skipStage()
-				return
-			}
+			echo 'purging local maven repository'
 			sh "mvn-dev -P ${ REPOS } dependency:purge-local-repository -DactTransitively=false -DreResolve=false"
-			sh "mvn-dev -P ${ REPOS },install,validate dependency:go-offline -U --fail-never"
+
+			echo 'caching validation dependencies'
+			sh "mvn-dev -P ${ REPOS },validate dependency:resolve-plugins dependency:resolve -U --fail-never"
+
+			if(checkAllModules(match: 'all', active: false)) {
+				echo 'skipping build dependency download » unused'
+			} else {
+				echo 'caching build dependencies'
+				sh "mvn-dev -P ${ REPOS },install dependency:resolve -U --fail-never"
+			}
 		}
 
 		stage('Code Validation') {
@@ -115,23 +127,23 @@ node( label: 'linux' ) {
 
 		bundleContext {
 			stage('Install R4M Parent') {
-				installArtifact( getModule(id: 'r4m-parent') );
+				installArtifact( parentMod );
 			}
 			stage('Install R4M Bill of Sources') {
-				installArtifact( getModule(id: 'r4m-sources') );
+				installArtifact( getModule(id: 'r4m-sources'), parentMod );
 			}
 
 			stage('Install R4M Model') {
-				installArtifact( getModule(id: 'r4m-model') );
+				installArtifact( getModule(id: 'r4m-model'), parentMod );
 			}
 			stage('Install R4M API') {
-				installArtifact( getModule(id: 'r4m-api') );
+				installArtifact( getModule(id: 'r4m-api'), parentMod );
 			}
 			stage('Install R4M Model Builder') {
-				installArtifact( getModule(id: 'r4m-model-builder') );
+				installArtifact( getModule(id: 'r4m-model-builder'), parentMod );
 			}
 			stage('Install R4M Extension') {
-				installArtifact( getModule(id: 'r4m-extension') );
+				installArtifact( getModule(id: 'r4m-extension'), parentMod );
 			}
 
 			// System Packages are on hold see the GitHub Issue:
@@ -202,7 +214,7 @@ node( label: 'linux' ) {
 				}
 			}
 
-			stage('Deploy to Dev-Repo') {
+			stage('Deploy') {
 				perModule {
 					def mod = getModule();
 					if(!mod.active()) {
@@ -212,54 +224,33 @@ node( label: 'linux' ) {
 					// bundle info
 					bundleInfo( bundle: mod.id(), metadata: true )
 					// deploy to development repo
-					deployArtifacts( bundle: mod.id(), repo: 'nexus-runeduniverse>maven-development' )
-					// merge bundles into default
-					bundleMerge( source: mod.id() )
-				}
-			}
-
-			stage('Stage at Maven-Central') {
-				if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.BRANCH_NAME != 'master') {
-					skipStage()
-					return
-				}
-				deployArtifacts( repo: 'maven-central>net.runeduniverse' )
-			}
-
-			stage('Cache to Release Repo') {
-				if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.BRANCH_NAME != 'master') {
-					skipStage()
-					return
-				}
-				perModule {
-					def mod = getModule();
-					if(!mod.active()) {
-						skipStage()
-						return
+					stage('Develop'){
+						deployArtifacts( bundle: mod.id(), repo: 'nexus-runeduniverse>maven-development' )
 					}
 					// deploy to release repo
-					deployArtifacts( bundle: mod.id(), repo: 'nexus-runeduniverse>maven-releases' )
-				}
-			}
-
-			stage('Update SCM') {
-				if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.BRANCH_NAME != 'master') {
-					skipStage()
-					return
-				}
-				sshagent (credentials: ['RunedUniverse-Jenkins']) {
-					perModule {
-						def mod = getModule();
-						if(!mod.active()) {
+					stage('Release') {
+						if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.BRANCH_NAME != 'master') {
 							skipStage()
 							return
 						}
-						def groupId = evalValue('project.groupId', mod.relPathFrom('r4m-parent'))
-						def artifactId = evalValue('project.artifactId', mod.relPathFrom('r4m-parent'))
-						def version = evalValue('project.version', mod.relPathFrom('r4m-parent'))
-						sh "git tag -a ${ mod.id() }/v${ version } -f -m '[artifact] ${ groupId }:${ artifactId }:${ version }'"
-						sh "git push origin ${ mod.id() }/v${ version }"
+						deployArtifacts( bundle: mod.id(), repo: 'nexus-runeduniverse>maven-releases' )
+						def groupId = evalValue('project.groupId', mod.relPathFrom(parentMod))
+						def artifactId = evalValue('project.artifactId', mod.relPathFrom(parentMod))
+						def version = evalValue('project.version', mod.relPathFrom(parentMod))
+						sshagent (credentials: ['RunedUniverse-Jenkins']) {
+							sh "git tag -a ${ mod.id() }/v${ version } -f -m '[artifact] ${ groupId }:${ artifactId }:${ version }'"
+							sh "git push origin ${ mod.id() }/v${ version }"
+						}
 					}
+					// merge bundles into default
+					bundleMerge( source: mod.id() )
+				}
+				stage('Stage at Maven-Central') {
+					if(currentBuild.resultIsWorseOrEqualTo('UNSTABLE') || env.BRANCH_NAME != 'master') {
+						skipStage()
+						return
+					}
+					deployArtifacts( repo: 'maven-central>net.runeduniverse' )
 				}
 			}
 		}

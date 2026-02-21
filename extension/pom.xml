@@ -282,7 +282,7 @@
 						========================================================== -->
 					<!-- we have to use the javadoc notation because the           -->
 					<!-- annotations uses static enums, which for example          -->
-					<!-- restrict forking other non-default lifecyles!             -->
+					<!-- restrict forking other non-default lifecycles!             -->
 					<!--
 						https://maven.apache.org/plugin-tools/maven-plugin-tools-java/index.html -->
 					<!--

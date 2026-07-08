@@ -98,7 +98,7 @@
 		<plexus-component-version>1.7.1</plexus-component-version>
 		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
 		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
-		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>
+		<plugin-maven-resources-version>3.5.0</plugin-maven-resources-version>
 		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
 		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
 		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
@@ -146,7 +146,7 @@
 		</profile>
 		<!-- PIPELINE -->
 		<profile>
-			<id>install</id>
+			<id>ci-install</id>
 			<build>
 				<defaultGoal>clean install</defaultGoal>
 				<plugins>
@@ -192,7 +192,7 @@
 			</repositories>
 		</profile>
 		<profile>
-			<!-- dev-repo contains: build-helper-java & development builds -->
+			<!-- dev-repo contains: development builds -->
 			<id>repo-development</id>
 			<repositories>
 				<repository>
@@ -205,7 +205,7 @@
 		</profile>
 		<!-- LICENSES -->
 		<profile>
-			<id>validate</id>
+			<id>ci-validate</id>
 			<build>
 				<defaultGoal>license:check formatter:validate</defaultGoal>
 				<plugins>
@@ -405,11 +405,11 @@
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>${plugin-maven-dependency-version}</version>
 				</plugin>
-				<plugin>
+				<!--<plugin>
 					<groupId>de.dentrassi.maven</groupId>
 					<artifactId>rpm</artifactId>
 					<version>${plugin-dentrassi-rpm-version}</version>
-				</plugin>
+				</plugin>-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>

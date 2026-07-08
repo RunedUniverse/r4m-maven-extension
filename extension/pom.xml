@@ -197,7 +197,7 @@
 	<profiles>
 		<!-- PIPELINE -->
 		<profile>
-			<id>install</id>
+			<id>ci-install</id>
 			<build>
 				<defaultGoal>clean install</defaultGoal>
 				<plugins>

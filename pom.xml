@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
@@ -82,9 +82,11 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<root-dir>${basedir}</root-dir>
+		<!-- sources -->
+		<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
 		<java-source-version>1.8</java-source-version>
 		<java-target-version>${java-source-version}</java-target-version>
-		<root-dir>${basedir}</root-dir>
 		<!-- VERSIONS -->
 		<major-version>1</major-version>
 		<minor-version>1</minor-version>
@@ -96,7 +98,7 @@
 		<plexus-component-version>1.7.1</plexus-component-version>
 		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
 		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
-		<plugin-maven-resources-version>3.3.1</plugin-maven-resources-version>
+		<plugin-maven-resources-version>3.5.0</plugin-maven-resources-version>
 		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
 		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
 		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
@@ -110,8 +112,19 @@
 	</properties>
 
 	<profiles>
+		<!-- TOOLCHAINS -->
+		<profile>
+			<id>toolchain-openjdk-1-8-0</id>
+			<properties>
+				<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
+			</properties>
+		</profile>
+		<!-- DEV-INSTALL -->
 		<profile>
 			<id>dev-install</id>
+			<properties>
+				<toolchain-jdk-source-version>openjdk-1.8.0</toolchain-jdk-source-version>
+			</properties>
 			<repositories>
 				<!-- dev-repo contains: development builds -->
 				<repository>
@@ -133,20 +146,13 @@
 		</profile>
 		<!-- PIPELINE -->
 		<profile>
-			<id>install</id>
+			<id>ci-install</id>
 			<build>
 				<defaultGoal>clean install</defaultGoal>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-toolchains-plugin</artifactId>
-						<configuration>
-							<toolchains>
-								<jdk>
-									<version>openjdk-1.8.0</version>
-								</jdk>
-							</toolchains>
-						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
@@ -180,24 +186,26 @@
 				<repository>
 					<id>runeduniverse-releases</id>
 					<url>
-						https://nexus.runeduniverse.net/repository/maven-releases/</url>
+						https://nexus.runeduniverse.net/repository/maven-releases/
+					</url>
 				</repository>
 			</repositories>
 		</profile>
 		<profile>
-			<!-- dev-repo contains: build-helper-java & development builds -->
+			<!-- dev-repo contains: development builds -->
 			<id>repo-development</id>
 			<repositories>
 				<repository>
 					<id>runeduniverse-development</id>
 					<url>
-						https://nexus.runeduniverse.net/repository/maven-development/</url>
+						https://nexus.runeduniverse.net/repository/maven-development/
+					</url>
 				</repository>
 			</repositories>
 		</profile>
 		<!-- LICENSES -->
 		<profile>
-			<id>validate</id>
+			<id>ci-validate</id>
 			<build>
 				<defaultGoal>license:check formatter:validate</defaultGoal>
 				<plugins>
@@ -300,7 +308,7 @@
 					<configuration>
 						<toolchains>
 							<jdk>
-								<version>openjdk-1.8.0</version>
+								<version>${toolchain-jdk-source-version}</version>
 							</jdk>
 						</toolchains>
 					</configuration>
@@ -371,6 +379,16 @@
 						<source>${java-source-version}</source>
 						<target>${java-target-version}</target>
 					</configuration>
+					<executions>
+						<execution>
+							<id>source-compile</id>
+							<configuration>
+								<jdkToolchain>
+									<version>${toolchain-jdk-source-version}</version>
+								</jdkToolchain>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -387,11 +405,11 @@
 					<artifactId>maven-dependency-plugin</artifactId>
 					<version>${plugin-maven-dependency-version}</version>
 				</plugin>
-				<plugin>
+				<!--<plugin>
 					<groupId>de.dentrassi.maven</groupId>
 					<artifactId>rpm</artifactId>
 					<version>${plugin-dentrassi-rpm-version}</version>
-				</plugin>
+				</plugin>-->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>

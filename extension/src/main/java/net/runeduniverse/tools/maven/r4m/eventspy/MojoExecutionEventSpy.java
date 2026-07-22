@@ -24,7 +24,6 @@ import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.logging.Logger;
 
 import net.runeduniverse.tools.maven.r4m.R4MProperties;
-import net.runeduniverse.tools.maven.r4m.api.Runes4MavenProperties;
 import net.runeduniverse.tools.maven.r4m.lifecycle.api.MojoExecutionData;
 import net.runeduniverse.tools.maven.r4m.pem.model.Fork;
 

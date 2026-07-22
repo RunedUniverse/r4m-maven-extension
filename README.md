@@ -1,7 +1,7 @@
 # Runes4Maven (r4m) Maven Extension
 
 [![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven?label=License)](LICENSE)
-[![Maven Central](https://img.shields.io/maven-central/v/net.runeduniverse.tools.maven.r4m/r4m-maven-extension?label=Maven%20Central)](https://search.maven.org/search?q=g:%22net.runeduniverse.tools.maven.r4m%22%20AND%20a:%22r4m-maven-extension%22)
+[![MvnRepository](https://badges.mvnrepository.com/badge/net.runeduniverse.tools.maven.r4m/r4m-maven-extension/badge.svg?label=MvnRepository)](https://mvnrepository.com/artifact/net.runeduniverse.tools.maven.r4m/r4m-maven-extension)
 
 Runes4Maven (r4m) Maven Extension enables you to specify how Maven builds your project!
 
@@ -39,7 +39,7 @@ This is accomplished by providing a better way for defining maven executions and
 - Provides goals to dump the current configuration (in case you want to redefine everything, so you don't need to start from scratch)
 - Provides debug goals
 - Configurations (`pem.xml` & `grm.xml`) are loaded from all active plugins therefore Workflow Plugins can be used for easier project setup
-  - RunedUniverse provides example Workflow Plugins for use with [Jenkins-Plugins](https://github.com/RunedUniverse/maven-jenkins-workflow), [Spring Projects](https://github.com/RunedUniverse/maven-spring-workflow) and normal Java Projects.
+  - RunedUniverse provides example Workflow Plugins for use with [Jenkins-Plugins](https://github.com/RunedUniverse/maven-jenkins-workflow), [Spring Projects](https://github.com/RunedUniverse/maven-spring-workflow) and normal [Java Projects](https://github.com/RunedUniverse/maven-java-workflow).
 - Provides Configuration options for Runes4Maven Features (see [Properties](#properties))
 - Built to be extendable by other Maven Core-Extensions
 
@@ -70,7 +70,7 @@ mvn net.runeduniverse.tools.maven.r4m:r4m-maven-extension:setup
     <extension>
         <groupId>net.runeduniverse.tools.maven.r4m</groupId>
         <artifactId>r4m-maven-extension</artifactId>
-        <version>1.1.0</version>
+        <version>1.1.2</version>
     </extension>
 </extensions>
 ```

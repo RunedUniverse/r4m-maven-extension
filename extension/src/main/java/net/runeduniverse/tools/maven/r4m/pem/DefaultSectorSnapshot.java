@@ -25,8 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Function;
-
 import org.apache.maven.project.MavenProject;
 
 import net.runeduniverse.lib.utils.common.LinkedHashDataMap;

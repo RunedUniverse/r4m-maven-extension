@@ -1,0 +1,25 @@
+#!/usr/bin/sh
+
+set -e
+
+if [ $# -lt 2 ] || [ $# -gt 3 ]; then
+  printf "Usage: %s <property> <new-value> [path]\n" "$0"
+  printf "  path defaults to current directory\n"
+  exit 1
+fi
+
+PROP_NAME="$1"
+NEW_VALUE="$2"
+SEARCH_PATH="${3:-.}"
+
+find "$SEARCH_PATH" \
+  \( -type d -name src -o -type d -name target \) -prune -o \
+  -type f -name pom.xml -print |
+while read -r pom; do
+  sed -i \
+    "s|\(<[[:space:]]*${PROP_NAME}[[:space:]]*>[[:space:]]*\)[^<]*\([[:space:]]*</[[:space:]]*${PROP_NAME}[[:space:]]*>\)|\1${NEW_VALUE}\2|g" \
+    "$pom"
+done
+
+printf "Updated %s to %s under %s\n" "${PROP_NAME}" "${NEW_VALUE}" "${SEARCH_PATH}"
+

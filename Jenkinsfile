@@ -87,7 +87,7 @@ node( label: 'linux' ) {
 		tool(name: 'maven-latest', type: 'maven')
 
 		stage('Checkout SCM') {
-			checkout2(scm)
+			checkout(scm)
 		}
 
 		sh 'chmod +x $WORKSPACE/.build/*'

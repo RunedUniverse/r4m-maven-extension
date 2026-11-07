@@ -175,15 +175,6 @@ bundleContext {
 					installArtifact( getModule(id: 'r4m-extension'), parentMod );
 				}
 
-				stage('Install Maven Parent') {
-					installArtifact( parentMod );
-				}
-				stage('Install - BOMs') {
-					perModule(withTagIn: [ 'bom' ]) {
-						installArtifact( getModule(), parentMod );
-					}
-				}
-
 				stage('Code Validation') {
 					// note: bugged maven artifact resolve requires all modules to be locally installed before license verification
 					sh "mvn -P ${ REPOS },ci-validate --fail-at-end -T1C"

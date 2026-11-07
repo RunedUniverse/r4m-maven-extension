@@ -30,12 +30,6 @@
 			<url>${env.MVN_PROXY_central_URL}</url>
 		</mirror>
 		<mirror>
-			<id>rnet-releases-mirror</id>
-			<mirrorOf>runeduniverse-releases</mirrorOf>
-			<name>Local Mirror: rnet-releases</name>
-			<url>${env.MVN_PROXY_rnet_releases_URL}</url>
-		</mirror>
-		<mirror>
 			<id>rnet-development-mirror</id>
 			<mirrorOf>runeduniverse-development</mirrorOf>
 			<name>Local Mirror: rnet-development</name>

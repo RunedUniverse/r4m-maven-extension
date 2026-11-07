@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import org.apache.maven.execution.MavenSession;
@@ -410,9 +411,10 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 		}
 
 		for (Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
+			final String phase = entry.getKey();
 			final List<MojoExecution> executions = entry.getValue();
 			final Map<EntityView, MojoExecution> proxyMap = new LinkedHashMap<>();
-			final RuntimeView runtimeView = this.grmViewFactory.createRuntimeView(pemSelectorConfig, entry.getKey());
+			final RuntimeView runtimeView = this.grmViewFactory.createRuntimeView(pemSelectorConfig, phase);
 
 			for (MojoExecution mojoExec : executions) {
 				final GoalView goalView = this.grmViewFactory.createGoalView(mojoExec);
@@ -422,14 +424,21 @@ public class AdvancedLifecycleExecutionPlanCalculator implements LifecycleExecut
 			final List<EntityView> entityList = new LinkedList<>();
 			entityList.addAll(proxyMap.keySet());
 
-			if (0 < debug) {
-				this.log.debug("Reduced GRM Celection Dump");
+			if (1 < entityList.size() && 0 < debug) {
+				this.log.debug("Reduced GRM Selection Dump");
 				this.log.debug(selection.clone()
 						.filterByApplicableData(entityList)
 						.toString());
 			}
 
 			entityList.sort(comparator);
+
+			if (0 < debug) {
+				this.log.debug("Goals of Phase (" + phase + ") in Execution Oder -> " + entityList.stream()
+						.map(EntityView::getGoal)
+						.map(gv -> gv.getGroupId() + ':' + gv.getArtifactId() + ':' + gv.getGoalId())
+						.collect(Collectors.joining(", ", "[", "]")));
+			}
 
 			executions.clear();
 			for (EntityView entity : entityList) {

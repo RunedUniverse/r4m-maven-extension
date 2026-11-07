@@ -23,11 +23,11 @@
 	<parent>
 		<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 		<artifactId>r4m-parent</artifactId>
-		<version>1.1.1</version>
+		<version>1.1.2</version>
 	</parent>
 
 	<artifactId>r4m-bom-sources</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Bill of Sources</name>
@@ -44,7 +44,7 @@
 		<apache-commons-lang3-version>3.8.1</apache-commons-lang3-version>
 		<apache-commons-io-version>2.6</apache-commons-io-version>
 		<!-- ARTIFACT VERSIONS - BOMs -->
-		<runeduniverse-utils-bom-version>2.0.1</runeduniverse-utils-bom-version>
+		<runeduniverse-utils-bom-version>2.0.2</runeduniverse-utils-bom-version>
 	</properties>
 
 
@@ -123,15 +123,22 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
-			<!-- COMPILER -->
-			<!-- dependency for plexus annotation -->
-			<dependency>
-				<groupId>org.codehaus.plexus</groupId>
-				<artifactId>plexus-component-annotations</artifactId>
-				<version>${plexus-component-version}</version>
-				<scope>provided</scope>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<configuration combine.children="append">
+					<flattenMode>bom</flattenMode>
+					<pomElements>
+						<properties>remove</properties>
+						<dependencyManagement>interpolate</dependencyManagement>
+					</pomElements>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

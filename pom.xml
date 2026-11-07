@@ -22,7 +22,7 @@
 
 	<groupId>net.runeduniverse.tools.maven.r4m</groupId>
 	<artifactId>r4m-parent</artifactId>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<packaging>pom</packaging>
 
 	<name>Runes4Maven Parent</name>
@@ -99,13 +99,14 @@
 		<plugin-maven-clean-version>3.4.1</plugin-maven-clean-version>
 		<plugin-maven-toolchains-version>3.2.0</plugin-maven-toolchains-version>
 		<plugin-maven-resources-version>3.5.0</plugin-maven-resources-version>
+		<plugin-codehaus-flatten-version>1.7.3</plugin-codehaus-flatten-version>
 		<plugin-maven-compiler-version>3.14.0</plugin-maven-compiler-version>
 		<plugin-maven-jar-version>3.4.2</plugin-maven-jar-version>
 		<plugin-maven-source-version>3.3.1</plugin-maven-source-version>
 		<plugin-maven-javadoc-version>3.11.2</plugin-maven-javadoc-version>
 		<plugin-maven-install-version>3.1.4</plugin-maven-install-version>
 		<plugin-revelc-formatter-version>2.25.0</plugin-revelc-formatter-version>
-		<plugin-mycila-license-version>4.6</plugin-mycila-license-version>
+		<plugin-mycila-license-version>5.1.2</plugin-mycila-license-version>
 		<!-- ARTIFACT VERSIONS - PACKAGER -->
 		<plugin-maven-dependency-version>3.8.1</plugin-maven-dependency-version>
 		<plugin-dentrassi-rpm-version>1.13.0</plugin-dentrassi-rpm-version>
@@ -260,8 +261,20 @@
 				</plugins>
 			</build>
 		</profile>
-
 	</profiles>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- COMPILER -->
+			<!-- dependency for plexus annotation -->
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-component-annotations</artifactId>
+				<version>${plexus-component-version}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<resources>
@@ -359,12 +372,46 @@
 						<dependencyExceptionMessage>1 or more dependencies got
 							rejected doe to invalid licenses! Contact the
 							Maintainer for a solution!</dependencyExceptionMessage>
+						<dependencyScopes>
+							<dependencyScope>import</dependencyScope>
+							<dependencyScope>compile</dependencyScope>
+							<!--<dependencyScope>runtime</dependencyScope>-->
+							<dependencyScope>system</dependencyScope>
+							<dependencyScope>test</dependencyScope>
+						</dependencyScopes>
 					</configuration>
 				</plugin>
 				<plugin>
 					<!-- don't add groupId here it bricks inherited version -->
 					<artifactId>maven-plugin-plugin</artifactId>
 					<version>${maven-plugin-plugin-version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>${plugin-codehaus-flatten-version}</version>
+					<executions>
+						<execution>
+							<id>default-clean</id>
+							<goals>
+								<goal>clean</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>default-flatten</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>flatten</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<outputDirectory>${project.build.directory}</outputDirectory>
+						<flattenedPomFilename>
+							${project.artifactId}-${project.version}.pom
+						</flattenedPomFilename>
+						<updatePomFile>true</updatePomFile>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.plexus</groupId>
